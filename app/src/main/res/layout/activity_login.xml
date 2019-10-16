@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.LoginActivity">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivLogo"
+                    android:layout_width="@dimen/_130sdp"
+                    android:layout_height="@dimen/_130sdp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_30sdp"
+                    android:background="@drawable/kalam_circle" />
+
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="@dimen/_274sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_below="@+id/ivLogo"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_30sdp"
+                    android:background="@drawable/box_theme_outine"
+                    android:fontFamily="@font/halvatic_light"
+                    android:gravity="center"
+                    android:hint="@string/phone_username"
+                    android:textSize="@dimen/_13sdp" />
+
+                <RelativeLayout
+                    android:id="@+id/rlPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/etUsername"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_5sdp">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etPass"
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/box_theme_outine"
+                        android:fontFamily="@font/halvatic_light"
+                        android:gravity="center"
+                        android:hint="@string/password"
+                        android:inputType="textPassword"
+                        android:padding="@dimen/_10sdp"
+                        android:paddingRight="@dimen/_13sdp"
+                        android:textSize="@dimen/_13sdp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/hidePassword"
+                        android:layout_width="@dimen/_23sdp"
+                        android:layout_height="@dimen/_18sdp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/_35sdp"
+                        android:background="@drawable/hide_eye_icon" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/llForgotPass"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/rlPassword"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginEnd="@dimen/_22sdp"
+                    android:layout_marginRight="@dimen/_22sdp"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvResendCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/halvatic_light"
+                        android:text="@string/forget_pass"
+                        android:textColor="@color/theme_color"
+                        android:textSize="@dimen/_12sdp" />
+
+                    <View
+                        android:id="@+id/view"
+                        android:layout_width="@dimen/_95sdp"
+                        android:layout_height="0.5dp"
+                        android:background="@color/theme_color" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTermsPolicy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/llForgotPass"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_40sdp"
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="@string/tap_login"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLogin"
+                    android:layout_width="@dimen/_274sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_below="@id/tvTermsPolicy"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_30sdp"
+                    android:background="@drawable/theme_button"
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="@string/login"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_17sdp" />
+
+                <View
+                    android:id="@+id/or_bar"
+                    android:layout_width="@dimen/_110sdp"
+                    android:layout_height="@dimen/_5sdp"
+                    android:layout_below="@id/btnLogin"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:background="@drawable/or_bar" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLoginWorlNoor"
+                    android:layout_width="@dimen/_204sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_below="@id/or_bar"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:background="@drawable/theme_button"
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="@string/login_world_noor"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12sdp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSignUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnLoginWorlNoor"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginBottom="@dimen/_20sdp"
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="@string/signup"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_13sdp" />
+            </RelativeLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

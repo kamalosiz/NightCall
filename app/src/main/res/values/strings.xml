@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Kalam</string>
+    <string name="hello_dagger">Hello Dagger</string>
+    <string name="welcome_to_kalam">Welcome to Kalam</string>
+    <string name="select_country_code">Please select your country code and \n enter your phone number</string>
+    <string name="enter_phone">Enter your phone number</string>
+    <string name="next">Next</string>
+    <string name="finished">Finished</string>
+    <string name="verify">Verify me</string>
+    <string name="resend_code">Resend Code</string>
+    <string name="update_profile">Upload your profile</string>
+    <string name="six_digit_code">Please enter the six digit code</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="username">Username</string>
+    <string name="email_address">Email address</string>
+    <string name="welcome">Welcome Ali \n Have a start your Kalam</string>
+    <string name="phone_username">Phone number or Username</string>
+    <string name="password">Password</string>
+    <string name="forget_pass">Forgot Password?</string>
+    <string name="tap_login">Tap \"Login\" to accept the Kalam Terms of \n Services and Privacy Policy.</string>
+    <string name="kalam_terms">Kalam Terms of \n Services and Privacy Policy.</string>
+    <string name="login">Login</string>
+    <string name="signup">Don\'t have an account SignUp</string>
+    <string name="signup_sub">SignUp</string>
+    <string name="login_world_noor">Login with World Noor</string>
+    <string name="world_noor">World Noor</string>
+</resources>
