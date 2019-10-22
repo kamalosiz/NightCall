@@ -44,6 +44,8 @@
         <activity
             android:name=".view.MainActivity"
             android:screenOrientation="portrait" />
+
+        <!--Transparent Permission Activity-->
         <activity
             android:name=".util.permissionHelper.PermissionsActivity"
             android:launchMode="singleInstance"

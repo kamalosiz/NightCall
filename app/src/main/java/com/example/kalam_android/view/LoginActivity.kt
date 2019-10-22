@@ -1,6 +1,7 @@
 package com.example.kalam_android.view
 
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
@@ -20,8 +21,9 @@ import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityLoginBinding
-import com.example.kalam_android.util.D
+import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.toast
+import javax.inject.Inject
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
 
@@ -125,6 +127,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun logE(message: String) {
-        D.e(TAG, message)
+        Debugger.e(TAG, message)
     }
 }

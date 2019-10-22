@@ -7,11 +7,14 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ActivityVerifyCodeBinding
+import com.example.kalam_android.util.AppConstants
+import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.toast
 
 class VerifyCodeActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var binding: ActivityVerifyCodeBinding
+    val code = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +22,10 @@ class VerifyCodeActivity : AppCompatActivity(), View.OnClickListener {
         binding.btnBack.setOnClickListener(this)
         binding.btnVerify.setOnClickListener(this)
         binding.tvResendCode.setOnClickListener(this)
+        //For Testing
+//        Debugger.e("VerifyCodeActivity", intent.getStringExtra(AppConstants.VERIFICATION_CODE))
 
+        binding.etCode.setText(intent.getIntExtra(AppConstants.VERIFICATION_CODE, 0).toString())
     }
 
     override fun onClick(v: View?) {

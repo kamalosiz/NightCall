@@ -8,7 +8,7 @@ import com.example.kalam_android.util.permissionHelper.listeners.MediaPermission
 import java.util.*
 
 class PermissionHelper(permissionBuilder: PermissionBuilder) : MediaPermissionListener {
-    private val TAG = "PermissionHelper"
+//    private val TAG = "PermissionHelper"
     private var mediaPermissionListener: MediaPermissionListener? = null
     private val permissionsList: ArrayList<String>?
     var context: Context? = null
@@ -42,20 +42,20 @@ class PermissionHelper(permissionBuilder: PermissionBuilder) : MediaPermissionLi
             this.permissionsList = ArrayList()
         }
 
-        fun with(context: Context): PermissionBuilder {
+        /*fun with(context: Context): PermissionBuilder {
             this.context = context
             this.permissionsList = ArrayList()
             return this
-        }
+        }*/
 
-        fun addPermission(permission: String): PermissionBuilder {
+        /*fun addPermission(permission: String): PermissionBuilder {
             if (permissionsList == null) {
                 permissionsList = ArrayList()
             }
 //            permissionsList!!.add(permission)
             permissionsList?.add(permission)
             return this
-        }
+        }*/
 
         fun addPermissions(vararg permission: String): PermissionBuilder {
             if (permissionsList == null) {
@@ -80,8 +80,8 @@ class PermissionHelper(permissionBuilder: PermissionBuilder) : MediaPermissionLi
             return PermissionBuilder(context)
         }
 
-        fun showAlert(context: Context) {
+        /*fun showAlert(context: Context) {
             Toast.makeText(context, "Please Allow Permissions to proceed.", Toast.LENGTH_SHORT).show()
-        }
+        }*/
     }
 }

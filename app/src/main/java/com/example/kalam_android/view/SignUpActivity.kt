@@ -3,18 +3,22 @@ package com.example.kalam_android.view
 import android.content.Intent
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivitySignUpBinding
-import com.example.kalam_android.repository.model.LoginResponse
+import com.example.kalam_android.repository.model.SignUpResponse
 import com.example.kalam_android.repository.net.ApiResponse
-import com.example.kalam_android.repository.net.Status
-import com.example.kalam_android.util.D
+import com.example.kalam_android.repository.net.Status.*
+import com.example.kalam_android.util.AppConstants
+import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.viewmodel.SignUpViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.ybs.countrypicker.CountryPicker
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 
@@ -25,47 +29,45 @@ class SignUpActivity : BaseActivity() {
     private lateinit var viewModel: SignUpViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+    @Inject
+    lateinit var sharedPrefsHelper: SharedPrefsHelper
+    var phone = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
         MyApplication.getAppComponent(this).doInjection(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SignUpViewModel::class.java)
-        binding.tvCountry.setOnClickListener {
-            val picker = CountryPicker.newInstance("Select Country")
-            picker.setListener { name, code, dialCode, flagID ->
-                binding.tvCountry.text = name
-                binding.tvDialCode.text = dialCode
-                picker.dismiss()
-            }
-            picker.show(supportFragmentManager, "COUNTRY_PICKER")
-        }
-        binding.btnNext.setOnClickListener {
-            startActivity(Intent(this, VerifyCodeActivity::class.java))
-//            hitLogin()
-        }
-
-        /*viewModel.loginResponse().observe(this, Observer {
+        binding.tvCountry.setOnClickListener { pickerDialoge() }
+        binding.btnNext.setOnClickListener { hitSignUp() }
+        viewModel.signupResponse().observe(this, Observer<ApiResponse<SignUpResponse>> {
             consumeResponse(it)
-        })*/
+        })
     }
 
-    private fun consumeResponse(apiResponse: ApiResponse<LoginResponse>?) {
-        D.e(TAG, "consumeResponse")
+    private fun pickerDialoge() {
+        val picker = CountryPicker.newInstance("Select Country")
+        picker.setListener { name, code, dialCode, flagID ->
+            binding.tvCountry.text = name
+            binding.tvDialCode.text = dialCode
+            picker.dismiss()
+        }
+        picker.show(supportFragmentManager, "COUNTRY_PICKER")
+    }
+
+    private fun consumeResponse(apiResponse: ApiResponse<SignUpResponse>?) {
         when (apiResponse?.status) {
 
-            Status.LOADING -> {
+            LOADING -> {
+                showProgressDialog(this@SignUpActivity)
             }
-            Status.SUCCESS -> {
-//                hideProgressDialog()
-                logE("consumeResponse SUCCESS")
-//                binding.pbSignIn.visibility = View.GONE
-//                renderSuccessResponse(apiResponse.data as SigninResponse)
+            SUCCESS -> {
+                hideProgressDialog()
+                renderResponse(apiResponse.data as SignUpResponse)
+                logE("consumeResponse SUCCESS : ${apiResponse.data}")
             }
-            Status.ERROR -> {
-                /* hideProgressDialog()
-                 binding.pbSignIn.visibility = View.GONE
-                 toast(getString(R.string.errorString))*/
+            ERROR -> {
+                hideProgressDialog()
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
             }
             else -> {
@@ -73,18 +75,30 @@ class SignUpActivity : BaseActivity() {
         }
     }
 
-    private fun hitLogin() {
-        D.d(TAG, "Login Email: " + viewModel.email)
-        D.d(TAG, "Login Password: " + viewModel.password)
+    private fun renderResponse(response: SignUpResponse?) {
+        logE("response: $response")
+        response?.let {
+            logE(it.toString())
+            if (response.status) {
+                logE("status true: ${it.data?.verification_code}")
+                sharedPrefsHelper.savePhoneNo(phone)
+                val intent = Intent(this@SignUpActivity, VerifyCodeActivity::class.java)
+                intent.putExtra(AppConstants.VERIFICATION_CODE, it.data?.verification_code)
+                startActivity(intent)
+                finish()
+            }
+        }
+    }
 
+    private fun hitSignUp() {
+        phone = StringBuilder(binding.tvDialCode.text).append(binding.etNumber.text.toString())
+            .toString()
         val params = HashMap<String, String>()
-        params["email"] = viewModel.email
-        params["password"] = viewModel.password
-
-        viewModel.hitLoginApi(params)
+        params["number"] = phone
+        viewModel.hitSignUpApi(params)
     }
 
     private fun logE(message: String) {
-        D.e(TAG, message)
+        Debugger.e(TAG, message)
     }
 }

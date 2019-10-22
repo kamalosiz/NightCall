@@ -3,7 +3,7 @@ package com.example.kalam_android.di.modules
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.repository.net.ApiCallInterface
 import com.example.kalam_android.repository.net.Urls
-import com.example.kalam_android.util.D
+import com.example.kalam_android.util.Debugger
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -28,7 +28,7 @@ object UtilsModule {
             val interceptor = HttpLoggingInterceptor()
 
             interceptor.level =
-                if (D.IS_DEVELOPMENT_MODE) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+                if (Debugger.IS_DEVELOPMENT_MODE) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
             return interceptor
         }
 

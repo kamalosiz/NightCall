@@ -2,13 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-        <variable
-            name="signUpClass"
-            type="com.example.kalam_android.view.SignUpActivity" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -47,7 +40,7 @@
             android:drawableEnd="@drawable/down_arrow"
             android:drawableRight="@drawable/down_arrow"
             android:fontFamily="@font/halvatic_light"
-            android:hint="Pakistan"
+            android:hint="Select Country"
             android:padding="@dimen/_10sdp"
             android:paddingRight="@dimen/_13sdp"
             android:textSize="@dimen/_13sdp"
@@ -73,7 +66,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/halvatic_light"
             android:gravity="center"
-            android:hint="+92"
+            android:hint="+00"
             android:textSize="@dimen/_13sdp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/appCompatTextView2"
@@ -81,18 +74,18 @@
             app:layout_constraintTop_toTopOf="@+id/appCompatTextView2" />
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/tvNumber"
+            android:id="@+id/etNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_17sdp"
             android:layout_marginLeft="@dimen/_17sdp"
+            android:background="@null"
             android:fontFamily="@font/halvatic_light"
             android:hint="@string/enter_phone"
-            android:textSize="@dimen/_13sdp"
+            android:inputType="number"
             android:maxLength="15"
             android:singleLine="true"
-            android:inputType="number"
-            android:background="@null"
+            android:textSize="@dimen/_13sdp"
             app:layout_constraintBottom_toBottomOf="@+id/appCompatTextView2"
             app:layout_constraintStart_toEndOf="@+id/tvDialCode"
             app:layout_constraintTop_toTopOf="@+id/appCompatTextView2" />

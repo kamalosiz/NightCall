@@ -25,4 +25,5 @@
     <string name="signup_sub">SignUp</string>
     <string name="login_world_noor">Login with World Noor</string>
     <string name="world_noor">World Noor</string>
+    <string name="dialoge_text">Processing, Please wait</string>
 </resources>

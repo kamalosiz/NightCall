@@ -2,9 +2,8 @@ package com.example.kalam_android.util
 
 import android.util.Log
 
-object D {
+object Debugger {
     var IS_DEVELOPMENT_MODE = true
-    val TAG = "com.sports.friends"
 
     fun d(tag: String, msg: String) {
         if (IS_DEVELOPMENT_MODE)
@@ -17,7 +16,8 @@ object D {
     }
 
     fun i(tag: String, msg: String) {
-        if (IS_DEVELOPMENT_MODE) Log.i(tag, msg)
+        if (IS_DEVELOPMENT_MODE)
+            Log.i(tag, msg)
     }
 
     fun v(tag: String, msg: String) {

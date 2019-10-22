@@ -10,7 +10,7 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ActivityCreateProfileBinding
-import com.example.kalam_android.util.D
+import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
 import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
 import com.fxn.pix.Pix
@@ -95,8 +95,8 @@ class CreateProfileActivity : AppCompatActivity(), View.OnClickListener {
             this,
             binding.ivUploadImage,
             profileImagePath ?: "",
-            R.drawable.user_placeholder,
-            R.drawable.user_placeholder
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
         )
         binding.ivCameraUpload.visibility = View.GONE
     }
@@ -112,6 +112,6 @@ class CreateProfileActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun logE(message: String) {
-        D.e(TAG, message)
+        Debugger.e(TAG, message)
     }
 }
