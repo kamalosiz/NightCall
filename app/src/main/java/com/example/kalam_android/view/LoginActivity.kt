@@ -68,7 +68,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 if (SIGN_UP)
                     startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
                 else
-                    toast(this@LoginActivity, "Terms and Policies")
+                    toast("Terms and Policies")
             }
 
             override fun updateDrawState(ds: TextPaint) {

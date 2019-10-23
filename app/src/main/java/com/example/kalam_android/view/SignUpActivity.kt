@@ -12,9 +12,7 @@ import com.example.kalam_android.databinding.ActivitySignUpBinding
 import com.example.kalam_android.repository.model.SignUpResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status.*
-import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.SharedPrefsHelper
+import com.example.kalam_android.util.*
 import com.example.kalam_android.viewmodel.SignUpViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.ybs.countrypicker.CountryPicker
@@ -39,11 +37,13 @@ class SignUpActivity : BaseActivity() {
         MyApplication.getAppComponent(this).doInjection(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SignUpViewModel::class.java)
         binding.tvCountry.setOnClickListener { pickerDialoge() }
+        binding.btnBack.setOnClickListener { finish() }
         binding.btnNext.setOnClickListener { hitSignUp() }
         viewModel.signupResponse().observe(this, Observer<ApiResponse<SignUpResponse>> {
             consumeResponse(it)
         })
     }
+
 
     private fun pickerDialoge() {
         val picker = CountryPicker.newInstance("Select Country")
@@ -79,18 +79,28 @@ class SignUpActivity : BaseActivity() {
         logE("response: $response")
         response?.let {
             logE(it.toString())
-            if (response.status) {
+            if (it.status) {
                 logE("status true: ${it.data?.verification_code}")
                 sharedPrefsHelper.savePhoneNo(phone)
                 val intent = Intent(this@SignUpActivity, VerifyCodeActivity::class.java)
                 intent.putExtra(AppConstants.VERIFICATION_CODE, it.data?.verification_code)
                 startActivity(intent)
                 finish()
+            } else {
+                showAlertDialoge(this, "Error", it.message)
             }
         }
     }
 
     private fun hitSignUp() {
+        if (binding.tvCountry.text.isEmpty()) {
+            toast("Please select your Country")
+            return
+        }
+        if (binding.etNumber.text.toString().isEmpty()) {
+            toast("Please enter your Number")
+            return
+        }
         phone = StringBuilder(binding.tvDialCode.text).append(binding.etNumber.text.toString())
             .toString()
         val params = HashMap<String, String>()

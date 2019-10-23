@@ -21,7 +21,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.CreateProfileActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".view.VerifyCodeActivity"
             android:screenOrientation="portrait" />
@@ -43,15 +44,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.MainActivity"
-            android:screenOrientation="portrait" />
-
-        <!--Transparent Permission Activity-->
+            android:screenOrientation="portrait" /> <!-- Transparent Permission Activity -->
         <activity
             android:name=".util.permissionHelper.PermissionsActivity"
             android:launchMode="singleInstance"
-            android:theme="@style/Dexter.Internal.Theme.Transparent" />
-
-        <!--Just for start if no Sandreas Camera-->
+            android:theme="@style/Dexter.Internal.Theme.Transparent" /> <!-- Just for start if no Sandreas Camera -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"

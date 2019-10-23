@@ -1,5 +1,6 @@
 package com.example.kalam_android.repository
 
+import com.example.kalam_android.repository.model.CreateProfileResponse
 import com.example.kalam_android.repository.model.SignUpResponse
 import com.example.kalam_android.repository.model.VerifyCodeResponse
 import com.example.kalam_android.repository.net.ApiCallInterface
@@ -13,5 +14,9 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
 
     fun executeVerifyCode(parameters: Map<String, String>): Observable<VerifyCodeResponse> {
         return apiCallInterface.verifyCode(parameters)
+    }
+
+    fun createProfile(parameters: Map<String, String>): Observable<CreateProfileResponse> {
+        return apiCallInterface.createProfile(parameters)
     }
 }

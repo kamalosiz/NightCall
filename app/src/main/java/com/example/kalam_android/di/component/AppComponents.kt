@@ -3,8 +3,7 @@ package com.example.kalam_android.di.component
 import com.example.kalam_android.di.modules.AppModule
 import com.example.kalam_android.di.modules.UtilsModule
 import com.example.kalam_android.di.modules.ViewModelsModule
-import com.example.kalam_android.view.LoginActivity
-import com.example.kalam_android.view.SignUpActivity
+import com.example.kalam_android.view.*
 import dagger.Component
 import javax.inject.Singleton
 
@@ -12,6 +11,9 @@ import javax.inject.Singleton
 @Component(modules = [UtilsModule::class, ViewModelsModule::class, AppModule::class])
 interface AppComponents {
 
+    fun doInjection(activity: SplashActivity)
     fun doInjection(activity: LoginActivity)
     fun doInjection(activity: SignUpActivity)
+    fun doInjection(activity: VerifyCodeActivity)
+    fun doInjection(activity: CreateProfileActivity)
 }

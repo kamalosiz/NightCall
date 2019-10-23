@@ -10,7 +10,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class VerifyCodeViewModel @Inject constructor(val repository: Repository) : ViewModel() {
+class VerifyCodeViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
     private val disposable = CompositeDisposable()
     private val responseLiveData = MutableLiveData<ApiResponse<VerifyCodeResponse>>()
 

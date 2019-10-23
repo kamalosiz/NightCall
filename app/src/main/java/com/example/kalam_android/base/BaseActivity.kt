@@ -27,4 +27,5 @@ open class BaseActivity : AppCompatActivity() {
             progressDialog!!.dismiss()
         }
     }
+
 }
