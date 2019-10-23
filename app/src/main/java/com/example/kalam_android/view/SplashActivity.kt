@@ -20,7 +20,7 @@ class SplashActivity : BaseActivity() {
         setContentView(R.layout.activity_splash)
         MyApplication.getAppComponent(this).doInjection(this)
         Handler().postDelayed({
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(Intent(this, ContactListActivity::class.java))
             finish()
         }, 2000)
     }
