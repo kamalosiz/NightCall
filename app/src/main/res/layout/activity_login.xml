@@ -25,7 +25,7 @@
                     android:layout_width="@dimen/_130sdp"
                     android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_35sdp"
                     android:background="@drawable/kalam_circle" />
 
                 <androidx.appcompat.widget.AppCompatEditText
@@ -34,7 +34,7 @@
                     android:layout_height="@dimen/_40sdp"
                     android:layout_below="@+id/ivLogo"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_35sdp"
                     android:background="@drawable/box_theme_outine"
                     android:fontFamily="@font/halvatic_light"
                     android:gravity="center"
@@ -68,9 +68,8 @@
                         android:layout_width="@dimen/_23sdp"
                         android:layout_height="@dimen/_18sdp"
                         android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="@dimen/_35sdp"
+                        android:layout_marginEnd="@dimen/_35sdp"
                         android:background="@drawable/hide_eye_icon" />
                 </RelativeLayout>
 
@@ -108,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/llForgotPass"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_40sdp"
+                    android:layout_marginTop="@dimen/_35sdp"
                     android:fontFamily="@font/halvatic_light"
                     android:text="@string/tap_login"
                     android:textAlignment="center"
@@ -121,7 +120,7 @@
                     android:layout_height="@dimen/_40sdp"
                     android:layout_below="@id/tvTermsPolicy"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_50sdp"
                     android:background="@drawable/theme_button"
                     android:fontFamily="@font/halvatic_light"
                     android:text="@string/login"
@@ -129,37 +128,13 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/_17sdp" />
 
-                <View
-                    android:id="@+id/or_bar"
-                    android:layout_width="@dimen/_110sdp"
-                    android:layout_height="@dimen/_5sdp"
-                    android:layout_below="@id/btnLogin"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_20sdp"
-                    android:background="@drawable/or_bar" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnLoginWorlNoor"
-                    android:layout_width="@dimen/_204sdp"
-                    android:layout_height="@dimen/_40sdp"
-                    android:layout_below="@id/or_bar"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_20sdp"
-                    android:background="@drawable/theme_button"
-                    android:fontFamily="@font/halvatic_light"
-                    android:text="@string/login_world_noor"
-                    android:textAllCaps="false"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_12sdp" />
-
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvSignUp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/btnLoginWorlNoor"
+                    android:layout_below="@id/btnLogin"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_20sdp"
-                    android:layout_marginBottom="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_25sdp"
                     android:fontFamily="@font/halvatic_light"
                     android:text="@string/signup"
                     android:textAlignment="center"

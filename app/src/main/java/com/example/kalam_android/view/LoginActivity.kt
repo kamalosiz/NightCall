@@ -18,11 +18,19 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
+import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityLoginBinding
-import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.toast
+import com.example.kalam_android.repository.model.LoginResponse
+import com.example.kalam_android.repository.model.SignUpResponse
+import com.example.kalam_android.repository.net.ApiResponse
+import com.example.kalam_android.repository.net.Status
+import com.example.kalam_android.util.*
+import com.example.kalam_android.viewmodel.LoginViewModel
+import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import javax.inject.Inject
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
@@ -30,12 +38,55 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityLoginBinding
     var HIDE_PASSWORD = true
+    @Inject
+    lateinit var factory: ViewModelFactory
+    lateinit var viewModel: LoginViewModel
+    @Inject
+    lateinit var sharedPrefsHelper: SharedPrefsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        MyApplication.getAppComponent(this).doInjection(this)
+        viewModel = ViewModelProviders.of(this, factory).get(LoginViewModel::class.java)
+        viewModel.loginResponse().observe(this, Observer {
+            consumeResponse(it)
+        })
         setSpannable()
         binding.hidePassword.setOnClickListener(this)
+        binding.btnLogin.setOnClickListener(this)
+    }
+
+    private fun consumeResponse(apiResponse: ApiResponse<LoginResponse>?) {
+        when (apiResponse?.status) {
+
+            Status.LOADING -> {
+                showProgressDialog(this)
+            }
+            Status.SUCCESS -> {
+                hideProgressDialog()
+                renderResponse(apiResponse.data as LoginResponse)
+                logE("consumeResponse SUCCESS : ${apiResponse.data}")
+            }
+            Status.ERROR -> {
+                hideProgressDialog()
+                logE("consumeResponse ERROR: " + apiResponse.error.toString())
+            }
+            else -> {
+            }
+        }
+    }
+
+    private fun renderResponse(response: LoginResponse?) {
+        logE("response: $response")
+        response?.let {
+            logE(it.toString())
+            if (it.status) {
+                toast(it.message)
+            } else {
+                showAlertDialoge(this, "Error", it.message)
+            }
+        }
     }
 
     fun setSpannable() {
@@ -51,7 +102,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             binding.tvSignUp,
             true
         )
-        setSpannableButtonText(binding.btnLoginWorlNoor)
     }
 
     private fun setSpannableTextView(
@@ -93,22 +143,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         view.movementMethod = LinkMovementMethod.getInstance()
     }
 
-    fun setSpannableButtonText(btn: Button) {
-        val fullText = resources.getString(R.string.login_world_noor)
-        val subText = resources.getString(R.string.world_noor)
-        val color = ContextCompat.getColor(this, R.color.white)
-        val spannable = SpannableString(fullText)
-        val i = fullText.indexOf(subText)
-        spannable.setSpan(
-            ForegroundColorSpan(color),
-            i,
-            i + subText.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        btn.text = spannable
-        btn.movementMethod = LinkMovementMethod.getInstance()
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.hidePassword -> {
@@ -122,6 +156,12 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                     binding.etPass.transformationMethod = PasswordTransformationMethod.getInstance()
                     binding.hidePassword.setBackgroundResource(R.drawable.hide_eye_icon)
                 }
+            }
+            R.id.btnLogin -> {
+                val params = HashMap<String, String>()
+                params["login"] = binding.etUsername.text.toString()
+                params["password"] = binding.etPass.text.toString()
+                viewModel.hitLogin(params)
             }
         }
     }

@@ -2,6 +2,7 @@ package com.example.kalam_android.util
 
 import android.content.SharedPreferences
 import com.example.kalam_android.repository.model.CreateProfileResponse
+import com.example.kalam_android.repository.model.PhoneModel
 import com.example.kalam_android.repository.model.UserData
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -14,6 +15,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     val PHONE = "key_phoneno"
     private val KEY_USER_OBJECT = "kalam_user"
     private val KEY_IS_LOGIN = "is_logged_in_kalam"
+    private val KEY_PHONE = "key_phone_kalam"
 
     fun put(key: String, value: String) {
         mSharedPreferences.edit().putString(key, value).apply()
@@ -47,11 +49,11 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         return mSharedPreferences.getBoolean(key, defaultValue)
     }
 
-    fun savePhoneNo(phone: String) {
+    fun setNumber(phone: String) {
         put(PHONE, phone)
     }
 
-    fun getPhoneNo(): String? {
+    fun getNumber(): String? {
         return get(PHONE, "")
     }
 
@@ -69,6 +71,22 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         return try {
             val json = get(KEY_USER_OBJECT, "")
             Gson().fromJson(json, UserData::class.java)
+        } catch (e: JsonSyntaxException) {
+            null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun setPhone(phoneModel: PhoneModel?) {
+        val json = Gson().toJson(phoneModel)
+        put(KEY_PHONE, json)
+    }
+
+    fun getPhone(): PhoneModel? {
+        return try {
+            val json = get(KEY_PHONE, "")
+            Gson().fromJson(json, PhoneModel::class.java)
         } catch (e: JsonSyntaxException) {
             null
         } catch (e: Exception) {

@@ -7,12 +7,17 @@ import com.fxn.pix.Options
 import com.fxn.utility.ImageQuality
 import android.content.DialogInterface
 import android.text.TextUtils
+import okhttp3.FormBody
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
 import java.nio.file.Files.delete
 import java.nio.file.Files.exists
+import android.R.attr.path
 
 
 fun Context.toast(message: CharSequence) =
@@ -37,6 +42,12 @@ fun showAlertDialoge(context: Context, title: String, message: String) {
     builder1.setCancelable(true)
     builder1.setPositiveButton("Okay") { dialog, id -> dialog.cancel() }
     builder1.create().show()
+}
+
+fun getFileBody(path: String, fileName: String): MultipartBody.Part {
+    val file = File(path)
+    val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+    return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
 }
 
 fun isValidEmail(email: String): Boolean {

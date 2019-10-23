@@ -9,6 +9,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivitySignUpBinding
+import com.example.kalam_android.repository.model.PhoneModel
 import com.example.kalam_android.repository.model.SignUpResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status.*
@@ -50,6 +51,8 @@ class SignUpActivity : BaseActivity() {
         picker.setListener { name, code, dialCode, flagID ->
             binding.tvCountry.text = name
             binding.tvDialCode.text = dialCode
+            sharedPrefsHelper.setPhone(PhoneModel(name, code, dialCode.substring(1)))
+            logE("phone number: ${sharedPrefsHelper.getPhone()}")
             picker.dismiss()
         }
         picker.show(supportFragmentManager, "COUNTRY_PICKER")
@@ -81,7 +84,7 @@ class SignUpActivity : BaseActivity() {
             logE(it.toString())
             if (it.status) {
                 logE("status true: ${it.data?.verification_code}")
-                sharedPrefsHelper.savePhoneNo(phone)
+                sharedPrefsHelper.setNumber(phone)
                 val intent = Intent(this@SignUpActivity, VerifyCodeActivity::class.java)
                 intent.putExtra(AppConstants.VERIFICATION_CODE, it.data?.verification_code)
                 startActivity(intent)

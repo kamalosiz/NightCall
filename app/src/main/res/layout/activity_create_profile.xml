@@ -43,7 +43,7 @@
                     android:id="@+id/ivUploadImage"
                     android:layout_width="@dimen/_130sdp"
                     android:layout_height="@dimen/_130sdp"
-                    android:layout_marginTop="@dimen/_25sdp"
+                    android:layout_marginTop="@dimen/_30sdp"
                     android:clickable="true"
                     android:focusable="true"
                     android:src="@drawable/kalam_logo_profile"
@@ -56,7 +56,7 @@
                     android:id="@+id/linearLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_25sdp"
+                    android:layout_marginTop="@dimen/_30sdp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -95,16 +95,16 @@
                             android:textSize="@dimen/_13sdp" />
                     </LinearLayout>
 
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/etUserName"
-                        android:layout_width="@dimen/_274sdp"
-                        android:layout_height="@dimen/_40sdp"
-                        android:layout_marginTop="@dimen/_5sdp"
-                        android:background="@drawable/box_theme_outine"
-                        android:gravity="center_vertical"
-                        android:hint="@string/username"
-                        android:paddingLeft="@dimen/_10sdp"
-                        android:textSize="@dimen/_13sdp" />
+                    <!-- <androidx.appcompat.widget.AppCompatEditText
+                         android:id="@+id/etUserName"
+                         android:layout_width="@dimen/_274sdp"
+                         android:layout_height="@dimen/_40sdp"
+                         android:layout_marginTop="@dimen/_5sdp"
+                         android:background="@drawable/box_theme_outine"
+                         android:gravity="center_vertical"
+                         android:hint="@string/username"
+                         android:paddingLeft="@dimen/_10sdp"
+                         android:textSize="@dimen/_13sdp" />-->
 
                     <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/etEmail"
@@ -117,29 +117,56 @@
                         android:paddingLeft="@dimen/_10sdp"
                         android:textSize="@dimen/_13sdp" />
 
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/etPhone"
-                        android:layout_width="@dimen/_274sdp"
-                        android:layout_height="@dimen/_40sdp"
-                        android:layout_marginTop="@dimen/_5sdp"
-                        android:background="@drawable/box_theme_outine"
-                        android:gravity="center_vertical"
-                        android:inputType="textPassword"
-                        android:hint="@string/enter_password"
-                        android:paddingLeft="@dimen/_10sdp"
-                        android:textSize="@dimen/_13sdp" />
+                    <RelativeLayout
+                        android:id="@+id/rlPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_5sdp">
 
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:id="@+id/etConfirmPhone"
-                        android:layout_width="@dimen/_274sdp"
-                        android:layout_height="@dimen/_40sdp"
-                        android:layout_marginTop="@dimen/_5sdp"
-                        android:background="@drawable/box_theme_outine"
-                        android:gravity="center_vertical"
-                        android:hint="@string/confirm_password"
-                        android:inputType="textPassword"
-                        android:paddingLeft="@dimen/_10sdp"
-                        android:textSize="@dimen/_13sdp" />
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="@dimen/_274sdp"
+                            android:layout_height="@dimen/_40sdp"
+                            android:background="@drawable/box_theme_outine"
+                            android:gravity="center_vertical"
+                            android:hint="@string/enter_password"
+                            android:inputType="textPassword"
+                            android:paddingLeft="@dimen/_10sdp"
+                            android:textSize="@dimen/_13sdp" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/hidePassword"
+                            android:layout_width="@dimen/_23sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="@dimen/_15sdp"
+                            android:background="@drawable/hide_eye_icon" />
+                    </RelativeLayout>
+
+                    <!--  <androidx.appcompat.widget.AppCompatEditText
+                          android:id="@+id/etPhone"
+                          android:layout_width="@dimen/_274sdp"
+                          android:layout_height="@dimen/_40sdp"
+                          android:layout_marginTop="@dimen/_5sdp"
+                          android:background="@drawable/box_theme_outine"
+                          android:gravity="center_vertical"
+                          android:hint="@string/enter_password"
+                          android:inputType="textPassword"
+                          android:paddingLeft="@dimen/_10sdp"
+                          android:textSize="@dimen/_13sdp" />-->
+
+                    <!-- <androidx.appcompat.widget.AppCompatEditText
+                         android:id="@+id/etConfirmPhone"
+                         android:layout_width="@dimen/_274sdp"
+                         android:layout_height="@dimen/_40sdp"
+                         android:layout_marginTop="@dimen/_5sdp"
+                         android:background="@drawable/box_theme_outine"
+                         android:gravity="center_vertical"
+                         android:hint="@string/confirm_password"
+                         android:inputType="textPassword"
+                         android:paddingLeft="@dimen/_10sdp"
+                         android:textSize="@dimen/_13sdp" />-->
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -158,7 +185,7 @@
                     android:id="@+id/btnNext"
                     android:layout_width="@dimen/_274sdp"
                     android:layout_height="@dimen/_40sdp"
-                    android:layout_marginTop="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_70sdp"
                     android:background="@drawable/theme_button"
                     android:fontFamily="@font/halvatic_light"
                     android:text="@string/next"

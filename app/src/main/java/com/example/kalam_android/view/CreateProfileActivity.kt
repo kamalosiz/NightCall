@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -41,6 +43,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
     lateinit var factory: ViewModelFactory
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
+    private var HIDE_PASSWORD = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         viewModel = ViewModelProviders.of(this, factory).get(CreateProfileViewModel::class.java)
         binding.btnBack.setOnClickListener(this)
         binding.ivUploadImage.setOnClickListener(this)
+        binding.hidePassword.setOnClickListener(this)
         binding.btnNext.setOnClickListener(this)
         viewModel.createProfileResponse().observe(this, Observer {
             consumeResponse(it)
@@ -76,8 +80,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         logE("response $response")
         response?.let {
             if (it.status) {
-                toast("Profile successfully created")
-                sharedPrefsHelper.setUser(it.data)
+//                toast(it.data)
                 startActivity(Intent(this, WelcomeActivity::class.java))
                 finish()
             } else {
@@ -159,8 +162,8 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             toast("Please enter your last name")
             return
         }
-        if (binding.etUserName.text.toString().isEmpty()) {
-            toast("Please enter your username")
+        if (binding.etPassword.text.toString().isEmpty()) {
+            toast("Please enter password")
             return
         }
         if (binding.etEmail.text.toString().isEmpty()) {
@@ -173,12 +176,19 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         val params = HashMap<String, String>()
         params["firstname"] = binding.etFirstName.text.toString()
         params["lastname"] = binding.etLastName.text.toString()
-        params["username"] = binding.etUserName.text.toString()
         params["email"] = binding.etEmail.text.toString()
-        params["phone"] = sharedPrefsHelper.getPhoneNo().toString()
-        params["password"] = binding.etPhone.text.toString()
-        params["password_confirmation"] = binding.etConfirmPhone.text.toString()
-        viewModel.hitCreateProfileApi(params)
+        params["phone"] = sharedPrefsHelper.getNumber().toString()
+        params["password"] = binding.etPassword.text.toString()
+        params["country"] = sharedPrefsHelper.getPhone()?.countryCode.toString()
+        params["country_code"] = sharedPrefsHelper.getPhone()?.dialCode.toString()
+
+        if (!profileImagePath.isNullOrEmpty()) {
+            logE("Profile image is not empty")
+            viewModel.hitCreateProfileApi(params, getFileBody(profileImagePath.toString(), "file"))
+        } else {
+            logE("Profile image empty")
+            viewModel.hitCreateProfileApi(params)
+        }
     }
 
     override fun onClick(v: View?) {
@@ -188,6 +198,19 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                 setData()
             }
             R.id.ivUploadImage -> checkPixPermission()
+            R.id.hidePassword -> {
+                if (HIDE_PASSWORD) {
+                    HIDE_PASSWORD = false
+                    binding.etPassword.transformationMethod =
+                        HideReturnsTransformationMethod.getInstance()
+                    binding.hidePassword.setBackgroundResource(R.drawable.eye_icon)
+                } else {
+                    HIDE_PASSWORD = true
+                    binding.etPassword.transformationMethod =
+                        PasswordTransformationMethod.getInstance()
+                    binding.hidePassword.setBackgroundResource(R.drawable.hide_eye_icon)
+                }
+            }
         }
     }
 

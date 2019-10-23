@@ -1,7 +1,6 @@
 package com.example.kalam_android.view
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.DataBindingUtil
@@ -92,7 +91,7 @@ class VerifyCodeActivity : BaseActivity(), View.OnClickListener {
                     return
                 }
                 val params = HashMap<String, String>()
-                params["number"] = sharedPrefsHelper.getPhoneNo().toString()
+                params["number"] = sharedPrefsHelper.getNumber().toString()
                 params["verification_code"] = binding.etCode.text.toString()
                 viewModel.hitVerificationApi(params)
             }

@@ -17,7 +17,7 @@
     <string name="enter_password">Enter Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="welcome">Welcome Ali \n Have a start your Kalam</string>
-    <string name="phone_username">Phone number or Username</string>
+    <string name="phone_username">Phone number</string>
     <string name="password">Password</string>
     <string name="forget_pass">Forgot Password?</string>
     <string name="tap_login">Tap \"Login\" to accept the Kalam Terms of \n Services and Privacy Policy.</string>
@@ -27,5 +27,5 @@
     <string name="signup_sub">SignUp</string>
     <string name="login_world_noor">Login with World Noor</string>
     <string name="world_noor">World Noor</string>
-    <string name="dialoge_text">Processing , Please wait</string>
+    <string name="dialoge_text">Processing , Please wait…</string>
 </resources>
