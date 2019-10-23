@@ -16,7 +16,6 @@ class WelcomeActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_welcome)
         binding.btnBack.setOnClickListener { finish() }
         binding.btnFinish.setOnClickListener {
-            toast(this, "Profile created successfully")
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }

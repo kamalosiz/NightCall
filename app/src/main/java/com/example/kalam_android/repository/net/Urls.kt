@@ -5,8 +5,6 @@ class Urls {
         const val BASE_URL = "http://192.168.0.71:5000/"
         const val VERIFY_PHONE = "api/user/verify_phone"
         const val VERIFY_PHONE_CODE = "api/user/verify_phone_code"
-       /* const val BASE_URL = "http://192.168.0.71:5000/api/user/"
-        const val VERIFY_PHONE = "verify_phone"*/
+        const val CREATE_PROFILE = "api/user/register"
     }
-
 }

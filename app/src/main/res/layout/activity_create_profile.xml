@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.activities.CreateProfileActivity">
@@ -15,128 +15,162 @@
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginLeft="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_15sdp"
-            android:background="@drawable/back_arrow"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@drawable/back_arrow" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/helvetica_medium"
-            android:text="@string/update_profile"
-            android:textColor="@color/theme_color"
-            android:textSize="@dimen/_15sdp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnBack" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/btnBack">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/ivUploadImage"
-            android:layout_width="@dimen/_130sdp"
-            android:layout_height="@dimen/_130sdp"
-            android:layout_marginTop="36dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/kalam_logo_profile"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/helvetica_medium"
+                    android:text="@string/update_profile"
+                    android:textColor="@color/theme_color"
+                    android:textSize="@dimen/_15sdp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/ivUploadImage"
+                    android:layout_width="@dimen/_130sdp"
+                    android:layout_height="@dimen/_130sdp"
+                    android:layout_marginTop="@dimen/_25sdp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:src="@drawable/kalam_logo_profile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_40sdp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ivUploadImage">
+                <LinearLayout
+                    android:id="@+id/linearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_25sdp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ivUploadImage">
 
-            <LinearLayout
-                android:layout_width="@dimen/_274sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:gravity="center"
-                android:weightSum="2">
+                    <LinearLayout
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:gravity="center"
+                        android:weightSum="2">
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/etFirstName"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="@dimen/_1sdp"
-                    android:layout_marginRight="@dimen/_1sdp"
-                    android:layout_weight="1"
-                    android:background="@drawable/box_theme_outine"
-                    android:gravity="center_vertical"
-                    android:hint="@string/first_name"
-                    android:paddingLeft="@dimen/_10sdp"
-                    android:textSize="@dimen/_13sdp" />
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etFirstName"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="@dimen/_1sdp"
+                            android:layout_marginRight="@dimen/_1sdp"
+                            android:layout_weight="1"
+                            android:background="@drawable/box_theme_outine"
+                            android:gravity="center_vertical"
+                            android:hint="@string/first_name"
+                            android:paddingLeft="@dimen/_10sdp"
+                            android:textSize="@dimen/_13sdp" />
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/etLastName"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/_1sdp"
-                    android:layout_marginLeft="@dimen/_1sdp"
-                    android:layout_weight="1"
-                    android:background="@drawable/box_theme_outine"
-                    android:gravity="center_vertical"
-                    android:hint="@string/last_name"
-                    android:paddingLeft="@dimen/_10sdp"
-                    android:textSize="@dimen/_13sdp" />
-            </LinearLayout>
+                        <androidx.appcompat.widget.AppCompatEditText
+                            android:id="@+id/etLastName"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/_1sdp"
+                            android:layout_marginLeft="@dimen/_1sdp"
+                            android:layout_weight="1"
+                            android:background="@drawable/box_theme_outine"
+                            android:gravity="center_vertical"
+                            android:hint="@string/last_name"
+                            android:paddingLeft="@dimen/_10sdp"
+                            android:textSize="@dimen/_13sdp" />
+                    </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/etUserName"
-                android:layout_width="@dimen/_274sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/box_theme_outine"
-                android:gravity="center_vertical"
-                android:hint="@string/username"
-                android:paddingLeft="@dimen/_10sdp"
-                android:textSize="@dimen/_13sdp" />
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etUserName"
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:background="@drawable/box_theme_outine"
+                        android:gravity="center_vertical"
+                        android:hint="@string/username"
+                        android:paddingLeft="@dimen/_10sdp"
+                        android:textSize="@dimen/_13sdp" />
 
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/etEmail"
-                android:layout_width="@dimen/_274sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/box_theme_outine"
-                android:gravity="center_vertical"
-                android:hint="@string/email_address"
-                android:paddingLeft="@dimen/_10sdp"
-                android:textSize="@dimen/_13sdp" />
-        </LinearLayout>
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:background="@drawable/box_theme_outine"
+                        android:gravity="center_vertical"
+                        android:hint="@string/email_address"
+                        android:paddingLeft="@dimen/_10sdp"
+                        android:textSize="@dimen/_13sdp" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivCameraUpload"
-            android:layout_width="@dimen/_24sdp"
-            android:layout_height="@dimen/_21sdp"
-            android:layout_marginBottom="@dimen/_6sdp"
-            android:clickable="false"
-            android:focusable="false"
-            app:layout_constraintBottom_toBottomOf="@+id/ivUploadImage"
-            app:layout_constraintEnd_toEndOf="@+id/ivUploadImage"
-            app:layout_constraintStart_toStartOf="@+id/ivUploadImage"
-            app:srcCompat="@drawable/camera_icon" />
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etPhone"
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:background="@drawable/box_theme_outine"
+                        android:gravity="center_vertical"
+                        android:inputType="textPassword"
+                        android:hint="@string/enter_password"
+                        android:paddingLeft="@dimen/_10sdp"
+                        android:textSize="@dimen/_13sdp" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnNext"
-            android:layout_width="@dimen/_274sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:background="@drawable/theme_button"
-            android:fontFamily="@font/halvatic_light"
-            android:text="@string/next"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_17sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etConfirmPhone"
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:background="@drawable/box_theme_outine"
+                        android:gravity="center_vertical"
+                        android:hint="@string/confirm_password"
+                        android:inputType="textPassword"
+                        android:paddingLeft="@dimen/_10sdp"
+                        android:textSize="@dimen/_13sdp" />
+                </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivCameraUpload"
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="@dimen/_21sdp"
+                    android:layout_marginBottom="@dimen/_6sdp"
+                    android:clickable="false"
+                    android:focusable="false"
+                    app:layout_constraintBottom_toBottomOf="@+id/ivUploadImage"
+                    app:layout_constraintEnd_toEndOf="@+id/ivUploadImage"
+                    app:layout_constraintStart_toStartOf="@+id/ivUploadImage"
+                    app:srcCompat="@drawable/camera_icon" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnNext"
+                    android:layout_width="@dimen/_274sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_marginTop="@dimen/_30sdp"
+                    android:background="@drawable/theme_button"
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="@string/next"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_17sdp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+    </RelativeLayout>
 </layout>
