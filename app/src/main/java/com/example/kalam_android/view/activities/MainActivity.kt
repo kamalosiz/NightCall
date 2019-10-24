@@ -1,4 +1,4 @@
-package com.example.kalam_android.view
+package com.example.kalam_android.view.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

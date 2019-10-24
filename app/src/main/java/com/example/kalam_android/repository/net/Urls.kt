@@ -7,5 +7,6 @@ class Urls {
         const val VERIFY_PHONE_CODE = "api/user/verify_phone_code"
         const val CREATE_PROFILE = "api/user/signup"
         const val SIGN_IN = "api/user/signin"
+        const val VERIFY_CONTACTS = "api/user/sync_contacts"
     }
 }

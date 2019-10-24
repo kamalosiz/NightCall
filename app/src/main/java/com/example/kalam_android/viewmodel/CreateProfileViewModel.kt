@@ -46,4 +46,9 @@ class CreateProfileViewModel @Inject constructor(private val repository: Reposit
             })
         )
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        disposable.clear()
+    }
 }

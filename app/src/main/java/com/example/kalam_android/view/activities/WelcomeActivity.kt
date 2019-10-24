@@ -1,4 +1,4 @@
-package com.example.kalam_android.view
+package com.example.kalam_android.view.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ActivityWelcomeBinding
-import com.example.kalam_android.util.toast
 
 class WelcomeActivity : AppCompatActivity() {
     lateinit var binding: ActivityWelcomeBinding

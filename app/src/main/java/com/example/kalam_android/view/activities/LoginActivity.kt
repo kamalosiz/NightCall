@@ -1,7 +1,6 @@
-package com.example.kalam_android.view
+package com.example.kalam_android.view.activities
 
 import android.content.Intent
-import android.content.res.Resources
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
@@ -14,7 +13,6 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -25,7 +23,6 @@ import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityLoginBinding
 import com.example.kalam_android.repository.model.LoginResponse
-import com.example.kalam_android.repository.model.SignUpResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
@@ -55,6 +52,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         setSpannable()
         binding.hidePassword.setOnClickListener(this)
         binding.btnLogin.setOnClickListener(this)
+        binding.etUsername.setText("testing@gmail.com")
+        binding.etPass.setText("123")
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<LoginResponse>?) {
@@ -83,6 +82,9 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             logE(it.toString())
             if (it.status) {
                 toast(it.message)
+                sharedPrefsHelper.setUser(it.data[0])
+                startActivity(Intent(this, ContactListActivity::class.java))
+                finish()
             } else {
                 showAlertDialoge(this, "Error", it.message)
             }

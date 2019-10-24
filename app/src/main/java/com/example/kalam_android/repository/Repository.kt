@@ -1,9 +1,6 @@
 package com.example.kalam_android.repository
 
-import com.example.kalam_android.repository.model.CreateProfileResponse
-import com.example.kalam_android.repository.model.LoginResponse
-import com.example.kalam_android.repository.model.SignUpResponse
-import com.example.kalam_android.repository.model.VerifyCodeResponse
+import com.example.kalam_android.repository.model.*
 import com.example.kalam_android.repository.net.ApiCallInterface
 import io.reactivex.Observable
 import okhttp3.MultipartBody
@@ -29,5 +26,9 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
 
     fun login(parameters: Map<String, String>): Observable<LoginResponse> {
         return apiCallInterface.login(parameters)
+    }
+
+    fun getContacts(parameters: Map<String, String>): Observable<Contacts> {
+        return apiCallInterface.getContacts(parameters)
     }
 }

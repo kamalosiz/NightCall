@@ -2,10 +2,7 @@ package com.example.kalam_android.di.modules
 
 import androidx.lifecycle.ViewModel
 import com.example.kalam_android.di.keys.ViewModelKey
-import com.example.kalam_android.viewmodel.CreateProfileViewModel
-import com.example.kalam_android.viewmodel.LoginViewModel
-import com.example.kalam_android.viewmodel.SignUpViewModel
-import com.example.kalam_android.viewmodel.VerifyCodeViewModel
+import com.example.kalam_android.viewmodel.*
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -32,5 +29,10 @@ abstract class ViewModelsModule {
     @IntoMap
     @ViewModelKey(CreateProfileViewModel::class)
     abstract fun bindCreateProfileViewModel(viewModel: CreateProfileViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ContactsViewModel::class)
+    abstract fun bindContactsViewModel(viewModel: ContactsViewModel): ViewModel
 
 }
