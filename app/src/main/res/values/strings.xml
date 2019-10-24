@@ -30,4 +30,8 @@
     <string name="dialoge_text">Processing , Please wait…</string>
     <string name="labelNewGroup">New group</string>
     <string name="labelNewContact">New contact</string>
+    <string name="labelBack">Back</string>
+    <string name="msgForResetPassword">Enter your email address to reset \n your password</string>
+    <string name="hintEmailAddress">Email Address</string>
+    <string name="labelSubmit">Submit</string>
 </resources>
