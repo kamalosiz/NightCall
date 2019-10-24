@@ -49,7 +49,7 @@ class ContactListActivity : BaseActivity() {
             consumeResponse(it)
         })
         binding.rvForContacts.layoutManager = LinearLayoutManager(applicationContext)
-        binding.rvForContacts.adapter = AdapterForContacts()
+        binding.rvForContacts.adapter = AdapterForContacts(applicationContext)
         contactList = mutableListOf()
         checkPixPermission()
     }

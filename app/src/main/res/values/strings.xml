@@ -28,4 +28,6 @@
     <string name="login_world_noor">Login with World Noor</string>
     <string name="world_noor">World Noor</string>
     <string name="dialoge_text">Processing , Please wait…</string>
+    <string name="labelNewGroup">New group</string>
+    <string name="labelNewContact">New contact</string>
 </resources>

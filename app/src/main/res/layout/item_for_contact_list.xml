@@ -4,7 +4,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/_5sdp">
+        android:paddingTop="@dimen/_5sdp"
+        android:paddingBottom="@dimen/_5sdp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivContactImage"
@@ -26,7 +27,6 @@
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:fontFamily="@font/helvetica_medium"
-                android:text="Ali"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_13sdp" />
 
@@ -38,7 +38,6 @@
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:fontFamily="@font/helvetica_medium"
-                android:text="Ali"
                 android:textColor="@color/grey"
                 android:textSize="@dimen/_12sdp" />
 
