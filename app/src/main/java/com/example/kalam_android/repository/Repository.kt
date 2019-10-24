@@ -4,7 +4,9 @@ import com.example.kalam_android.repository.model.*
 import com.example.kalam_android.repository.net.ApiCallInterface
 import io.reactivex.Observable
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Part
+import retrofit2.http.PartMap
 
 class Repository(private val apiCallInterface: ApiCallInterface) {
 
@@ -16,11 +18,11 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.verifyCode(parameters)
     }
 
-    fun createProfile(parameters: Map<String, String>): Observable<CreateProfileResponse> {
+    fun createProfile(@PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>): Observable<CreateProfileResponse> {
         return apiCallInterface.createProfile(parameters)
     }
 
-    fun createProfile(parameters: Map<String, String>, @Part profilePic: MultipartBody.Part): Observable<CreateProfileResponse> {
+    fun createProfile(@PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part profilePic: MultipartBody.Part): Observable<CreateProfileResponse> {
         return apiCallInterface.createProfile(parameters, profilePic)
     }
 

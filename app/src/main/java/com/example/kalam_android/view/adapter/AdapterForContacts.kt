@@ -1,5 +1,6 @@
 package com.example.kalam_android.view.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemForContactListBinding
 import com.example.kalam_android.repository.model.ContactInfo
+import com.example.kalam_android.repository.model.ContactsList
+import com.example.kalam_android.wrapper.GlideDownloder
 
-class AdapterForContacts : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class AdapterForContacts(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var contactInfo: MutableList<ContactInfo>? = null
+    var contactInfo: ArrayList<ContactsList>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemForContactListBinding>(
@@ -30,9 +33,16 @@ class AdapterForContacts : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val itemHolder = holder as ContactViewHolder
         itemHolder.binding.tvContactName.text = item?.name
         itemHolder.binding.tvContactPhone.text = item?.number
+        GlideDownloder.load(
+            context,
+            itemHolder.binding.ivContactImage,
+            item?.profile_image,
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
+        )
     }
 
-    fun updateList(listOfContact: MutableList<ContactInfo>) {
+    fun updateList(listOfContact: ArrayList<ContactsList>) {
         contactInfo?.clear()
         contactInfo = listOfContact
         notifyDataSetChanged()

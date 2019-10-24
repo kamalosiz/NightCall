@@ -44,14 +44,15 @@ fun showAlertDialoge(context: Context, title: String, message: String) {
     builder1.create().show()
 }
 
-fun getFileBody(path: String, fileName: String): MultipartBody.Part {
+/*fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     val file = File(path)
     val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
     return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
-}
+}*/
 
 fun isValidEmail(email: String): Boolean {
     return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(
         email
     ).matches()
 }
+

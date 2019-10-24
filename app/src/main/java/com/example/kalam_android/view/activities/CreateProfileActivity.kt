@@ -29,6 +29,9 @@ import com.example.kalam_android.wrapper.GlideDownloder
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.yalantis.ucrop.UCrop
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.io.File
 import javax.inject.Inject
 
@@ -173,18 +176,23 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             toast("Email not Valid")
             return
         }
-        val params = HashMap<String, String>()
-        params["firstname"] = binding.etFirstName.text.toString()
-        params["lastname"] = binding.etLastName.text.toString()
-        params["email"] = binding.etEmail.text.toString()
-        params["phone"] = sharedPrefsHelper.getNumber().toString()
-        params["password"] = binding.etPassword.text.toString()
-        params["country"] = sharedPrefsHelper.getPhone()?.countryCode.toString()
-        params["country_code"] = sharedPrefsHelper.getPhone()?.dialCode.toString()
+
+        val params = HashMap<String, RequestBody>()
+        params["firstname"] = RequestBody.create(MediaType.parse("text/plain"), binding.etFirstName.text.toString())
+        params["lastname"] = RequestBody.create(MediaType.parse("text/plain"), binding.etLastName.text.toString())
+        params["email"] = RequestBody.create(MediaType.parse("text/plain"), binding.etEmail.text.toString())
+        params["phone"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getNumber().toString())
+        params["password"] = RequestBody.create(MediaType.parse("text/plain"), binding.etPassword.text.toString())
+        params["country"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getPhone()?.countryCode.toString())
+        params["country_code"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getPhone()?.dialCode.toString())
 
         if (!profileImagePath.isNullOrEmpty()) {
             logE("Profile image is not empty")
-            viewModel.hitCreateProfileApi(params, getFileBody(profileImagePath.toString(), "file"))
+            val imageFileBody: MultipartBody.Part?
+            val fileToUpload = File(profileImagePath.toString())
+            val requestBody = RequestBody.create(MediaType.parse("image/*"), fileToUpload)
+            imageFileBody = MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
+            viewModel.hitCreateProfileApi(params , imageFileBody)
         } else {
             logE("Profile image empty")
             viewModel.hitCreateProfileApi(params)
