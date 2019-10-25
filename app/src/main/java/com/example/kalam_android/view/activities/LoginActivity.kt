@@ -81,9 +81,9 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         response?.let {
             logE(it.toString())
             if (it.status) {
-                toast(it.message)
-                sharedPrefsHelper.setUser(it.data[0])
-                startActivity(Intent(this, ContactListActivity::class.java))
+//                toast(it.message)
+                sharedPrefsHelper.setUser(it.data)
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             } else {
                 showAlertDialoge(this, "Error", it.message)

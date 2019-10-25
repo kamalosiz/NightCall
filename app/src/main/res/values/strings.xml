@@ -27,5 +27,12 @@
     <string name="signup_sub">SignUp</string>
     <string name="login_world_noor">Login with World Noor</string>
     <string name="world_noor">World Noor</string>
-    <string name="dialoge_text">Processing , Please wait…</string>
+    <string name="dialoge_text">Please wait! This may take a moment.</string>
+    <string name="labelNewGroup">New group</string>
+    <string name="labelNewContact">New contact</string>
+    <string name="labelBack">Back</string>
+    <string name="msgForResetPassword">Enter your email address to reset \n your password</string>
+    <string name="hintEmailAddress">Email Address</string>
+    <string name="labelSubmit">Submit</string>
+    <string name="no_chat">There is currently no chat, Start chatting by clicking compose button </string>
 </resources>

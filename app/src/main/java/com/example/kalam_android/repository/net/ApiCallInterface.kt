@@ -14,11 +14,10 @@ interface ApiCallInterface {
     @POST(Urls.VERIFY_PHONE_CODE)
     fun verifyCode(@Body parameters: Map<String, String>): Observable<VerifyCodeResponse>
 
-    /*
-        @POST(Urls.CREATE_PROFILE)
-        fun createProfile(@QueryMap parameters: Map<String, String>): Observable<CreateProfileResponse>*/
     @POST(Urls.CREATE_PROFILE)
-    fun createProfile(@PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>): Observable<CreateProfileResponse>
+    fun createProfile(@Body parameters: Map<String, String>): Observable<CreateProfileResponse>
+    /* @POST(Urls.CREATE_PROFILE)
+     fun createProfile(@PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>): Observable<CreateProfileResponse>*/
 
 //    @Multipart
 //    @POST(Urls.CREATE_PROFILE)

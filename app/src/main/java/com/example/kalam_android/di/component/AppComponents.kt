@@ -17,4 +17,5 @@ interface AppComponents {
     fun doInjection(activity: VerifyCodeActivity)
     fun doInjection(activity: CreateProfileActivity)
     fun doInjection(activity: ContactListActivity)
+    fun doInjection(activity: WelcomeActivity)
 }

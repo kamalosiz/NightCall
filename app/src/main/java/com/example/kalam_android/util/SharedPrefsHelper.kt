@@ -16,6 +16,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     private val KEY_USER_OBJECT = "kalam_user"
     private val KEY_IS_LOGIN = "is_logged_in_kalam"
     private val KEY_PHONE = "key_phone_kalam"
+    private val IMAGE_INDEX = "key_image_index_kalam"
 
     fun put(key: String, value: String) {
         mSharedPreferences.edit().putString(key, value).apply()
@@ -53,8 +54,16 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         put(PHONE, phone)
     }
 
+    fun setImageIndex(index: Int) {
+        put(IMAGE_INDEX, index)
+    }
+
     fun getNumber(): String? {
         return get(PHONE, "")
+    }
+
+    fun getImageIndex(): Int? {
+        return get(IMAGE_INDEX, 0)
     }
 
     fun isLoggedIn(): Boolean {

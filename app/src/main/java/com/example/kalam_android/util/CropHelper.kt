@@ -1,32 +1,31 @@
 package com.example.kalam_android.util
 
-import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.kalam_android.R
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
+
 object CropHelper {
 
-    private val SAMPLE_CROPPED_IMAGE_NAME = "SampleCropImage"
-    private var index = 0
+    private val SAMPLE_CROPPED_IMAGE_NAME = "KalamImage"
+    private var index: Int? = null
 
-    fun startCropActivity(context: Context, uri: Uri/*, imageType: ImageType*/) {
-        val destinationFileName = SAMPLE_CROPPED_IMAGE_NAME + index++ + ".jpg"
-
+    fun startCropActivity(
+        sharedPrefsHelper: SharedPrefsHelper,
+        context: Context,
+        uri: Uri
+    ) {
+        index = sharedPrefsHelper.getImageIndex()?.plus(1)
+        val destinationFileName = "$SAMPLE_CROPPED_IMAGE_NAME$index.jpg"
+        index?.let { sharedPrefsHelper.setImageIndex(it) }
         var uCrop = UCrop.of(uri, Uri.fromFile(File(context.cacheDir, destinationFileName)))
-
-        /* uCrop = if (imageType === ImageType.dpCover) {
-             uCrop.withAspectRatio(3f, 2f)  // for cover: 3:2
-         } else {*/
         uCrop.withAspectRatio(1f, 1f)  // for profile: 3:4  a kind of square
-//        }
-
         uCrop = advancedConfig(context, uCrop)
-
-        uCrop.start(context as Activity)
+        uCrop.start(context as AppCompatActivity)
     }
 
     private fun advancedConfig(context: Context, uCrop: UCrop): UCrop {

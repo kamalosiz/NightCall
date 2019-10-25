@@ -18,8 +18,12 @@ class SplashActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         MyApplication.getAppComponent(this).doInjection(this)
+        var intent = Intent(this, LoginActivity::class.java)
+        if (sharedPrefsHelper.isLoggedIn()) {
+            intent = Intent(this, MainActivity::class.java)
+        }
         Handler().postDelayed({
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(intent)
             finish()
         }, 2000)
     }

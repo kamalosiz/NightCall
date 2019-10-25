@@ -1,15 +1,24 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <RelativeLayout
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <TextView
+            android:id="@+id/tvNoChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chats Fragment"
-            android:textSize="@dimen/_20sdp" />
+            android:layout_centerInParent="true"
+            android:layout_margin="@dimen/_10sdp"
+            android:gravity="center"
+            android:textColor="@color/theme_color"
+            android:text="@string/no_chat"
+            android:textSize="@dimen/_15sdp" />
     </RelativeLayout>
 </layout>

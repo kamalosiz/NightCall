@@ -10,6 +10,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Body
 import retrofit2.http.Part
 import retrofit2.http.PartMap
 import javax.inject.Inject
@@ -23,8 +24,8 @@ class CreateProfileViewModel @Inject constructor(private val repository: Reposit
         return responsiveLiveData
     }
 
-    fun hitCreateProfileApi(@PartMap params: Map<String, @JvmSuppressWildcards RequestBody>) {
-        disposable.add(repository.createProfile(params)
+    fun hitCreateProfileApi(@Body parameters: Map<String, String>) {
+        disposable.add(repository.createProfile(parameters)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }

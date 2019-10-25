@@ -35,24 +35,3 @@ fun pixOptionsSingle(): Options {
     return options
 }
 
-fun showAlertDialoge(context: Context, title: String, message: String) {
-    val builder1 = AlertDialog.Builder(context)
-    builder1.setTitle(title)
-    builder1.setMessage(message)
-    builder1.setCancelable(true)
-    builder1.setPositiveButton("Okay") { dialog, id -> dialog.cancel() }
-    builder1.create().show()
-}
-
-/*fun getFileBody(path: String, fileName: String): MultipartBody.Part {
-    val file = File(path)
-    val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-    return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
-}*/
-
-fun isValidEmail(email: String): Boolean {
-    return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(
-        email
-    ).matches()
-}
-

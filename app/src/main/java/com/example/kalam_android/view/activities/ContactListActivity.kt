@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.os.Bundle
 import android.os.Handler
 import android.provider.ContactsContract
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -22,6 +23,7 @@ import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
 import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
+import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForContacts
 import com.example.kalam_android.viewmodel.ContactsViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
@@ -62,12 +64,15 @@ class ContactListActivity : BaseActivity() {
 //                showProgressDialog(this)
             }
             Status.SUCCESS -> {
-                hideProgressDialog()
+//                hideProgressDialog()
+                binding.pbCenter.visibility = View.GONE
                 renderResponse(apiResponse.data as Contacts)
                 logE("+${apiResponse.data}")
             }
             Status.ERROR -> {
-                hideProgressDialog()
+//                hideProgressDialog()
+                binding.pbCenter.visibility = View.GONE
+                toast("Something went wrong please try again")
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
             }
             else -> {
@@ -127,7 +132,7 @@ class ContactListActivity : BaseActivity() {
                     Manifest.permission.WRITE_CONTACTS
                 ).listener(object : MediaPermissionListener {
                     override fun onPermissionGranted() {
-                        showProgressDialog(this@ContactListActivity)
+//                        showProgressDialog(this@ContactListActivity)
                         val params = HashMap<String, String>()
                         params["contacts"] = createContactsJson(getAllContact()).toString()
                         viewModel.getContacts(params)

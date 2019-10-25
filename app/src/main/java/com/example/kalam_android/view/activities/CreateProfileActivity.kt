@@ -84,7 +84,11 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         response?.let {
             if (it.status) {
 //                toast(it.data)
-                startActivity(Intent(this, WelcomeActivity::class.java))
+                sharedPrefsHelper.setUser(it.data)
+                val intent = Intent(this, WelcomeActivity::class.java)
+                intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profileImagePath.toString())
+                intent.putExtra(AppConstants.USER_NAME, binding.etFirstName.text.toString())
+                startActivity(intent)
                 finish()
             } else {
                 showAlertDialoge(this, "Error", it.message)
@@ -127,6 +131,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                     val returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
                     logE("onActivityResult returnValue: $returnValue")
                     CropHelper.startCropActivity(
+                        sharedPrefsHelper,
                         this,
                         Uri.fromFile(File(returnValue?.get(0).toString()))
                     )
@@ -140,16 +145,18 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun handleCropResult(result: Intent?) {
-        val resultUri = result?.let { UCrop.getOutput(it) }
+        profileImagePath = ""
+        val resultUri =/* result?.let {  }*/result?.let { UCrop.getOutput(it) }
         if (resultUri == null) {
             Toast.makeText(this, "Error in Image file", Toast.LENGTH_SHORT).show()
             return
         }
-        profileImagePath = resultUri.path
+        logE("result: ${resultUri.path}")
+        profileImagePath = resultUri.path.toString()
         GlideDownloder.load(
             this,
             binding.ivUploadImage,
-            profileImagePath ?: "",
+            resultUri.path,
             R.drawable.dummy_placeholder,
             R.drawable.dummy_placeholder
         )
@@ -177,24 +184,56 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             return
         }
 
-        val params = HashMap<String, RequestBody>()
-        params["firstname"] = RequestBody.create(MediaType.parse("text/plain"), binding.etFirstName.text.toString())
-        params["lastname"] = RequestBody.create(MediaType.parse("text/plain"), binding.etLastName.text.toString())
-        params["email"] = RequestBody.create(MediaType.parse("text/plain"), binding.etEmail.text.toString())
-        params["phone"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getNumber().toString())
-        params["password"] = RequestBody.create(MediaType.parse("text/plain"), binding.etPassword.text.toString())
-        params["country"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getPhone()?.countryCode.toString())
-        params["country_code"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getPhone()?.dialCode.toString())
 
         if (!profileImagePath.isNullOrEmpty()) {
             logE("Profile image is not empty")
+
+            val params = HashMap<String, RequestBody>()
+            params["firstname"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.etFirstName.text.toString()
+            )
+            params["lastname"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.etLastName.text.toString()
+            )
+            params["email"] =
+                RequestBody.create(MediaType.parse("text/plain"), binding.etEmail.text.toString())
+            params["phone"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                sharedPrefsHelper.getNumber().toString()
+            )
+            params["password"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.etPassword.text.toString()
+            )
+            params["country"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                sharedPrefsHelper.getPhone()?.countryCode.toString()
+            )
+            params["country_code"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                sharedPrefsHelper.getPhone()?.dialCode.toString()
+            )
+
             val imageFileBody: MultipartBody.Part?
             val fileToUpload = File(profileImagePath.toString())
             val requestBody = RequestBody.create(MediaType.parse("image/*"), fileToUpload)
-            imageFileBody = MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
-            viewModel.hitCreateProfileApi(params , imageFileBody)
+            imageFileBody =
+                MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
+            viewModel.hitCreateProfileApi(params, imageFileBody)
         } else {
             logE("Profile image empty")
+
+            val params = HashMap<String, String>()
+            params["firstname"] = binding.etFirstName.text.toString()
+            params["lastname"] = binding.etLastName.text.toString()
+            params["email"] = binding.etEmail.text.toString()
+            params["phone"] = sharedPrefsHelper.getNumber().toString()
+            params["password"] = binding.etPassword.text.toString()
+            params["country"] = sharedPrefsHelper.getPhone()?.countryCode.toString()
+            params["country_code"] = sharedPrefsHelper.getPhone()?.dialCode.toString()
+
             viewModel.hitCreateProfileApi(params)
         }
     }

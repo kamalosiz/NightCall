@@ -11,7 +11,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnBack"
-            android:layout_width="@dimen/_11sdp"
+            android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_20sdp"
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginLeft="@dimen/_15sdp"
@@ -20,18 +20,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imageView3"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivUserImage"
             android:layout_width="@dimen/_180sdp"
             android:layout_height="@dimen/_180sdp"
             android:layout_marginTop="@dimen/_30sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnBack"
-            app:srcCompat="@drawable/dummy_placeholder" />
+            android:src="@drawable/dummy_placeholder" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textView5"
+            android:id="@+id/tvWelcomeUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_20sdp"
@@ -42,7 +42,7 @@
             android:textSize="@dimen/_18sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+            app:layout_constraintTop_toBottomOf="@+id/ivUserImage" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnFinish"
@@ -57,7 +57,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5"
+            app:layout_constraintTop_toBottomOf="@+id/tvWelcomeUser"
             app:layout_constraintVertical_bias="0.71000004" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
