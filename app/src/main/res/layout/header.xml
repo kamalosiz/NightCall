@@ -15,5 +15,14 @@
             android:text="Kalam"
             android:textColor="@color/white"
             android:textSize="@dimen/_18sdp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_right"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:background="@drawable/icon_settings" />
     </RelativeLayout>
 </layout>

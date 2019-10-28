@@ -5,6 +5,8 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
 
@@ -42,5 +44,17 @@ open class BaseActivity : AppCompatActivity() {
         builder1.setCancelable(true)
         builder1.setPositiveButton("Okay") { dialog, id -> dialog.cancel() }
         builder1.create().show()
+    }
+
+    fun popUpMenu(view: View, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
+        val popupMenu = PopupMenu(this, view)
+        popupMenu.inflate(menu)
+        popupMenu.setOnMenuItemClickListener(listener)
+        /* val tempMenu = popupMenu.getMenu()
+         for (i in 0 until tempMenu.size()) {
+             val mi = tempMenu.getItem(i)
+             applyFontToMenuItem(mi)
+         }*/
+        popupMenu.show()
     }
 }

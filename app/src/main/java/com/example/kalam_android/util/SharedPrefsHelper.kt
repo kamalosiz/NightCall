@@ -17,6 +17,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     private val KEY_IS_LOGIN = "is_logged_in_kalam"
     private val KEY_PHONE = "key_phone_kalam"
     private val IMAGE_INDEX = "key_image_index_kalam"
+    private val CONTACTS_SYNCED = "key_contacts_synced"
 
     fun put(key: String, value: String) {
         mSharedPreferences.edit().putString(key, value).apply()
@@ -101,5 +102,13 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         } catch (e: Exception) {
             null
         }
+    }
+
+    fun contactsSynced() {
+        put(CONTACTS_SYNCED, true)
+    }
+
+    fun isContactsSynced(): Boolean {
+        return get(CONTACTS_SYNCED, false) ?: false
     }
 }

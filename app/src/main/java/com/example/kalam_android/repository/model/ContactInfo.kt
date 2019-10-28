@@ -6,16 +6,17 @@ data class Contacts(
     val action: String,
     val code: Int,
     val status: Boolean,
-    val data: ContactsData
+    val data: ContactList
+)
+
+data class ContactList(
+    val contacts_list: ArrayList<ContactsData>
 )
 
 data class ContactsData(
-    val contacts_list: ArrayList<ContactsList>
-)
-
-data class ContactsList(
-    val number: String,
-    val id: Int,
-    val name: String,
-    val profile_image: String
+    val number: String?,
+    val id: Int?,
+    val name: String?,
+    val profile_image: String?,
+    val kalam_number: String?
 )

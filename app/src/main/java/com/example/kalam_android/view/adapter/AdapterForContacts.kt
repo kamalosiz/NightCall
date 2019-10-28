@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemForContactListBinding
 import com.example.kalam_android.databinding.ItemForNewGroupContactBinding
-import com.example.kalam_android.repository.model.ContactsList
+import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.wrapper.GlideDownloder
 
 class AdapterForContacts(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var contactInfo: ArrayList<ContactsList>? = null
+    private var contactInfo: ArrayList<ContactsData>? = null
 
     companion object {
         const val VIEW_NEW_GROUP_AND_NUMBER = 0
@@ -108,7 +108,7 @@ class AdapterForContacts(val context: Context) : RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    fun updateList(listOfContact: ArrayList<ContactsList>?) {
+    fun updateList(listOfContact: ArrayList<ContactsData>?) {
         contactInfo?.clear()
         contactInfo = listOfContact
         contactInfo?.size?.plus(1)
