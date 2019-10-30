@@ -16,12 +16,6 @@ interface ApiCallInterface {
 
     @POST(Urls.CREATE_PROFILE)
     fun createProfile(@Body parameters: Map<String, String>): Observable<CreateProfileResponse>
-    /* @POST(Urls.CREATE_PROFILE)
-     fun createProfile(@PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>): Observable<CreateProfileResponse>*/
-
-//    @Multipart
-//    @POST(Urls.CREATE_PROFILE)
-//    fun createProfile(@QueryMap parameters: Map<String, String>, @Part profilePic: MultipartBody.Part): Observable<CreateProfileResponse>
 
     @Multipart
     @POST(Urls.CREATE_PROFILE)
@@ -32,4 +26,10 @@ interface ApiCallInterface {
 
     @POST(Urls.VERIFY_CONTACTS)
     fun getContacts(@Body parameters: Map<String, String>): Observable<Contacts>
+
+    @POST(Urls.ALL_CHATS_LIST)
+    fun getAllChats(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
+
+    @POST(Urls.ALL_CHATS_MESSAGES)
+    fun getAllMessages(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<ChatMessagesResponse>
 }

@@ -7,19 +7,19 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/lvNewGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:paddingTop="@dimen/_5sdp"
-            android:paddingBottom="@dimen/_5sdp"
-            android:id="@+id/lvNewGroup"
-            android:gravity="center">
+            android:paddingBottom="@dimen/_5sdp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivNewGroupImage"
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:src="@color/theme_color"/>
+                android:src="@color/theme_color" />
 
             <TextView
                 android:id="@+id/tvNewGroup"
@@ -36,19 +36,19 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/lvNewContact"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:paddingTop="@dimen/_5sdp"
-            android:paddingBottom="@dimen/_5sdp"
-            android:id="@+id/lvNewContact"
-            android:gravity="center">
+            android:paddingBottom="@dimen/_5sdp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivNewContactImage"
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:src="@color/theme_color"/>
+                android:src="@color/theme_color" />
 
             <TextView
                 android:id="@+id/tvNewContact"

@@ -1,7 +1,6 @@
 package com.example.kalam_android.base
 
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,11 +8,15 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
+import com.github.nkzawa.engineio.client.Socket
+import com.github.nkzawa.socketio.client.IO
+
 
 open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     private var progressDialog: AlertDialog? = null

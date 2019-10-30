@@ -14,7 +14,6 @@ class LocalRepo @Inject constructor(private val dao: ContactsDao) {
     fun insertIntoDB(contactsData: ArrayList<ContactsEntityClass>) {
         contactsData.let {
             Log.i("testingLocal", "insertIntoDB: $it")
-
             dao.insert(it)
         }
     }

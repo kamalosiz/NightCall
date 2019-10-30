@@ -34,4 +34,20 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     fun getContacts(parameters: Map<String, String>): Observable<Contacts> {
         return apiCallInterface.getContacts(parameters)
     }
+
+    fun getAllChat(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<AllChatListResponse> {
+        return apiCallInterface.getAllChats(authorization, parameters)
+    }
+
+    fun getAllMessages(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<ChatMessagesResponse> {
+        return apiCallInterface.getAllMessages(authorization, parameters)
+    }
+
+
 }

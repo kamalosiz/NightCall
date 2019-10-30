@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.os.Bundle
 import android.os.Handler
 import android.provider.ContactsContract
+import android.telephony.SmsManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
@@ -72,7 +73,8 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
             consumeResponse(it)
         })
         binding.rvForContacts.layoutManager = LinearLayoutManager(applicationContext)
-        binding.rvForContacts.adapter = AdapterForContacts(this)
+        binding.rvForContacts.adapter =
+            AdapterForContacts(this, sharedPrefsHelper.getUser()?.id.toString())
         contactList = ArrayList()
         binding.header.btnRight.setOnClickListener {
             popUpMenu(it, R.menu.menu, this)
@@ -180,6 +182,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                 phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
             val phoneNumber =
                 phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                    .trim()
             if (!list.contains(ContactInfo(name, phoneNumber))) {
                 list.add(ContactInfo(name, phoneNumber))
             }

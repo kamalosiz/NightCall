@@ -72,4 +72,13 @@ dependencies {
     //Room Database
     implementation "android.arch.persistence.room:runtime:1.1.1"
     kapt "android.arch.persistence.room:compiler:1.1.1"
+
+    //Socket
+    implementation 'com.github.nkzawa:socket.io-client:0.6.0'
+
+    /*implementation ('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }*/
+
 }

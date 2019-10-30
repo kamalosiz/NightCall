@@ -35,4 +35,14 @@ abstract class ViewModelsModule {
     @ViewModelKey(ContactsViewModel::class)
     abstract fun bindContactsViewModel(viewModel: ContactsViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(AllChatListViewModel::class)
+    abstract fun bindAllChatListViewModel(viewModel: AllChatListViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(ChatMessagesViewModel::class)
+    abstract fun bindChatMessagesViewModel(viewModel: ChatMessagesViewModel): ViewModel
+
 }
