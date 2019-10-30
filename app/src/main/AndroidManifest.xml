@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.activities.ChatDetailActivity"></activity>
+        <activity android:name=".view.activities.SettingActivity"></activity>
+        <activity android:name=".view.activities.ChatDetailActivity" />
 
         <uses-library
             android:name="org.apache.http.legacy"

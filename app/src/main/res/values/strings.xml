@@ -36,4 +36,6 @@
     <string name="labelSubmit">Submit</string>
     <string name="no_chat">There is currently no chat, Start chatting by clicking compose button </string>
     <string name="invite_text">Check out Kalam, I use it to message and call the people I care about. Get it for free</string>
+    <string name="slide_to_cancel">Slide to cancel</string>
+    <string name="labelChangeLng">Change Language</string>
 </resources>
