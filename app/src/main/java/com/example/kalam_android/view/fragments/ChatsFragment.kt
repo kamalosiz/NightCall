@@ -75,7 +75,7 @@ class ChatsFragment : Fragment() {
     private fun renderResponse(response: AllChatListResponse?) {
         logE("response: $response")
         response?.let {
-            if (it.data.isNotEmpty()) {
+            if (it.data?.isNotEmpty() == true) {
                 (binding.chatRecycler.adapter as AllChatsAdapter).updateList(it.data)
                 binding.tvNoChat.visibility = View.GONE
             } else {

@@ -23,13 +23,4 @@ object SocketIO {
             Debugger.e(TAG, "==============================OFF")
         }
     }
-
-    fun chatInitiated() {
-        socket?.on(AppConstants.CHAT_INITIATED) {
-            val data = it[0] as JSONObject
-            Debugger.e(TAG, "USER ID $data")
-        }
-    }
-
-
 }

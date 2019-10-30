@@ -23,6 +23,7 @@ import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import javax.inject.Inject
 
@@ -54,21 +55,27 @@ class ChatDetailActivity : BaseActivity() {
         logE("isFromChatFragment : $isFromChatFragment")
         if (isFromChatFragment) {
             chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
+            logE("chat id in if: $chatId")
             params["chat_id"] = chatId.toString()
             viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
 
         } else {
             val id = intent.getStringExtra(AppConstants.RECEIVER_ID)
+           /* val socketParams = HashMap<String, String>()
+            socketParams["user_id"] = sharedPrefsHelper.getUser()?.id.toString()
+            socketParams["receiver_id"] = id*/
             val jsonObject = JsonObject()
             jsonObject.addProperty("user_id", sharedPrefsHelper.getUser()?.id.toString())
             jsonObject.addProperty("receiver_id", id)
+//            val gson = Gson()
             SocketIO.socket?.emit(AppConstants.START_CAHT, jsonObject, Ack {
                 val chatId = it[0] as Int
                 Debugger.e(TAG, "ID $chatId")
                 this.chatId = chatId
-                params["chat_id"] = this.chatId.toString()
-                viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
             })
+//            logE("Json: ${gson.toJson(socketParams).toString().replace("\"","")}")
+            params["chat_id"] = chatId.toString()
+            viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
         }
     }
 
@@ -80,7 +87,6 @@ class ChatDetailActivity : BaseActivity() {
             }
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
-                toast("Contacts Synced Successfully")
                 renderResponse(apiResponse.data as ChatMessagesResponse)
                 logE("+${apiResponse.data}")
             }

@@ -4,7 +4,7 @@ data class ChatMessagesResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
-    val data: ArrayList<ChatData>,
+    val data: ArrayList<ChatData>?,
     val message: String
 )
 

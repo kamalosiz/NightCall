@@ -4,7 +4,7 @@ data class AllChatListResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
-    val data: ArrayList<ChatListData>,
+    val data: ArrayList<ChatListData>?,
     val message: String
 )
 
