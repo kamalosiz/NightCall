@@ -1,5 +1,6 @@
 package com.example.kalam_android.view.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -151,7 +152,7 @@ class AdapterForContacts(val context: Context, val userID: String) :
                         intent.putExtra(AppConstants.RECEIVER_ID, item?.id.toString())
                         intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
                         context.startActivity(intent)
-
+                        (context as Activity).finish()
                     } else {
                         logE("Receiver Id in else: ${item.id}")
                     }

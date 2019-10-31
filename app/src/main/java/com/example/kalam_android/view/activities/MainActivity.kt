@@ -8,13 +8,10 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityMainBinding
-import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.adapter.HomePagerAdapter
 import com.example.kalam_android.wrapper.SocketIO
-import com.github.nkzawa.socketio.client.IO
-import com.github.nkzawa.socketio.client.Socket
 import javax.inject.Inject
 
 class MainActivity : BaseActivity() {
@@ -126,5 +123,10 @@ class MainActivity : BaseActivity() {
 
     private fun logE(message: String) {
         Debugger.e(TAG, message)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SocketIO.disconnectSocket()
     }
 }

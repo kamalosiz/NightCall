@@ -121,7 +121,7 @@ class AudioRecordView : FrameLayout {
 
         layoutInflater = LayoutInflater.from(context)
         binding =
-            DataBindingUtil.inflate(layoutInflater, R.layout.layout_for_chat_screen,null,true)
+            DataBindingUtil.inflate(layoutInflater, R.layout.layout_for_chat_screen, null, true)
         addView(binding.root)
 
         dp = TypedValue.applyDimension(

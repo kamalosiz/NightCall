@@ -1,11 +1,12 @@
 package com.example.kalam_android.wrapper
 
+import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.github.nkzawa.socketio.client.IO
 import com.github.nkzawa.socketio.client.Socket
-import org.json.JSONObject
+import com.google.gson.JsonObject
 
 
 object SocketIO {
@@ -21,15 +22,28 @@ object SocketIO {
             Debugger.e(TAG, "==============================CONNECTED")
         }?.on(Socket.EVENT_DISCONNECT) {
             Debugger.e(TAG, "==============================OFF")
+        }?.on(AppConstants.MESSAGE_TYPING) {
+            val jsonObject = it[0] as JsonObject
+            Debugger.e(TAG, "Some one is typing : $it")
+            Debugger.e(TAG, "Some one is typing : $jsonObject")
         }
     }
 
-    fun chatInitiated() {
-        socket?.on(AppConstants.CHAT_INITIATED) {
-            val data = it[0] as JSONObject
-            Debugger.e(TAG, "USER ID $data")
-        }
+    fun disconnectSocket() {
+        socket?.disconnect()
     }
 
+    fun checkSomeoneTyping(action: String, userId: String, chatId: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("user_id", userId)
+        jsonObject.addProperty("chat_id", chatId)
+        socket?.emit(action, jsonObject)
+    }
 
+    fun checkNewMessage(newMessageListener: NewMessageListener) {
+        socket?.on(AppConstants.NEW_MESSAGE) {
+            val jsonObject = it[0] as JsonObject
+            newMessageListener.newMessage(jsonObject)
+        }
+    }
 }
