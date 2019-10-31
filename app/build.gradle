@@ -46,6 +46,7 @@ dependencies {
     //Helpers/Random
     implementation 'com.github.yalantis:ucrop:2.2.4'
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
     implementation 'com.github.yesterselga:country-picker-android:1.0'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
@@ -75,10 +76,5 @@ dependencies {
 
     //Socket
     implementation 'com.github.nkzawa:socket.io-client:0.6.0'
-
-    /*implementation ('io.socket:socket.io-client:1.0.0') {
-        // excluding org.json which is provided by Android
-        exclude group: 'org.json', module: 'json'
-    }*/
 
 }

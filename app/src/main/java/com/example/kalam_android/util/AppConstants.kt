@@ -9,11 +9,20 @@ object AppConstants {
     const val IS_FROM_CHAT_FRAGMENT = "is_chat_boolean"
     const val CHAT_ID = "kalam_chat_id"
 
+    //Request Code
+    const val CHAT_FRAGMENT_CODE = 1000
+
     //Local DB=
     const val DB_NAME = "kalam_local_db"
     const val CONTACTS_TABLE = "contacts"
 
     //Socket Actions
     const val START_CAHT = "startChat"
-    const val CHAT_INITIATED = "chatInitiated"
+    const val SEND_MESSAGE = "send_message"
+    const val START_TYPING = "start_typing"
+    const val STOP_TYPING = "stop_typing"
+
+    //Listeners
+    const val MESSAGE_TYPING = "message_typing"
+    const val NEW_MESSAGE = "new_message"
 }

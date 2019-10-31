@@ -2,22 +2,22 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        android:id="@+id/rlSender"
-        android:layout_width="wrap_content"
+        android:id="@+id/rlMessage"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_margin="@dimen/_5sdp"
-        android:background="@drawable/box_theme_outine"
+        android:gravity="start"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvSender"
+            android:id="@+id/tvMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/_5sdp"
             android:fontFamily="@font/halvatic_light"
             android:text="Hello how are you?"
             android:textColor="@color/theme_color"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_13sdp"
+            android:padding="@dimen/_10sdp"
+            android:background="@drawable/box_theme_outine"/>
     </LinearLayout>
 </layout>

@@ -16,5 +16,5 @@
         android:layout_weight="4"
         android:gravity="center"
         android:text="@string/dialoge_text"
-        android:textSize="@dimen/_11sdp" />
+        android:textSize="@dimen/_11ssp" />
 </LinearLayout>

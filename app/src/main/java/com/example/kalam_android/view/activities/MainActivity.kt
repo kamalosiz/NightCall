@@ -8,13 +8,10 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityMainBinding
-import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.adapter.HomePagerAdapter
 import com.example.kalam_android.wrapper.SocketIO
-import com.github.nkzawa.socketio.client.IO
-import com.github.nkzawa.socketio.client.Socket
 import javax.inject.Inject
 
 class MainActivity : BaseActivity() {
@@ -35,15 +32,6 @@ class MainActivity : BaseActivity() {
         binding.llCall.setOnClickListener { binding.viewPager.setCurrentItem(1, true) }
         binding.llStories.setOnClickListener { binding.viewPager.setCurrentItem(2, true) }
         binding.llProfile.setOnClickListener { binding.viewPager.setCurrentItem(3, true) }
-        /* val opts = IO.Options()
-         opts.query = "token=" + sharedPrefsHelper.getUser()?.token
-         val socket = IO.socket(Urls.BASE_URL, opts)
-         socket?.on(Socket.EVENT_CONNECT) {
-             logE("==============================CONNECTED")
-         }?.on(Socket.EVENT_DISCONNECT) {
-             logE("==============================OFF")
-         }
-         socket.connect()*/
         SocketIO.connectSocket(sharedPrefsHelper.getUser()?.token)
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
@@ -106,5 +94,10 @@ class MainActivity : BaseActivity() {
 
     private fun logE(message: String) {
         Debugger.e(TAG, message)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SocketIO.disconnectSocket()
     }
 }

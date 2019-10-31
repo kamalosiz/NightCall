@@ -11,7 +11,7 @@ data class ChatMessagesResponse(
 data class ChatData(
     val id: Int,
     val chat_id: Int,
-    val sender_id: Int,
+    val sender_id: Int?,
     val receiver_id: Int,
     val message: String,
     val sender_deleted: Int,

@@ -72,7 +72,6 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         viewModel.contactsResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        binding.rvForContacts.layoutManager = LinearLayoutManager(applicationContext)
         binding.rvForContacts.adapter =
             AdapterForContacts(this, sharedPrefsHelper.getUser()?.id.toString())
         contactList = ArrayList()
@@ -95,6 +94,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
             }
             Status.ERROR -> {
                 binding.pbCenter.visibility = View.GONE
+                binding.rvForContacts.visibility = View.VISIBLE
                 toast("Something went wrong please try again")
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
             }
