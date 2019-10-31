@@ -22,4 +22,5 @@ interface AppComponents {
     fun doInjection(activity: MainActivity)
     fun doInjection(activity: ChatDetailActivity)
     fun doInjection(fragment: ChatsFragment)
+    fun doInjection(findsFriendsActivity: FindsFriendsActivity)
 }
