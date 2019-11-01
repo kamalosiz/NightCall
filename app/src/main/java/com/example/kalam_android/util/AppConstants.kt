@@ -7,7 +7,10 @@ object AppConstants {
     const val USER_NAME = "user_name_kalam"
     const val RECEIVER_ID = "user_receiver_id"
     const val IS_FROM_CHAT_FRAGMENT = "is_chat_boolean"
+    const val CHAT_USER_NAME = "chat_user_name"
+    const val CHAT_USER_PICTURE = "chat_user_picture"
     const val CHAT_ID = "kalam_chat_id"
+    const val DUMMY_DATA = -1
 
     //Request Code
     const val CHAT_FRAGMENT_CODE = 1000
@@ -25,4 +28,5 @@ object AppConstants {
     //Listeners
     const val MESSAGE_TYPING = "message_typing"
     const val NEW_MESSAGE = "new_message"
+    const val MESSAGE_STOPS_TYPING = "message_stop_typing"
 }

@@ -104,7 +104,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun renderResponse(response: Contacts?) {
-        logE("response: $response")
+        logE("socketResponse: $response")
         response?.let {
             contactList = it.data.contacts_list
             (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
@@ -135,7 +135,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
                 renderLocalResponse(apiResponse.data)
-                logE("local response +${apiResponse.data}")
+                logE("local socketResponse +${apiResponse.data}")
             }
             Status.ERROR -> {
                 binding.pbCenter.visibility = View.GONE

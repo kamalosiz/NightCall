@@ -49,8 +49,10 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
         itemHolder.binding.tvMessage.text = item?.message
         if (item?.sender_id == userId.toInt()) {
             itemHolder.binding.rlMessage.gravity = Gravity.END
+            itemHolder.binding.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
         } else {
             itemHolder.binding.rlMessage.gravity = Gravity.START
+            itemHolder.binding.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
         }
     }
 

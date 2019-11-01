@@ -13,10 +13,10 @@ data class ChatData(
     val chat_id: Int,
     val sender_id: Int?,
     val receiver_id: Int,
-    val message: String,
+    val message: String?,
     val sender_deleted: Int,
     val receiver_deleted: Int,
     val type: String,
     val file_id: Int,
-    val original_message: String
+    val original_message: String?
 )

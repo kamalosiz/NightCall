@@ -52,7 +52,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         setSpannable()
         binding.hidePassword.setOnClickListener(this)
         binding.btnLogin.setOnClickListener(this)
-        binding.etUsername.setText("testing@gmail.com")
+        binding.etUsername.setText("waqarmustafa18@gmail.com")
         binding.etPass.setText("123")
     }
 
@@ -77,7 +77,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun renderResponse(response: LoginResponse?) {
-        logE("response: $response")
+        logE("socketResponse: $response")
         response?.let {
             logE(it.toString())
             if (it.status) {
@@ -86,7 +86,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             } else {
-                showAlertDialoge(this, "Error", it.message)
+                showAlertDialoge(this, "Error", it.message.toString())
             }
         }
     }

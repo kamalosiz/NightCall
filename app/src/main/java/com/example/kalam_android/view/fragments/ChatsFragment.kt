@@ -29,7 +29,7 @@ import com.example.kalam_android.view.adapter.AllChatListAdapter
 import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
-import com.google.gson.JsonObject
+import org.json.JSONObject
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -60,7 +60,8 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         })
         chatList = ArrayList()
         hitAllChatApi()
-        SocketIO.checkNewMessage(this)
+        SocketIO.setListener(this)
+//        SocketIO.checkNewMessage()
         binding.swipeRefreshLayout.setOnRefreshListener {
             hitAllChatApi()
         }
@@ -91,7 +92,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
     }
 
     private fun renderResponse(response: AllChatListResponse?) {
-        logE("response: $response")
+        logE("socketResponse: $response")
         response?.let {
             if (it.data?.isNotEmpty() == true) {
                 it.data.reverse()
@@ -116,8 +117,11 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         Debugger.e(TAG, message)
     }
 
-    override fun newMessage(jsonObject: JsonObject) {
-        logE("Chats Fragment New Message is called: $jsonObject")
+    override fun socketResponse(jsonObject: JSONObject) {
+        logE("call Api")
+        activity?.runOnUiThread {
+            hitAllChatApi()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -125,7 +129,9 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
+                    logE("Api hit successfully")
                     hitAllChatApi()
+                    SocketIO.setListener(this)
                 }
             }
         }
@@ -138,12 +144,16 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
                 val intent = Intent(activity, ChatDetailActivity::class.java)
                 intent.putExtra(AppConstants.CHAT_ID, item?.chat_id)
                 intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
-                (activity as Activity).startActivityForResult(
+                intent.putExtra(
+                    AppConstants.CHAT_USER_NAME,
+                    StringBuilder(item?.firstname.toString()).append(" ").append(item?.lastname.toString()).toString()
+                )
+                intent.putExtra(AppConstants.CHAT_USER_PICTURE, item?.profile_image.toString())
+                startActivityForResult(
                     intent,
                     AppConstants.CHAT_FRAGMENT_CODE
                 )
             }
         }
     }
-
 }

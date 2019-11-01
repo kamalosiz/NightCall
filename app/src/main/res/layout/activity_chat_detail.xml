@@ -7,18 +7,21 @@
         android:layout_height="match_parent"
         android:background="#EFEFEF">
 
-        <include layout="@layout/header" />
+        <include
+            android:id="@+id/header"
+            layout="@layout/header_chat" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/header"
             android:layout_marginBottom="@dimen/_50sdp"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_messages_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </LinearLayout>

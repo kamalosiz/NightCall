@@ -1,7 +1,7 @@
 package com.example.kalam_android.callbacks
 
-import com.google.gson.JsonObject
+import org.json.JSONObject
 
 interface NewMessageListener {
-    fun newMessage(jsonObject: JsonObject)
+    fun socketResponse(jsonObject: JSONObject)
 }

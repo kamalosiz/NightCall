@@ -1,5 +1,6 @@
 package com.example.kalam_android.wrapper
 
+import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
@@ -7,11 +8,14 @@ import com.example.kalam_android.util.Debugger
 import com.github.nkzawa.socketio.client.IO
 import com.github.nkzawa.socketio.client.Socket
 import com.google.gson.JsonObject
+import org.json.JSONObject
 
 
 object SocketIO {
     private val TAG = this.javaClass.simpleName
     var socket: Socket? = null
+    private var newMessageListener: NewMessageListener? = null
+    private var messageTypingResponse: MessageTypingListener? = null
 
     fun connectSocket(token: String?) {
         val opts = IO.Options()
@@ -22,10 +26,23 @@ object SocketIO {
             Debugger.e(TAG, "==============================CONNECTED")
         }?.on(Socket.EVENT_DISCONNECT) {
             Debugger.e(TAG, "==============================OFF")
+
+        }?.on(AppConstants.NEW_MESSAGE) {
+
+            val jsonObject = it[0] as JSONObject
+//            if (newMessageListener != null)
+                newMessageListener?.socketResponse(jsonObject)
+
         }?.on(AppConstants.MESSAGE_TYPING) {
-            val jsonObject = it[0] as JsonObject
-            Debugger.e(TAG, "Some one is typing : $it")
-            Debugger.e(TAG, "Some one is typing : $jsonObject")
+
+            val jsonObject = it[0] as JSONObject
+            messageTypingResponse?.typingResponse(jsonObject, true)
+
+        }?.on(AppConstants.MESSAGE_STOPS_TYPING) {
+
+            val jsonObject = it[0] as JSONObject
+            messageTypingResponse?.typingResponse(jsonObject, false)
+
         }
     }
 
@@ -33,17 +50,18 @@ object SocketIO {
         socket?.disconnect()
     }
 
-    fun checkSomeoneTyping(action: String, userId: String, chatId: String) {
+    fun typingEvent(action: String, userId: String, chatId: String) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", userId)
         jsonObject.addProperty("chat_id", chatId)
         socket?.emit(action, jsonObject)
     }
 
-    fun checkNewMessage(newMessageListener: NewMessageListener) {
-        socket?.on(AppConstants.NEW_MESSAGE) {
-            val jsonObject = it[0] as JsonObject
-            newMessageListener.newMessage(jsonObject)
-        }
+    fun setListener(newMessageListener: NewMessageListener) {
+        this.newMessageListener = newMessageListener
+    }
+
+    fun setTypingListener(messageTypingResponse: MessageTypingListener) {
+        this.messageTypingResponse = messageTypingResponse
     }
 }

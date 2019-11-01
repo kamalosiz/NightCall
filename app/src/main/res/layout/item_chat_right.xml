@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/rlMessage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tvMessage"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_margin="@dimen/_5sdp"
-            android:fontFamily="@font/halvatic_light"
-            android:text="Hello how are you?"
-            android:textColor="@color/theme_color"
-            android:textSize="@dimen/_13sdp"
-            android:padding="@dimen/_10sdp"
-            android:background="@drawable/box_theme_outine"/>
-    </LinearLayout>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignStart="@id/tvMessage"
+                android:layout_alignTop="@id/tvMessage"
+                android:layout_alignEnd="@id/tvMessage"
+                android:layout_alignBottom="@id/tvMessage"
+                android:scaleType="fitXY" />
+
+            <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/halvatic_light"
+                android:gravity="center_horizontal"
+                android:paddingStart="@dimen/_25sdp"
+                android:paddingTop="@dimen/_5sdp"
+                android:paddingEnd="@dimen/_10sdp"
+                android:paddingBottom="@dimen/_5sdp"
+                android:text="This is a dummy message"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13ssp" />
+        </RelativeLayout>
+    </RelativeLayout>
 </layout>
