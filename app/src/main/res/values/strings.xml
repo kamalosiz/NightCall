@@ -37,10 +37,16 @@
     <string name="no_chat">There is currently no chat, Start chatting by clicking compose button </string>
     <string name="invite_text">Check out Kalam, I use it to message and call the people I care about. Get it for free</string>
     <string name="slide_to_cancel">Slide to cancel</string>
-    <string name="labelChangeLng">Change Language</string>
+    <string name="labelChangeLng">Select Language</string>
     <string name="labelAbout">About</string>
     <string name="labelTermCondition"><![CDATA[Terms & Condition]]></string>
     <string name="labelPrivacyPolicy">Privacy Policy</string>
     <string name="labelEnglish">English</string>
     <string name="labelArabic">Arabic</string>
+    <string name="selectAuto">Select Automatically</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="labelFindFriends">Find Friends</string>
+    <string name="labelSearch">Search</string>
 </resources>

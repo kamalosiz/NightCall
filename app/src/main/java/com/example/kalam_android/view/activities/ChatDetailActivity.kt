@@ -64,7 +64,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private val delay: Long = 1000
     private var lastTextEdit: Long = 0
     var handler = Handler()
-
+    private var audioPath: String? = null
     private var state: Boolean = false
     private var recordingStopped: Boolean = false
     private var pause: Boolean = false
@@ -85,7 +85,8 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         binding.chatMessagesRecycler.adapter =
             ChatMessagesAdapter(this, sharedPrefsHelper.getUser()?.id.toString())
         binding.recordingView.imageViewSend.setOnClickListener(this)
-        moveRecyclerView()
+        binding.header.rlBack.setOnClickListener(this)
+//        moveRecyclerView()
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
@@ -96,6 +97,8 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         val params = HashMap<String, String>()
         if (isFromChatFragment) {
             chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
+            params["chat_id"] = chatId.toString()
+            viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
         } else {
             receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
             val jsonObject = JsonObject()
@@ -105,10 +108,12 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
                 val chatId = it[0] as Int
                 Debugger.e(TAG, "ID $chatId")
                 this.chatId = chatId
+                runOnUiThread {
+                    params["chat_id"] = chatId.toString()
+                    viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
+                }
             })
         }
-        params["chat_id"] = chatId.toString()
-        viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
     }
 
     private fun setUserData() {
@@ -185,7 +190,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private fun initRecorder() {
 
         path = File(Environment.getExternalStorageDirectory().path, "recording.mp3")
-
+        audioPath = Environment.getExternalStorageDirectory().absolutePath + "/recording.mp3"
         try {
             file = File.createTempFile("recording", ".mp3", path)
         } catch (e: IOException) {
@@ -195,7 +200,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         mediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
         mediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         mediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-        mediaRecorder?.setOutputFile(path.absolutePath)
+        mediaRecorder?.setOutputFile(audioPath)
     }
 
     private fun startRecording() {
@@ -221,28 +226,6 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         }
     }
 
-    /*   private fun pauseRecording() {
-           if (state) {
-               if (!recordingStopped) {
-                   Toast.makeText(this, "Stopped!", Toast.LENGTH_SHORT).show()
-                   mediaRecorder?.pause()
-                   recordingStopped = true
-   //                button_pause_recording.text = "Resume"
-               } else {
-                   resumeRecording()
-               }
-           }
-       }*/
-
-    /*   @SuppressLint("RestrictedApi", "SetTextI18n")
-       @TargetApi(Build.VERSION_CODES.N)
-       private fun resumeRecording() {
-           Toast.makeText(this, "Resume!", Toast.LENGTH_SHORT).show()
-           mediaRecorder?.resume()
-   //        button_pause_recording.text = "Pause"
-           recordingStopped = false
-       }*/
-
     override fun onRecordingStarted() {
         startRecording()
     }
@@ -252,6 +235,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     override fun onRecordingCompleted() {
         stopRecording()
+//        sendVoiceMessage()
     }
 
     override fun onRecordingCanceled() {
@@ -262,8 +246,29 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
             R.id.imageViewSend -> {
                 sendMessage()
             }
+            R.id.rlBack -> {
+                onBackPressed()
+            }
         }
     }
+
+ /*   private fun sendVoiceMessage() {
+        val message = ChatData(
+            -1, chatId, sharedPrefsHelper.getUser()?.id, -1
+            , audioPath.toString(),
+            -1, -1,
+            "audio", -1, ""
+        )
+        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(message)
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("user_id", sharedPrefsHelper.getUser()?.id.toString())
+        jsonObject.addProperty("chat_id", chatId.toString())
+        jsonObject.addProperty("message", audioPath)
+        jsonObject.addProperty("type", "audio")
+        SocketIO.socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
+        logE("Message Emitted to socket")
+        chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
+    }*/
 
     private fun moveRecyclerView() {
         binding.chatMessagesRecycler.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
@@ -358,7 +363,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
                 if (user.equals(userRealName)) {
                     val list: List<String>? = user?.split(" ")
                     binding.header.tvName.text =
-                        StringBuilder(list?.get(0).toString()).append(" is typing")
+                        StringBuilder(list?.get(0).toString()).append(" is typing...")
                 }
             } else {
                 binding.header.tvName.text = userRealName
@@ -371,7 +376,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
             AppConstants.DUMMY_DATA, chatId, id, AppConstants.DUMMY_DATA
             , msg,
             AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
-            "text", AppConstants.DUMMY_DATA, originalMsg
+            "text", AppConstants.DUMMY_STRING, originalMsg
         )
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(message)
         chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }

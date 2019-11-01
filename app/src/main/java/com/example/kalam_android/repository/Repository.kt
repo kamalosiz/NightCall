@@ -48,6 +48,12 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     ): Observable<ChatMessagesResponse> {
         return apiCallInterface.getAllMessages(authorization, parameters)
     }
+    fun findFriends(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<FindFriends> {
+        return apiCallInterface.findFriends(authorization, parameters)
+    }
 
 
 }

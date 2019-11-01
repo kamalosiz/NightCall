@@ -17,6 +17,6 @@ data class ChatData(
     val sender_deleted: Int,
     val receiver_deleted: Int,
     val type: String,
-    val file_id: Int,
+    val file_id: String?,
     val original_message: String?
 )

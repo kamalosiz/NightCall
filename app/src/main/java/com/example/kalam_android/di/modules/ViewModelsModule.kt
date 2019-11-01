@@ -45,4 +45,9 @@ abstract class ViewModelsModule {
     @ViewModelKey(ChatMessagesViewModel::class)
     abstract fun bindChatMessagesViewModel(viewModel: ChatMessagesViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(FindFriendsViewModel::class)
+    abstract fun bindFindFriendsViewModel(viewModel: FindFriendsViewModel): ViewModel
+
 }

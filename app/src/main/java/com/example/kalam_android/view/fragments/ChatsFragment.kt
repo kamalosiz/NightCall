@@ -60,8 +60,8 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         })
         chatList = ArrayList()
         hitAllChatApi()
+        binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this, chatList)
         SocketIO.setListener(this)
-//        SocketIO.checkNewMessage()
         binding.swipeRefreshLayout.setOnRefreshListener {
             hitAllChatApi()
         }
@@ -130,6 +130,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
                     logE("Api hit successfully")
+                    logE("Finally i did it")
                     hitAllChatApi()
                     SocketIO.setListener(this)
                 }

@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.example.kalam_android.repository.model.CreateProfileResponse
 import com.example.kalam_android.repository.model.PhoneModel
 import com.example.kalam_android.repository.model.UserData
+import com.example.kalam_android.view.activities.SelectLanguage
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import javax.inject.Inject
@@ -18,6 +19,8 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     private val KEY_PHONE = "key_phone_kalam"
     private val IMAGE_INDEX = "key_image_index_kalam"
     private val CONTACTS_SYNCED = "key_contacts_synced"
+    private val LANGUAGE = "kalam_user_language"
+    private val SELECT_AUTO = "kalam_translate_data"
 
     fun put(key: String, value: String) {
         mSharedPreferences.edit().putString(key, value).apply()
@@ -110,5 +113,21 @@ constructor(private val mSharedPreferences: SharedPreferences) {
 
     fun isContactsSynced(): Boolean {
         return get(CONTACTS_SYNCED, false) ?: false
+    }
+
+    fun saveLanguage(language: Int) {
+        put(LANGUAGE, language)
+    }
+
+    fun getLanguage(): Int? {
+        return get(LANGUAGE, 0)
+    }
+
+    fun saveTranslateState(translate: Int) {
+        put(SELECT_AUTO, translate)
+    }
+
+    fun getTransState(): Int? {
+        return get(SELECT_AUTO, 0)
     }
 }

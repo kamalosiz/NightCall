@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".view.activities.SettingActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,12 +16,29 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelChangeLng"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp" />
+            android:textSize="@dimen/_13ssp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/_1sdp"
             android:background="@color/light_grey" />
+
+        <TextView
+            android:id="@+id/tvFindFriends"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/halvatic_light"
+            android:gravity="center_vertical"
+            android:padding="@dimen/_15sdp"
+            android:text="@string/labelFindFriends"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_13ssp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:background="@color/light_grey" />
+
         <TextView
 
             android:layout_width="match_parent"
@@ -34,7 +48,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelPrivacyPolicy"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp" />
+            android:textSize="@dimen/_13ssp" />
 
         <View
             android:layout_width="match_parent"
@@ -50,12 +64,13 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelTermCondition"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp" />
+            android:textSize="@dimen/_13ssp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/_1sdp"
             android:background="@color/light_grey" />
+
         <TextView
             android:id="@+id/tvAbout"
             android:layout_width="match_parent"
@@ -65,7 +80,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelAbout"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp" />
+            android:textSize="@dimen/_13ssp" />
 
         <View
             android:layout_width="match_parent"

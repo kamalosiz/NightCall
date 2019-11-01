@@ -27,11 +27,11 @@ class AdapterForContacts(val context: Context, val userID: String) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var contactList: ArrayList<ContactsData>? = null
-    private val onClickListener: View.OnClickListener
     private val TAG = this.javaClass.simpleName
-
     private val VIEW_HEADER = 0
+
     private val VIEW_ITEM = 1
+    private val onClickListener: View.OnClickListener
 
     init {
         onClickListener = AdapterClickListener()
@@ -151,6 +151,11 @@ class AdapterForContacts(val context: Context, val userID: String) :
                         val intent = Intent(context, ChatDetailActivity::class.java)
                         intent.putExtra(AppConstants.RECEIVER_ID, item?.id.toString())
                         intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
+                        intent.putExtra(AppConstants.CHAT_USER_NAME, item?.name.toString())
+                        intent.putExtra(
+                            AppConstants.CHAT_USER_PICTURE,
+                            item?.profile_image.toString()
+                        )
                         context.startActivity(intent)
                         (context as Activity).finish()
                     } else {

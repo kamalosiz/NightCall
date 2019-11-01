@@ -38,4 +38,9 @@ fun pixOptionsSingle(): Options {
 fun toast(context: Context?, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
+fun getFileBody(path: String, fileName: String): MultipartBody.Part {
+    val file = File(path)
+    val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+    return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
+}
 

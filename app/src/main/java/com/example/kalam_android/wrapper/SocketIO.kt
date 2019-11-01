@@ -30,8 +30,7 @@ object SocketIO {
         }?.on(AppConstants.NEW_MESSAGE) {
 
             val jsonObject = it[0] as JSONObject
-//            if (newMessageListener != null)
-                newMessageListener?.socketResponse(jsonObject)
+            newMessageListener?.socketResponse(jsonObject)
 
         }?.on(AppConstants.MESSAGE_TYPING) {
 
@@ -47,6 +46,9 @@ object SocketIO {
     }
 
     fun disconnectSocket() {
+        socket?.off(AppConstants.NEW_MESSAGE)
+        socket?.off(AppConstants.MESSAGE_TYPING)
+        socket?.off(AppConstants.MESSAGE_STOPS_TYPING)
         socket?.disconnect()
     }
 
@@ -54,6 +56,14 @@ object SocketIO {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", userId)
         jsonObject.addProperty("chat_id", chatId)
+        socket?.emit(action, jsonObject)
+    }
+
+    fun updateSettings(action: String, autoTranslate: String, language: String, id: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("auto_translate", autoTranslate)
+        jsonObject.addProperty("language", language)
+        jsonObject.addProperty("user_id", id)
         socket?.emit(action, jsonObject)
     }
 
