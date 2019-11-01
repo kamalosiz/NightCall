@@ -79,7 +79,7 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun renderResponse(response: SignUpResponse?) {
-        logE("response: $response")
+        logE("socketResponse: $response")
         response?.let {
             logE(it.toString())
             if (it.status) {

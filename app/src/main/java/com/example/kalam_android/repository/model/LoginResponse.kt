@@ -5,5 +5,5 @@ data class LoginResponse(
     val code: Int,
     val status: Boolean,
     var data: UserData?,
-    var message: String
+    var message: String?
 )

@@ -63,7 +63,7 @@ class VerifyCodeActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun renderResponse(response: VerifyCodeResponse?) {
-        logE("response $response")
+        logE("socketResponse $response")
         response?.let {
             if (it.status) {
                 toast(it.data)

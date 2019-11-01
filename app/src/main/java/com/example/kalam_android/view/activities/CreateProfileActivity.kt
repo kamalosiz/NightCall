@@ -80,7 +80,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun renderResponse(response: CreateProfileResponse?) {
-        logE("response $response")
+        logE("socketResponse $response")
         response?.let {
             if (it.status) {
 //                toast(it.data)

@@ -2,119 +2,143 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/rlMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvPlayer"
+        android:layout_width="@dimen/_250sdp"
+        android:layout_height="@dimen/_55sdp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone"
+        android:foregroundGravity=""
+        app:cardBackgroundColor="@color/sender_color"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:id="@+id/lvMediaPlayer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_5sdp"
-            android:background="@drawable/box_theme_outine"
-            android:fontFamily="@font/halvatic_light"
-            android:padding="@dimen/_10sdp"
-            android:text="Hello how are you?"
-            android:textColor="@color/theme_color"
-            android:textSize="@dimen/_13sdp" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cvPlayer"
-            android:layout_width="@dimen/_250sdp"
-            android:layout_height="@dimen/_55sdp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="visible"
-            app:cardBackgroundColor="@color/sender_color"
-            app:cardCornerRadius="@dimen/_10sdp"
-            app:cardElevation="0dp">
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/lvMediaPlayer"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_marginEnd="@dimen/_10sdp"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:orientation="horizontal">
 
-                <LinearLayout
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvMsgTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="@dimen/_2sdp"
-                    android:orientation="horizontal">
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="2:00 PM"
+                    android:textColor="#000"
+                    android:textSize="@dimen/_12sdp" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvMsgTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:fontFamily="@font/halvatic_light"
-                        android:text="2:00 PM"
-                        android:textColor="#000"
-                        android:textSize="@dimen/_12sdp" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/ivReadMsg"
-                        android:layout_width="@dimen/_13sdp"
-                        android:layout_height="@dimen/_13sdp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/_5sdp"
-                        android:background="@drawable/icon_message_read"
-                        android:padding="@dimen/_5sdp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/ivPlayPause"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_gravity="center_vertical"
-                        android:background="@drawable/icon_play"
-                        android:padding="@dimen/_5sdp" />
-
-
-                    <SeekBar
-                        android:id="@+id/seekBar"
-                        android:layout_width="@dimen/_160sdp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/seekbar_style"
-                        android:saveEnabled="true"
-                        android:thumb="@drawable/seekbar_thumb" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvPlayerTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:fontFamily="@font/halvatic_light"
-                        android:text="2:00"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/_12sdp" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/ivStop"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/_2sdp"
-                        android:background="@drawable/icon_stop"
-                        android:padding="@dimen/_5sdp" />
-                </LinearLayout>
-
-
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/ivReadMsg"
+                    android:layout_width="@dimen/_13sdp"
+                    android:layout_height="@dimen/_13sdp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:background="@drawable/icon_message_read"
+                    android:padding="@dimen/_5sdp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/ivPlayPause"
+                    android:layout_width="@dimen/_18sdp"
+                    android:layout_height="@dimen/_18sdp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/icon_play"
+                    android:padding="@dimen/_5sdp" />
+
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="@dimen/_160sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:progress="0"
+                    android:clickable="false"
+                    android:progressDrawable="@drawable/seekbar_style"
+                    android:saveEnabled="true"
+                    android:thumb="@drawable/seekbar_thumb" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvPlayerTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="@font/halvatic_light"
+                    android:text="2:00"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12sdp" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/ivStop"
+                    android:layout_width="@dimen/_18sdp"
+                    android:layout_height="@dimen/_18sdp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/_2sdp"
+                    android:background="@drawable/icon_stop"
+                    android:padding="@dimen/_5sdp" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <RelativeLayout
+        android:id="@+id/rlMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_5sdp">
+
+            <ImageView
+                android:id="@+id/ivMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignStart="@id/tvMessage"
+                android:layout_alignTop="@id/tvMessage"
+                android:layout_alignEnd="@id/tvMessage"
+                android:layout_alignBottom="@id/tvMessage"
+                android:scaleType="fitXY" />
+
+            <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/halvatic_light"
+                android:gravity="center_horizontal"
+                android:paddingStart="@dimen/_25sdp"
+                android:paddingTop="@dimen/_5sdp"
+                android:paddingEnd="@dimen/_10sdp"
+                android:paddingBottom="@dimen/_5sdp"
+                android:text="This is a dummy message"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13ssp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+        </RelativeLayout>
 </layout>
