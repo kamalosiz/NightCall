@@ -1,23 +1,16 @@
 package com.example.kalam_android.util
 
-import android.app.AlertDialog
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import com.fxn.pix.Options
 import com.fxn.utility.ImageQuality
-import android.content.DialogInterface
-import android.text.TextUtils
-import okhttp3.FormBody
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.BufferedInputStream
 import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
-import java.nio.file.Files.delete
-import java.nio.file.Files.exists
-import android.R.attr.path
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 fun Context.toast(message: CharSequence) =
@@ -38,9 +31,38 @@ fun pixOptionsSingle(): Options {
 fun toast(context: Context?, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
+
 fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     val file = File(path)
     val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
     return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
+}
+
+@SuppressLint("SimpleDateFormat")
+fun calculateLocalDate(unixTime: Long?): String {
+    val itemLong = (unixTime?.div(1000))
+    val d = itemLong?.times(1000L)?.let { Date(it) }
+//    return SimpleDateFormat("dd-MMM HH:mm").format(d)
+    return SimpleDateFormat("h:mm a").format(d)
+}
+
+fun printDifference(startDate: Date, endDate: Date) {
+    //milliseconds
+    var different = endDate.time - startDate.time
+    val secondsInMilli: Long = 1000
+    val minutesInMilli = secondsInMilli * 60
+    val hoursInMilli = minutesInMilli * 60
+    val daysInMilli = hoursInMilli * 24
+
+    val elapsedDays = different / daysInMilli
+    different %= daysInMilli
+
+    val elapsedHours = different / hoursInMilli
+    different %= hoursInMilli
+
+    val elapsedMinutes = different / minutesInMilli
+    different %= minutesInMilli
+
+    val elapsedSeconds = different / secondsInMilli
 }
 

@@ -10,8 +10,11 @@ data class AllChatListResponse(
 
 data class ChatListData(
     val chat_id: Int,
+    val updated_at: String,
+    val unix_time: Long,
     val firstname: String,
     val lastname: String,
     val profile_image: String,
-    val message: String?
+    val message: String?,
+    val un_read_count: Int
 )

@@ -48,6 +48,7 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     ): Observable<ChatMessagesResponse> {
         return apiCallInterface.getAllMessages(authorization, parameters)
     }
+
     fun findFriends(
         authorization: String?,
         parameters: Map<String, String>
@@ -55,5 +56,7 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.findFriends(authorization, parameters)
     }
 
-
+    fun uploadAudio(authorization: String?, @Part audio: MultipartBody.Part): Observable<AudioResponse> {
+        return apiCallInterface.uploadAudio(authorization, audio)
+    }
 }

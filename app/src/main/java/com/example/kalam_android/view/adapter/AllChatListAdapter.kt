@@ -2,13 +2,17 @@ package com.example.kalam_android.view.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.databinding.ItemChatAdapterBinding
 import com.example.kalam_android.repository.model.ChatListData
+import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.calculateLocalDate
 import com.example.kalam_android.wrapper.GlideDownloder
 
 class AllChatListAdapter(
@@ -39,6 +43,19 @@ class AllChatListAdapter(
         holderItem.binding.tvName.text =
             StringBuilder(item?.firstname.toString()).append(" ").append(item?.lastname.toString())
         holderItem.binding.tvLastMessage.text = item?.message.toString()
+        if (item?.un_read_count == 0) {
+            holderItem.binding.llUnread.visibility = View.GONE
+        } else {
+            holderItem.binding.llUnread.visibility = View.VISIBLE
+            holder.binding.tvUnread.text = item?.un_read_count.toString()
+            holderItem.binding.tvAgo.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.light_green
+                )
+            )
+        }
+        holderItem.binding.tvAgo.text = calculateLocalDate(item?.unix_time)
         GlideDownloder.load(
             context,
             holderItem.binding.ivImage,

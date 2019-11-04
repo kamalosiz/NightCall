@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-        android:id="@+id/rlMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -13,6 +13,7 @@
             android:layout_height="@dimen/_55sdp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:foregroundGravity=""
             android:visibility="gone"
             app:cardBackgroundColor="@color/sender_color"
             app:cardCornerRadius="@dimen/_10sdp"
@@ -74,6 +75,7 @@
                         android:layout_width="@dimen/_160sdp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:clickable="false"
                         android:progress="0"
                         android:progressDrawable="@drawable/seekbar_style"
                         android:saveEnabled="true"
@@ -104,9 +106,15 @@
         </androidx.cardview.widget.CardView>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/rlMessage"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/_5sdp">
+
+            <!--   <RelativeLayout
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_margin="@dimen/_5sdp">-->
 
             <ImageView
                 android:id="@+id/ivMessage"
@@ -131,13 +139,14 @@
                     android:gravity="center_horizontal"
                     android:paddingStart="@dimen/_20sdp"
                     android:paddingTop="@dimen/_5sdp"
-                    android:singleLine="false"
-                    android:textAlignment="textStart"
                     android:paddingEnd="@dimen/_22sdp"
                     android:paddingBottom="@dimen/_5sdp"
+                    android:singleLine="false"
                     android:text="This is a dummy message"
+                    android:textAlignment="textStart"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/_13ssp" />
+                    android:textSize="@dimen/_13ssp"
+                    tools:ignore="RtlCompat" />
 
                 <LinearLayout
                     android:id="@+id/llOriginal"
@@ -146,8 +155,8 @@
                     android:layout_below="@id/tvMessage"
                     android:layout_marginStart="@dimen/_20sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:gravity="center"
                     android:layout_marginEnd="@dimen/_10sdp"
+                    android:gravity="center"
                     android:orientation="vertical">
 
                     <TextView
@@ -165,7 +174,7 @@
                         android:background="@color/theme_color" />
                 </LinearLayout>
             </RelativeLayout>
+            <!--            </RelativeLayout>-->
         </RelativeLayout>
     </RelativeLayout>
-    <!--    </RelativeLayout>-->
 </layout>

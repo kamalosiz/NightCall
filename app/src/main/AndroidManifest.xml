@@ -19,10 +19,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.activities.SelectLanguage"></activity>
-        <activity android:name=".view.activities.FindsFriendsActivity" />
-        <activity android:name=".view.activities.SettingActivity" />
-        <activity android:name=".view.activities.ChatDetailActivity" />
+        <activity
+            android:name=".view.activities.SelectLanguage"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.UserProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.FindsFriendsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.ChatDetailActivity"
+            android:screenOrientation="portrait" />
 
         <uses-library
             android:name="org.apache.http.legacy"

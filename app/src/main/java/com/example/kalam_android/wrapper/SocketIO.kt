@@ -74,4 +74,20 @@ object SocketIO {
     fun setTypingListener(messageTypingResponse: MessageTypingListener) {
         this.messageTypingResponse = messageTypingResponse
     }
+
+    fun emitNewMessage(
+        id: String,
+        chatID: String,
+        message: String,
+        type: String,
+        senderName: String
+    ) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("user_id", id)
+        jsonObject.addProperty("chat_id", chatID)
+        jsonObject.addProperty("message", message)
+        jsonObject.addProperty("mtype", type)
+        jsonObject.addProperty("sender_name", senderName)
+        socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
+    }
 }

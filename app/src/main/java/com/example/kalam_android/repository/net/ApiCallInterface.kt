@@ -36,4 +36,8 @@ interface ApiCallInterface {
     @POST(Urls.FIND_FRIENDS)
     @FormUrlEncoded
     fun findFriends(@Header("Authorization") authorization: String?, @FieldMap parameters: Map<String, String>): Observable<FindFriends>
+
+    @Multipart
+    @POST(Urls.UPLOAD_AUDIO)
+    fun uploadAudio(@Header("Authorization") authorization: String?, @Part audio: MultipartBody.Part): Observable<AudioResponse>
 }
