@@ -39,6 +39,7 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
+                android:singleLine="true"
                 android:fontFamily="@font/halvatic_light"
                 android:textColor="@color/grey"
                 android:textSize="@dimen/_12sdp" />

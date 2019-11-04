@@ -52,8 +52,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         setSpannable()
         binding.hidePassword.setOnClickListener(this)
         binding.btnLogin.setOnClickListener(this)
-//        binding.etUsername.setText("waqarmustafa18@gmail.com")
-//        binding.etPass.setText("123")
+        binding.etUsername.setText("waqarmustafa18@gmail.com")
+        binding.etPass.setText("123")
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<LoginResponse>?) {
