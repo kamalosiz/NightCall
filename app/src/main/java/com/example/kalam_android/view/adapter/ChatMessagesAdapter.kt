@@ -63,7 +63,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
         audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
         mediaPlayer.setAudioAttributes(audioAttributes.build())
         timeFormatter.timeZone = TimeZone.getTimeZone("UTC")
-        
+
         return MyHolder(
             DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
