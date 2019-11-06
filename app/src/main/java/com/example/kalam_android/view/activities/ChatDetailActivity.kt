@@ -346,7 +346,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
              sharedPrefsHelper.getUser()?.id, AppConstants.TEXT_MESSAGE*//*
             message
         )*/
-        createChatObject(path.absolutePath, AppConstants.AUDIO_MESSAGE)
+        createChatObject(AppConstants.DUMMY_STRING, path.absolutePath, AppConstants.AUDIO_MESSAGE)
 
         uploadAudioMedia()
         logE("Audio Api hit successfully")
@@ -424,7 +424,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
             message
         )*/
         createChatObject(
-            binding.recordingView.editTextMessage.text.toString(),
+            binding.recordingView.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
             AppConstants.TEXT_MESSAGE
         )
         /*SocketIO.emitNewMessage(
@@ -477,7 +477,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         }
     }
 
-    private fun createChatObject(message: String, type: String) {
+    private fun createChatObject(message: String, file: String, type: String) {
         addMessage(
             ChatData(
                 AppConstants.DUMMY_DATA,
@@ -488,7 +488,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
                 AppConstants.DUMMY_DATA,
                 AppConstants.DUMMY_DATA,
                 type,
-                AppConstants.DUMMY_STRING,
+                file,
                 0,
                 0,
                 message

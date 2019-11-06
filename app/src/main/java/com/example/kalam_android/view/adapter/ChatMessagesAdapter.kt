@@ -37,6 +37,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private var chatList: ArrayList<ChatData>? = null
     private val TAG = this.javaClass.simpleName
     var isOriginal = true
+    private var isRelease = false
 
     fun updateList(list: ArrayList<ChatData>?) {
         chatList?.clear()
@@ -134,7 +135,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String) {
         logE("Progress Bar is visible")
         try {
-//            if (currentPos != prePos) {
+            if (isRelease || currentPos != prePos) {
             binding.audioPlayer.ivPlayPause.visibility = View.GONE
             binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
             prePos = currentPos
@@ -143,8 +144,10 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
                 AudioAttributes
                     .Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
                     .build()
             )
+                isRelease = false
             /* val audioAttributes = AudioAttributes.Builder()
              audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
              audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
@@ -168,7 +171,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
 
 //                binding.audioPlayer.seekBar.max = seconds
             logE("If section")
-            /* } else {
+             } else {
                  logE("Else section")
                  if (!mediaPlayer.isPlaying) {
                      logE("Else if section")
@@ -179,7 +182,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
                      binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
                      mediaPlayer.pause()
                  }
-             }*/
+             }
 
         } catch (e: IllegalStateException) {
             logE("exception:${e.message}")
@@ -191,6 +194,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
             binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
             mp.stop()
             mp.release()
+            isRelease = true
             binding.audioPlayer.seekBar.max = 0
         }
 
