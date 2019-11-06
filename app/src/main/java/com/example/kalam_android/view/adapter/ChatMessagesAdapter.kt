@@ -37,6 +37,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private var chatList: ArrayList<ChatData>? = null
     private val TAG = this.javaClass.simpleName
     var isOriginal = true
+    private var isRelease = false
 
     fun updateList(list: ArrayList<ChatData>?) {
         chatList?.clear()
@@ -134,63 +135,50 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String) {
         logE("Progress Bar is visible")
         try {
-//            if (currentPos != prePos) {
-            binding.audioPlayer.ivPlayPause.visibility = View.GONE
-            binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
-            prePos = currentPos
-            mediaPlayer = MediaPlayer()
-            mediaPlayer.setAudioAttributes(
-                AudioAttributes
-                    .Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build()
-            )
-            /* val audioAttributes = AudioAttributes.Builder()
-             audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-             audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-             mediaPlayer.setAudioAttributes(audioAttributes.build())*/
-//                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-            mediaPlayer.setDataSource(voiceMessage)
-//                initializeSeekBar(binding)
-//                mediaPlayer.prepare()
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
-                logE("setOnPreparedListener is called")
-                binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
-                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                binding.audioPlayer.ivPlayProgress.visibility = View.GONE
-                mediaPlayer.start()
-                initializeSeekBar(binding)
-                binding.audioPlayer.seekBar.max = seconds
+            if (isRelease || currentPos != prePos) {
+                binding.audioPlayer.ivPlayPause.visibility = View.GONE
+                binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
+                prePos = currentPos
+                mediaPlayer = MediaPlayer()
+                mediaPlayer.setAudioAttributes(
+                    AudioAttributes
+                        .Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                        .build()
+                )
+                isRelease = false
+                mediaPlayer.setDataSource(voiceMessage)
+                mediaPlayer.prepareAsync()
+                mediaPlayer.setOnPreparedListener {
+                    logE("setOnPreparedListener is called")
+                    binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    binding.audioPlayer.ivPlayProgress.visibility = View.GONE
+                    mediaPlayer.start()
+                    initializeSeekBar(binding)
+                    binding.audioPlayer.seekBar.max = seconds
 
+                }
+            } else {
+                if (!mediaPlayer.isPlaying) {
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    mediaPlayer.start()
+                } else {
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                    mediaPlayer.pause()
+                }
             }
-//                mediaPlayer.start()
-
-//                binding.audioPlayer.seekBar.max = seconds
-            logE("If section")
-            /* } else {
-                 logE("Else section")
-                 if (!mediaPlayer.isPlaying) {
-                     logE("Else if section")
-                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                     mediaPlayer.start()
-                 } else {
-                     logE("Else else section")
-                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                     mediaPlayer.pause()
-                 }
-             }*/
 
         } catch (e: IllegalStateException) {
             logE("exception:${e.message}")
         }
 
-
         mediaPlayer.setOnCompletionListener { mp ->
-
             binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
             mp.stop()
             mp.release()
+            isRelease = true
             binding.audioPlayer.seekBar.max = 0
         }
 
