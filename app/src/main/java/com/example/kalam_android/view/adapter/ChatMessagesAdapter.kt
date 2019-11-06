@@ -18,7 +18,6 @@ import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.Debugger
 import java.io.File
 import java.io.FileInputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,7 +27,10 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
 
     private var handler: Handler = Handler()
     private lateinit var runnable: Runnable
-    private var pause: Boolean = false
+    private var isStop: Boolean = false
+    private var isPause: Boolean = false
+    private var isFirstPlay: Boolean = true
+    private var isFirstClick: Boolean = true
     private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
     private lateinit var mediaPlayer: MediaPlayer
     private var chatList: ArrayList<ChatData>? = null
@@ -48,10 +50,17 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
 
     fun addMessage(message: ChatData) {
         chatList?.add(message)
+        isFirstPlay = true
         chatList?.size?.let { notifyItemInserted(it) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        mediaPlayer = MediaPlayer()
+        val audioAttributes = AudioAttributes.Builder()
+        audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+        audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
+        mediaPlayer.setAudioAttributes(audioAttributes.build())
+        timeFormatter.timeZone = TimeZone.getTimeZone("UTC")
 
         return MyHolder(
             DataBindingUtil.inflate(
@@ -101,61 +110,69 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
                 itemHolder.binding.ivPlayPause.setOnClickListener {
                     playVoiceMsg(itemHolder.binding, item.message.toString())
                 }
+                itemHolder.binding.ivStop.setOnClickListener {
+                    itemHolder.binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                    itemHolder.binding.seekBar.max = 0
+                    isStop = false
+                    mediaPlayer.stop()
+                    mediaPlayer.release()
+                    isFirstPlay = true
+                    mediaPlayer = MediaPlayer()
+                }
             }
-
         }
-        /* itemHolder.binding.ivPlayPause.setOnClickListener {
-             playVoiceMsg(itemHolder.binding, item?.message.toString())
-         }*/
-
     }
 
     inner class MyHolder(val binding: ItemChatRightBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     private fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String) {
+
+
         try {
-            mediaPlayer = MediaPlayer()
-            val audioAttributes = AudioAttributes.Builder()
-            audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-            mediaPlayer.setAudioAttributes(audioAttributes.build())
-            timeFormatter.timeZone = TimeZone.getTimeZone("UTC")
-
-            if (!pause) {
-                val file = File(voiceMessage)
-                val fd = FileInputStream(file)
+            if (isFirstPlay) {
+                isStop = true
                 binding.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                mediaPlayer.setDataSource(fd.fd)
+                mediaPlayer.reset()
+                mediaPlayer.setDataSource(voiceMessage)
+                initializeSeekBar(binding)
                 mediaPlayer.prepare()
-
                 mediaPlayer.start()
                 binding.seekBar.max = seconds
-                initializeSeekBar(binding)
-                pause = true
+                isFirstPlay = false
+
             } else {
-                binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                mediaPlayer.pause()
-                binding.seekBar.max = 0
-                pause = false
+                if (!mediaPlayer.isPlaying) {
+                    isStop = true
+                    binding.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    mediaPlayer.start()
+                } else {
+                    binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                    mediaPlayer.pause()
+                    isStop = false
+                }
             }
-        } catch (e: IOException) {
+
+        } catch (e: IllegalStateException) {
             logE("exception:${e.message}")
         }
 
         mediaPlayer.setOnCompletionListener { mp ->
-            if (seconds == currentSeconds) {
-                binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                pause = false
-                mediaPlayer.release()
-                binding.seekBar.max = 0
-            }
+
+            binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+            isStop = false
+            mp.stop()
+            mp.reset()
+            mp.release()
+            binding.seekBar.max = 0
+            isFirstPlay = true
+            mediaPlayer = MediaPlayer()
         }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    mediaPlayer.seekTo(progress / 1000)
+                    mediaPlayer.seekTo(progress * 1000)
                 }
             }
 

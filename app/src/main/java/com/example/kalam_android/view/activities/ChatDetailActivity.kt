@@ -41,6 +41,7 @@ import kotlinx.android.synthetic.main.layout_for_chat_screen.view.*
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.lang.RuntimeException
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -259,9 +260,13 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     private fun stopRecording() {
         if (state) {
-            mediaRecorder?.stop()
-            mediaRecorder?.release()
-            state = false
+            try {
+                mediaRecorder?.stop()
+                mediaRecorder?.release()
+                state = false
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
+            }
         } else {
             Toast.makeText(this, "You are not recording right now!", Toast.LENGTH_SHORT).show()
         }
@@ -301,13 +306,12 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     }
 
     private fun sendVoiceMessage() {
-        val message = ChatData(
-            -1, chatId, sharedPrefsHelper.getUser()?.id, AppConstants.DUMMY_DATA
-            , path.absolutePath,
-            -1, -1,
-            "audio", AppConstants.DUMMY_STRING, ""
+        addMessage(
+            path.absolutePath,
+            path.absolutePath,
+            sharedPrefsHelper.getUser()?.id
+            , "audio"
         )
-        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(message)
         uploadAudioMedia()
         logE("Audio Api hit successfully")
         chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
@@ -366,19 +370,8 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         addMessage(
             binding.recordingView.editTextMessage.text.toString(),
             binding.recordingView.editTextMessage.text.toString(),
-            sharedPrefsHelper.getUser()?.id
+            sharedPrefsHelper.getUser()?.id, "text"
         )
-//        val jsonObject = JsonObject()
-        /*    jsonObject.addProperty("user_id", sharedPrefsHelper.getUser()?.id.toString())
-            jsonObject.addProperty("chat_id", chatId.toString())
-            jsonObject.addProperty("message", binding.recordingView.editTextMessage.text.toString())
-            jsonObject.addProperty("mType", "text")
-            jsonObject.addProperty(
-                "sender_name",
-                sharedPrefsHelper.getUser()?.firstname.toString()
-                        + " " + sharedPrefsHelper.getUser()?.lastname.toString()
-            )
-            SocketIO.socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)*/
         SocketIO.emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(),
             chatId.toString(),
@@ -399,7 +392,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         val senderName = jsonObject.getString("sender_name")
         if (localChatID.toInt() == chatId) {
             runOnUiThread {
-                addMessage(msg, originalMsg, AppConstants.DUMMY_DATA)
+                addMessage(msg, originalMsg, AppConstants.DUMMY_DATA, "text")
             }
         }
     }
@@ -421,12 +414,12 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         }
     }
 
-    private fun addMessage(msg: String?, originalMsg: String?, id: Int?) {
+    private fun addMessage(msg: String?, originalMsg: String?, id: Int?, type: String) {
         val message = ChatData(
             AppConstants.DUMMY_DATA, chatId, id, AppConstants.DUMMY_DATA
             , msg,
             AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
-            "text", AppConstants.DUMMY_STRING, originalMsg
+            type, AppConstants.DUMMY_STRING, originalMsg
         )
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(message)
         chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }

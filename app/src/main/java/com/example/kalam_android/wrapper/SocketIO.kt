@@ -86,7 +86,7 @@ object SocketIO {
         jsonObject.addProperty("user_id", id)
         jsonObject.addProperty("chat_id", chatID)
         jsonObject.addProperty("message", message)
-        jsonObject.addProperty("mtype", type)
+        jsonObject.addProperty("mType", type)
         jsonObject.addProperty("sender_name", senderName)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
     }

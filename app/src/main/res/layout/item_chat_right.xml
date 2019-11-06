@@ -100,8 +100,6 @@
                         android:background="@drawable/icon_stop"
                         android:padding="@dimen/_5sdp" />
                 </LinearLayout>
-
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
