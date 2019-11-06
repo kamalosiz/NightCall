@@ -3,26 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:context="com.example.kalam_android.view.activities.UserProfileActivity">
+        android:layout_height="match_parent">
+
+        <!-- Scrollable view here -->
+        <include layout="@layout/layout_content_of_user_profile" />
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_300sdp"
-            tools:ignore="MissingConstraints">
+            android:layout_height="@dimen/_300sdp">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/collapsingToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleGravity="top"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+                app:expandedTitleGravity="bottom"
+                app:collapsedTitleTextAppearance="@color/white"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                app:titleEnabled="true">
 
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivUserImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/dummy_placeholder"
@@ -30,21 +33,14 @@
                     app:layout_collapseParallaxMultiplier="0.5" />
 
                 <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/AppBar"
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_50sdp"
-                    app:layout_collapseMode="pin" />
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:titleTextColor="@color/white" />
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:ignore="PrivateResource">
-
-            <include layout="@layout/layout_content_of_user_profile"/>
-        </androidx.core.widget.NestedScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

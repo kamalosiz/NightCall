@@ -80,7 +80,9 @@ object SocketIO {
         chatID: String,
         message: String,
         type: String,
-        senderName: String
+        senderName: String,
+        file: String,
+        duration: String
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
@@ -88,6 +90,8 @@ object SocketIO {
         jsonObject.addProperty("message", message)
         jsonObject.addProperty("mType", type)
         jsonObject.addProperty("sender_name", senderName)
+        jsonObject.addProperty("file", file)
+        jsonObject.addProperty("duration", duration)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
     }
 }

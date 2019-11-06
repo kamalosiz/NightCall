@@ -10,12 +10,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.repository.model.ChatData
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.toast
 import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -27,20 +30,13 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
 
     private var handler: Handler = Handler()
     private lateinit var runnable: Runnable
-    private var isStop: Boolean = false
-    private var isPause: Boolean = false
-    private var isFirstPlay: Boolean = true
-    private var isFirstClick: Boolean = true
+    private var currentPos = -1
+    private var prePos = -1
     private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
     private lateinit var mediaPlayer: MediaPlayer
     private var chatList: ArrayList<ChatData>? = null
     private val TAG = this.javaClass.simpleName
     var isOriginal = true
-    /*private val onClickListener: View.OnClickListener
-
-    init {
-        onClickListener = AdapterClickListener()
-    }*/
 
     fun updateList(list: ArrayList<ChatData>?) {
         chatList?.clear()
@@ -50,18 +46,10 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
 
     fun addMessage(message: ChatData) {
         chatList?.add(message)
-        isFirstPlay = true
         chatList?.size?.let { notifyItemInserted(it) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        mediaPlayer = MediaPlayer()
-        val audioAttributes = AudioAttributes.Builder()
-        audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-        audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-        mediaPlayer.setAudioAttributes(audioAttributes.build())
-        timeFormatter.timeZone = TimeZone.getTimeZone("UTC")
-
         return MyHolder(
             DataBindingUtil.inflate(
                 LayoutInflater.from(parent.context),
@@ -80,44 +68,61 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
         val itemHolder = holder as MyHolder
         val item = chatList?.get(position)
         when (item?.type) {
-            "text" -> {
-                itemHolder.binding.cvPlayer.visibility = View.GONE
-                itemHolder.binding.rlMessage.visibility = View.VISIBLE
-                itemHolder.binding.tvMessage.text = item.message
-                itemHolder.binding.llOriginal.setOnClickListener {
+            AppConstants.TEXT_MESSAGE -> {
+                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
+                itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
+                itemHolder.binding.itemChat.tvMessage.text = item.message
+                itemHolder.binding.itemChat.llOriginal.setOnClickListener {
                     if (isOriginal) {
                         isOriginal = false
-                        itemHolder.binding.tvMessage.text = item.original_message
-                        itemHolder.binding.tvOriginal.text = "Translated"
+                        itemHolder.binding.itemChat.tvMessage.text = item.original_message
+                        itemHolder.binding.itemChat.tvOriginal.text = "Translated"
                     } else {
                         isOriginal = true
-                        itemHolder.binding.tvMessage.text = item.message
-                        itemHolder.binding.tvOriginal.text = "View Original"
+                        itemHolder.binding.itemChat.tvMessage.text = item.message
+                        itemHolder.binding.itemChat.tvOriginal.text = "View Original"
                     }
                 }
                 if (item.sender_id == userId.toInt()) {
-                    itemHolder.binding.rlMessage.gravity = Gravity.END
-                    itemHolder.binding.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
+                    itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
                 } else {
-                    itemHolder.binding.rlMessage.gravity = Gravity.START
-                    itemHolder.binding.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
+                    itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
                 }
 
             }
-            "audio" -> {
-                itemHolder.binding.cvPlayer.visibility = View.VISIBLE
-                itemHolder.binding.rlMessage.visibility = View.GONE
-                itemHolder.binding.ivPlayPause.setOnClickListener {
-                    playVoiceMsg(itemHolder.binding, item.message.toString())
-                }
-                itemHolder.binding.ivStop.setOnClickListener {
-                    itemHolder.binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                    itemHolder.binding.seekBar.max = 0
-                    isStop = false
+            AppConstants.AUDIO_MESSAGE -> {
+                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.VISIBLE
+                itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
+                itemHolder.binding.audioPlayer.ivStop.setOnClickListener {
+                    itemHolder.binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                    itemHolder.binding.audioPlayer.seekBar.max = 0
                     mediaPlayer.stop()
                     mediaPlayer.release()
-                    isFirstPlay = true
-                    mediaPlayer = MediaPlayer()
+                }
+                itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
+                    currentPos = position
+                    logE("Clicked")
+                    playVoiceMsg(itemHolder.binding, item.file.toString())
+                    toast(context, "Clicked")
+                }
+                if (item.sender_id == userId.toInt()) {
+                    itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
+                    itemHolder.binding.audioPlayer.cvPlayer.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.sender_color
+                        )
+                    )
+                } else {
+                    itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
+                    itemHolder.binding.audioPlayer.cvPlayer.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.receiver_color
+                        )
+                    )
                 }
             }
         }
@@ -127,49 +132,70 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
         RecyclerView.ViewHolder(binding.root)
 
     private fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String) {
-
-
+        logE("Progress Bar is visible")
         try {
-            if (isFirstPlay) {
-                isStop = true
-                binding.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                mediaPlayer.reset()
-                mediaPlayer.setDataSource(voiceMessage)
-                initializeSeekBar(binding)
-                mediaPlayer.prepare()
+//            if (currentPos != prePos) {
+            binding.audioPlayer.ivPlayPause.visibility = View.GONE
+            binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
+            prePos = currentPos
+            mediaPlayer = MediaPlayer()
+            mediaPlayer.setAudioAttributes(
+                AudioAttributes
+                    .Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+            )
+            /* val audioAttributes = AudioAttributes.Builder()
+             audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+             audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
+             mediaPlayer.setAudioAttributes(audioAttributes.build())*/
+//                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+            mediaPlayer.setDataSource(voiceMessage)
+//                initializeSeekBar(binding)
+//                mediaPlayer.prepare()
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnPreparedListener {
+                logE("setOnPreparedListener is called")
+                binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                binding.audioPlayer.ivPlayProgress.visibility = View.GONE
                 mediaPlayer.start()
-                binding.seekBar.max = seconds
-                isFirstPlay = false
+                initializeSeekBar(binding)
+                binding.audioPlayer.seekBar.max = seconds
 
-            } else {
-                if (!mediaPlayer.isPlaying) {
-                    isStop = true
-                    binding.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                    mediaPlayer.start()
-                } else {
-                    binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                    mediaPlayer.pause()
-                    isStop = false
-                }
             }
+//                mediaPlayer.start()
+
+//                binding.audioPlayer.seekBar.max = seconds
+            logE("If section")
+            /* } else {
+                 logE("Else section")
+                 if (!mediaPlayer.isPlaying) {
+                     logE("Else if section")
+                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                     mediaPlayer.start()
+                 } else {
+                     logE("Else else section")
+                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                     mediaPlayer.pause()
+                 }
+             }*/
 
         } catch (e: IllegalStateException) {
             logE("exception:${e.message}")
         }
 
+
         mediaPlayer.setOnCompletionListener { mp ->
 
-            binding.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-            isStop = false
+            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
             mp.stop()
-            mp.reset()
             mp.release()
-            binding.seekBar.max = 0
-            isFirstPlay = true
-            mediaPlayer = MediaPlayer()
+            binding.audioPlayer.seekBar.max = 0
         }
 
-        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.audioPlayer.seekBar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     mediaPlayer.seekTo(progress * 1000)
@@ -191,10 +217,10 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
             var currentSeconds = 0
             try {
                 currentSeconds = mediaPlayer.currentPosition / 1000
-                binding.seekBar.progress = currentSeconds
-                binding.tvPlayerTime.text =
+                binding.audioPlayer.seekBar.progress = currentSeconds
+                binding.audioPlayer.tvPlayerTime.text =
                     timeFormatter.format(Date((currentSeconds * 1000).toLong()))
-                val difference = seconds - currentSeconds
+//                val difference = seconds - currentSeconds
                 handler.postDelayed(runnable, 1000)
             } catch (e: IllegalStateException) {
 
@@ -212,16 +238,6 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
             } catch (e: IllegalStateException) {
             }
             return seconds
-        }
-    private val currentSeconds: Int
-        get() {
-            var currentSeconds: Int = 0
-            try {
-                currentSeconds = mediaPlayer.currentPosition / 1000
-            } catch (e: IllegalStateException) {
-
-            }
-            return currentSeconds
         }
 
     private fun logE(msg: String) {

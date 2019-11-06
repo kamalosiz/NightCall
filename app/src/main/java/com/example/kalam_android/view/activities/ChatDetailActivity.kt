@@ -3,6 +3,7 @@ package com.example.kalam_android.view.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Environment
@@ -36,6 +37,7 @@ import com.example.kalam_android.wrapper.AudioRecordView
 import com.example.kalam_android.wrapper.GlideDownloder
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
+import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.layout_for_chat_screen.view.*
 import org.json.JSONObject
@@ -68,11 +70,9 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private val delay: Long = 1000
     private var lastTextEdit: Long = 0
     var handler = Handler()
-    private var audioPath: String? = null
     private var state: Boolean = false
-    private var recordingStopped: Boolean = false
-    private var pause: Boolean = false
     private var chatList1: ArrayList<ChatData>? = null
+    private var profileImage: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +97,17 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
+        clickListener()
+    }
+
+    private fun clickListener() {
+
+        binding.header.tvName.setOnClickListener {
+            val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
+            intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+            intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+            startActivity(intent)
+        }
     }
 
     private fun gettingChatId() {
@@ -125,12 +136,12 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     private fun setUserData() {
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
-        val profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
+        profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
         binding.header.tvName.text = userRealName
         GlideDownloder.load(
             this,
             binding.header.ivProfileImage,
-            profileImage ?: "",
+            profileImage,
             R.drawable.dummy_placeholder,
             R.drawable.dummy_placeholder
         )
@@ -191,11 +202,14 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private fun renderAudioResponse(response: AudioResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            SocketIO.emitNewMessage(
+            /*SocketIO.emitNewMessage(
                 sharedPrefsHelper.getUser()?.id.toString(),
                 chatId.toString(), it.data?.file_url.toString(), "audio",
                 sharedPrefsHelper.getUser()?.firstname.toString()
                         + " " + sharedPrefsHelper.getUser()?.lastname.toString()
+            )*/
+            emitNewMessage(
+                "", AppConstants.AUDIO_MESSAGE, it.data?.file_url.toString(), "01:00"
             )
             logE("Audio Successfully emitted to server")
         }
@@ -306,12 +320,34 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     }
 
     private fun sendVoiceMessage() {
-        addMessage(
+/*        *//* addMessage(
+             path.absolutePath,
+             path.absolutePath,
+             sharedPrefsHelper.getUser()?.id
+             , AppConstants.AUDIO_MESSAGE
+         )*//*
+        val message = ChatData(
+            AppConstants.DUMMY_DATA,
+            chatId,
+            sharedPrefsHelper.getUser()?.id,
+            AppConstants.DUMMY_DATA,
             path.absolutePath,
-            path.absolutePath,
-            sharedPrefsHelper.getUser()?.id
-            , "audio"
+            AppConstants.DUMMY_DATA,
+            AppConstants.DUMMY_DATA,
+            AppConstants.AUDIO_MESSAGE,
+            AppConstants.DUMMY_STRING,
+            0,
+            0,
+            path.absolutePath
         )
+        addMessage(
+            *//* binding.recordingView.editTextMessage.text.toString(),
+             binding.recordingView.editTextMessage.text.toString(),
+             sharedPrefsHelper.getUser()?.id, AppConstants.TEXT_MESSAGE*//*
+            message
+        )*/
+        createChatObject(path.absolutePath, AppConstants.AUDIO_MESSAGE)
+
         uploadAudioMedia()
         logE("Audio Api hit successfully")
         chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
@@ -367,17 +403,40 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     }
 
     private fun sendMessage() {
-        addMessage(
+        /*  val message = ChatData(
+              AppConstants.DUMMY_DATA,
+              chatId,
+              sharedPrefsHelper.getUser()?.id,
+              AppConstants.DUMMY_DATA,
+              binding.recordingView.editTextMessage.text.toString(),
+              AppConstants.DUMMY_DATA,
+              AppConstants.DUMMY_DATA,
+              AppConstants.TEXT_MESSAGE,
+              AppConstants.DUMMY_STRING,
+              0,
+              0,
+              binding.recordingView.editTextMessage.text.toString()
+          )
+          addMessage(
+              *//* binding.recordingView.editTextMessage.text.toString(),
+             binding.recordingView.editTextMessage.text.toString(),
+             sharedPrefsHelper.getUser()?.id, AppConstants.TEXT_MESSAGE*//*
+            message
+        )*/
+        createChatObject(
             binding.recordingView.editTextMessage.text.toString(),
-            binding.recordingView.editTextMessage.text.toString(),
-            sharedPrefsHelper.getUser()?.id, "text"
+            AppConstants.TEXT_MESSAGE
         )
-        SocketIO.emitNewMessage(
+        /*SocketIO.emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(),
             chatId.toString(),
             binding.recordingView.editTextMessage.text.toString(), "text",
             sharedPrefsHelper.getUser()?.firstname.toString()
                     + " " + sharedPrefsHelper.getUser()?.lastname.toString()
+        )*/
+        emitNewMessage(
+            binding.recordingView.editTextMessage.text.toString(),
+            AppConstants.TEXT_MESSAGE, "", ""
         )
         logE("Message Emitted to socket")
         binding.recordingView.editTextMessage.setText("")
@@ -385,14 +444,18 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     }
 
     override fun socketResponse(jsonObject: JSONObject) {
+        val gson = Gson()
+        val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
         logE("Chats Details New Message is called: $jsonObject")
-        val msg: String? = jsonObject.getString("msg")
-        val originalMsg = jsonObject.getString("orignal_msg")
-        val localChatID = jsonObject.getString("chat_id")
-        val senderName = jsonObject.getString("sender_name")
-        if (localChatID.toInt() == chatId) {
+        logE("Chats Details New Message is called: $data")
+        /* val msg: String? = jsonObject.getString("msg")
+         val msgType: String? = jsonObject.getString("msg_type")
+         val originalMsg = jsonObject.getString("orignal_msg")
+         val localChatID = jsonObject.getString("chat_id")
+         val senderName = jsonObject.getString("sender_name")*/
+        if (/*localChatID.toInt()*/data.chat_id == chatId) {
             runOnUiThread {
-                addMessage(msg, originalMsg, AppConstants.DUMMY_DATA, "text")
+                addMessage(/*msg, originalMsg, AppConstants.DUMMY_DATA, msgType.toString()*/data)
             }
         }
     }
@@ -414,15 +477,42 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         }
     }
 
-    private fun addMessage(msg: String?, originalMsg: String?, id: Int?, type: String) {
-        val message = ChatData(
-            AppConstants.DUMMY_DATA, chatId, id, AppConstants.DUMMY_DATA
-            , msg,
-            AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
-            type, AppConstants.DUMMY_STRING, originalMsg
+    private fun createChatObject(message: String, type: String) {
+        addMessage(
+            ChatData(
+                AppConstants.DUMMY_DATA,
+                chatId,
+                sharedPrefsHelper.getUser()?.id,
+                AppConstants.DUMMY_DATA,
+                message,
+                AppConstants.DUMMY_DATA,
+                AppConstants.DUMMY_DATA,
+                type,
+                AppConstants.DUMMY_STRING,
+                0,
+                0,
+                message
+            )
         )
-        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(message)
+    }
+
+    private fun addMessage(/*msg: String?, originalMsg: String?, id: Int?, type: String*/chatData: ChatData) {
+        /* val message = ChatData(
+             AppConstants.DUMMY_DATA, chatId, id, AppConstants.DUMMY_DATA
+             , msg,
+             AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
+             type, AppConstants.DUMMY_STRING, originalMsg
+         )*/
+        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
         chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
+    }
+
+    private fun emitNewMessage(message: String, type: String, file: String, duration: String) {
+        SocketIO.emitNewMessage(
+            sharedPrefsHelper.getUser()?.id.toString(), chatId.toString(), message, type,
+            sharedPrefsHelper.getUser()?.firstname.toString()
+                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(), file, duration
+        )
     }
 
     override fun onBackPressed() {
