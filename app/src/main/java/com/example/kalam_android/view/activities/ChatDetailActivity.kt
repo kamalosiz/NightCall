@@ -2,6 +2,7 @@ package com.example.kalam_android.view.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.media.MediaRecorder
 import android.os.Bundle
@@ -74,6 +75,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private var pause: Boolean = false
     private var chatList1: ArrayList<ChatData>? = null
     val sdf = java.text.SimpleDateFormat("ddMyyyyhhmmss", Locale.getDefault())
+    private var profileImage: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +96,17 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
+        clickListener()
+    }
+
+    private fun clickListener() {
+
+        binding.header.tvName.setOnClickListener {
+            val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
+            intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+            intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+            startActivity(intent)
+        }
     }
 
     private fun gettingChatId() {
@@ -118,7 +131,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     private fun setUserData() {
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
-        val profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
+        profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
         binding.header.tvName.text = userRealName
         GlideDownloder.load(
             this,
