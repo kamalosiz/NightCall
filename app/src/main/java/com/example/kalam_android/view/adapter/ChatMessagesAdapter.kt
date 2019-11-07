@@ -23,6 +23,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ChatMessagesAdapter(val context: Context, val userId: String) :
@@ -34,20 +35,22 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private var prePos = -1
     private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
     private lateinit var mediaPlayer: MediaPlayer
-    private var chatList: ArrayList<ChatData>? = null
+    private var chatList: ArrayList<ChatData>? = ArrayList()
     private val TAG = this.javaClass.simpleName
     var isOriginal = true
     private var isRelease = false
 
-    fun updateList(list: ArrayList<ChatData>?) {
-        chatList?.clear()
-        chatList = list
+    fun updateList(list: ArrayList<ChatData>) {
+//        chatList?.clear()
+//        chatList = list
+        chatList?.addAll(list)
         notifyDataSetChanged()
     }
 
     fun addMessage(message: ChatData) {
-        chatList?.add(message)
-        chatList?.size?.let { notifyItemInserted(it) }
+        chatList?.add(0, message)
+//        chatList?.size?.let { notifyItemInserted(it) }
+        notifyItemInserted(0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

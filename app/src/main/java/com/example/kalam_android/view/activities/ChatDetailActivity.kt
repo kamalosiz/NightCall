@@ -12,10 +12,12 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
@@ -69,10 +71,13 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private lateinit var file: File
     private val delay: Long = 1000
     private var lastTextEdit: Long = 0
+    private var index = 0
     var handler = Handler()
     private var state: Boolean = false
-    private var chatList1: ArrayList<ChatData>? = null
+    private var chatList1: ArrayList<ChatData> = ArrayList()
     private var profileImage: String = ""
+    private var loading = false
+    private var isPaging = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,16 +93,20 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         gettingChatId()
         setUserData()
         binding.recordingView.recordingListener = this
+        val linearLayout = LinearLayoutManager(this)
+        linearLayout.reverseLayout = true
+        linearLayout.stackFromEnd = false
+        binding.chatMessagesRecycler.layoutManager = linearLayout
         binding.chatMessagesRecycler.adapter =
             ChatMessagesAdapter(this, sharedPrefsHelper.getUser()?.id.toString())
         binding.recordingView.imageViewSend.setOnClickListener(this)
         binding.header.rlBack.setOnClickListener(this)
         initRecorderWithPermissions()
-//        moveRecyclerView()
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
         clickListener()
+        applyPagination()
     }
 
     private fun clickListener() {
@@ -109,13 +118,31 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         }
     }
 
+    private fun applyPagination() {
+
+        binding.chatMessagesRecycler.addOnScrollListener(object :
+            PaginationScrollListener(binding.chatMessagesRecycler.layoutManager as LinearLayoutManager) {
+            override val isLastPage: Boolean
+                get() = chatList1.size == 0
+            override val isLoading: Boolean
+                get() = loading
+
+            override fun loadMoreItems() {
+                binding.pbHeader.visibility = View.VISIBLE
+                isPaging = true
+                loading = true
+                index += 20
+                logE("chatListSize ${chatList1.size}")
+                hitAllChatApi(index)
+            }
+        })
+    }
+
     private fun gettingChatId() {
         val isFromChatFragment = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
-        val params = HashMap<String, String>()
         if (isFromChatFragment) {
             chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
-            params["chat_id"] = chatId.toString()
-            viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
+            hitAllChatApi(0)
         } else {
             receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
             val jsonObject = JsonObject()
@@ -126,11 +153,17 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
                 Debugger.e(TAG, "ID $chatId")
                 this.chatId = chatId
                 runOnUiThread {
-                    params["chat_id"] = chatId.toString()
-                    viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
+                    hitAllChatApi(0)
                 }
             })
         }
+    }
+
+    fun hitAllChatApi(offset: Int) {
+        val params = HashMap<String, String>()
+        params["chat_id"] = this.chatId.toString()
+        params["offset"] = offset.toString()
+        viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
     }
 
     private fun setUserData() {
@@ -150,16 +183,20 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         when (apiResponse?.status) {
 
             Status.LOADING -> {
-                binding.pbCenter.visibility = View.VISIBLE
                 logE("Loading Chat Messages")
+                loading = true
             }
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
+                binding.pbHeader.visibility = View.GONE
                 renderResponse(apiResponse.data as ChatMessagesResponse)
                 logE("+${apiResponse.data}")
+                loading = false
             }
             Status.ERROR -> {
+                loading = false
                 binding.pbCenter.visibility = View.GONE
+                binding.pbHeader.visibility = View.GONE
                 toast("Something went wrong please try again")
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
             }
@@ -170,13 +207,12 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     private fun renderResponse(response: ChatMessagesResponse?) {
         logE("socketResponse: $response")
-        response?.let {
-            it.data?.reverse()
-            chatList1 = ArrayList()
-            chatList1 = it.data
-            logE("All Messages Api Called")
-            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(it.data)
-            it.data?.size?.let { it1 -> binding.chatMessagesRecycler.scrollToPosition(it1 - 1) }
+        response?.let { it ->
+            it.data?.let {
+                chatList1 = it
+                logE("All Messages Api Called")
+                (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(it)
+            }
         }
     }
 
@@ -202,9 +238,8 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         logE("socketResponse: $response")
         response?.let {
             emitNewMessage(
-                "", AppConstants.AUDIO_MESSAGE, it.data?.file_url.toString(), "01:00"
+                "", AppConstants.AUDIO_MESSAGE, it.data?.file_url.toString(), 0
             )
-            logE("Audio Successfully emitted to server")
         }
     }
 
@@ -316,7 +351,6 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         createChatObject(AppConstants.DUMMY_STRING, path.absolutePath, AppConstants.AUDIO_MESSAGE)
         uploadAudioMedia()
         logE("Audio Api hit successfully")
-        chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
     }
 
     private val inputFinishChecker = Runnable {
@@ -365,11 +399,10 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         )
         emitNewMessage(
             binding.recordingView.editTextMessage.text.toString(),
-            AppConstants.TEXT_MESSAGE, "", ""
+            AppConstants.TEXT_MESSAGE, "", 0
         )
         logE("Message Emitted to socket")
         binding.recordingView.editTextMessage.setText("")
-        chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
     }
 
     override fun socketResponse(jsonObject: JSONObject) {
@@ -420,10 +453,10 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     private fun addMessage(chatData: ChatData) {
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
-        chatList1?.size?.let { binding.chatMessagesRecycler.scrollToPosition(it - 1) }
+        binding.chatMessagesRecycler.scrollToPosition(0)
     }
 
-    private fun emitNewMessage(message: String, type: String, file: String, duration: String) {
+    private fun emitNewMessage(message: String, type: String, file: String, duration: Int) {
         SocketIO.emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(), chatId.toString(), message, type,
             sharedPrefsHelper.getUser()?.firstname.toString()

@@ -82,7 +82,7 @@ object SocketIO {
         type: String,
         senderName: String,
         file: String,
-        duration: String
+        duration: Int
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
