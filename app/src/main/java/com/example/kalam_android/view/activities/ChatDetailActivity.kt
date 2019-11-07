@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Environment
@@ -78,6 +79,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private var profileImage: String = ""
     private var loading = false
     private var isPaging = false
+    private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -306,6 +308,11 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
                 mediaRecorder?.stop()
                 mediaRecorder?.release()
                 state = false
+                val time = timeFormatter.format(Date(getDuration(path).toLong()))
+                if (time >= "00:01") {
+                    sendVoiceMessage()
+                }
+
             } catch (e: RuntimeException) {
                 e.printStackTrace()
             }
@@ -323,7 +330,6 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     override fun onRecordingCompleted() {
         stopRecording()
-        sendVoiceMessage()
     }
 
     override fun onRecordingCanceled() {
@@ -462,6 +468,14 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
             sharedPrefsHelper.getUser()?.firstname.toString()
                     + " " + sharedPrefsHelper.getUser()?.lastname.toString(), file, duration
         )
+    }
+
+    private fun getDuration(file: File): Int {
+        val mediaMetadataRetriever = MediaMetadataRetriever()
+        mediaMetadataRetriever.setDataSource(file.getAbsolutePath());
+        val durationStr =
+            mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        return durationStr.toInt()
     }
 
     override fun onBackPressed() {
