@@ -73,6 +73,9 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private var state: Boolean = false
     private var chatList1: ArrayList<ChatData>? = null
     private var profileImage: String = ""
+    private var loading = false
+    private var isPaging = false
+    private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
