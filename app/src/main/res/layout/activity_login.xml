@@ -38,7 +38,7 @@
                     android:background="@drawable/box_theme_outine"
                     android:fontFamily="@font/halvatic_light"
                     android:gravity="center"
-                    android:hint="@string/phone_username"
+                    android:hint="Email"
                     android:textSize="@dimen/_13sdp" />
 
                 <RelativeLayout

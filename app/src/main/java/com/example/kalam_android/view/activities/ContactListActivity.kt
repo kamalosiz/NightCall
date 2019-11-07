@@ -167,7 +167,6 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
     }
 
-    @SuppressLint("Recycle")
     private fun getAllContact(): ArrayList<ContactInfo> {
         val list: ArrayList<ContactInfo> = ArrayList()
         val phones: Cursor? = contentResolver.query(

@@ -23,6 +23,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ChatMessagesAdapter(val context: Context, val userId: String) :
@@ -34,20 +35,22 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private var prePos = -1
     private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
     private lateinit var mediaPlayer: MediaPlayer
-    private var chatList: ArrayList<ChatData>? = null
+    private var chatList: ArrayList<ChatData>? = ArrayList()
     private val TAG = this.javaClass.simpleName
     var isOriginal = true
     private var isRelease = false
 
-    fun updateList(list: ArrayList<ChatData>?) {
-        chatList?.clear()
-        chatList = list
+    fun updateList(list: ArrayList<ChatData>) {
+//        chatList?.clear()
+//        chatList = list
+        chatList?.addAll(list)
         notifyDataSetChanged()
     }
 
     fun addMessage(message: ChatData) {
-        chatList?.add(message)
-        chatList?.size?.let { notifyItemInserted(it) }
+        chatList?.add(0, message)
+//        chatList?.size?.let { notifyItemInserted(it) }
+        notifyItemInserted(0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -136,61 +139,45 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
         logE("Progress Bar is visible")
         try {
             if (isRelease || currentPos != prePos) {
-            binding.audioPlayer.ivPlayPause.visibility = View.GONE
-            binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
-            prePos = currentPos
-            mediaPlayer = MediaPlayer()
-            mediaPlayer.setAudioAttributes(
-                AudioAttributes
-                    .Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                    .build()
-            )
+                binding.audioPlayer.ivPlayPause.visibility = View.GONE
+                binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
+                prePos = currentPos
+                mediaPlayer = MediaPlayer()
+                mediaPlayer.setAudioAttributes(
+                    AudioAttributes
+                        .Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                        .build()
+                )
                 isRelease = false
-            /* val audioAttributes = AudioAttributes.Builder()
-             audioAttributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-             audioAttributes.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-             mediaPlayer.setAudioAttributes(audioAttributes.build())*/
-//                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-            mediaPlayer.setDataSource(voiceMessage)
-//                initializeSeekBar(binding)
-//                mediaPlayer.prepare()
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
-                logE("setOnPreparedListener is called")
-                binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
-                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                binding.audioPlayer.ivPlayProgress.visibility = View.GONE
-                mediaPlayer.start()
-                initializeSeekBar(binding)
-                binding.audioPlayer.seekBar.max = seconds
+                mediaPlayer.setDataSource(voiceMessage)
+                mediaPlayer.prepareAsync()
+                mediaPlayer.setOnPreparedListener {
+                    logE("setOnPreparedListener is called")
+                    binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    binding.audioPlayer.ivPlayProgress.visibility = View.GONE
+                    mediaPlayer.start()
+                    initializeSeekBar(binding)
+                    binding.audioPlayer.seekBar.max = seconds
 
+                }
+            } else {
+                if (!mediaPlayer.isPlaying) {
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    mediaPlayer.start()
+                } else {
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                    mediaPlayer.pause()
+                }
             }
-//                mediaPlayer.start()
-
-//                binding.audioPlayer.seekBar.max = seconds
-            logE("If section")
-             } else {
-                 logE("Else section")
-                 if (!mediaPlayer.isPlaying) {
-                     logE("Else if section")
-                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
-                     mediaPlayer.start()
-                 } else {
-                     logE("Else else section")
-                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                     mediaPlayer.pause()
-                 }
-             }
 
         } catch (e: IllegalStateException) {
             logE("exception:${e.message}")
         }
 
-
         mediaPlayer.setOnCompletionListener { mp ->
-
             binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
             mp.stop()
             mp.release()

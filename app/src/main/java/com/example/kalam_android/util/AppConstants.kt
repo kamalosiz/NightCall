@@ -21,6 +21,7 @@ object AppConstants {
     //Local DB=
     const val DB_NAME = "kalam_local_db"
     const val CONTACTS_TABLE = "contacts"
+    const val ALL_CHAT_ENTITY = "allchatentity"
 
     //Socket Actions
     const val START_CAHT = "startChat"
