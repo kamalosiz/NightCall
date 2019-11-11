@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/_230sdp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_alignParentBottom="true"
+    android:layout_gravity="bottom"
+    android:layout_marginStart="@dimen/_40sdp"
+    android:layout_marginBottom="@dimen/_47sdp"
+    android:gravity="center_horizontal">
+
+
+    <RelativeLayout
+        android:layout_width="@dimen/_215sdp"
+        android:layout_height="@dimen/_95sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@drawable/ic_recorder_bubble">
+
+        <RelativeLayout
+            android:id="@+id/lvPlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/_15sdp"
+            android:paddingTop="@dimen/_15sdp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivPlay"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:saveEnabled="false"
+                android:clickable="false"
+                app:srcCompat="@drawable/ic_play_gray" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivPause"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_toEndOf="@id/ivPlay"
+                android:clickable="false"
+                android:src="@drawable/ic_pause_gray" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivStop"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_toEndOf="@id/ivPause"
+                android:clickable="false"
+                android:src="@drawable/ic_stop_gray" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivRecord"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_toEndOf="@id/ivStop"
+                android:saveEnabled="true"
+                android:src="@drawable/ic_record_green" />
+        </RelativeLayout>
+
+        <Chronometer
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lvPlayer"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/helvetica_medium"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sdp"
+            android:visibility="visible" />
+
+        <RelativeLayout
+            android:id="@+id/lvSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lvPlayer"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:visibility="gone">
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="@dimen/_175sdp"
+                android:layout_height="wrap_content"
+                android:thumb="@drawable/new_seekbar_thumb" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/seekBar"
+                android:layout_marginStart="@dimen/_12sdp"
+                android:text="00:00"
+                android:textSize="@dimen/_11sdp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/seekBar"
+                android:layout_marginStart="@dimen/_105sdp"
+                android:layout_toEndOf="@+id/tvTimer"
+                android:text="00:00"
+                android:textSize="@dimen/_11sdp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivCancel"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_50sdp"
+        android:src="@drawable/ic_cancel" />
+
+</RelativeLayout>

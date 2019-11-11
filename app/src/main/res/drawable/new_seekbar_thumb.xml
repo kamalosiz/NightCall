@@ -1,0 +1,8 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <size android:height="@dimen/_15sdp" android:width="@dimen/_15sdp"/>
+    <solid android:color="@color/colorSeekBar" />
+    <corners android:radius="1dp" />
+
+</shape>
