@@ -369,6 +369,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.lvRecoder.lvForRecorder.visibility = View.GONE
         binding.lvRecoder.lvForRecorder.lvSeekBar.visibility = View.GONE
         binding.lvRecoder.chronometer.visibility = View.VISIBLE
+//        
         val file = File(output)
         if (file.exists()) {
             file.delete()
