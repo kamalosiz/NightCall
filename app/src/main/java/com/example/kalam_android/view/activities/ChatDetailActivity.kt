@@ -167,7 +167,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
             binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
             binding.lvRecoder.lvForRecorder.seekBar.max = 0
-            updateClickable(false, true, false, false)
+            updateClickable(false, false, false, false)
             updateDrawables(record_gray, play_green, pause_gray, stop_gray)
 
         }
@@ -299,8 +299,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun playAudio() {
 
-        updateDrawables(record_gray, play_green, pause_green, stop_green)
-        updateClickable(false, true, true, true)
+        updateDrawables(record_gray, play_gray, pause_green, stop_green)
+        updateClickable(false, false, true, true)
 
         isPlayPlayer = true
         isStopPlayer = true
