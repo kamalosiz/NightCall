@@ -38,12 +38,12 @@ import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
-import kotlinx.android.synthetic.main.layout_for_chat_screen.view.*
 import kotlinx.android.synthetic.main.layout_for_chat_screen.view.editTextMessage
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
 import omrecorder.*
 import org.json.JSONObject
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -52,6 +52,7 @@ import kotlin.collections.HashMap
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     NewMessageListener, MessageTypingListener {
+
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -64,7 +65,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     lateinit var binding: ActivityChatDetailBinding
     lateinit var viewModel: ChatMessagesViewModel
     private lateinit var path: String
-    private lateinit var output: String
+    private var output: String = ""
     private val delay: Long = 1000
     private var lastTextEdit: Long = 0
     private var index = 0
@@ -75,13 +76,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var isFromChatFragment = false
     private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
     private var recorder: Recorder? = null
-    private var timeWhenStopped: Long = 0;
+    private var timeWhenPause: Long = 0;
     private var isResumeRecorder = false
     private var isPlayPlayer = false
     private var isStopPlayer = false
     private var isStopRecording = false
     private var isPlayerRelease = false
     private var mediaPlayer: MediaPlayer? = null
+    private val gone = View.GONE
+    private val visible = View.VISIBLE
+    private val playGreen = R.drawable.ic_play_green
+    private val playGray = R.drawable.ic_play_gray
+    private val pauseGreen = R.drawable.ic_pause_green
+    private val pauseGray = R.drawable.ic_pause_gray
+    private val stopGreen = R.drawable.ic_stop_green
+    private val stopGray = R.drawable.ic_stop_gray
+    private val recordGreen = R.drawable.ic_record_green
+    private val recordGray = R.drawable.ic_record_gray
+    private val recordRed = R.drawable.ic_record_red
     private lateinit var runnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,9 +115,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.chatMessagesRecycler.layoutManager = linearLayout
         binding.chatMessagesRecycler.adapter =
             ChatMessagesAdapter(this, sharedPrefsHelper.getUser()?.id.toString())
-        binding.recordingView.imageViewSend.setOnClickListener(this)
+        binding.lvRecoder.ivSend.setOnClickListener(this)
         binding.header.rlBack.setOnClickListener(this)
-        initRecorderWithPermissions()
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
@@ -114,21 +125,46 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun initMediaPlayer() {
+        try {
+            if (mediaPlayer != null && !mediaPlayer?.isPlaying!!) {
+                mediaPlayer?.start()
+            } else {
+                mediaPlayer = MediaPlayer()
+                mediaPlayer?.setAudioAttributes(
+                    AudioAttributes
+                        .Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                        .build()
+                )
+                mediaPlayer?.setDataSource(output)
+                mediaPlayer?.prepare()
+                mediaPlayer?.start()
+                initializeSeekBar()
+            }
+        } catch (e: IOException) {
+            logE("excep:${e.message}")
+        }
 
+        mediaPlayer?.setOnCompletionListener {
 
-        mediaPlayer = MediaPlayer()
-        mediaPlayer?.setAudioAttributes(
-            AudioAttributes
-                .Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                .build()
-        )
-        mediaPlayer?.setDataSource(output)
-        mediaPlayer?.prepare()
-        mediaPlayer?.start()
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+            isPlayerRelease = true
+            isStopPlayer = false
+            binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
+            binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
+            binding.lvRecoder.lvForRecorder.seekBar.max = 0
+            updateClickable(
+                canClickRecoder = false,
+                canClickPlay = true,
+                canClickPause = false,
+                canClickStop = false
+            )
+            updateDrawables(recordGray, playGreen, pauseGray, stopGray)
 
-        initializeSeekBar()
+        }
 
     }
 
@@ -140,7 +176,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             startActivity(intent)
         }
         binding.lvRecoder.ivMic.setOnClickListener {
-            binding.lvRecoder.lvForRecorder.visibility = View.VISIBLE
+            initRecorderWithPermissions()
         }
 
         binding.lvRecoder.lvForRecorder.ivRecord.setOnClickListener {
@@ -178,41 +214,42 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun playPauseRecorder() {
 
         if (!isResumeRecorder) {
-            binding.lvRecoder.chronometer.base = SystemClock.elapsedRealtime()
-            binding.lvRecoder.chronometer.start()
-            binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_green)
-            binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_green)
-            binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-            binding.lvRecoder.lvForRecorder.ivPause.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivStop.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
+            startChronometer()
+            initializeRecorder()
             recorder?.startRecording()
+            updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
+            updateClickable(
+                canClickRecoder = false,
+                canClickPlay = false,
+                canClickPause = true,
+                canClickStop = true
+            )
             isStopRecording = true
 
         } else {
-            binding.lvRecoder.chronometer.base = SystemClock.elapsedRealtime() - timeWhenStopped
-            binding.lvRecoder.chronometer.start()
-            binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_green)
-            binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_green)
-            binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-            binding.lvRecoder.lvForRecorder.ivPause.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivStop.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
+
+            resumeChronometer()
+            updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
+            updateClickable(
+                canClickRecoder = false,
+                canClickPlay = false,
+                canClickPause = true,
+                canClickStop = true
+            )
             recorder?.resumeRecording()
             isStopRecording = true
         }
     }
 
     private fun pauseRecorder() {
-        binding.lvRecoder.chronometer.stop()
-        timeWhenStopped = SystemClock.elapsedRealtime() - binding.lvRecoder.chronometer.base
-        binding.lvRecoder.chronometer.base = SystemClock.elapsedRealtime() - timeWhenStopped
-        binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_green)
-        binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_green)
-        binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_red)
-        binding.lvRecoder.lvForRecorder.ivPause.isClickable = true
-        binding.lvRecoder.lvForRecorder.ivStop.isClickable = true
-        binding.lvRecoder.lvForRecorder.ivRecord.isClickable = true
+        pauseChronometer()
+        updateDrawables(recordRed, playGray, pauseGreen, stopGreen)
+        updateClickable(
+            canClickRecoder = true,
+            canClickPlay = false,
+            canClickPause = false,
+            canClickStop = true
+        )
         recorder?.pauseRecording()
         isResumeRecorder = true
     }
@@ -221,15 +258,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
         if (mediaPlayer?.isPlaying!!) {
             mediaPlayer?.pause()
-            binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_green)
-            binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_gray)
-            binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_green)
-            binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-            binding.lvRecoder.lvForRecorder.ivPlay.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivPause.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivStop.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
-
+            updateDrawables(recordGray, playGreen, pauseGray, stopGreen)
+            updateClickable(
+                canClickRecoder = false,
+                canClickPlay = true,
+                canClickPause = false,
+                canClickStop = true
+            )
         }
     }
 
@@ -241,14 +276,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         isPlayerRelease = true
         isStopPlayer = false
         binding.lvRecoder.lvForRecorder.seekBar.max = 0
-        binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_green)
-        binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_gray)
-        binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_gray)
-        binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-        binding.lvRecoder.lvForRecorder.ivPlay.isClickable = true
-        binding.lvRecoder.lvForRecorder.ivPause.isClickable = false
-        binding.lvRecoder.lvForRecorder.ivStop.isClickable = false
-        binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
+        updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+        updateClickable(
+            canClickRecoder = false,
+            canClickPlay = true,
+            canClickPause = false,
+            canClickStop = false
+        )
+        binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
+        binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
 
     }
 
@@ -256,101 +292,130 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (isStopRecording) {
             recorder?.stopRecording()
             recorder = null
-            binding.lvRecoder.chronometer.stop()
-            binding.lvRecoder.lvForRecorder.lvSeekBar.visibility = View.VISIBLE
-            binding.lvRecoder.chronometer.visibility = View.GONE
-            binding.lvRecoder.chronometer.base = 0
-            binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_green)
-            binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_gray)
-            binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_gray)
-            binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-            binding.lvRecoder.lvForRecorder.ivPlay.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivPause.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivStop.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
-            isResumeRecorder = false
+            stopChronometer()
+            visibility(visible, visible, gone)
+            updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+            updateClickable(
+                canClickRecoder = false,
+                canClickPlay = true,
+                canClickPause = false,
+                canClickStop = false
+            )
             isStopRecording = false
         } else {
-            binding.lvRecoder.chronometer.stop()
-            timeWhenStopped =
-                SystemClock.elapsedRealtime() - binding.lvRecoder.chronometer.base
-            binding.lvRecoder.chronometer.base =
-                SystemClock.elapsedRealtime() - timeWhenStopped
-            binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_green)
-            binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_gray)
-            binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_gray)
-            binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-            binding.lvRecoder.lvForRecorder.ivPlay.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivPause.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivStop.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
+            stopPlayer()
+            updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+            updateClickable(
+                canClickRecoder = true,
+                canClickPlay = false,
+                canClickPause = false,
+                canClickStop = false
+            )
             isResumeRecorder = true
         }
     }
 
     private fun playAudio() {
-        binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_gray)
-        binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_green)
-        binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_green)
-        binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-        binding.lvRecoder.lvForRecorder.ivPlay.isClickable = false
-        binding.lvRecoder.lvForRecorder.ivPause.isClickable = true
-        binding.lvRecoder.lvForRecorder.ivStop.isClickable = true
-        binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
+
+        updateDrawables(recordGray, playGreen, pauseGreen, stopGreen)
+        updateClickable(
+            canClickRecoder = false,
+            canClickPlay = true,
+            canClickPause = true,
+            canClickStop = true
+        )
+
         isPlayPlayer = true
         isStopPlayer = true
-        if (mediaPlayer != null && !mediaPlayer?.isPlaying!!) {
-            mediaPlayer?.start()
-        } else {
-            initMediaPlayer()
-        }
-        mediaPlayer?.setOnCompletionListener {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            isPlayerRelease = true
-            isStopPlayer = false
-            binding.lvRecoder.lvForRecorder.seekBar.max = 0
-            binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_green)
-            binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_gray)
-            binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_gray)
-            binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_gray)
-            binding.lvRecoder.lvForRecorder.ivPlay.isClickable = true
-            binding.lvRecoder.lvForRecorder.ivPause.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivStop.isClickable = false
-            binding.lvRecoder.lvForRecorder.ivRecord.isClickable = false
-        }
+        initMediaPlayer()
+
     }
+
 
     private fun cancel() {
 
         mediaPlayer?.stop()
         mediaPlayer?.release()
-        recorder?.stopRecording()
+        mediaPlayer = null
         recorder = null
-        timeWhenStopped = 0
+        timeWhenPause = 0
         isResumeRecorder = false
         isPlayPlayer = false
         isStopPlayer = false
         isStopRecording = false
         isPlayerRelease = false
-        mediaPlayer = null
-        binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(R.drawable.ic_play_gray)
-        binding.lvRecoder.lvForRecorder.ivPause.setImageResource(R.drawable.ic_pause_gray)
-        binding.lvRecoder.lvForRecorder.ivStop.setImageResource(R.drawable.ic_stop_gray)
-        binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(R.drawable.ic_record_green)
-        binding.lvRecoder.lvForRecorder.ivPlay.isClickable = false
-        binding.lvRecoder.lvForRecorder.ivPause.isClickable = false
-        binding.lvRecoder.lvForRecorder.ivStop.isClickable = false
-        binding.lvRecoder.lvForRecorder.ivRecord.isClickable = true
-        binding.lvRecoder.lvForRecorder.visibility = View.GONE
-        binding.lvRecoder.lvForRecorder.lvSeekBar.visibility = View.GONE
-        binding.lvRecoder.chronometer.visibility = View.VISIBLE
-//        
+        stopChronometer()
+        binding.lvRecoder.lvForRecorder.seekBar.max = 0
+        binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
+        binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
+        updateDrawables(recordGreen, playGray, pauseGray, stopGray)
+        updateClickable(
+            canClickRecoder = true,
+            canClickPlay = false,
+            canClickPause = false,
+            canClickStop = false
+        )
+        visibility(gone, gone, visible)
         val file = File(output)
         if (file.exists()) {
             file.delete()
         }
+    }
+
+    private fun visibility(recorderVisibility: Int, seekbarVisibility: Int, chronometer: Int) {
+
+        binding.lvRecoder.lvForRecorder.visibility = recorderVisibility
+        binding.lvRecoder.lvForRecorder.lvSeekBar.visibility = seekbarVisibility
+        binding.lvRecoder.chronometer.visibility = chronometer
+    }
+
+    private fun updateDrawables(
+        recordButton: Int, playButton: Int, pauseButton: Int, stopButton: Int
+    ) {
+        binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(recordButton)
+        binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(playButton)
+        binding.lvRecoder.lvForRecorder.ivPause.setImageResource(pauseButton)
+        binding.lvRecoder.lvForRecorder.ivStop.setImageResource(stopButton)
+    }
+
+    private fun updateClickable(
+        canClickRecoder: Boolean,
+        canClickPlay: Boolean,
+        canClickPause: Boolean,
+        canClickStop: Boolean
+    ) {
+        binding.lvRecoder.lvForRecorder.ivRecord.isClickable = canClickRecoder
+        binding.lvRecoder.lvForRecorder.ivPlay.isClickable = canClickPlay
+        binding.lvRecoder.lvForRecorder.ivPause.isClickable = canClickPause
+        binding.lvRecoder.lvForRecorder.ivStop.isClickable = canClickStop
+    }
+
+    private fun startChronometer() {
+
+        binding.lvRecoder.lvForRecorder.chronometer.base = SystemClock.elapsedRealtime()
+        binding.lvRecoder.lvForRecorder.chronometer.start()
+    }
+
+    private fun stopChronometer() {
+
+        binding.lvRecoder.lvForRecorder.chronometer.base = SystemClock.elapsedRealtime()
+        binding.lvRecoder.lvForRecorder.chronometer.stop()
+    }
+
+    private fun pauseChronometer() {
+
+        timeWhenPause =
+            binding.lvRecoder.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()
+        binding.lvRecoder.lvForRecorder.chronometer.stop()
+
+    }
+
+    private fun resumeChronometer() {
+
+        binding.lvRecoder.lvForRecorder.chronometer.base =
+            SystemClock.elapsedRealtime() + timeWhenPause
+        binding.lvRecoder.lvForRecorder.chronometer.start()
+
     }
 
     private fun initializeSeekBar() {
@@ -368,7 +433,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
                     binding.lvRecoder.lvForRecorder.tvTimer.text =
                         timeFormatter.format(currentSeconds)
-//                val difference = seconds - currentSeconds
                     handler.postDelayed(runnable, 1)
                 }
             } catch (e: IllegalStateException) {
@@ -557,7 +621,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ).listener(object : MediaPermissionListener {
                     override fun onPermissionGranted() {
-                        initializeRecorder()
+                        binding.lvRecoder.lvForRecorder.visibility = View.VISIBLE
                     }
 
                     override fun onPermissionDenied() {
@@ -570,7 +634,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.imageViewSend -> {
+            R.id.ivSend -> {
                 sendMessage()
             }
             R.id.rlBack -> {
@@ -604,7 +668,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun checkSomeoneTyping() {
-        binding.recordingView.editTextMessage.addTextChangedListener(object : TextWatcher {
+        binding.lvRecoder.editTextMessage.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (s?.isNotEmpty() == true) {
                     lastTextEdit = System.currentTimeMillis()
@@ -633,15 +697,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun sendMessage() {
         createChatObject(
-            binding.recordingView.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
+            binding.lvRecoder.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
             AppConstants.TEXT_MESSAGE
         )
         emitNewMessageToSocket(
-            binding.recordingView.editTextMessage.text.toString(),
+            binding.lvRecoder.editTextMessage.text.toString(),
             AppConstants.TEXT_MESSAGE, "", 0
         )
         logE("Message Emitted to socket")
-        binding.recordingView.editTextMessage.setText("")
+        binding.lvRecoder.editTextMessage.setText("")
     }
 
     override fun socketResponse(jsonObject: JSONObject) {
