@@ -169,24 +169,26 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
 
     private fun getAllContact(): ArrayList<ContactInfo> {
         val list: ArrayList<ContactInfo> = ArrayList()
-        val phones: Cursor? = contentResolver.query(
+        val cursor: Cursor? = contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null,
             null,
             null,
             null
         )
-        while (phones!!.moveToNext()) {
+        while (cursor!!.moveToNext()) {
             val name =
-                phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
             val phoneNumber =
-                phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
                     .trim()
+
             if (!list.contains(ContactInfo(name, phoneNumber))) {
                 list.add(ContactInfo(name, phoneNumber))
             }
+
         }
-        phones.close()
+        cursor.close()
         return list
     }
 

@@ -1,6 +1,7 @@
 package com.example.kalam_android.util
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 import com.fxn.pix.Options
@@ -73,5 +74,14 @@ fun printDifference(endDate: Date): String {
         elapsedSeconds.toInt() != 0 -> duration = "${abs(elapsedSeconds)} seconds ago"
     }
     return duration
+}
+
+fun showAlertDialoge(context: Context, title: String, message: String) {
+    val builder1 = AlertDialog.Builder(context)
+    builder1.setTitle(title)
+    builder1.setMessage(message)
+    builder1.setCancelable(true)
+    builder1.setPositiveButton("Okay") { dialog, id -> dialog.cancel() }
+    builder1.create().show()
 }
 

@@ -45,11 +45,11 @@ class SelectLanguage : BaseActivity(), AdapterView.OnItemSelectedListener, View.
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (position) {
             0 -> {
-                item = "ar"
+                item = "en"
                 this.position = position
             }
             1 -> {
-                item = "en"
+                item = "ar"
                 this.position = position
             }
         }
@@ -67,7 +67,7 @@ class SelectLanguage : BaseActivity(), AdapterView.OnItemSelectedListener, View.
 
     private fun applySpinner() {
         val languages: ArrayList<String> = ArrayList()
-        languages.addAll(arrayOf("Arabic", "English"))
+        languages.addAll(arrayOf("English", "Arabic"))
         binding.spinner1.onItemSelectedListener = this
         val aa =
             ArrayAdapter(this, android.R.layout.simple_spinner_item, languages)

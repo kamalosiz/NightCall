@@ -49,7 +49,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private var chatList: ArrayList<ChatListData> = ArrayList()
-    //    private var chatListLocal: List<AllChatEntityClass> = ArrayList()
+        private var chatListLocal: List<AllChatEntityClass> = ArrayList()
     var position = -1
 
     override fun onCreateView(
@@ -84,7 +84,6 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         binding.swipeRefreshLayout.setOnRefreshListener {
             hitAllChatApi()
         }
-        logE("my Number: ${sharedPrefsHelper.getUser()?.phone}")
         return binding.root
     }
 
@@ -150,7 +149,6 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
                         x.un_read_count
                     )
                 )
-
             }
         }
         binding.chatRecycler.adapter =
@@ -239,7 +237,6 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
 //                this.position = position
                 val item = chatList[position]
                 val intent = Intent(activity, ChatDetailActivity::class.java)
-//                intent.putExtra("dummyid", chatListLocal[position].id)
                 intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
                 intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
                 intent.putExtra(

@@ -40,15 +40,6 @@ open class BaseActivity : AppCompatActivity() {
         ).matches()
     }
 
-    fun showAlertDialoge(context: Context, title: String, message: String) {
-        val builder1 = AlertDialog.Builder(context)
-        builder1.setTitle(title)
-        builder1.setMessage(message)
-        builder1.setCancelable(true)
-        builder1.setPositiveButton("Okay") { dialog, id -> dialog.cancel() }
-        builder1.create().show()
-    }
-
     fun popUpMenu(view: View, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(menu)

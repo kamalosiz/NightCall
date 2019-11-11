@@ -95,12 +95,15 @@ class AdapterForContacts(val context: Context, val userID: String) :
                 if (item?.id == 0) {
                     itemHolder.binding.btnInvite.visibility = View.VISIBLE
                     itemHolder.binding.btnInvite.tag = position - 1
+                    itemHolder.binding.rlItem.setOnClickListener(null)
 //                    itemHolder.binding.rlItem.setOnClickListener(null)
                 } else {
                     itemHolder.binding.btnInvite.visibility = View.GONE
                     itemHolder.binding.rlItem.tag = position - 1
+                    itemHolder.binding.rlItem.setOnClickListener(onClickListener)
 //                    itemHolder.binding.rlItem.setOnClickListener(onClickListener)
                 }
+
             }
 
         }

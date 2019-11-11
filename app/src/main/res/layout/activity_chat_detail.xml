@@ -38,11 +38,16 @@
             android:layout_height="@dimen/_20sdp"
             android:layout_centerInParent="true"
             android:visibility="visible" />
-
+<!--
         <com.example.kalam_android.wrapper.AudioRecordView
             android:id="@+id/recordingView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentBottom="true"
+            android:visibility="gone" />-->
+
+        <include layout="@layout/layout_content_of_chat"
+            android:id="@+id/lvRecoder"/>
+
     </RelativeLayout>
 </layout>

@@ -19,6 +19,7 @@ import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.showAlertDialoge
 import com.example.kalam_android.util.toast
 import java.io.File
 import java.io.FileInputStream
@@ -38,7 +39,6 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
     private lateinit var mediaPlayer: MediaPlayer
     private var chatList: ArrayList<ChatData>? = ArrayList()
     private val TAG = this.javaClass.simpleName
-    var isOriginal = true
     private var isRelease = false
 
     fun updateList(list: ArrayList<ChatData>) {
@@ -76,7 +76,8 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
                 itemHolder.binding.itemChat.tvMessage.text = item.message
                 itemHolder.binding.itemChat.llOriginal.setOnClickListener {
-                    if (isOriginal) {
+                    showAlertDialoge(context, "Original Message", item.original_message.toString())
+                    /*if (isOriginal) {
                         isOriginal = false
                         itemHolder.binding.itemChat.tvMessage.text = item.original_message
                         itemHolder.binding.itemChat.tvOriginal.text = "Translated"
@@ -84,16 +85,40 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                         isOriginal = true
                         itemHolder.binding.itemChat.tvMessage.text = item.message
                         itemHolder.binding.itemChat.tvOriginal.text = "View Original"
-                    }
+                    }*/
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
-                    itemHolder.binding.itemChat.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.white))
+                    itemHolder.binding.itemChat.tvMessage.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+                    itemHolder.binding.itemChat.tvOriginal.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
+                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
-                    itemHolder.binding.itemChat.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    itemHolder.binding.itemChat.tvMessage.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.black
+                        )
+                    )
+                    itemHolder.binding.itemChat.tvOriginal.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.theme_color
+                        )
+                    )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
+                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.theme_color)
                 }
             }
             AppConstants.AUDIO_MESSAGE -> {
