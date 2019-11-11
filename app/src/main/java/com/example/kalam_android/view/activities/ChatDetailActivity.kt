@@ -1,7 +1,6 @@
 package com.example.kalam_android.view.activities
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.media.MediaMetadataRetriever
@@ -13,7 +12,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -47,7 +45,6 @@ import org.json.JSONObject
 import java.io.File
 import java.io.IOException
 import java.lang.RuntimeException
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -78,7 +75,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private var chatList1: ArrayList<ChatData> = ArrayList()
     private var profileImage: String = ""
     private var loading = false
-    private var isPaging = false
+    private var isFromChatFragment = false
     private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,7 +128,6 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
             override fun loadMoreItems() {
                 binding.pbHeader.visibility = View.VISIBLE
-                isPaging = true
                 loading = true
                 index += 20
                 logE("chatListSize ${chatList1.size}")
@@ -141,10 +137,11 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     }
 
     private fun gettingChatId() {
-        val isFromChatFragment = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
+        isFromChatFragment = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
         if (isFromChatFragment) {
             chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
             hitAllChatApi(0)
+            sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
         } else {
             receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
             val jsonObject = JsonObject()
@@ -158,6 +155,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
                     hitAllChatApi(0)
                 }
             })
+            sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
         }
     }
 
@@ -185,15 +183,15 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         when (apiResponse?.status) {
 
             Status.LOADING -> {
-                logE("Loading Chat Messages")
                 loading = true
+                logE("Loading Chat Messages")
             }
             Status.SUCCESS -> {
+                loading = false
                 binding.pbCenter.visibility = View.GONE
                 binding.pbHeader.visibility = View.GONE
                 renderResponse(apiResponse.data as ChatMessagesResponse)
                 logE("+${apiResponse.data}")
-                loading = false
             }
             Status.ERROR -> {
                 loading = false
@@ -239,7 +237,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
     private fun renderAudioResponse(response: AudioResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            emitNewMessage(
+            emitNewMessageToSocket(
                 "", AppConstants.AUDIO_MESSAGE, it.data?.file_url.toString(), 0
             )
         }
@@ -269,10 +267,9 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         )
     }
 
-    @SuppressLint("SimpleDateFormat")
     private fun initRecorder() {
         val date = Calendar.getInstance().time
-        val sdf = SimpleDateFormat("yyMMddHHmmssZ")
+        val sdf = SimpleDateFormat("yyMMddHHmmssZ", Locale.getDefault())
         path =
             File(Environment.getExternalStorageDirectory().path, "${sdf.format(date)}recording.mp3")
 
@@ -294,7 +291,6 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
             mediaRecorder?.prepare()
             mediaRecorder?.start()
             state = true
-            Toast.makeText(this, "Recording started!", Toast.LENGTH_SHORT).show()
         } catch (e: IllegalStateException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -403,7 +399,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
             binding.recordingView.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
             AppConstants.TEXT_MESSAGE
         )
-        emitNewMessage(
+        emitNewMessageToSocket(
             binding.recordingView.editTextMessage.text.toString(),
             AppConstants.TEXT_MESSAGE, "", 0
         )
@@ -425,15 +421,17 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         logE("typing response: $jsonObject")
         val chatId1 = jsonObject.getString("chat_id")
         if (chatId1.toInt() == chatId) {
-            if (isTyping) {
-                val user: String? = jsonObject.getString("user")
-                if (user.equals(userRealName)) {
-                    val list: List<String>? = user?.split(" ")
-                    binding.header.tvName.text =
-                        StringBuilder(list?.get(0).toString()).append(" is typing...")
+            runOnUiThread {
+                if (isTyping) {
+                    val user: String? = jsonObject.getString("user")
+                    if (user.equals(userRealName)) {
+                        logE("Is Typing")
+                        binding.header.tvTyping.visibility = View.VISIBLE
+                    }
+                } else {
+                    logE("Not Typing")
+                    binding.header.tvTyping.visibility = View.GONE
                 }
-            } else {
-                binding.header.tvName.text = userRealName
             }
         }
     }
@@ -462,7 +460,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
 
-    private fun emitNewMessage(message: String, type: String, file: String, duration: Int) {
+    private fun emitNewMessageToSocket(message: String, type: String, file: String, duration: Int) {
         SocketIO.emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(), chatId.toString(), message, type,
             sharedPrefsHelper.getUser()?.firstname.toString()
@@ -472,7 +470,7 @@ class ChatDetailActivity : BaseActivity(), AudioRecordView.RecordingListener, Vi
 
     private fun getDuration(file: File): Int {
         val mediaMetadataRetriever = MediaMetadataRetriever()
-        mediaMetadataRetriever.setDataSource(file.getAbsolutePath());
+        mediaMetadataRetriever.setDataSource(file.absolutePath);
         val durationStr =
             mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         return durationStr.toInt()

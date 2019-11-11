@@ -7,21 +7,21 @@
         android:layout_height="@dimen/_40sdp"
         android:background="@color/theme_color">
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/rlBack"
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
             android:layout_marginStart="@dimen/_8sdp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:gravity="center"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="@dimen/_16sdp"
                 android:layout_height="@dimen/_16sdp"
                 app:srcCompat="@drawable/icon_back" />
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -34,31 +34,49 @@
             app:layout_constraintStart_toEndOf="@+id/rlBack"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="@dimen/_90sdp"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/rlName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_15sdp"
-            android:fontFamily="@font/halvatic_light"
-            android:singleLine="true"
-            android:text="Waqar Mustafa"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12ssp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvName"
+                android:layout_width="@dimen/_95sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/helvetica_medium"
+                android:singleLine="true"
+                android:text="Waqar Mustafa"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_13ssp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTyping"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/halvatic_light"
+                android:singleLine="true"
+                android:text="@string/typing"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_11ssp"
+                android:visibility="gone" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageView5"
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
             android:layout_marginStart="@dimen/_20sdp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvName"
+            app:layout_constraintStart_toEndOf="@+id/rlName"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/icon_audio" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageView6"
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_25sdp"
@@ -68,7 +86,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/icon_video" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageView7"
             android:layout_width="@dimen/_25sdp"
             android:layout_height="@dimen/_20sdp"

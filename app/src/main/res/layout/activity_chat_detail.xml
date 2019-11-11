@@ -15,6 +15,7 @@
             android:layout_height="match_parent"
             android:layout_below="@id/header"
             android:layout_marginBottom="@dimen/_50sdp"
+            android:background="@drawable/chat_screen_background"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView

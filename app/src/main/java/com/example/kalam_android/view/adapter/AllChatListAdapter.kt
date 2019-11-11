@@ -55,7 +55,8 @@ class AllChatListAdapter(
                 )
             )
         }
-        holderItem.binding.tvAgo.text = calculateLocalDate(item?.unix_time)
+
+        holderItem.binding.tvAgo.text = item?.unix_time?.let { calculateLocalDate(it) }
         GlideDownloder.load(
             context,
             holderItem.binding.ivImage,

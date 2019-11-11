@@ -44,6 +44,7 @@
     <string name="labelEnglish">English</string>
     <string name="labelArabic">Arabic</string>
     <string name="selectAuto">Select Automatically</string>
+    <string name="typing">typing…</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
