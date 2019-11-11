@@ -1,5 +1,6 @@
 package com.example.kalam_android.di.modules
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
@@ -7,10 +8,12 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 import androidx.room.Room
+import com.example.kalam_android.localdb.AllChatListDao
 import com.example.kalam_android.localdb.ContactsDao
 import com.example.kalam_android.localdb.RoomDB
-import com.example.kalam_android.repository.LocalRepo
+import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.util.AppConstants
+import com.example.kalam_android.view.activities.MainActivity
 
 
 @Module
@@ -50,10 +53,16 @@ class AppModule(private val context: Context) {
         return roomDb.contactsDao()
     }
 
+    @Singleton
+    @Provides
+    fun provideAllChatDao(roomDb: RoomDB): AllChatListDao {
+        return roomDb.allChatListDao()
+    }
+
     @Provides
     @Singleton
-    fun getLocalRepo(contactsDao: ContactsDao): LocalRepo {
-        return LocalRepo(contactsDao)
+    fun getLocalRepo(contactsDao: ContactsDao, allChatListDao: AllChatListDao): LocalRepo {
+        return LocalRepo(contactsDao, allChatListDao)
     }
 
 }

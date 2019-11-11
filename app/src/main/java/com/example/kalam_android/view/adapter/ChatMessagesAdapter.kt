@@ -1,5 +1,6 @@
 package com.example.kalam_android.view.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -26,7 +27,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ChatMessagesAdapter(val context: Context, val userId: String) :
+class ChatMessagesAdapter(val context: Context, private val userId: String) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var handler: Handler = Handler()
@@ -41,15 +42,12 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
     private var isRelease = false
 
     fun updateList(list: ArrayList<ChatData>) {
-//        chatList?.clear()
-//        chatList = list
         chatList?.addAll(list)
         notifyDataSetChanged()
     }
 
     fun addMessage(message: ChatData) {
         chatList?.add(0, message)
-//        chatList?.size?.let { notifyItemInserted(it) }
         notifyItemInserted(0)
     }
 
@@ -68,6 +66,7 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
         return chatList?.size ?: 0
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val itemHolder = holder as MyHolder
         val item = chatList?.get(position)
@@ -89,12 +88,13 @@ class ChatMessagesAdapter(val context: Context, val userId: String) :
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
+                    itemHolder.binding.itemChat.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.white))
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
+                    itemHolder.binding.itemChat.tvMessage.setTextColor(ContextCompat.getColor(context, R.color.black))
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
                 }
-
             }
             AppConstants.AUDIO_MESSAGE -> {
                 itemHolder.binding.audioPlayer.cvPlayer.visibility = View.VISIBLE

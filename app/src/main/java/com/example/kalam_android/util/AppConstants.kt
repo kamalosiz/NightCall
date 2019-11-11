@@ -14,6 +14,7 @@ object AppConstants {
     const val DUMMY_STRING = ""
     const val TEXT_MESSAGE = "text"
     const val AUDIO_MESSAGE = "audio"
+    const val IS_FROM_CONTACTS = "inFromContactsAdapter"
 
     //Request Code
     const val CHAT_FRAGMENT_CODE = 1000

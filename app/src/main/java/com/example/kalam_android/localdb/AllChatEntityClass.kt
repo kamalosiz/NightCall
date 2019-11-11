@@ -10,7 +10,7 @@ data class AllChatEntityClass(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     @ColumnInfo(name = "chat_id") var chatID: Int,
-    @ColumnInfo(name = "updated_at") var updated_at: String?,
+    @ColumnInfo(name = "updated_at") var updated_at: String,
     @ColumnInfo(name = "unix_time") var unix_time: Long,
     @ColumnInfo(name = "firstname") var firstname: String,
     @ColumnInfo(name = "lastname") var lastname: String,

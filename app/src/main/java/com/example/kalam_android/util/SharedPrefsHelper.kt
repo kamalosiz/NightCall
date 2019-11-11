@@ -19,6 +19,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     private val KEY_PHONE = "key_phone_kalam"
     private val IMAGE_INDEX = "key_image_index_kalam"
     private val CONTACTS_SYNCED = "key_contacts_synced"
+    private val ALL_CHAT_ITEM_SYNCED = "key_all_chat_item_synced"
     private val LANGUAGE = "kalam_user_language"
     private val SELECT_AUTO = "kalam_translate_data"
 
@@ -113,6 +114,14 @@ constructor(private val mSharedPreferences: SharedPreferences) {
 
     fun isContactsSynced(): Boolean {
         return get(CONTACTS_SYNCED, false) ?: false
+    }
+
+    fun allChatItemSynced() {
+        put(ALL_CHAT_ITEM_SYNCED, true)
+    }
+
+    fun isAllChatsItemsSynced(): Boolean {
+        return get(ALL_CHAT_ITEM_SYNCED, false) ?: false
     }
 
     fun saveLanguage(language: Int) {

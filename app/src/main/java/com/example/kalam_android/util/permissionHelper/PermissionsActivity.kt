@@ -15,8 +15,6 @@ import java.util.*
 
 class PermissionsActivity : Activity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private val TAG = "PermissionsActivity"
-
     private var permissionsList: ArrayList<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

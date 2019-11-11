@@ -11,7 +11,7 @@ import okhttp3.RequestBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-
+import kotlin.math.abs
 
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -39,30 +39,39 @@ fun getFileBody(path: String, fileName: String): MultipartBody.Part {
 }
 
 @SuppressLint("SimpleDateFormat")
-fun calculateLocalDate(unixTime: Long?): String {
-    val itemLong = (unixTime?.div(1000))
-    val d = itemLong?.times(1000L)?.let { Date(it) }
-//    return SimpleDateFormat("dd-MMM HH:mm").format(d)
-    return SimpleDateFormat("h:mm a").format(d)
+fun calculateLocalDate(unixTime: Long): String {
+    val date = Date(unixTime * 1000L)
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+    sdf.timeZone = TimeZone.getDefault()
+    return printDifference(sdf.parse(sdf.format(date)))
 }
 
-fun printDifference(startDate: Date, endDate: Date) {
-    //milliseconds
+@SuppressLint("SimpleDateFormat")
+fun printDifference(endDate: Date): String {
+    val c = Calendar.getInstance().time
+    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+    val formattedDate = df.format(c)
+    val startDate = df.parse(formattedDate)
+
     var different = endDate.time - startDate.time
     val secondsInMilli: Long = 1000
     val minutesInMilli = secondsInMilli * 60
     val hoursInMilli = minutesInMilli * 60
     val daysInMilli = hoursInMilli * 24
-
     val elapsedDays = different / daysInMilli
     different %= daysInMilli
-
     val elapsedHours = different / hoursInMilli
     different %= hoursInMilli
-
     val elapsedMinutes = different / minutesInMilli
     different %= minutesInMilli
-
     val elapsedSeconds = different / secondsInMilli
+    var duration = ""
+    when {
+        elapsedDays.toInt() != 0 -> duration = "${abs(elapsedDays)} days ago"
+        elapsedHours.toInt() != 0 -> duration = "${abs(elapsedHours)} hours ago"
+        elapsedMinutes.toInt() != 0 -> duration = "${abs(elapsedMinutes)} minutes ago"
+        elapsedSeconds.toInt() != 0 -> duration = "${abs(elapsedSeconds)} seconds ago"
+    }
+    return duration
 }
 

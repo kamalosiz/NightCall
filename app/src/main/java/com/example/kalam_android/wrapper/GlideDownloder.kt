@@ -22,7 +22,7 @@ object GlideDownloder {
                     .load(resource) // Uri of the picture
                     .error(error)
                     .placeholder(placeholder)
-//                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(it1)
             }
         }
