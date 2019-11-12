@@ -22,4 +22,6 @@ interface ContactsDao {
 
     @Query("DELETE FROM ${AppConstants.CONTACTS_TABLE}")
     fun deleteAll()
+
+
 }

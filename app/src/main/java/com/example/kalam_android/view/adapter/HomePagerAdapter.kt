@@ -14,7 +14,7 @@ class HomePagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
             1 -> f = CallsFragment()
             2 -> f = StoriesFragment()
             3 -> f = ProfileFragment()
-            4 -> f = SettingFragment()
+            4 -> f = MoreFragment()
         }
         /*  val args = Bundle()
           args.putBoolean(Constants.KEY_IS_FROM_ACTIVITY, false)

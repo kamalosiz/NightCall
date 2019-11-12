@@ -15,7 +15,7 @@ import com.example.kalam_android.repository.model.FindFriendList
 import com.example.kalam_android.repository.model.FindFriends
 import com.example.kalam_android.wrapper.GlideDownloder
 
-class AdapterForFindFriends(val context: Context, var friendList:MutableList<FindFriendList>) :
+class AdapterForFindFriends(val context: Context, var friendList: MutableList<FindFriendList>) :
     RecyclerView.Adapter<AdapterForFindFriends.FindFriendsVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FindFriendsVH {
@@ -30,7 +30,7 @@ class AdapterForFindFriends(val context: Context, var friendList:MutableList<Fin
         )
     }
 
-    fun updateList(list: MutableList<FindFriendList>){
+    fun updateList(list: MutableList<FindFriendList>) {
         friendList.clear()
         friendList = list
         notifyDataSetChanged()
@@ -45,7 +45,7 @@ class AdapterForFindFriends(val context: Context, var friendList:MutableList<Fin
     override fun onBindViewHolder(holder: FindFriendsVH, position: Int) {
 
         val item = friendList.get(position)
-        holder.binding.tvName.text = item.firstname+ item.lastname
+        holder.binding.tvName.text = item.firstname + " " + item.lastname
         holder.binding.tvLocation.text = item.country
         GlideDownloder.load(
             context,
@@ -57,7 +57,5 @@ class AdapterForFindFriends(val context: Context, var friendList:MutableList<Fin
     }
 
     inner class FindFriendsVH(val binding: ItemForFindFriendsBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-    }
+        RecyclerView.ViewHolder(binding.root)
 }

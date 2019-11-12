@@ -2,6 +2,7 @@ package com.example.kalam_android.view.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.ViewPager
 import com.example.kalam_android.R
@@ -34,6 +35,7 @@ class MainActivity : BaseActivity() {
         binding.llProfile.setOnClickListener { binding.viewPager.setCurrentItem(3, true) }
         binding.ivSettings.setOnClickListener { binding.viewPager.setCurrentItem(4, true) }
         SocketIO.connectSocket(sharedPrefsHelper.getUser()?.token)
+        binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
 

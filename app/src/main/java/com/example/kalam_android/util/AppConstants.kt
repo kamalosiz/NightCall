@@ -18,6 +18,7 @@ object AppConstants {
 
     //Request Code
     const val CHAT_FRAGMENT_CODE = 1000
+    const val LOGOUT_CODE = 1001
 
     //Local DB=
     const val DB_NAME = "kalam_local_db"

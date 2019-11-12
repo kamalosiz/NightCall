@@ -26,7 +26,7 @@
             </intent-filter>
         </service>
         <activity
-            android:name=".view.activities.SelectLanguage"
+            android:name=".view.activities.SettingActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.activities.UserProfileActivity"

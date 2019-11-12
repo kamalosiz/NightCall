@@ -3,8 +3,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#EFEFEF">
+        android:layout_height="match_parent">
 
         <include
             android:id="@+id/header"
@@ -15,13 +14,13 @@
             android:layout_height="match_parent"
             android:layout_below="@id/header"
             android:layout_marginBottom="@dimen/_50sdp"
+            android:background="@drawable/chat_screen_background"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_messages_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/_10sdp"/>
+                android:layout_height="match_parent" />
 
             <ProgressBar
                 android:id="@+id/pbHeader"
@@ -39,15 +38,9 @@
             android:layout_centerInParent="true"
             android:visibility="visible" />
 
-        <com.example.kalam_android.wrapper.AudioRecordView
-            android:id="@+id/recordingView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:visibility="gone" />
-
-        <include layout="@layout/layout_content_of_chat"
-            android:id="@+id/lvRecoder"/>
+        <include
+            android:id="@+id/lvRecoder"
+            layout="@layout/layout_content_of_chat" />
 
     </RelativeLayout>
 </layout>

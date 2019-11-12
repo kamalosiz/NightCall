@@ -80,8 +80,6 @@ class FindsFriendsActivity : BaseActivity(), TextWatcher {
             }
             Status.ERROR -> {
                 binding.pbCenter.visibility = View.GONE
-                toast(this, "Something went wrong please try again")
-                logE("Error:${response.error}")
             }
             else -> {
 

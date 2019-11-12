@@ -14,6 +14,7 @@
     <color name="colorRecorder">#efeffa</color>
     <color name="colorSeekBar">#158053</color>
     <color name="colorAudioMsg">#E7F2ED</color>
+    <color name="lighest_grey">#F5F5F5</color>
 
 
 </resources>
