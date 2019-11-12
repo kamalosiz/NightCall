@@ -316,10 +316,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun playAudio() {
 
-        updateDrawables(recordGray, playGreen, pauseGreen, stopGreen)
+        updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
         updateClickable(
             canClickRecoder = false,
-            canClickPlay = true,
+            canClickPlay = false,
             canClickPause = true,
             canClickStop = true
         )

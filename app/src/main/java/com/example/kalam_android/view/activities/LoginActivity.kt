@@ -28,9 +28,11 @@ import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
 import com.example.kalam_android.viewmodel.LoginViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
+import com.google.firebase.iid.FirebaseInstanceId
 import javax.inject.Inject
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
+
 
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityLoginBinding
@@ -40,6 +42,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
     lateinit var viewModel: LoginViewModel
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
+    private var fcmToken = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +57,25 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         binding.btnLogin.setOnClickListener(this)
         binding.etUsername.setText("waqarmustafa18@gmail.com")
         binding.etPass.setText("123")
+        fcmToken = sharedPrefsHelper.getFCMToken().toString()
+        if (fcmToken == "") {
+            getFCMToken()
+        }
+    }
+
+    private fun getFCMToken() {
+
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (task.result != null) {
+                    fcmToken = task.result!!.token
+                    sharedPrefsHelper.setFCMToken( fcmToken)
+                    logE("FCM Token:${fcmToken}")
+                }
+            } else {
+                logE("getInstance Failed:${task.exception}")
+            }
+        }
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<LoginResponse>?) {
@@ -163,6 +185,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 val params = HashMap<String, String>()
                 params["login"] = binding.etUsername.text.toString()
                 params["password"] = binding.etPass.text.toString()
+                params["fcm_token"] = fcmToken
+                logE("FCM Token:${fcmToken}")
                 viewModel.hitLogin(params)
             }
         }

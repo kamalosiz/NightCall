@@ -28,6 +28,7 @@ import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
+import com.google.firebase.iid.FirebaseInstanceId
 import com.yalantis.ucrop.UCrop
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -47,7 +48,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private var HIDE_PASSWORD = true
-
+    var fcmToken = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_create_profile)
@@ -60,6 +61,22 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         viewModel.createProfileResponse().observe(this, Observer {
             consumeResponse(it)
         })
+        getFCMToken()
+    }
+
+    private fun getFCMToken() {
+
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (task.result != null) {
+                    fcmToken = task.result!!.token
+                    sharedPrefsHelper.setFCMToken(fcmToken)
+                    logE("FCM Token:${fcmToken}")
+                }
+            } else {
+                logE("getInstance Failed:${task.exception}")
+            }
+        }
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<CreateProfileResponse>) {
@@ -179,7 +196,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         if (binding.etEmail.text.toString().isEmpty()) {
             toast("Please enter your email address")
             return
-        } else if (!isValidEmail(binding.etEmail.text.toString())) {
+        } else if (!isEmailValid(binding.etEmail.text.toString())) {
             toast("Email not Valid")
             return
         }
@@ -215,6 +232,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                 MediaType.parse("text/plain"),
                 sharedPrefsHelper.getPhone()?.dialCode.toString()
             )
+            params["fcm_token"] = RequestBody.create(MediaType.parse("text/plain"), fcmToken)
 
             val imageFileBody: MultipartBody.Part?
             val fileToUpload = File(profileImagePath.toString())
@@ -233,6 +251,8 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             params["password"] = binding.etPassword.text.toString()
             params["country"] = sharedPrefsHelper.getPhone()?.countryCode.toString()
             params["country_code"] = sharedPrefsHelper.getPhone()?.dialCode.toString()
+            params["fcm_token"] = fcmToken
+            logE("Fcm Token ${fcmToken}")
 
             viewModel.hitCreateProfileApi(params)
         }
@@ -264,4 +284,6 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
     private fun logE(message: String) {
         Debugger.e(TAG, message)
     }
+
+
 }

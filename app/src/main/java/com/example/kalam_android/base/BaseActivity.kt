@@ -34,11 +34,11 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun isValidEmail(email: String): Boolean {
+    /*fun isValidEmail(email: String): Boolean {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(
             email
         ).matches()
-    }
+    }*/
 
     fun popUpMenu(view: View, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
         val popupMenu = PopupMenu(this, view)
@@ -50,5 +50,12 @@ open class BaseActivity : AppCompatActivity() {
              applyFontToMenuItem(mi)
          }*/
         popupMenu.show()
+    }
+    companion object {
+
+        val EMAIL_REGEX = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+        fun isEmailValid(email: String): Boolean {
+            return EMAIL_REGEX.toRegex().matches(email)
+        }
     }
 }
