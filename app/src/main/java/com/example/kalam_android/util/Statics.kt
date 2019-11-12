@@ -84,4 +84,13 @@ fun showAlertDialoge(context: Context, title: String, message: String) {
     builder1.setPositiveButton("Okay") { dialog, id -> dialog.cancel() }
     builder1.create().show()
 }
+fun logoutAlertDialoge(context: Context, message: String) {
+    val builder1 = AlertDialog.Builder(context)
+    builder1.setTitle("Logout")
+    builder1.setMessage("Are you sure you want to logout?")
+    builder1.setCancelable(true)
+    builder1.setPositiveButton("Yes") { dialog, id -> dialog.cancel() }
+    builder1.setNegativeButton("No") { dialog, id -> dialog.cancel() }
+    builder1.create().show()
+}
 

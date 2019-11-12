@@ -5,7 +5,7 @@ import com.example.kalam_android.di.modules.UtilsModule
 import com.example.kalam_android.di.modules.ViewModelsModule
 import com.example.kalam_android.view.activities.*
 import com.example.kalam_android.view.fragments.ChatsFragment
-import com.example.kalam_android.view.fragments.SettingFragment
+import com.example.kalam_android.view.fragments.MoreFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -24,6 +24,6 @@ interface AppComponents {
     fun doInjection(activity: ChatDetailActivity)
     fun doInjection(fragment: ChatsFragment)
     fun doInjection(activity: FindsFriendsActivity)
-    fun doInjection(fragment: SettingFragment)
-    fun doInjection(activity: SelectLanguage)
+    fun doInjection(fragment: MoreFragment)
+    fun doInjection(activity: SettingActivity)
 }

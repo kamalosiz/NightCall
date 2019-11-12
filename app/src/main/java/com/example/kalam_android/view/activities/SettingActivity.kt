@@ -1,5 +1,7 @@
 package com.example.kalam_android.view.activities
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -16,7 +18,7 @@ import com.example.kalam_android.util.toast
 import com.example.kalam_android.wrapper.SocketIO
 import javax.inject.Inject
 
-class SelectLanguage : BaseActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener {
+class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener {
 
     var item = ""
     var position = -1
@@ -30,9 +32,10 @@ class SelectLanguage : BaseActivity(), AdapterView.OnItemSelectedListener, View.
         binding = DataBindingUtil.setContentView(this, R.layout.activity_select_language)
         MyApplication.getAppComponent(this).doInjection(this)
         binding.btnUpdateChanges.setOnClickListener(this)
+        binding.logout.setOnClickListener(this)
         binding.header.btnRight.visibility = View.GONE
         Debugger.e(
-            "SelectLanguage",
+            "SettingActivity",
             "Language: ${sharedPrefsHelper.getLanguage()} , isCheck: ${sharedPrefsHelper.getTransState()}"
         )
         binding.checkBox.isChecked = sharedPrefsHelper.getTransState() != 0
@@ -86,6 +89,23 @@ class SelectLanguage : BaseActivity(), AdapterView.OnItemSelectedListener, View.
                 toast("Language successfully updated")
                 sharedPrefsHelper.saveLanguage(position)
                 sharedPrefsHelper.saveTranslateState(autoTranslate)
+            }
+            R.id.logout -> {
+                val builder1 = AlertDialog.Builder(this)
+                builder1.setTitle("Logout")
+                builder1.setMessage("Are you sure you want to logout?")
+                builder1.setCancelable(true)
+                builder1.setPositiveButton("Yes") { dialog, id ->
+                    sharedPrefsHelper.put("key_contacts_synced", false)
+                    sharedPrefsHelper.put("is_logged_in_kalam", false)
+                    toast("Logout Successfully")
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                }
+                builder1.setNegativeButton("No") { dialog, id ->
+                    dialog.cancel()
+                }
+                builder1.create().show()
             }
         }
     }

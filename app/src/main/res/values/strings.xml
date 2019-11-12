@@ -38,6 +38,7 @@
     <string name="invite_text">Check out Kalam, I use it to message and call the people I care about. Get it for free</string>
     <string name="slide_to_cancel">Slide to cancel</string>
     <string name="labelChangeLng">Select Language</string>
+    <string name="settings">Settings</string>
     <string name="labelAbout">About</string>
     <string name="labelTermCondition"><![CDATA[Terms & Condition]]></string>
     <string name="labelPrivacyPolicy">Privacy Policy</string>

@@ -35,7 +35,6 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
     private lateinit var runnable: Runnable
     private var currentPos = -1
     private var prePos = -1
-    private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
     private lateinit var mediaPlayer: MediaPlayer
     private var chatList: ArrayList<ChatData>? = ArrayList()
     private val TAG = this.javaClass.simpleName
@@ -77,15 +76,6 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 itemHolder.binding.itemChat.tvMessage.text = item.message
                 itemHolder.binding.itemChat.llOriginal.setOnClickListener {
                     showAlertDialoge(context, "Original Message", item.original_message.toString())
-                    /*if (isOriginal) {
-                        isOriginal = false
-                        itemHolder.binding.itemChat.tvMessage.text = item.original_message
-                        itemHolder.binding.itemChat.tvOriginal.text = "Translated"
-                    } else {
-                        isOriginal = true
-                        itemHolder.binding.itemChat.tvMessage.text = item.message
-                        itemHolder.binding.itemChat.tvOriginal.text = "View Original"
-                    }*/
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
@@ -95,14 +85,14 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                             R.color.white
                         )
                     )
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
+                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
                         ContextCompat.getColor(
                             context,
                             R.color.white
                         )
                     )
-                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
-                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
@@ -111,25 +101,19 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                             R.color.black
                         )
                     )
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
+                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.black)
                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.theme_color
+                            R.color.black
                         )
                     )
-                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
-                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.theme_color)
                 }
             }
             AppConstants.AUDIO_MESSAGE -> {
                 itemHolder.binding.audioPlayer.cvPlayer.visibility = View.VISIBLE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
-                itemHolder.binding.audioPlayer.ivStop.setOnClickListener {
-                    itemHolder.binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
-                    itemHolder.binding.audioPlayer.seekBar.max = 0
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                }
                 itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
                     currentPos = position
                     logE("Clicked")
@@ -137,21 +121,12 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                     toast(context, "Clicked")
                 }
                 if (item.sender_id == userId.toInt()) {
+
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
-                    itemHolder.binding.audioPlayer.cvPlayer.setCardBackgroundColor(
-                        ContextCompat.getColor(
-                            context,
-                            R.color.sender_color
-                        )
-                    )
+                    itemHolder.binding.audioPlayer.cvPlayer.setBackgroundResource(R.drawable.audio_bubble_right)
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
-                    itemHolder.binding.audioPlayer.cvPlayer.setCardBackgroundColor(
-                        ContextCompat.getColor(
-                            context,
-                            R.color.receiver_color
-                        )
-                    )
+                    itemHolder.binding.audioPlayer.cvPlayer.setBackgroundResource(R.drawable.audio_bubble_left)
                 }
             }
         }
@@ -181,19 +156,17 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 mediaPlayer.setOnPreparedListener {
                     logE("setOnPreparedListener is called")
                     binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
-                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
                     binding.audioPlayer.ivPlayProgress.visibility = View.GONE
                     mediaPlayer.start()
                     initializeSeekBar(binding)
-                    binding.audioPlayer.seekBar.max = seconds
-
                 }
             } else {
                 if (!mediaPlayer.isPlaying) {
-                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_pause)
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
                     mediaPlayer.start()
                 } else {
-                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
                     mediaPlayer.pause()
                 }
             }
@@ -203,7 +176,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
         }
 
         mediaPlayer.setOnCompletionListener { mp ->
-            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.icon_play)
+            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
             mp.stop()
             mp.release()
             isRelease = true
@@ -228,33 +201,22 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
     }
 
     private fun initializeSeekBar(binding: ItemChatRightBinding) {
-
+        binding.audioPlayer.seekBar.max = mediaPlayer.duration
         runnable = Runnable {
-            var currentSeconds = 0
+
             try {
-                currentSeconds = mediaPlayer.currentPosition / 1000
-                binding.audioPlayer.seekBar.progress = currentSeconds
-                binding.audioPlayer.tvPlayerTime.text =
-                    timeFormatter.format(Date((currentSeconds * 1000).toLong()))
-//                val difference = seconds - currentSeconds
-                handler.postDelayed(runnable, 1000)
+                val currentSeconds = mediaPlayer.currentPosition
+                currentSeconds.let {
+                    binding.audioPlayer.seekBar.progress = it
+                }
+                handler.postDelayed(runnable, 1)
             } catch (e: IllegalStateException) {
 
             }
         }
-        handler.postDelayed(runnable, 1000)
+        handler.postDelayed(runnable, 1)
     }
 
-    private val seconds: Int
-        get() {
-            var seconds: Int = 0
-            try {
-                seconds = mediaPlayer.duration / 1000
-
-            } catch (e: IllegalStateException) {
-            }
-            return seconds
-        }
 
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)

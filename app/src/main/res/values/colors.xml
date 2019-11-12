@@ -13,7 +13,8 @@
     <color name="light_green">#4BE84F</color>
     <color name="colorRecorder">#efeffa</color>
     <color name="colorSeekBar">#158053</color>
-    <!--<color name="colorSeekBar">#e7f2ed</color>-->
+    <color name="colorAudioMsg">#E7F2ED</color>
+    <color name="lighest_grey">#F5F5F5</color>
 
 
 </resources>

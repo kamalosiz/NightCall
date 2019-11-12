@@ -1,10 +1,8 @@
 package com.example.kalam_android.util
 
 import android.content.SharedPreferences
-import com.example.kalam_android.repository.model.CreateProfileResponse
 import com.example.kalam_android.repository.model.PhoneModel
 import com.example.kalam_android.repository.model.UserData
-import com.example.kalam_android.view.activities.SelectLanguage
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import javax.inject.Inject

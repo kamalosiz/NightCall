@@ -1,25 +1,24 @@
 package com.example.kalam_android.view.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.example.kalam_android.R
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.FragmentSettingBinding
-import com.example.kalam_android.util.SharedPrefsHelper
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.view.activities.FindsFriendsActivity
-import com.example.kalam_android.view.activities.SelectLanguage
-import javax.inject.Inject
+import com.example.kalam_android.view.activities.LoginActivity
+import com.example.kalam_android.view.activities.SettingActivity
+import com.example.kalam_android.wrapper.SocketIO
 
-class SettingFragment : Fragment(), View.OnClickListener {
+class MoreFragment : Fragment(), View.OnClickListener {
 
     private lateinit var binding: FragmentSettingBinding
 
@@ -44,9 +43,22 @@ class SettingFragment : Fragment(), View.OnClickListener {
                 startActivity(Intent(activity, FindsFriendsActivity::class.java))
             }
             R.id.tvChangeLanguage -> {
-                startActivity(Intent(activity, SelectLanguage::class.java))
+                startActivityForResult(
+                    Intent(activity, SettingActivity::class.java),
+                    AppConstants.LOGOUT_CODE
+                )
             }
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                AppConstants.LOGOUT_CODE -> {
+                    startActivity(Intent(activity, LoginActivity::class.java))
+                    activity?.finish()
+                }
+            }
+        }
+    }
 }

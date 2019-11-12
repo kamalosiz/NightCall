@@ -14,7 +14,7 @@
             android:fontFamily="@font/halvatic_light"
             android:gravity="center_vertical"
             android:padding="@dimen/_15sdp"
-            android:text="@string/labelChangeLng"
+            android:text="@string/settings"
             android:textColor="@color/black"
             android:textSize="@dimen/_13ssp" />
 

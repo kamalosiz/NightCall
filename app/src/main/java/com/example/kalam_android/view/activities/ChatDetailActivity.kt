@@ -44,6 +44,7 @@ import omrecorder.*
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -225,9 +226,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 canClickStop = true
             )
             isStopRecording = true
-
         } else {
-
             resumeChronometer()
             updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
             updateClickable(
@@ -635,7 +634,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivSend -> {
-                sendMessage()
+                if (output == "") {
+                    sendMessage()
+                } else {
+                    sendVoiceMessage()
+                    binding.lvRecoder.lvForRecorder.visibility = View.GONE
+                }
             }
             R.id.rlBack -> {
                 onBackPressed()
@@ -651,6 +655,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun sendVoiceMessage() {
+        logE("Output Message $output")
         createChatObject(AppConstants.DUMMY_STRING, output, AppConstants.AUDIO_MESSAGE)
         uploadAudioMedia()
         logE("Audio Api hit successfully")
@@ -710,6 +715,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun socketResponse(jsonObject: JSONObject) {
         val gson = Gson()
+        logE("New Message : $jsonObject")
         val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
         if (data.chat_id == chatId) {
             runOnUiThread {
@@ -740,6 +746,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun createChatObject(message: String, file: String, type: String) {
         addMessage(
             ChatData(
+                StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
+                    sharedPrefsHelper.getUser()?.lastname.toString()
+                ).toString(),
                 AppConstants.DUMMY_DATA,
                 chatId,
                 sharedPrefsHelper.getUser()?.id,
@@ -752,6 +761,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 0,
                 0,
                 message
+                , ""
             )
         )
     }

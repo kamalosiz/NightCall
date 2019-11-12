@@ -1,114 +1,63 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:id="@+id/rlAudioItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_5sdp">
+        android:layout_margin="@dimen/_5sdp">
 
-        <androidx.cardview.widget.CardView
+        <RelativeLayout
             android:id="@+id/cvPlayer"
             android:layout_width="@dimen/_250sdp"
             android:layout_height="@dimen/_55sdp"
-            android:foregroundGravity=""
-            app:cardBackgroundColor="@color/sender_color"
-            app:cardCornerRadius="@dimen/_10sdp"
-            app:cardElevation="0dp">
+            android:background="@drawable/audio_bubble_right"
+            android:gravity="center"
+            tools:ignore="UselessParent">
 
-            <LinearLayout
-                android:id="@+id/lvMediaPlayer"
+            <RelativeLayout
+                android:id="@+id/rlPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/_10sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPlayPause"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_play_audio" />
+
+                <ProgressBar
+                    android:id="@+id/ivPlayProgress"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <SeekBar
+                android:id="@+id/seekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/_10sdp"
-                android:orientation="vertical">
+                android:layout_toEndOf="@+id/rlPlay"
+                android:clickable="false"
+                android:progress="0"
+                android:progressDrawable="@drawable/seekbar_style"
+                android:thumb="@drawable/new_seekbar_thumb" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="@dimen/_2sdp"
-                    android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/seekBar"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/_20sdp"
+                android:textSize="@dimen/_11sdp"
+                android:fontFamily="@font/halvatic_light"
+                android:text="03:00 PM" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvMsgTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:fontFamily="@font/halvatic_light"
-                        android:text="2:00 PM"
-                        android:textColor="#000"
-                        android:textSize="@dimen/_12sdp" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/ivReadMsg"
-                        android:layout_width="@dimen/_13sdp"
-                        android:layout_height="@dimen/_13sdp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/_5sdp"
-                        android:background="@drawable/icon_message_read"
-                        android:padding="@dimen/_5sdp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <RelativeLayout
-                        android:id="@+id/rlPlay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/ivPlayPause"
-                            android:layout_width="@dimen/_18sdp"
-                            android:layout_height="@dimen/_18sdp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@drawable/icon_play"
-                            android:padding="@dimen/_5sdp" />
-
-                        <ProgressBar
-                            android:id="@+id/ivPlayProgress"
-                            android:layout_width="@dimen/_18sdp"
-                            android:layout_height="@dimen/_18sdp"
-                            android:visibility="gone"/>
-                    </RelativeLayout>
-
-                    <SeekBar
-                        android:id="@+id/seekBar"
-                        android:layout_width="@dimen/_160sdp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:clickable="false"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/seekbar_style"
-                        android:saveEnabled="true"
-                        android:thumb="@drawable/seekbar_thumb" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tvPlayerTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:fontFamily="@font/halvatic_light"
-                        android:text="2:00"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/_12sdp" />
-
-                    <androidx.appcompat.widget.AppCompatImageButton
-                        android:id="@+id/ivStop"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/_2sdp"
-                        android:background="@drawable/icon_stop"
-                        android:padding="@dimen/_5sdp" />
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </RelativeLayout>
     </RelativeLayout>
 </layout>
