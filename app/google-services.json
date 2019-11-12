@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "230389003154",
+    "firebase_url": "https://kalam-dev.firebaseio.com",
+    "project_id": "kalam-dev",
+    "storage_bucket": "kalam-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230389003154:android:f931898c9f0cd725a0074b",
+        "android_client_info": {
+          "package_name": "com.example.kalam_android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230389003154-vmu07p90386b5kbjm35pgb93l84n98rf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kalam_android",
+            "certificate_hash": "1bb4fd71fc0c3c487794c762eb558999d07c08b7"
+          }
+        },
+        {
+          "client_id": "230389003154-unut0db7s9t9d5skgjt6adk39ppufo61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB66xJkLDBIV9jzl6kcnJ7jKlzexxSTAEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230389003154-unut0db7s9t9d5skgjt6adk39ppufo61.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
