@@ -17,6 +17,19 @@
             android:layout_alignBottom="@id/rlLayout"
             android:scaleType="fitXY" />
 
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/rlLayout"
+            android:layout_alignBottom="@id/rlLayout"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/halvatic_light"
+            android:text="5:30 pm"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp" />
+
         <RelativeLayout
             android:id="@+id/rlLayout"
             android:layout_width="wrap_content"
@@ -25,7 +38,7 @@
 
             <TextView
                 android:id="@+id/tvMessage"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/_250sdp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/halvatic_light"
                 android:gravity="center_horizontal"

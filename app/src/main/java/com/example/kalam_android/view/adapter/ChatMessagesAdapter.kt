@@ -16,16 +16,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
+import com.example.kalam_android.repository.model.AudioUploadResponse
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.showAlertDialoge
-import com.example.kalam_android.util.toast
-import java.io.File
-import java.io.FileInputStream
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class ChatMessagesAdapter(val context: Context, private val userId: String) :
@@ -39,11 +34,17 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
     private var chatList: ArrayList<ChatData>? = ArrayList()
     private val TAG = this.javaClass.simpleName
     private var isRelease = false
+    private var isUploaded = false
 
     fun updateList(list: ArrayList<ChatData>) {
         chatList?.addAll(list)
         notifyDataSetChanged()
     }
+
+   /* fun updateAudioList(audioList: ArrayList<AudioUploadResponse>, position: Int) {
+        this.audioList = audioList
+        notifyItemChanged(position)
+    }*/
 
     fun addMessage(message: ChatData) {
         chatList?.add(0, message)
@@ -85,6 +86,12 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                             R.color.white
                         )
                     )
+                    itemHolder.binding.itemChat.tvTime.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
                     itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
@@ -102,6 +109,12 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                         )
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
+                    itemHolder.binding.itemChat.tvTime.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.black
+                        )
+                    )
                     itemHolder.binding.itemChat.view.setBackgroundResource(R.color.black)
                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
                         ContextCompat.getColor(
@@ -116,9 +129,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
                     currentPos = position
-                    logE("Clicked")
                     playVoiceMsg(itemHolder.binding, item.file.toString())
-                    toast(context, "Clicked")
                 }
                 if (item.sender_id == userId.toInt()) {
 
@@ -136,7 +147,6 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
         RecyclerView.ViewHolder(binding.root)
 
     private fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String) {
-        logE("Progress Bar is visible")
         try {
             if (isRelease || currentPos != prePos) {
                 binding.audioPlayer.ivPlayPause.visibility = View.GONE
@@ -154,7 +164,6 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 mediaPlayer.setDataSource(voiceMessage)
                 mediaPlayer.prepareAsync()
                 mediaPlayer.setOnPreparedListener {
-                    logE("setOnPreparedListener is called")
                     binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
                     binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
                     binding.audioPlayer.ivPlayProgress.visibility = View.GONE

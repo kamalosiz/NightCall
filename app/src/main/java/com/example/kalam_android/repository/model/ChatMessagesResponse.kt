@@ -36,3 +36,8 @@ data class AudioResponse(
 data class DataResponse(
     val file_url: String
 )
+
+data class AudioUploadResponse(
+    val position: Int,
+    val isUploaded: Boolean
+)

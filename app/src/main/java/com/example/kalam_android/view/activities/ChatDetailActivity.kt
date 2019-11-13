@@ -22,6 +22,7 @@ import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.repository.model.AudioResponse
+import com.example.kalam_android.repository.model.AudioUploadResponse
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
@@ -54,7 +55,6 @@ import kotlin.collections.HashMap
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     NewMessageListener, MessageTypingListener {
 
-
     private val TAG = this.javaClass.simpleName
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
@@ -83,6 +83,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var isStopPlayer = false
     private var isStopRecording = false
     private var isPlayerRelease = false
+    private var isFileReady = false
     private var mediaPlayer: MediaPlayer? = null
     private val gone = View.GONE
     private val visible = View.VISIBLE
@@ -208,7 +209,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
 
         binding.lvRecoder.lvForRecorder.ivCancel.setOnClickListener {
-            cancel()
+            cancel(true)
         }
     }
 
@@ -289,6 +290,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun stopRecord() {
         if (isStopRecording) {
+            isFileReady = true
             recorder?.stopRecording()
             recorder = null
             stopChronometer()
@@ -331,7 +333,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
 
-    private fun cancel() {
+    private fun cancel(deleteFile: Boolean) {
 
         mediaPlayer?.stop()
         mediaPlayer?.release()
@@ -355,10 +357,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             canClickStop = false
         )
         visibility(gone, gone, visible)
-        val file = File(output)
-        if (file.exists()) {
-            file.delete()
+        if (deleteFile) {
+            val file = File(output)
+            if (file.exists()) {
+                file.delete()
+            }
         }
+        output = ""
     }
 
     private fun visibility(recorderVisibility: Int, seekbarVisibility: Int, chronometer: Int) {
@@ -462,7 +467,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
         path = "/recording_${System.currentTimeMillis()}.wav"
         output = getExternalFilesDir(null)?.absolutePath + path
-
         recorder = OmRecorder.wav(
             PullTransport.Default(mic()), file()
         )
@@ -494,7 +498,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 binding.pbHeader.visibility = View.VISIBLE
                 loading = true
                 index += 20
-                logE("chatListSize ${chatList1.size}")
                 hitAllChatApi(index)
             }
         })
@@ -631,22 +634,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.ivSend -> {
-                if (output == "") {
-                    sendMessage()
-                } else {
-                    sendVoiceMessage()
-                    binding.lvRecoder.lvForRecorder.visibility = View.GONE
-                }
-            }
-            R.id.rlBack -> {
-                onBackPressed()
-            }
-        }
-    }
-
     private fun uploadAudioMedia() {
         viewModel.hitUploadAudioApi(
             sharedPrefsHelper.getUser()?.token,
@@ -777,6 +764,28 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             sharedPrefsHelper.getUser()?.firstname.toString()
                     + " " + sharedPrefsHelper.getUser()?.lastname.toString(), file, duration
         )
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.ivSend -> {
+                if (output.isEmpty() && binding.lvRecoder.editTextMessage.text.toString().isNotEmpty()) {
+                    sendMessage()
+                    logE("Text Message")
+                } else {
+                    if (isFileReady) {
+                        logE("Audio Message")
+                        sendVoiceMessage()
+                        binding.lvRecoder.lvForRecorder.visibility = View.GONE
+                        cancel(false)
+                        isFileReady = false
+                    }
+                }
+            }
+            R.id.rlBack -> {
+                onBackPressed()
+            }
+        }
     }
 
     override fun onBackPressed() {
