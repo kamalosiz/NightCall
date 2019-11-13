@@ -57,4 +57,9 @@
 
     <string name="notifications_admin_channel_name">com.example.kalam_android</string>
     <string name="notifications_admin_channel_description">Kalam Firebase PushNotification</string>
+    <string name="labelFile">File</string>
+    <string name="labelContacts">Contacts</string>
+    <string name="labelImageVideo">Img/video</string>
+    <string name="labelAudio">Audio</string>
+    <string name="labelLocation">Location</string>
 </resources>

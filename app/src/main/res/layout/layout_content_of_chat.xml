@@ -42,6 +42,15 @@
             android:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAttachment"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_65sdp"
+            android:background="@drawable/ic_attachment" />
+
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivSend"
             android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_20sdp"
@@ -70,4 +79,13 @@
         android:layout_above="@id/rlBottom"
         android:layout_centerHorizontal="true"
         android:visibility="gone" />
+
+    <include
+        android:id="@+id/lvForAttachment"
+        layout="@layout/layout_for_attachment"
+        android:layout_width="@dimen/_270sdp"
+        android:layout_height="@dimen/_90sdp"
+        android:layout_above="@id/rlBottom"
+        android:layout_centerHorizontal="true"
+        android:visibility="visible" />
 </RelativeLayout>

@@ -54,6 +54,7 @@ import kotlin.collections.HashMap
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     NewMessageListener, MessageTypingListener {
 
+    private val PICKFILE_RESULT_CODE: Int = 123
     private val TAG = this.javaClass.simpleName
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
@@ -193,6 +194,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun clickListener() {
+
         binding.header.tvName.setOnClickListener {
             val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
             intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
@@ -229,6 +231,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
         binding.lvRecoder.lvForRecorder.ivCancel.setOnClickListener {
             cancel(true)
+        }
+
+        binding.lvRecoder.ivAttachment.setOnClickListener {
+
+            binding.lvRecoder.lvForAttachment.visibility = View.VISIBLE
         }
     }
 
