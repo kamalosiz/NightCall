@@ -83,6 +83,9 @@ dependencies {
 //    Firebase Cloud messaging
     implementation 'com.google.firebase:firebase-messaging:20.0.1'
 
+    //Image Compressor
+    implementation 'id.zelory:compressor:2.1.0'
+
 
 }
 apply plugin: 'com.google.gms.google-services'

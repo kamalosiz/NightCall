@@ -30,8 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/_15sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:layout_toStartOf="@+id/ivMic"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_toStartOf="@+id/ivCamera"
             android:layout_toEndOf="@id/ivEmoji"
             android:background="@null"
             android:ems="8"
@@ -47,17 +47,27 @@
             android:layout_height="@dimen/_20sdp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
             android:background="@drawable/ic_send" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivMic"
             android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_20sdp"
-            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/_40sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_toStartOf="@id/ivSend"
             android:background="@drawable/ic_mic" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCamera"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_toStartOf="@id/ivMic"
+            android:background="@drawable/ic_camera" />
+
 
     </RelativeLayout>
     <!--    </RelativeLayout>-->

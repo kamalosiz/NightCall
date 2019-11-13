@@ -1,23 +1,26 @@
 package com.example.kalam_android.base
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
+import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
+import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
+import com.fxn.pix.Options
+import com.fxn.pix.Pix
 import com.github.nkzawa.engineio.client.Socket
 import com.github.nkzawa.socketio.client.IO
 
 
 open class BaseActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     private var progressDialog: AlertDialog? = null
 
@@ -34,6 +37,10 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    val EMAIL_REGEX = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+    fun isEmailValid(email: String): Boolean {
+        return EMAIL_REGEX.toRegex().matches(email)
+    }
     /*fun isValidEmail(email: String): Boolean {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(
             email
@@ -51,11 +58,29 @@ open class BaseActivity : AppCompatActivity() {
          }*/
         popupMenu.show()
     }
-    companion object {
 
-        val EMAIL_REGEX = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
-        fun isEmailValid(email: String): Boolean {
-            return EMAIL_REGEX.toRegex().matches(email)
-        }
+    fun checkPixPermission(context: FragmentActivity, requestCode: Int) {
+        Handler().postDelayed(
+            {
+                PermissionHelper.withActivity(this).addPermissions(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ).listener(object : MediaPermissionListener {
+                    override fun onPermissionGranted() {
+                        Pix.start(
+                            context,
+                            Options.init().setRequestCode(requestCode)
+                        )
+                    }
+
+                    override fun onPermissionDenied() {
+                        Debugger.e("Capturing Image", "onPermissionDenied")
+                    }
+
+                }).build().init()
+
+            }, 100
+        )
     }
 }

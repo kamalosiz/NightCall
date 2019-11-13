@@ -14,6 +14,7 @@ object AppConstants {
     const val DUMMY_STRING = ""
     const val TEXT_MESSAGE = "text"
     const val AUDIO_MESSAGE = "audio"
+    const val IMAGE_MESSAGE = "image"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
 
@@ -21,6 +22,7 @@ object AppConstants {
     //Request Code
     const val CHAT_FRAGMENT_CODE = 1000
     const val LOGOUT_CODE = 1001
+    const val CHAT_IMAGE_CODE = 1002
 
     //Local DB=
     const val DB_NAME = "kalam_local_db"

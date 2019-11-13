@@ -39,7 +39,7 @@
             android:visibility="visible" />
 
         <include
-            android:id="@+id/lvRecoder"
+            android:id="@+id/lvBottomChat"
             layout="@layout/layout_content_of_chat" />
 
     </RelativeLayout>
