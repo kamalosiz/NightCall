@@ -54,4 +54,7 @@
     <string name="labelMobile">Mobile</string>
     <string name="labelBlock">Block</string>
     <string name="labelReport">Report contact</string>
+
+    <string name="notifications_admin_channel_name">com.example.kalam_android</string>
+    <string name="notifications_admin_channel_description">Kalam Firebase PushNotification</string>
 </resources>

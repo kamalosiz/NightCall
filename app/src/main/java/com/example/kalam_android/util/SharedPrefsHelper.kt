@@ -53,6 +53,14 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         return mSharedPreferences.getBoolean(key, defaultValue)
     }
 
+    fun setFCMToken(fcmToken:String){
+
+        put(AppConstants.FCM_TOKEN,fcmToken)
+    }
+    fun getFCMToken():String?{
+     return get(AppConstants.FCM_TOKEN,"")
+    }
+
     fun setNumber(phone: String) {
         put(PHONE, phone)
     }
