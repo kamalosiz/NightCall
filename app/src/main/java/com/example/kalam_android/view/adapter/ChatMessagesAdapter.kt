@@ -21,6 +21,9 @@ import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.showAlertDialoge
+import kotlinx.android.synthetic.main.audio_player_item.view.*
+import kotlinx.android.synthetic.main.audio_player_item.view.tvTime
+import kotlinx.android.synthetic.main.item_chat.view.*
 
 
 class ChatMessagesAdapter(val context: Context, private val userId: String) :
@@ -41,10 +44,10 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
         notifyDataSetChanged()
     }
 
-   /* fun updateAudioList(audioList: ArrayList<AudioUploadResponse>, position: Int) {
-        this.audioList = audioList
-        notifyItemChanged(position)
-    }*/
+    /* fun updateAudioList(audioList: ArrayList<AudioUploadResponse>, position: Int) {
+         this.audioList = audioList
+         notifyItemChanged(position)
+     }*/
 
     fun addMessage(message: ChatData) {
         chatList?.add(0, message)

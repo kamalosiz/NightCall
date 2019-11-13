@@ -39,7 +39,6 @@ import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
-import kotlinx.android.synthetic.main.layout_for_chat_screen.view.editTextMessage
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
 import omrecorder.*
 import org.json.JSONObject
@@ -334,7 +333,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
 
     private fun cancel(deleteFile: Boolean) {
-
+        isFileReady = false
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
@@ -778,7 +777,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         sendVoiceMessage()
                         binding.lvRecoder.lvForRecorder.visibility = View.GONE
                         cancel(false)
-                        isFileReady = false
                     }
                 }
             }
