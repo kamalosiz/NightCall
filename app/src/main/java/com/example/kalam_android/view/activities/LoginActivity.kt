@@ -64,12 +64,11 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun getFCMToken() {
-
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 if (task.result != null) {
                     fcmToken = task.result!!.token
-                    sharedPrefsHelper.setFCMToken( fcmToken)
+                    sharedPrefsHelper.setFCMToken(fcmToken)
                     logE("FCM Token:${fcmToken}")
                 }
             } else {

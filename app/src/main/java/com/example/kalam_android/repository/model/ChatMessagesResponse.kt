@@ -22,7 +22,8 @@ data class ChatData(
     val is_read: Int,
     val duration: Int,
     val original_message: String?,
-    val tr_file: String?
+    val tr_file: String?,
+    var identifier: String?
 )
 
 data class AudioResponse(
@@ -34,10 +35,8 @@ data class AudioResponse(
 )
 
 data class DataResponse(
-    val file_url: String
-)
-
-data class AudioUploadResponse(
-    val position: Int,
-    val isUploaded: Boolean
+    val file_url: String,
+    val duration: Double,
+    val message: String,
+    val identifier: String
 )

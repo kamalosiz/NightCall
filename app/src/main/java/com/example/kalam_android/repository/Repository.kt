@@ -56,7 +56,11 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.findFriends(authorization, parameters)
     }
 
-    fun uploadAudio(authorization: String?, @Part audio: MultipartBody.Part): Observable<AudioResponse> {
-        return apiCallInterface.uploadAudio(authorization, audio)
+    fun uploadAudio(
+        authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+        @Part audio: MultipartBody.Part
+    ): Observable<AudioResponse> {
+        return apiCallInterface.uploadAudio(authorization, params, audio)
     }
 }

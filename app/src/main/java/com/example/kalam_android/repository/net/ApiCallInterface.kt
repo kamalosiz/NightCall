@@ -19,7 +19,10 @@ interface ApiCallInterface {
 
     @Multipart
     @POST(Urls.CREATE_PROFILE)
-    fun createProfile(@PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part profilePic: MultipartBody.Part): Observable<CreateProfileResponse>
+    fun createProfile(
+        @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part profilePic: MultipartBody.Part
+    ): Observable<CreateProfileResponse>
 
     @POST(Urls.SIGN_IN)
     fun login(@Body parameters: Map<String, String>): Observable<LoginResponse>
@@ -39,5 +42,9 @@ interface ApiCallInterface {
 
     @Multipart
     @POST(Urls.UPLOAD_AUDIO)
-    fun uploadAudio(@Header("Authorization") authorization: String?, @Part audio: MultipartBody.Part): Observable<AudioResponse>
+    fun uploadAudio(
+        @Header("Authorization") authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+        @Part audio: MultipartBody.Part
+    ): Observable<AudioResponse>
 }

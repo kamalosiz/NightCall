@@ -10,8 +10,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.Part
+import retrofit2.http.PartMap
 import javax.inject.Inject
 
 class ChatMessagesViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
@@ -41,8 +43,11 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
         )
     }
 
-    fun hitUploadAudioApi(authorization: String?, @Part audio: MultipartBody.Part) {
-        disposable.add(repository.uploadAudio(authorization, audio)
+    fun hitUploadAudioApi(
+        authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>, @Part audio: MultipartBody.Part
+    ) {
+        disposable.add(repository.uploadAudio(authorization, params, audio)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { audioLiveData.value = ApiResponse.loading() }

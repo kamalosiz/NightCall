@@ -22,7 +22,6 @@ import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.repository.model.AudioResponse
-import com.example.kalam_android.repository.model.AudioUploadResponse
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
@@ -40,11 +39,12 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
+import okhttp3.MediaType
+import okhttp3.RequestBody
 import omrecorder.*
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
-import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -185,11 +185,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
 
         binding.lvRecoder.lvForRecorder.ivPause.setOnClickListener {
-
             if (isPlayPlayer) {
                 isPlayPlayer = false
                 pausePlayer()
-
             } else {
                 pauseRecorder()
             }
@@ -292,6 +290,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             isFileReady = true
             recorder?.stopRecording()
             recorder = null
+            logE("Recorder Time : ${binding.lvRecoder.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()}")
             stopChronometer()
             visibility(visible, visible, gone)
             updateDrawables(recordGray, playGreen, pauseGray, stopGray)
@@ -463,7 +462,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun initializeRecorder() {
-
         path = "/recording_${System.currentTimeMillis()}.wav"
         output = getExternalFilesDir(null)?.absolutePath + path
         recorder = OmRecorder.wav(
@@ -515,7 +513,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             jsonObject.addProperty("receiver_id", receiverId)
             SocketIO.socket?.emit(AppConstants.START_CAHT, jsonObject, Ack {
                 val chatId = it[0] as Int
-                Debugger.e(TAG, "ID $chatId")
                 this.chatId = chatId
                 runOnUiThread {
                     hitAllChatApi(0)
@@ -606,6 +603,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             emitNewMessageToSocket(
                 "", AppConstants.AUDIO_MESSAGE, it.data?.file_url.toString(), 0
             )
+            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(it.data?.identifier.toString())
         }
     }
 
@@ -633,17 +631,27 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    private fun uploadAudioMedia() {
+    private fun uploadAudioMedia(identifier: String) {
+        val params = HashMap<String, RequestBody>()
+        params["identifier"] = RequestBody.create(MediaType.parse("text/plain"), identifier)
+
+
         viewModel.hitUploadAudioApi(
-            sharedPrefsHelper.getUser()?.token,
+            sharedPrefsHelper.getUser()?.token, params,
             getFileBody(output, "file")
         )
     }
 
     private fun sendVoiceMessage() {
         logE("Output Message $output")
-        createChatObject(AppConstants.DUMMY_STRING, output, AppConstants.AUDIO_MESSAGE)
-        uploadAudioMedia()
+        val identifier = System.currentTimeMillis().toString()
+        createChatObject(
+            AppConstants.DUMMY_STRING,
+            output,
+            AppConstants.AUDIO_MESSAGE,
+            identifier
+        )
+        uploadAudioMedia(identifier)
         logE("Audio Api hit successfully")
     }
 
@@ -689,7 +697,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun sendMessage() {
         createChatObject(
             binding.lvRecoder.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
-            AppConstants.TEXT_MESSAGE
+            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING
         )
         emitNewMessageToSocket(
             binding.lvRecoder.editTextMessage.text.toString(),
@@ -729,7 +737,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun createChatObject(message: String, file: String, type: String) {
+    private fun createChatObject(message: String, file: String, type: String, identifier: String) {
         addMessage(
             ChatData(
                 StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
@@ -747,7 +755,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 0,
                 0,
                 message
-                , ""
+                , "",
+                identifier
             )
         )
     }

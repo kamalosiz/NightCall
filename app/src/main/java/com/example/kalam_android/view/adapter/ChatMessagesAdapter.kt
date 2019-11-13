@@ -16,14 +16,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
-import com.example.kalam_android.repository.model.AudioUploadResponse
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.showAlertDialoge
-import kotlinx.android.synthetic.main.audio_player_item.view.*
-import kotlinx.android.synthetic.main.audio_player_item.view.tvTime
-import kotlinx.android.synthetic.main.item_chat.view.*
 
 
 class ChatMessagesAdapter(val context: Context, private val userId: String) :
@@ -37,17 +33,22 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
     private var chatList: ArrayList<ChatData>? = ArrayList()
     private val TAG = this.javaClass.simpleName
     private var isRelease = false
-    private var isUploaded = false
 
     fun updateList(list: ArrayList<ChatData>) {
         chatList?.addAll(list)
         notifyDataSetChanged()
     }
 
-    /* fun updateAudioList(audioList: ArrayList<AudioUploadResponse>, position: Int) {
-         this.audioList = audioList
-         notifyItemChanged(position)
-     }*/
+    fun updateIdentifier(identifier: String) {
+        chatList?.let {
+            for (x in it) {
+                if (x.identifier == identifier) {
+                    x.identifier = ""
+                    notifyDataSetChanged()
+                }
+            }
+        }
+    }
 
     fun addMessage(message: ChatData) {
         chatList?.add(0, message)
@@ -128,6 +129,12 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 }
             }
             AppConstants.AUDIO_MESSAGE -> {
+                logE("Identifier: ${item.identifier}")
+                if (item.identifier.isNullOrEmpty()) {
+                    itemHolder.binding.audioPlayer.tvTime.text = "3:15 pm"
+                } else {
+                    itemHolder.binding.audioPlayer.tvTime.text = "Uploading Audio..."
+                }
                 itemHolder.binding.audioPlayer.cvPlayer.visibility = View.VISIBLE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
