@@ -78,6 +78,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var recorder: Recorder? = null
     private var timeWhenPause: Long = 0;
     private var isResumeRecorder = false
+    private var isRecording = false
     private var isPlayPlayer = false
     private var isStopPlayer = false
     private var isStopRecording = false
@@ -127,9 +128,33 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun initMediaPlayer() {
         try {
-            if (mediaPlayer != null && !mediaPlayer?.isPlaying!!) {
-                mediaPlayer?.start()
+            if (mediaPlayer != null) {
+                if (mediaPlayer?.isPlaying!!) {
+                    mediaPlayer?.pause()
+                    updateDrawables(recordGray, playGreen, stopGreen)
+                    updateClickable(
+                        canClickRecoder = false,
+                        canClickPlay = true,
+                        canClickStop = true
+                    )
+                } else {
+                    mediaPlayer?.pause()
+                    updateDrawables(recordGray, pauseGreen, stopGreen)
+                    updateClickable(
+                        canClickRecoder = false,
+                        canClickPlay = true,
+                        canClickStop = true
+                    )
+                    mediaPlayer?.start()
+                }
+
             } else {
+                updateDrawables(recordGray, pauseGreen, stopGreen)
+                updateClickable(
+                    canClickRecoder = false,
+                    canClickPlay = true,
+                    canClickStop = true
+                )
                 mediaPlayer = MediaPlayer()
                 mediaPlayer?.setAudioAttributes(
                     AudioAttributes
@@ -154,16 +179,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             mediaPlayer = null
             isPlayerRelease = true
             isStopPlayer = false
-            binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
             binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
             binding.lvRecoder.lvForRecorder.seekBar.max = 0
             updateClickable(
                 canClickRecoder = false,
                 canClickPlay = true,
-                canClickPause = false,
                 canClickStop = false
             )
-            updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+            updateDrawables(recordGray, playGreen, stopGray)
 
         }
 
@@ -184,25 +207,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             playPauseRecorder()
         }
 
-        binding.lvRecoder.lvForRecorder.ivPause.setOnClickListener {
-            if (isPlayPlayer) {
-                isPlayPlayer = false
-                pausePlayer()
-            } else {
-                pauseRecorder()
-            }
-        }
-
         binding.lvRecoder.lvForRecorder.ivStop.setOnClickListener {
+
             if (isStopPlayer) {
                 stopPlayer()
             } else {
                 stopRecord()
             }
+
         }
 
         binding.lvRecoder.lvForRecorder.ivPlay.setOnClickListener {
-            playAudio()
+            if (isRecording) {
+
+                pauseRecorder()
+
+            } else {
+                playAudio()
+            }
         }
 
         binding.lvRecoder.lvForRecorder.ivCancel.setOnClickListener {
@@ -216,21 +238,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             startChronometer()
             initializeRecorder()
             recorder?.startRecording()
-            updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
+            updateDrawables(recordGray, pauseGreen, stopGreen)
             updateClickable(
                 canClickRecoder = false,
-                canClickPlay = false,
-                canClickPause = true,
+                canClickPlay = true,
                 canClickStop = true
             )
+            isRecording = true
             isStopRecording = true
         } else {
             resumeChronometer()
-            updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
+            updateDrawables(recordGray, pauseGreen, stopGreen)
             updateClickable(
                 canClickRecoder = false,
-                canClickPlay = false,
-                canClickPause = true,
+                canClickPlay = true,
                 canClickStop = true
             )
             recorder?.resumeRecording()
@@ -240,30 +261,16 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun pauseRecorder() {
         pauseChronometer()
-        updateDrawables(recordRed, playGray, pauseGreen, stopGreen)
+        updateDrawables(recordRed, pauseGray, stopGreen)
         updateClickable(
             canClickRecoder = true,
             canClickPlay = false,
-            canClickPause = false,
             canClickStop = true
         )
         recorder?.pauseRecording()
         isResumeRecorder = true
     }
 
-    private fun pausePlayer() {
-
-        if (mediaPlayer?.isPlaying!!) {
-            mediaPlayer?.pause()
-            updateDrawables(recordGray, playGreen, pauseGray, stopGreen)
-            updateClickable(
-                canClickRecoder = false,
-                canClickPlay = true,
-                canClickPause = false,
-                canClickStop = true
-            )
-        }
-    }
 
     private fun stopPlayer() {
 
@@ -273,14 +280,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         isPlayerRelease = true
         isStopPlayer = false
         binding.lvRecoder.lvForRecorder.seekBar.max = 0
-        updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+        updateDrawables(recordGray, playGreen, stopGray)
         updateClickable(
             canClickRecoder = false,
             canClickPlay = true,
-            canClickPause = false,
             canClickStop = false
         )
-        binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
         binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
 
     }
@@ -293,21 +298,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             logE("Recorder Time : ${binding.lvRecoder.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()}")
             stopChronometer()
             visibility(visible, visible, gone)
-            updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+            updateDrawables(recordGray, playGreen, stopGray)
             updateClickable(
                 canClickRecoder = false,
                 canClickPlay = true,
-                canClickPause = false,
                 canClickStop = false
             )
             isStopRecording = false
+            isRecording = false
         } else {
             stopPlayer()
-            updateDrawables(recordGray, playGreen, pauseGray, stopGray)
+            updateDrawables(recordGray, playGreen, stopGray)
             updateClickable(
                 canClickRecoder = true,
                 canClickPlay = false,
-                canClickPause = false,
                 canClickStop = false
             )
             isResumeRecorder = true
@@ -315,14 +319,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun playAudio() {
-
-        updateDrawables(recordGray, playGray, pauseGreen, stopGreen)
-        updateClickable(
-            canClickRecoder = false,
-            canClickPlay = false,
-            canClickPause = true,
-            canClickStop = true
-        )
 
         isPlayPlayer = true
         isStopPlayer = true
@@ -346,12 +342,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         stopChronometer()
         binding.lvRecoder.lvForRecorder.seekBar.max = 0
         binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
-        binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
-        updateDrawables(recordGreen, playGray, pauseGray, stopGray)
+        updateDrawables(recordGreen, playGray, stopGray)
         updateClickable(
             canClickRecoder = true,
             canClickPlay = false,
-            canClickPause = false,
             canClickStop = false
         )
         visibility(gone, gone, visible)
@@ -372,23 +366,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun updateDrawables(
-        recordButton: Int, playButton: Int, pauseButton: Int, stopButton: Int
+        recordButton: Int, playButton: Int, stopButton: Int
     ) {
         binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(recordButton)
         binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(playButton)
-        binding.lvRecoder.lvForRecorder.ivPause.setImageResource(pauseButton)
         binding.lvRecoder.lvForRecorder.ivStop.setImageResource(stopButton)
     }
 
     private fun updateClickable(
         canClickRecoder: Boolean,
         canClickPlay: Boolean,
-        canClickPause: Boolean,
         canClickStop: Boolean
     ) {
         binding.lvRecoder.lvForRecorder.ivRecord.isClickable = canClickRecoder
         binding.lvRecoder.lvForRecorder.ivPlay.isClickable = canClickPlay
-        binding.lvRecoder.lvForRecorder.ivPause.isClickable = canClickPause
         binding.lvRecoder.lvForRecorder.ivStop.isClickable = canClickStop
     }
 
