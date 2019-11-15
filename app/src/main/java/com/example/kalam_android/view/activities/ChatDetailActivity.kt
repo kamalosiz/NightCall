@@ -3,14 +3,11 @@ package com.example.kalam_android.view.activities
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.media.*
 import android.os.Bundle
 import android.os.Handler
-import android.os.SystemClock
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -37,16 +34,11 @@ import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
-import kotlinx.android.synthetic.main.layout_for_recoder.view.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import omrecorder.*
 import org.json.JSONObject
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -75,29 +67,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var profileImage: String = ""
     private var loading = false
     private var isFromChatFragment = false
-    private val timeFormatter = SimpleDateFormat("mm:ss", Locale.getDefault())
-    private var recorder: Recorder? = null
-    private var timeWhenPause: Long = 0;
-    private var isResumeRecorder = false
-    private var isRecording = false
-    private var isPlayPlayer = false
-    private var isStopPlayer = false
-    private var isStopRecording = false
-    private var isPlayerRelease = false
-    private var isFileReady = false
-    private var mediaPlayer: MediaPlayer? = null
-    private val gone = View.GONE
-    private val visible = View.VISIBLE
-    private val playGreen = R.drawable.ic_play_green
-    private val playGray = R.drawable.ic_play_gray
-    private val pauseGreen = R.drawable.ic_pause_green
-    private val pauseGray = R.drawable.ic_pause_gray
-    private val stopGreen = R.drawable.ic_stop_green
-    private val stopGray = R.drawable.ic_stop_gray
-    private val recordGreen = R.drawable.ic_record_green
-    private val recordGray = R.drawable.ic_record_gray
-    private val recordRed = R.drawable.ic_record_red
-    private lateinit var runnable: Runnable
+    private var isVisibleAttach = false
+    private var isVisibleRecorder = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,357 +99,38 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         applyPagination()
     }
 
-    private fun initMediaPlayer() {
-        try {
-            if (mediaPlayer != null) {
-                if (mediaPlayer?.isPlaying!!) {
-                    mediaPlayer?.pause()
-                    updateDrawables(recordGray, playGreen, stopGreen)
-                    updateClickable(
-                        canClickRecoder = false,
-                        canClickPlay = true,
-                        canClickStop = true
-                    )
-                } else {
-                    mediaPlayer?.pause()
-                    updateDrawables(recordGray, pauseGreen, stopGreen)
-                    updateClickable(
-                        canClickRecoder = false,
-                        canClickPlay = true,
-                        canClickStop = true
-                    )
-                    mediaPlayer?.start()
-                }
-
-            } else {
-                updateDrawables(recordGray, pauseGreen, stopGreen)
-                updateClickable(
-                    canClickRecoder = false,
-                    canClickPlay = true,
-                    canClickStop = true
-                )
-                mediaPlayer = MediaPlayer()
-                mediaPlayer?.setAudioAttributes(
-                    AudioAttributes
-                        .Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                        .build()
-                )
-                mediaPlayer?.setDataSource(output)
-                mediaPlayer?.prepare()
-                mediaPlayer?.start()
-                initializeSeekBar()
-            }
-        } catch (e: IOException) {
-            logE("excep:${e.message}")
-        }
-
-        mediaPlayer?.setOnCompletionListener {
-
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            isPlayerRelease = true
-            isStopPlayer = false
-            binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
-            binding.lvRecoder.lvForRecorder.seekBar.max = 0
-            updateClickable(
-                canClickRecoder = false,
-                canClickPlay = true,
-                canClickStop = false
-            )
-            updateDrawables(recordGray, playGreen, stopGray)
-
-        }
-
-    }
-
     private fun clickListener() {
 
         binding.header.tvName.setOnClickListener {
+
             val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
             intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
             intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
             startActivity(intent)
         }
         binding.lvRecoder.ivMic.setOnClickListener {
+
             initRecorderWithPermissions()
-        }
-
-        binding.lvRecoder.lvForRecorder.ivRecord.setOnClickListener {
-            playPauseRecorder()
-        }
-
-        binding.lvRecoder.lvForRecorder.ivStop.setOnClickListener {
-
-            if (isStopPlayer) {
-                stopPlayer()
-            } else {
-                stopRecord()
+            if (isVisibleAttach) {
+                binding.lvRecoder.lvForAttachment.visibility = View.GONE
+                isVisibleAttach = false
             }
-
-        }
-
-        binding.lvRecoder.lvForRecorder.ivPlay.setOnClickListener {
-            if (isRecording) {
-
-                pauseRecorder()
-
-            } else {
-                playAudio()
-            }
-        }
-
-        binding.lvRecoder.lvForRecorder.ivCancel.setOnClickListener {
-            cancel(true)
         }
 
         binding.lvRecoder.ivAttachment.setOnClickListener {
 
-            binding.lvRecoder.lvForAttachment.visibility = View.VISIBLE
-        }
-    }
-
-    private fun playPauseRecorder() {
-
-        if (!isResumeRecorder) {
-            startChronometer()
-            initializeRecorder()
-            recorder?.startRecording()
-            updateDrawables(recordGray, pauseGreen, stopGreen)
-            updateClickable(
-                canClickRecoder = false,
-                canClickPlay = true,
-                canClickStop = true
-            )
-            isRecording = true
-            isStopRecording = true
-        } else {
-            resumeChronometer()
-            updateDrawables(recordGray, pauseGreen, stopGreen)
-            updateClickable(
-                canClickRecoder = false,
-                canClickPlay = true,
-                canClickStop = true
-            )
-            recorder?.resumeRecording()
-            isStopRecording = true
-        }
-    }
-
-    private fun pauseRecorder() {
-        pauseChronometer()
-        updateDrawables(recordRed, pauseGray, stopGreen)
-        updateClickable(
-            canClickRecoder = true,
-            canClickPlay = false,
-            canClickStop = true
-        )
-        recorder?.pauseRecording()
-        isResumeRecorder = true
-    }
-
-
-    private fun stopPlayer() {
-
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        isPlayerRelease = true
-        isStopPlayer = false
-        binding.lvRecoder.lvForRecorder.seekBar.max = 0
-        updateDrawables(recordGray, playGreen, stopGray)
-        updateClickable(
-            canClickRecoder = false,
-            canClickPlay = true,
-            canClickStop = false
-        )
-        binding.lvRecoder.lvForRecorder.tvTimer.text = "00:00"
-
-    }
-
-    private fun stopRecord() {
-        if (isStopRecording) {
-            isFileReady = true
-            recorder?.stopRecording()
-            recorder = null
-            logE("Recorder Time : ${binding.lvRecoder.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()}")
-            stopChronometer()
-            visibility(visible, visible, gone)
-            updateDrawables(recordGray, playGreen, stopGray)
-            updateClickable(
-                canClickRecoder = false,
-                canClickPlay = true,
-                canClickStop = false
-            )
-            isStopRecording = false
-            isRecording = false
-        } else {
-            stopPlayer()
-            updateDrawables(recordGray, playGreen, stopGray)
-            updateClickable(
-                canClickRecoder = true,
-                canClickPlay = false,
-                canClickStop = false
-            )
-            isResumeRecorder = true
-        }
-    }
-
-    private fun playAudio() {
-
-        isPlayPlayer = true
-        isStopPlayer = true
-        initMediaPlayer()
-
-    }
-
-
-    private fun cancel(deleteFile: Boolean) {
-        isFileReady = false
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        recorder = null
-        timeWhenPause = 0
-        isResumeRecorder = false
-        isPlayPlayer = false
-        isStopPlayer = false
-        isStopRecording = false
-        isPlayerRelease = false
-        stopChronometer()
-        binding.lvRecoder.lvForRecorder.seekBar.max = 0
-        binding.lvRecoder.lvForRecorder.tvTotalTime.text = "00:00"
-        updateDrawables(recordGreen, playGray, stopGray)
-        updateClickable(
-            canClickRecoder = true,
-            canClickPlay = false,
-            canClickStop = false
-        )
-        visibility(gone, gone, visible)
-        if (deleteFile) {
-            val file = File(output)
-            if (file.exists()) {
-                file.delete()
+            if (!isVisibleAttach) {
+                binding.lvRecoder.lvForAttachment.visibility = View.VISIBLE
+                isVisibleAttach = true
+            } else {
+                binding.lvRecoder.lvForAttachment.visibility = View.GONE
+                isVisibleAttach = false
+            }
+            if (isVisibleRecorder) {
+                binding.lvRecoder.lvForRecorder.visibility = View.GONE
+                isVisibleRecorder = false
             }
         }
-        output = ""
-    }
-
-    private fun visibility(recorderVisibility: Int, seekbarVisibility: Int, chronometer: Int) {
-
-        binding.lvRecoder.lvForRecorder.visibility = recorderVisibility
-        binding.lvRecoder.lvForRecorder.lvSeekBar.visibility = seekbarVisibility
-        binding.lvRecoder.chronometer.visibility = chronometer
-    }
-
-    private fun updateDrawables(
-        recordButton: Int, playButton: Int, stopButton: Int
-    ) {
-        binding.lvRecoder.lvForRecorder.ivRecord.setImageResource(recordButton)
-        binding.lvRecoder.lvForRecorder.ivPlay.setImageResource(playButton)
-        binding.lvRecoder.lvForRecorder.ivStop.setImageResource(stopButton)
-    }
-
-    private fun updateClickable(
-        canClickRecoder: Boolean,
-        canClickPlay: Boolean,
-        canClickStop: Boolean
-    ) {
-        binding.lvRecoder.lvForRecorder.ivRecord.isClickable = canClickRecoder
-        binding.lvRecoder.lvForRecorder.ivPlay.isClickable = canClickPlay
-        binding.lvRecoder.lvForRecorder.ivStop.isClickable = canClickStop
-    }
-
-    private fun startChronometer() {
-
-        binding.lvRecoder.lvForRecorder.chronometer.base = SystemClock.elapsedRealtime()
-        binding.lvRecoder.lvForRecorder.chronometer.start()
-    }
-
-    private fun stopChronometer() {
-
-        binding.lvRecoder.lvForRecorder.chronometer.base = SystemClock.elapsedRealtime()
-        binding.lvRecoder.lvForRecorder.chronometer.stop()
-    }
-
-    private fun pauseChronometer() {
-
-        timeWhenPause =
-            binding.lvRecoder.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()
-        binding.lvRecoder.lvForRecorder.chronometer.stop()
-
-    }
-
-    private fun resumeChronometer() {
-
-        binding.lvRecoder.lvForRecorder.chronometer.base =
-            SystemClock.elapsedRealtime() + timeWhenPause
-        binding.lvRecoder.lvForRecorder.chronometer.start()
-
-    }
-
-    private fun initializeSeekBar() {
-
-        binding.lvRecoder.lvForRecorder.seekBar.max = mediaPlayer?.duration!!
-        binding.lvRecoder.lvForRecorder.tvTotalTime.text =
-            timeFormatter.format(mediaPlayer?.duration!!)
-        runnable = Runnable {
-            try {
-                if (mediaPlayer != null) {
-                    val currentSeconds = mediaPlayer?.currentPosition
-                    currentSeconds?.let {
-                        binding.lvRecoder.lvForRecorder.seekBar.progress = it
-                    }
-
-                    binding.lvRecoder.lvForRecorder.tvTimer.text =
-                        timeFormatter.format(currentSeconds)
-                    handler.postDelayed(runnable, 1)
-                }
-            } catch (e: IllegalStateException) {
-
-            }
-
-        }
-        handler.postDelayed(runnable, 1)
-
-        binding.lvRecoder.lvForRecorder.seekBar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (mediaPlayer != null && fromUser) {
-                    mediaPlayer?.seekTo(progress)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
-    }
-
-    private fun initializeRecorder() {
-        path = "/recording_${System.currentTimeMillis()}.wav"
-        output = getExternalFilesDir(null)?.absolutePath + path
-        recorder = OmRecorder.wav(
-            PullTransport.Default(mic()), file()
-        )
-    }
-
-    private fun mic(): PullableSource {
-        return PullableSource.Default(
-            AudioRecordConfig.Default(
-                MediaRecorder.AudioSource.MIC, AudioFormat.ENCODING_PCM_16BIT,
-                AudioFormat.CHANNEL_IN_MONO, 44100
-            )
-        )
-    }
-
-    private fun file(): File {
-        return File(output)
     }
 
     private fun applyPagination() {
@@ -618,7 +271,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ).listener(object : MediaPermissionListener {
                     override fun onPermissionGranted() {
-                        binding.lvRecoder.lvForRecorder.visibility = View.VISIBLE
+                        if (!isVisibleRecorder) {
+                            binding.lvRecoder.lvForRecorder.visibility = View.VISIBLE
+                            isVisibleRecorder = true
+                        }
                     }
 
                     override fun onPermissionDenied() {
@@ -629,7 +285,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    private fun uploadAudioMedia(identifier: String) {
+    private fun uploadAudioMedia(identifier: String, output: String) {
         val params = HashMap<String, RequestBody>()
         params["identifier"] = RequestBody.create(MediaType.parse("text/plain"), identifier)
 
@@ -640,7 +296,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    private fun sendVoiceMessage() {
+    private fun sendVoiceMessage(output: String) {
         logE("Output Message $output")
         val identifier = System.currentTimeMillis().toString()
         createChatObject(
@@ -649,7 +305,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             AppConstants.AUDIO_MESSAGE,
             identifier
         )
-        uploadAudioMedia(identifier)
+        uploadAudioMedia(identifier, output)
         logE("Audio Api hit successfully")
     }
 
@@ -775,16 +431,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivSend -> {
+                if (isVisibleAttach) {
+                    binding.lvRecoder.lvForAttachment.visibility = View.GONE
+                    isVisibleAttach = false
+                }
                 if (output.isEmpty() && binding.lvRecoder.editTextMessage.text.toString().isNotEmpty()) {
                     sendMessage()
                     logE("Text Message")
                 } else {
-                    if (isFileReady) {
+                    /*if (isFileReady!!) {
                         logE("Audio Message")
                         sendVoiceMessage()
                         binding.lvRecoder.lvForRecorder.visibility = View.GONE
-                        cancel(false)
-                    }
+                        recorderAndPlayer?.cancel( false)
+                    }*/
                 }
             }
             R.id.rlBack -> {

@@ -26,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/halvatic_light"
+            android:textSize="@dimen/_9sdp"
             android:text="@string/labelFile" />
 
     </LinearLayout>
@@ -47,6 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/halvatic_light"
+            android:textSize="@dimen/_9sdp"
             android:text="@string/labelContacts" />
 
     </LinearLayout>
@@ -68,6 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/halvatic_light"
+            android:textSize="@dimen/_9sdp"
             android:text="@string/labelImageVideo" />
 
     </LinearLayout>
@@ -89,6 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/halvatic_light"
+            android:textSize="@dimen/_9sdp"
             android:text="@string/labelAudio" />
 
     </LinearLayout>
@@ -104,12 +108,13 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_audio_attach" />
+            android:src="@drawable/ic_location_attach" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/halvatic_light"
+            android:textSize="@dimen/_9sdp"
             android:text="@string/labelLocation" />
 
     </LinearLayout>
