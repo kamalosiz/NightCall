@@ -9,6 +9,9 @@ data class ChatMessagesResponse(
 )
 
 data class ChatData(
+    val original_audio_text: String?,
+    val audio_url: String?,
+    val original_audio_url: String?,
     val sender_name: String,
     val id: Int,
     val chat_id: Int,
@@ -20,9 +23,8 @@ data class ChatData(
     val type: String,
     val file: String?,
     val is_read: Int,
-    val duration: Int,
+    val duration: Long,
     val original_message: String?,
-    val tr_file: String?,
     var identifier: String?
 )
 
@@ -38,5 +40,6 @@ data class DataResponse(
     val file_url: String,
     val duration: Double,
     val message: String,
-    val identifier: String
+    val identifier: String,
+    val file_id: Long
 )

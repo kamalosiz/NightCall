@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,8 +27,6 @@ import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
-import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
 import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForContacts
 import com.example.kalam_android.viewmodel.ContactsViewModel
@@ -35,6 +34,8 @@ import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.tbruyelle.rxpermissions2.RxPermissions
+import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import javax.inject.Inject
 
 
@@ -205,27 +206,24 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         return jsonArray
     }
 
+    @SuppressLint("CheckResult")
     private fun checkPermissions() {
-        Handler().postDelayed(
-            {
-                PermissionHelper.withActivity(this).addPermissions(
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.WRITE_CONTACTS
-                ).listener(object : MediaPermissionListener {
-                    override fun onPermissionGranted() {
-                        binding.pbCenter.visibility = View.VISIBLE
-                        binding.rvForContacts.visibility = View.GONE
-                        val params = HashMap<String, String>()
-                        params["contacts"] = createContactsJson(getAllContact()).toString()
-                        viewModel.getContacts(params)
-                    }
-
-                    override fun onPermissionDenied() {
-                        logE("onPermissionDenied")
-                    }
-                }).build().init()
-            }, 100
-        )
+        RxPermissions(this)
+            .request(
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.WRITE_CONTACTS
+            )
+            .subscribe { granted ->
+                if (granted) {
+                    binding.pbCenter.visibility = View.VISIBLE
+                    binding.rvForContacts.visibility = View.GONE
+                    val params = HashMap<String, String>()
+                    params["contacts"] = createContactsJson(getAllContact()).toString()
+                    viewModel.getContacts(params)
+                } else {
+                    Debugger.e("Capturing Image", "onPermissionDenied")
+                }
+            }
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {

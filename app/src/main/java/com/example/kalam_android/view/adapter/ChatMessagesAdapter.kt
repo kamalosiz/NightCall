@@ -143,7 +143,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
                     currentPos = position
-                    playVoiceMsg(itemHolder.binding, item.tr_file.toString())
+                    playVoiceMsg(itemHolder.binding, item.audio_url.toString())
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END

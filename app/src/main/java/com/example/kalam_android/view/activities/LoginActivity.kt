@@ -179,7 +179,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                     binding.etPass.transformationMethod = PasswordTransformationMethod.getInstance()
                     binding.hidePassword.setBackgroundResource(R.drawable.hide_eye_icon)
                 }
-                if(binding.etPass.text.toString().isNotEmpty()){
+                if (binding.etPass.text.toString().isNotEmpty()) {
                     binding.etPass.setSelection(binding.etPass.text.toString().length)
                 }
             }

@@ -1,23 +1,18 @@
 package com.example.kalam_android.base
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.os.Bundle
-import android.os.Handler
-import android.text.TextUtils
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
 import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
-import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
-import com.github.nkzawa.engineio.client.Socket
-import com.github.nkzawa.socketio.client.IO
+import com.tbruyelle.rxpermissions2.RxPermissions
 
 
 open class BaseActivity : AppCompatActivity() {
@@ -59,28 +54,23 @@ open class BaseActivity : AppCompatActivity() {
         popupMenu.show()
     }
 
+    @SuppressLint("CheckResult")
     fun checkPixPermission(context: FragmentActivity, requestCode: Int) {
-        Handler().postDelayed(
-            {
-                PermissionHelper.withActivity(this).addPermissions(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ).listener(object : MediaPermissionListener {
-                    override fun onPermissionGranted() {
-                        Pix.start(
-                            context,
-                            Options.init().setRequestCode(requestCode)
-                        )
-                    }
-
-                    override fun onPermissionDenied() {
-                        Debugger.e("Capturing Image", "onPermissionDenied")
-                    }
-
-                }).build().init()
-
-            }, 100
-        )
+        RxPermissions(this)
+            .request(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+            .subscribe { granted ->
+                if (granted) {
+                    Pix.start(
+                        context,
+                        Options.init().setRequestCode(requestCode)
+                    )
+                } else {
+                    Debugger.e("Capturing Image", "onPermissionDenied")
+                }
+            }
     }
 }

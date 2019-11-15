@@ -13,7 +13,6 @@ import java.util.*
 
 @Dao
 interface ContactsDao {
-
     @Insert
     fun insert(contactsData: Iterable<ContactsEntityClass>)
 
@@ -22,6 +21,4 @@ interface ContactsDao {
 
     @Query("DELETE FROM ${AppConstants.CONTACTS_TABLE}")
     fun deleteAll()
-
-
 }

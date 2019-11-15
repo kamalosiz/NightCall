@@ -7,3 +7,16 @@ data class LoginResponse(
     var data: UserData?,
     var message: String?
 )
+
+data class UserData(
+    var firstname: String,
+    var lastname: String,
+    var email: String,
+    var country: String,
+    var country_code: String,
+    var profile_image: String,
+    val token: String,
+    val id: Int,
+    val language: String?,
+    val auto_translate: Int?
+)
