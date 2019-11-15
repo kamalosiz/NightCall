@@ -109,31 +109,6 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
 
     }
 
-/*    private fun checkPixPermission() {
-        Handler().postDelayed(
-            {
-                PermissionHelper.withActivity(this).addPermissions(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ).listener(object : MediaPermissionListener {
-                    override fun onPermissionGranted() {
-                        Pix.start(
-                            this@CreateProfileActivity,
-                            Options.init().setRequestCode(AppConstants.PROFILE_IMAGE_CODE)
-                        )
-                    }
-
-                    override fun onPermissionDenied() {
-                        logE("onPermissionDenied")
-                    }
-
-                }).build().init()
-
-            }, 100
-        )
-    }*/
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {

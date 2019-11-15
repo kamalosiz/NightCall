@@ -2,7 +2,6 @@ package com.example.kalam_android.util
 
 object AppConstants {
     const val VERIFICATION_CODE = "key_phone_verfiy"
-    const val PROFILE_IMAGE_CODE = 111
     const val PROFILE_IMAGE_KEY = "profileImage_kalam"
     const val USER_NAME = "user_name_kalam"
     const val RECEIVER_ID = "user_receiver_id"
@@ -15,11 +14,13 @@ object AppConstants {
     const val TEXT_MESSAGE = "text"
     const val AUDIO_MESSAGE = "audio"
     const val IMAGE_MESSAGE = "image"
+    const val VIDEO_MESSAGE = "video"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
 
 
     //Request Code
+    const val PROFILE_IMAGE_CODE = 111
     const val CHAT_FRAGMENT_CODE = 1000
     const val LOGOUT_CODE = 1001
     const val CHAT_IMAGE_CODE = 1002
@@ -27,7 +28,7 @@ object AppConstants {
     //Local DB=
     const val DB_NAME = "kalam_local_db"
     const val CONTACTS_TABLE = "contacts"
-    const val ALL_CHAT_ENTITY = "allchatentity"
+    const val ALL_CHAT_ENTITY = "allchat"
 
     //Socket Actions
     const val START_CAHT = "startChat"

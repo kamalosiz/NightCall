@@ -60,9 +60,9 @@
                 android:id="@+id/tvAgo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:fontFamily="@font/halvatic_light"
                 android:text="10.10 pm"
-                android:layout_marginTop="@dimen/_5sdp"
                 android:textSize="@dimen/_10sdp" />
 
             <LinearLayout

@@ -82,14 +82,11 @@
             android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|adjustPan" /> <!-- Transparent Permission Activity -->
-        <activity
-            android:name=".util.permissionHelper.PermissionsActivity"
-            android:launchMode="singleInstance"
-            android:theme="@style/Dexter.Internal.Theme.Transparent" /> <!-- Just for start if no Sandreas Camera -->
+<!--      &lt;!&ndash; Just for start if no Sandreas Camera &ndash;&gt;
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/ThemeFullscreen.Crop" />
+            android:theme="@style/ThemeFullscreen.Crop" />-->
     </application>
 
 </manifest>

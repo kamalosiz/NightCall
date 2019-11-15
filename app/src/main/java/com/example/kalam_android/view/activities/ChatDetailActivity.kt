@@ -2,6 +2,7 @@ package com.example.kalam_android.view.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -27,12 +28,15 @@ import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.example.kalam_android.wrapper.MyMediaRecorder
+import com.example.kalam_android.helper.MyMediaRecorder
 import com.example.kalam_android.wrapper.SocketIO
 import com.fxn.pix.Pix
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.sandrios.sandriosCamera.internal.SandriosCamera
+import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
+import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
@@ -59,7 +63,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var index = 0
     var handler = Handler()
     private var chatList1: ArrayList<ChatData> = ArrayList()
-    private var profileImage: String = ""
+    private var profileImage: String? = null
     private var loading = false
     private var isFromChatFragment = false
     private var messageType = ""
@@ -222,39 +226,48 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun renderAudioResponse(response: AudioResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            SocketIO.emitFileID(it.data?.file_id)
+            myMediaRecorder?.getTotalDuration()?.let { it1 ->
+                emitNewMessageToSocket(
+                    it.data?.message.toString(),
+                    AppConstants.AUDIO_MESSAGE,
+                    it.data?.file_id.toString(),
+                    it1
+                )
+            }
             (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(it.data?.identifier.toString())
         }
     }
 
-    private fun uploadMedia(identifier: String, file: String) {
+    private fun uploadMedia(identifier: String, file: String, duration: Long) {
         val params = HashMap<String, RequestBody>()
         params["identifier"] = RequestBody.create(MediaType.parse("text/plain"), identifier)
+        params["duration"] = RequestBody.create(MediaType.parse("text/plain"), duration.toString())
         viewModel.hitUploadAudioApi(
             sharedPrefsHelper.getUser()?.token, params,
             getFileBody(file, "file")
         )
     }
 
-    private fun sendMediaMessage(file: String, type: String, isImage: Boolean) {
+    private fun sendMediaMessage(file: String, type: String, isImage: String, duration: Long) {
         val identifier = System.currentTimeMillis().toString()
-        createChatObject(
-            AppConstants.DUMMY_STRING,
-            file,
-            type,
-            identifier
-        )
-        if (isImage) {
-            messageType = type
-            logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
-            val convertedFile = Compressor(this).compressToFile(File(file))
-            logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
-            uploadMedia(identifier, convertedFile.absolutePath)
-            logE("Image Api hit successfully")
-        } else {
-            messageType = type
-            uploadMedia(identifier, file)
-            logE("Audio Api hit successfully")
+        createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
+        when (isImage) {
+            AppConstants.AUDIO_MESSAGE -> {
+                messageType = type
+                uploadMedia(identifier, file, duration)
+                logE("Audio Api hit successfully")
+            }
+            AppConstants.IMAGE_MESSAGE -> {
+                messageType = type
+//            logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
+                val convertedFile = Compressor(this).compressToFile(File(file))
+//            logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
+                uploadMedia(identifier, convertedFile.absolutePath, duration)
+                logE("Image Api hit successfully")
+            }
+            AppConstants.VIDEO_MESSAGE -> {
+
+            }
         }
     }
 
@@ -297,23 +310,34 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         })
     }
 
-    private fun sendMessage() {
-        createChatObject(
-            binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
-            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING
-        )
+    private fun addMessage(chatData: ChatData) {
+        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
+        binding.chatMessagesRecycler.scrollToPosition(0)
+    }
+
+    private fun emitNewMessageToSocket(
+        message: String, type: String, fileID: String, duration: Long
+    ) {
         SocketIO.emitNewMessage(
-            sharedPrefsHelper.getUser()?.id.toString(),
-            chatId.toString(),
-            binding.lvBottomChat.editTextMessage.text.toString(),
-            AppConstants.TEXT_MESSAGE,
+            sharedPrefsHelper.getUser()?.id.toString(), chatId.toString(), message, type,
             sharedPrefsHelper.getUser()?.firstname.toString()
-                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
-            AppConstants.DUMMY_STRING,
-            0
+                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(), fileID, duration
         )
-        logE("Message Emitted to socket")
-        binding.lvBottomChat.editTextMessage.setText("")
+    }
+
+    private fun createChatObject(message: String, file: String, type: String, identifier: String) {
+        addMessage(
+            ChatData(
+                AppConstants.DUMMY_STRING,
+                file, AppConstants.DUMMY_STRING,
+                StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
+                    sharedPrefsHelper.getUser()?.lastname.toString()
+                ).toString(),
+                AppConstants.DUMMY_DATA, chatId, sharedPrefsHelper.getUser()?.id,
+                AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
+                type, file, 0, 0, message, identifier
+            )
+        )
     }
 
     override fun socketResponse(jsonObject: JSONObject) {
@@ -325,6 +349,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 addMessage(data)
             }
         }
+    }
+
+
+    private fun sendMessage() {
+        createChatObject(
+            binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
+            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING
+        )
+        emitNewMessageToSocket(
+            binding.lvBottomChat.editTextMessage.text.toString(),
+            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING, 0
+        )
+        logE("Message Emitted to socket")
+        binding.lvBottomChat.editTextMessage.setText("")
     }
 
     override fun typingResponse(jsonObject: JSONObject, isTyping: Boolean) {
@@ -346,50 +384,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun createChatObject(message: String, file: String, type: String, identifier: String) {
-        addMessage(
-            ChatData(
-                AppConstants.DUMMY_STRING,
-                file,
-                AppConstants.DUMMY_STRING,
-                StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
-                    sharedPrefsHelper.getUser()?.lastname.toString()
-                ).toString(),
-                AppConstants.DUMMY_DATA,
-                chatId,
-                sharedPrefsHelper.getUser()?.id,
-                AppConstants.DUMMY_DATA,
-                message,
-                AppConstants.DUMMY_DATA,
-                AppConstants.DUMMY_DATA,
-                type,
-                file,
-                0,
-                0,
-                message, identifier
-            )
-        )
-    }
-
-    private fun addMessage(chatData: ChatData) {
-        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
-        binding.chatMessagesRecycler.scrollToPosition(0)
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivSend -> {
-                if (myMediaRecorder?.fileOutput()?.isEmpty() == true && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()) {
+                if (myMediaRecorder?.fileOutput()?.isEmpty() == true &&
+                    binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
+                ) {
                     sendMessage()
                     logE("Text Message")
                 } else {
                     if (myMediaRecorder?.isFileReady() == true) {
                         logE("Audio Message")
-                        sendMediaMessage(
-                            myMediaRecorder?.fileOutput().toString(),
-                            AppConstants.AUDIO_MESSAGE,
-                            false
-                        )
+                        myMediaRecorder?.getTotalDuration()?.let {
+                            sendMediaMessage(
+                                myMediaRecorder?.fileOutput().toString(),
+                                AppConstants.AUDIO_MESSAGE,
+                                AppConstants.AUDIO_MESSAGE, it
+                            )
+                        }
                         myMediaRecorder?.hideRecorder()
                         myMediaRecorder?.cancel(false)
                     }
@@ -405,10 +417,16 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 startActivity(intent)
             }
             R.id.ivCamera -> {
-                checkPixPermission(
-                    this@ChatDetailActivity,
-                    AppConstants.CHAT_IMAGE_CODE
-                )
+                /* checkPixPermission(
+                     this@ChatDetailActivity,
+                     AppConstants.CHAT_IMAGE_CODE
+                 )*/
+                SandriosCamera
+                    .with()
+                    .setShowPicker(false)
+                    .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
+                    .enableImageCropping(false)
+                    .launchCamera(this)
             }
             R.id.ivMic -> {
                 myMediaRecorder?.initRecorderWithPermissions()
@@ -420,14 +438,27 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                AppConstants.CHAT_IMAGE_CODE -> {
-                    val returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
-                    logE("onActivityResult returnValue: $returnValue")
-                    sendMediaMessage(
-                        returnValue?.get(0).toString(),
-                        AppConstants.IMAGE_MESSAGE,
-                        true
-                    )
+                SandriosCamera.RESULT_CODE -> {
+                    if (data?.getSerializableExtra(SandriosCamera.MEDIA) is Media) {
+                        val media = data.getSerializableExtra(SandriosCamera.MEDIA) as Media
+                        if (media.type == SandriosCamera.MediaType.PHOTO) {
+                            sendMediaMessage(
+                                media.path,
+                                AppConstants.IMAGE_MESSAGE,
+                                AppConstants.IMAGE_MESSAGE, 0
+                            )
+                            logE("File: ${media.path}")
+                            logE("Type: ${media.type}")
+                        } else if (media.type == SandriosCamera.MediaType.VIDEO) {
+                            sendMediaMessage(
+                                media.path,
+                                AppConstants.VIDEO_MESSAGE,
+                                AppConstants.VIDEO_MESSAGE, 0
+                            )
+                            logE("File: ${media.path}")
+                            logE("Type: ${media.type}")
+                        }
+                    }
                 }
             }
         }

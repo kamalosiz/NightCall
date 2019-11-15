@@ -17,10 +17,8 @@ import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.databinding.ChatsFragmentBinding
 import com.example.kalam_android.localdb.AllChatEntityClass
-import com.example.kalam_android.localdb.ContactsEntityClass
 import com.example.kalam_android.repository.model.AllChatListResponse
 import com.example.kalam_android.repository.model.ChatListData
-import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.AppConstants
@@ -28,16 +26,12 @@ import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.activities.ChatDetailActivity
-import com.example.kalam_android.view.adapter.AdapterForContacts
 import com.example.kalam_android.view.adapter.AllChatListAdapter
 import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
 import org.json.JSONObject
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
 
@@ -49,7 +43,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private var chatList: ArrayList<ChatListData> = ArrayList()
-        private var chatListLocal: List<AllChatEntityClass> = ArrayList()
+    private var chatListLocal: List<AllChatEntityClass> = ArrayList()
     var position = -1
 
     override fun onCreateView(

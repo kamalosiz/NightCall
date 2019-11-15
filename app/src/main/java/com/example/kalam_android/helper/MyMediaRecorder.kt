@@ -1,4 +1,4 @@
-package com.example.kalam_android.wrapper
+package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -111,7 +111,7 @@ class MyMediaRecorder private constructor(
         binding.lvBottomChat.lvForRecorder.tvTotalTime.text = "00:00"
         updateDrawables(recordGreen, playGray, stopGray)
         updateClickable(
-            canClickRecoder = true,
+            canClickRecorder = true,
             canClickPlay = false,
             canClickStop = false
         )
@@ -133,7 +133,7 @@ class MyMediaRecorder private constructor(
             recorder?.startRecording()
             updateDrawables(recordGray, pauseGreen, stopGreen)
             updateClickable(
-                canClickRecoder = false,
+                canClickRecorder = false,
                 canClickPlay = true,
                 canClickStop = true
             )
@@ -143,7 +143,7 @@ class MyMediaRecorder private constructor(
             resumeChronometer()
             updateDrawables(recordGray, pauseGreen, stopGreen)
             updateClickable(
-                canClickRecoder = false,
+                canClickRecorder = false,
                 canClickPlay = true,
                 canClickStop = true
             )
@@ -214,11 +214,11 @@ class MyMediaRecorder private constructor(
     }
 
     private fun updateClickable(
-        canClickRecoder: Boolean,
+        canClickRecorder: Boolean,
         canClickPlay: Boolean,
         canClickStop: Boolean
     ) {
-        binding.lvBottomChat.lvForRecorder.ivRecord.isClickable = canClickRecoder
+        binding.lvBottomChat.lvForRecorder.ivRecord.isClickable = canClickRecorder
         binding.lvBottomChat.lvForRecorder.ivPlay.isClickable = canClickPlay
         binding.lvBottomChat.lvForRecorder.ivStop.isClickable = canClickStop
     }
@@ -233,7 +233,7 @@ class MyMediaRecorder private constructor(
         binding.lvBottomChat.lvForRecorder.seekBar.max = 0
         updateDrawables(recordGray, playGreen, stopGray)
         updateClickable(
-            canClickRecoder = false,
+            canClickRecorder = false,
             canClickPlay = true,
             canClickStop = false
         )
@@ -257,7 +257,7 @@ class MyMediaRecorder private constructor(
             visibility(visible, visible, gone)
             updateDrawables(recordGray, playGreen, stopGray)
             updateClickable(
-                canClickRecoder = false,
+                canClickRecorder = false,
                 canClickPlay = true,
                 canClickStop = false
             )
@@ -267,7 +267,7 @@ class MyMediaRecorder private constructor(
             stopPlayer()
             updateDrawables(recordGray, playGreen, stopGray)
             updateClickable(
-                canClickRecoder = true,
+                canClickRecorder = true,
                 canClickPlay = false,
                 canClickStop = false
             )
@@ -294,7 +294,7 @@ class MyMediaRecorder private constructor(
         pauseChronometer()
         updateDrawables(recordRed, pauseGray, stopGreen)
         updateClickable(
-            canClickRecoder = true,
+            canClickRecorder = true,
             canClickPlay = false,
             canClickStop = true
         )
@@ -317,7 +317,7 @@ class MyMediaRecorder private constructor(
                     mediaPlayer?.pause()
                     updateDrawables(recordGray, playGreen, stopGreen)
                     updateClickable(
-                        canClickRecoder = false,
+                        canClickRecorder = false,
                         canClickPlay = true,
                         canClickStop = true
                     )
@@ -325,7 +325,7 @@ class MyMediaRecorder private constructor(
                     mediaPlayer?.pause()
                     updateDrawables(recordGray, pauseGreen, stopGreen)
                     updateClickable(
-                        canClickRecoder = false,
+                        canClickRecorder = false,
                         canClickPlay = true,
                         canClickStop = true
                     )
@@ -335,7 +335,7 @@ class MyMediaRecorder private constructor(
             } else {
                 updateDrawables(recordGray, pauseGreen, stopGreen)
                 updateClickable(
-                    canClickRecoder = false,
+                    canClickRecorder = false,
                     canClickPlay = true,
                     canClickStop = true
                 )
@@ -366,7 +366,7 @@ class MyMediaRecorder private constructor(
             binding.lvBottomChat.lvForRecorder.tvTimer.text = "00:00"
             binding.lvBottomChat.lvForRecorder.seekBar.max = 0
             updateClickable(
-                canClickRecoder = false,
+                canClickRecorder = false,
                 canClickPlay = true,
                 canClickStop = false
             )

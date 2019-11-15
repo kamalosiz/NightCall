@@ -81,7 +81,7 @@ object SocketIO {
         message: String,
         type: String,
         senderName: String,
-        file: String,
+        fileID: String,
         duration: Long
     ) {
         val jsonObject = JsonObject()
@@ -90,14 +90,8 @@ object SocketIO {
         jsonObject.addProperty("message", message)
         jsonObject.addProperty("mType", type)
         jsonObject.addProperty("sender_name", senderName)
-        jsonObject.addProperty("file", file)
-        jsonObject.addProperty("duration", duration)
-        socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
-    }
-
-    fun emitFileID(fileID: Long?) {
-        val jsonObject = JsonObject()
         jsonObject.addProperty("file_id", fileID)
+        jsonObject.addProperty("duration", duration)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
     }
 }
