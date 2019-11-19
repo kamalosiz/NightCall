@@ -1,6 +1,8 @@
 package com.example.kalam_android.util
 
 import android.content.Context
+import android.content.ContextWrapper
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -11,6 +13,11 @@ import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
+import java.util.*
 
 object Global {
     private var isRelease = false
@@ -22,6 +29,8 @@ object Global {
     fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String, currentPos: Int) {
         try {
             if (isRelease || currentPos != prePos) {
+                Debugger.e("ChatMessagesAdapter","voiceMessage : $voiceMessage")
+                Debugger.e("ChatMessagesAdapter","currentPos : $currentPos")
                 binding.audioPlayer.ivPlayPause.visibility = View.GONE
                 binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
                 prePos = currentPos
@@ -60,6 +69,7 @@ object Global {
         mediaPlayer.setOnCompletionListener { mp ->
             binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
             mp.stop()
+            mp.reset()
             mp.release()
             isRelease = true
             binding.audioPlayer.seekBar.max = 0
@@ -104,5 +114,21 @@ object Global {
             context,
             color
         )
+    }
+
+    fun bitmapToFile(context: Context, bitmap: Bitmap?): File {
+        val wrapper = ContextWrapper(context)
+        var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
+        file = File(file, "${UUID.randomUUID()}.jpg")
+
+        try {
+            val stream: OutputStream = FileOutputStream(file)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            stream.flush()
+            stream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return file
     }
 }

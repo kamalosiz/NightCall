@@ -1,6 +1,10 @@
 package com.example.kalam_android.localdb
 
 import android.util.Log
+import com.example.kalam_android.localdb.dao.AllChatListDao
+import com.example.kalam_android.localdb.dao.ContactsDao
+import com.example.kalam_android.localdb.entities.ChatListData
+import com.example.kalam_android.localdb.entities.ContactsEntityClass
 import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,18 +32,29 @@ class LocalRepo @Inject constructor(
 
     //All Chat Entity Class
 
-    fun insertAllChatListToIntoDB(contactsData: ArrayList<AllChatEntityClass>) {
-        contactsData.let {
+    fun insertAllChatListToIntoDB(chatData: ArrayList<ChatListData>) {
+        chatData.let {
             Log.i("testingLocal", "insertContactsToIntoDB: $it")
-            daoChats.insert(it)
+            daoChats.insertChat(it)
         }
     }
 
-    fun updateItemToDB(unix_time: String, message: String, uid: Int) {
-        daoChats.updateUnixTime(unix_time, message, uid)
+    fun insertChat(chatListData: ChatListData) {
+        daoChats.insertChat(chatListData)
     }
 
-    fun getAllChatListFromDB(): Single<List<AllChatEntityClass>> {
+    fun updateItemToDB(unix_time: String, message: String, uid: Int,unReadcount: Int) {
+        daoChats.updateUnixTime(unix_time, message, uid,unReadcount)
+    }
+
+    fun updateReadCountDB(uid: Int,unReadcount: Int) {
+        daoChats.updateReadCountDB(uid,unReadcount)
+    }
+
+    fun getAllChatListFromDB(): Single<List<ChatListData>> {
         return daoChats.getAllContacts()
+    }
+    fun removeChats() {
+        return daoChats.deleteAll()
     }
 }

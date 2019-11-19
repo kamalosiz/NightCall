@@ -2,9 +2,12 @@ package com.example.kalam_android.view.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.media.ThumbnailUtils
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -34,6 +37,7 @@ import com.fxn.pix.Pix
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.nagihong.videocompressor.VideoCompressor
 import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
@@ -68,6 +72,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var isFromChatFragment = false
     private var messageType = ""
     private var myMediaRecorder: MyMediaRecorder? = null
+    private var lastMessage: String? = null
+    private var lastMsgTime: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,6 +152,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             })
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
         }
+        logE("Chat ID  : $chatId")
     }
 
     fun hitAllChatApi(offset: Int) {
@@ -229,11 +236,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             myMediaRecorder?.getTotalDuration()?.let { it1 ->
                 emitNewMessageToSocket(
                     it.data?.message.toString(),
-                    AppConstants.AUDIO_MESSAGE,
+                    messageType,
                     it.data?.file_id.toString(),
                     it1
                 )
             }
+            lastMsgTime = System.currentTimeMillis() / 1000L
             (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(it.data?.identifier.toString())
         }
     }
@@ -250,23 +258,51 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun sendMediaMessage(file: String, type: String, isImage: String, duration: Long) {
         val identifier = System.currentTimeMillis().toString()
-        createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
         when (isImage) {
             AppConstants.AUDIO_MESSAGE -> {
+                lastMessage = "Audio"
                 messageType = type
+                createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
                 uploadMedia(identifier, file, duration)
-                logE("Audio Api hit successfully")
             }
             AppConstants.IMAGE_MESSAGE -> {
+                lastMessage = "Image"
                 messageType = type
-//            logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
+                createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
+//                logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
                 val convertedFile = Compressor(this).compressToFile(File(file))
-//            logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
+//                logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
                 uploadMedia(identifier, convertedFile.absolutePath, duration)
-                logE("Image Api hit successfully")
             }
             AppConstants.VIDEO_MESSAGE -> {
-
+                lastMessage = "Video"
+                messageType = type
+                val thumb = ThumbnailUtils.createVideoThumbnail(
+                    File(file).path,
+                    MediaStore.Video.Thumbnails.MINI_KIND
+                )
+                createChatObject(
+                    AppConstants.DUMMY_STRING,
+                    Global.bitmapToFile(applicationContext, thumb).absolutePath,
+                    type,
+                    identifier
+                )
+//                logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
+                val output =
+                    Environment.getExternalStorageDirectory().toString() + File.separator + System.currentTimeMillis() + ".mp4"
+                object : Thread() {
+                    override fun run() {
+                        super.run()
+                        VideoCompressor().compressVideo(file, output)
+                        runOnUiThread {
+                            /*logE("updatePosts: isVideo = 1")
+                            logE(
+                                "After Conversion : ${getReadableFileSize(File(output).length())}"
+                            )*/
+                            uploadMedia(identifier, output, duration)
+                        }
+                    }
+                }.start()
             }
         }
     }
@@ -362,6 +398,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING, 0
         )
         logE("Message Emitted to socket")
+        lastMessage = binding.lvBottomChat.editTextMessage.text.toString()
         binding.lvBottomChat.editTextMessage.setText("")
     }
 
@@ -392,6 +429,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 ) {
                     sendMessage()
                     logE("Text Message")
+                    lastMsgTime = System.currentTimeMillis() / 1000L
                 } else {
                     if (myMediaRecorder?.isFileReady() == true) {
                         logE("Audio Message")
@@ -417,15 +455,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 startActivity(intent)
             }
             R.id.ivCamera -> {
-                /* checkPixPermission(
-                     this@ChatDetailActivity,
-                     AppConstants.CHAT_IMAGE_CODE
-                 )*/
                 SandriosCamera
                     .with()
                     .setShowPicker(false)
                     .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
-                    .enableImageCropping(false)
+                    .enableImageCropping(true)
                     .launchCamera(this)
             }
             R.id.ivMic -> {
@@ -442,21 +476,18 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (data?.getSerializableExtra(SandriosCamera.MEDIA) is Media) {
                         val media = data.getSerializableExtra(SandriosCamera.MEDIA) as Media
                         if (media.type == SandriosCamera.MediaType.PHOTO) {
+                            logE("onActivity Received")
                             sendMediaMessage(
                                 media.path,
                                 AppConstants.IMAGE_MESSAGE,
                                 AppConstants.IMAGE_MESSAGE, 0
                             )
-                            logE("File: ${media.path}")
-                            logE("Type: ${media.type}")
                         } else if (media.type == SandriosCamera.MediaType.VIDEO) {
                             sendMediaMessage(
                                 media.path,
                                 AppConstants.VIDEO_MESSAGE,
                                 AppConstants.VIDEO_MESSAGE, 0
                             )
-                            logE("File: ${media.path}")
-                            logE("Type: ${media.type}")
                         }
                     }
                 }
@@ -465,7 +496,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     override fun onBackPressed() {
-        setResult(Activity.RESULT_OK)
+        val intent = Intent()
+        if (lastMessage?.isNotEmpty() == true && lastMsgTime != null) {
+            intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
+            intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
+            intent.putExtra(AppConstants.IsSEEN, false)
+        } else {
+            intent.putExtra(AppConstants.IsSEEN, true)
+        }
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 

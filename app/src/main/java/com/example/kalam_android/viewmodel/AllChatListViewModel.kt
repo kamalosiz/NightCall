@@ -2,7 +2,7 @@ package com.example.kalam_android.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.kalam_android.localdb.AllChatEntityClass
+import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.repository.model.AllChatListResponse
@@ -22,13 +22,13 @@ class AllChatListViewModel @Inject constructor(
 
     private val disposable = CompositeDisposable()
     private val responsiveLiveData = MutableLiveData<ApiResponse<AllChatListResponse>>()
-    private val responsiveRoomData = MutableLiveData<ApiResponse<List<AllChatEntityClass>>>()
+    private val responsiveRoomData = MutableLiveData<ApiResponse<List<ChatListData>>>()
 
     fun allChatResponse(): MutableLiveData<ApiResponse<AllChatListResponse>> {
         return responsiveLiveData
     }
 
-    fun allChatLocalResponse(): MutableLiveData<ApiResponse<List<AllChatEntityClass>>> {
+    fun allChatLocalResponse(): MutableLiveData<ApiResponse<List<ChatListData>>> {
         return responsiveRoomData
     }
 
@@ -45,7 +45,7 @@ class AllChatListViewModel @Inject constructor(
         )
     }
 
-    fun addAllChatItemsToDB(list: ArrayList<AllChatEntityClass>) {
+    fun addAllChatItemsToDB(list: ArrayList<ChatListData>) {
         disposable.add(
             Completable.fromAction {
                 localRepo.insertAllChatListToIntoDB(list)
@@ -58,10 +58,48 @@ class AllChatListViewModel @Inject constructor(
         )
     }
 
-    fun updateItemToDB(unix_time: String, message: String, uid: Int) {
+    fun insertChat(item: ChatListData) {
         disposable.add(
             Completable.fromAction {
-                localRepo.updateItemToDB(unix_time, message, uid)
+                localRepo.insertChat(item)
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Chat Items inserted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
+        )
+    }
+
+    fun deleteAllChats() {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.removeChats()
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Items Deleted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
+        )
+    }
+
+    fun updateItemToDB(unix_time: String, message: String, uid: Int, unReadcount: Int) {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.updateItemToDB(unix_time, message, uid, unReadcount)
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Chat Items inserted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
+        )
+    }
+    fun updateReadCountDB(uid: Int, unReadcount: Int) {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.updateReadCountDB(uid, unReadcount)
             }.subscribeOn(Schedulers.io())
                 .subscribe({
                     Debugger.i("testingLocal", "All Chat Items inserted")

@@ -2,12 +2,15 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.media.*
 import android.os.Handler
 import android.os.SystemClock
 import android.view.View
 import android.widget.SeekBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
@@ -70,7 +73,7 @@ class MyMediaRecorder private constructor(
 
     @SuppressLint("CheckResult")
     fun initRecorderWithPermissions() {
-        RxPermissions(context as FragmentActivity)
+        RxPermissions(context as AppCompatActivity)
             .request(
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE,

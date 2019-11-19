@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
-import com.fxn.pix.Options
-import com.fxn.utility.ImageQuality
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -42,39 +40,40 @@ fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
 }
 
-@SuppressLint("SimpleDateFormat")
 fun calculateLocalDate(unixTime: Long): String {
     val date = Date(unixTime * 1000L)
-    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.getDefault())
     sdf.timeZone = TimeZone.getDefault()
     return printDifference(sdf.parse(sdf.format(date)))
 }
 
-@SuppressLint("SimpleDateFormat")
 fun printDifference(endDate: Date): String {
     val c = Calendar.getInstance().time
-    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.getDefault())
     val formattedDate = df.format(c)
     val startDate = df.parse(formattedDate)
 
-    var different = endDate.time - startDate.time
+    var difference = startDate?.time!! - endDate.time
+    if (difference.toInt() == 0) {
+        difference = 1000
+    }
     val secondsInMilli: Long = 1000
     val minutesInMilli = secondsInMilli * 60
     val hoursInMilli = minutesInMilli * 60
     val daysInMilli = hoursInMilli * 24
-    val elapsedDays = different / daysInMilli
-    different %= daysInMilli
-    val elapsedHours = different / hoursInMilli
-    different %= hoursInMilli
-    val elapsedMinutes = different / minutesInMilli
-    different %= minutesInMilli
-    val elapsedSeconds = different / secondsInMilli
+    val elapsedDays = difference / daysInMilli
+    difference %= daysInMilli
+    val elapsedHours = difference / hoursInMilli
+    difference %= hoursInMilli
+    val elapsedMinutes = difference / minutesInMilli
+    difference %= minutesInMilli
+    val elapsedSeconds = difference / secondsInMilli
     var duration = ""
     when {
-        elapsedDays.toInt() != 0 -> duration = "${abs(elapsedDays)} days ago"
-        elapsedHours.toInt() != 0 -> duration = "${abs(elapsedHours)} hours ago"
-        elapsedMinutes.toInt() != 0 -> duration = "${abs(elapsedMinutes)} minutes ago"
-        elapsedSeconds.toInt() != 0 -> duration = "${abs(elapsedSeconds)} seconds ago"
+        elapsedDays.toInt() != 0 -> duration = "$elapsedDays days ago"
+        elapsedHours.toInt() != 0 -> duration = "$elapsedHours hours ago"
+        elapsedMinutes.toInt() != 0 -> duration = "$elapsedMinutes minutes ago"
+        elapsedSeconds.toInt() != 0 -> duration = "$elapsedSeconds seconds ago"
     }
     return duration
 }

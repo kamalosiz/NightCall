@@ -20,6 +20,7 @@
                 android:layout_height="@dimen/_180sdp"
                 android:layout_centerHorizontal="true"
                 android:scaleType="centerCrop"
+                android:transitionName="myImage"
                 android:layout_marginTop="@dimen/_10sdp" />
 
             <TextView

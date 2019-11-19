@@ -17,6 +17,9 @@ object AppConstants {
     const val VIDEO_MESSAGE = "video"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
+    const val LAST_MESSAGE = "lastmessage"
+    const val LAST_MESSAGE_TIME = "lastmsgtime"
+    const val IsSEEN = "isseen"
 
 
     //Request Code

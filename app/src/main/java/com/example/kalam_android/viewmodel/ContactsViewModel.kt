@@ -2,7 +2,7 @@ package com.example.kalam_android.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.kalam_android.localdb.ContactsEntityClass
+import com.example.kalam_android.localdb.entities.ContactsEntityClass
 import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.repository.model.Contacts
