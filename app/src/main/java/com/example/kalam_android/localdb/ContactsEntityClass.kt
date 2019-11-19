@@ -14,5 +14,4 @@ data class ContactsEntityClass(
     @ColumnInfo(name = "name") var name: String?,
     @ColumnInfo(name = "profile_image") var profile_image: String?,
     @ColumnInfo(name = "kalam_number") var kalam_number: String?
-
 )

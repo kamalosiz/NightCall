@@ -1,23 +1,21 @@
 package com.example.kalam_android.base
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
-import com.github.nkzawa.engineio.client.Socket
-import com.github.nkzawa.socketio.client.IO
+import com.example.kalam_android.util.Debugger
+import com.fxn.pix.Options
+import com.fxn.pix.Pix
+import com.tbruyelle.rxpermissions2.RxPermissions
 
 
 open class BaseActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     private var progressDialog: AlertDialog? = null
 
@@ -34,6 +32,10 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    val EMAIL_REGEX = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+    fun isEmailValid(email: String): Boolean {
+        return EMAIL_REGEX.toRegex().matches(email)
+    }
     /*fun isValidEmail(email: String): Boolean {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(
             email
@@ -51,11 +53,24 @@ open class BaseActivity : AppCompatActivity() {
          }*/
         popupMenu.show()
     }
-    companion object {
 
-        val EMAIL_REGEX = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
-        fun isEmailValid(email: String): Boolean {
-            return EMAIL_REGEX.toRegex().matches(email)
-        }
+    @SuppressLint("CheckResult")
+    fun checkPixPermission(context: FragmentActivity, requestCode: Int) {
+        RxPermissions(this)
+            .request(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+            .subscribe { granted ->
+                if (granted) {
+                    Pix.start(
+                        context,
+                        Options.init().setRequestCode(requestCode)
+                    )
+                } else {
+                    Debugger.e("Capturing Image", "onPermissionDenied")
+                }
+            }
     }
 }

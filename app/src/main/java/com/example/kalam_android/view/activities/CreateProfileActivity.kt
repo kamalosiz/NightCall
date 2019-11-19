@@ -1,11 +1,9 @@
 package com.example.kalam_android.view.activities
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
@@ -21,12 +19,9 @@ import com.example.kalam_android.repository.model.CreateProfileResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
-import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
-import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
 import com.example.kalam_android.viewmodel.CreateProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.google.firebase.iid.FirebaseInstanceId
 import com.yalantis.ucrop.UCrop
@@ -114,7 +109,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
 
     }
 
-    private fun checkPixPermission() {
+/*    private fun checkPixPermission() {
         Handler().postDelayed(
             {
                 PermissionHelper.withActivity(this).addPermissions(
@@ -123,7 +118,6 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 ).listener(object : MediaPermissionListener {
                     override fun onPermissionGranted() {
-//                        Pix.start(this@CreateProfileActivity, PROFILE_IMAGE_CODE)
                         Pix.start(
                             this@CreateProfileActivity,
                             Options.init().setRequestCode(AppConstants.PROFILE_IMAGE_CODE)
@@ -138,7 +132,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
 
             }, 100
         )
-    }
+    }*/
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -252,7 +246,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             params["country"] = sharedPrefsHelper.getPhone()?.countryCode.toString()
             params["country_code"] = sharedPrefsHelper.getPhone()?.dialCode.toString()
             params["fcm_token"] = fcmToken
-            logE("Fcm Token ${fcmToken}")
+            logE("Fcm Token $fcmToken")
 
             viewModel.hitCreateProfileApi(params)
         }
@@ -264,7 +258,10 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             R.id.btnNext -> {
                 setData()
             }
-            R.id.ivUploadImage -> checkPixPermission()
+            R.id.ivUploadImage -> checkPixPermission(
+                this@CreateProfileActivity,
+                AppConstants.PROFILE_IMAGE_CODE
+            )
             R.id.hidePassword -> {
                 if (HIDE_PASSWORD) {
                     HIDE_PASSWORD = false
@@ -276,6 +273,9 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                     binding.etPassword.transformationMethod =
                         PasswordTransformationMethod.getInstance()
                     binding.hidePassword.setBackgroundResource(R.drawable.hide_eye_icon)
+                }
+                if (binding.etPassword.text.toString().isNotEmpty()) {
+                    binding.etPassword.setSelection(binding.etPassword.text.toString().length)
                 }
             }
         }

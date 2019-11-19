@@ -20,6 +20,8 @@ import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.showAlertDialoge
+import com.example.kalam_android.wrapper.GlideDownloder
+import kotlinx.android.synthetic.main.audio_player_item.view.*
 
 
 class ChatMessagesAdapter(val context: Context, private val userId: String) :
@@ -78,6 +80,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
             AppConstants.TEXT_MESSAGE -> {
                 itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
+                itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.itemChat.tvMessage.text = item.message
                 itemHolder.binding.itemChat.llOriginal.setOnClickListener {
                     showAlertDialoge(context, "Original Message", item.original_message.toString())
@@ -137,17 +140,40 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 }
                 itemHolder.binding.audioPlayer.cvPlayer.visibility = View.VISIBLE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
+                itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
                     currentPos = position
-                    playVoiceMsg(itemHolder.binding, item.file.toString())
+                    playVoiceMsg(itemHolder.binding, item.audio_url.toString())
                 }
                 if (item.sender_id == userId.toInt()) {
-
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
                     itemHolder.binding.audioPlayer.cvPlayer.setBackgroundResource(R.drawable.audio_bubble_right)
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
                     itemHolder.binding.audioPlayer.cvPlayer.setBackgroundResource(R.drawable.audio_bubble_left)
+                }
+            }
+            AppConstants.IMAGE_MESSAGE -> {
+                logE("Identifier: ${item.identifier}")
+                if (item.identifier.isNullOrEmpty()) {
+                    itemHolder.binding.imageHolder.tvTime.text = "3:15 pm"
+                } else {
+                    itemHolder.binding.imageHolder.tvTime.text = "Uploading Image..."
+                }
+                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
+                itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
+                itemHolder.binding.imageHolder.rlImageItem.visibility = View.VISIBLE
+                GlideDownloder.load(
+                    context,
+                    itemHolder.binding.imageHolder.ivImage,
+                    item.file.toString(),
+                    R.drawable.dummy_placeholder,
+                    R.drawable.dummy_placeholder
+                )
+                if (item.sender_id == userId.toInt()) {
+                    itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.END
+                } else {
+                    itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.END
                 }
             }
         }

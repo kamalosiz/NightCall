@@ -13,5 +13,10 @@
             android:id="@+id/itemChat"
             layout="@layout/item_chat" />
 
+        <include
+            android:id="@+id/imageHolder"
+            layout="@layout/image_chat_item" />
+
+
     </RelativeLayout>
 </layout>

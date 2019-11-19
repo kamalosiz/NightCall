@@ -1,6 +1,5 @@
 package com.example.kalam_android.view.activities
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -24,29 +23,27 @@ import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
-import com.example.kalam_android.util.permissionHelper.helper.PermissionHelper
-import com.example.kalam_android.util.permissionHelper.listeners.MediaPermissionListener
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.MyMediaRecorder
 import com.example.kalam_android.wrapper.SocketIO
+import com.fxn.pix.Pix
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.android.synthetic.main.header_chat.view.*
+import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.json.JSONObject
+import java.io.File
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     NewMessageListener, MessageTypingListener {
 
-    private val PICKFILE_RESULT_CODE: Int = 123
     private val TAG = this.javaClass.simpleName
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
@@ -57,8 +54,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     lateinit var factory: ViewModelFactory
     lateinit var binding: ActivityChatDetailBinding
     lateinit var viewModel: ChatMessagesViewModel
-    private lateinit var path: String
-    private var output: String = ""
     private val delay: Long = 1000
     private var lastTextEdit: Long = 0
     private var index = 0
@@ -67,9 +62,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var profileImage: String = ""
     private var loading = false
     private var isFromChatFragment = false
-    private var isVisibleAttach = false
-    private var isVisibleRecorder = false
-
+    private var messageType = ""
+    private var myMediaRecorder: MyMediaRecorder? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,53 +78,30 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         })
         gettingChatId()
         setUserData()
+        initAdapter()
+        initListeners()
+        checkSomeoneTyping()
+        SocketIO.setListener(this)
+        SocketIO.setTypingListener(this)
+        myMediaRecorder = MyMediaRecorder.getInstance(this, binding)
+        applyPagination()
+    }
+
+    private fun initListeners() {
+        binding.lvBottomChat.ivSend.setOnClickListener(this)
+        binding.lvBottomChat.ivCamera.setOnClickListener(this)
+        binding.header.rlBack.setOnClickListener(this)
+        binding.lvBottomChat.ivMic.setOnClickListener(this)
+        binding.header.tvName.setOnClickListener(this)
+    }
+
+    private fun initAdapter() {
         val linearLayout = LinearLayoutManager(this)
         linearLayout.reverseLayout = true
         linearLayout.stackFromEnd = false
         binding.chatMessagesRecycler.layoutManager = linearLayout
         binding.chatMessagesRecycler.adapter =
             ChatMessagesAdapter(this, sharedPrefsHelper.getUser()?.id.toString())
-        binding.lvRecoder.ivSend.setOnClickListener(this)
-        binding.header.rlBack.setOnClickListener(this)
-        checkSomeoneTyping()
-        SocketIO.setListener(this)
-        SocketIO.setTypingListener(this)
-        clickListener()
-        applyPagination()
-    }
-
-    private fun clickListener() {
-
-        binding.header.tvName.setOnClickListener {
-
-            val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
-            intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
-            intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
-            startActivity(intent)
-        }
-        binding.lvRecoder.ivMic.setOnClickListener {
-
-            initRecorderWithPermissions()
-            if (isVisibleAttach) {
-                binding.lvRecoder.lvForAttachment.visibility = View.GONE
-                isVisibleAttach = false
-            }
-        }
-
-        binding.lvRecoder.ivAttachment.setOnClickListener {
-
-            if (!isVisibleAttach) {
-                binding.lvRecoder.lvForAttachment.visibility = View.VISIBLE
-                isVisibleAttach = true
-            } else {
-                binding.lvRecoder.lvForAttachment.visibility = View.GONE
-                isVisibleAttach = false
-            }
-            if (isVisibleRecorder) {
-                binding.lvRecoder.lvForRecorder.visibility = View.GONE
-                isVisibleRecorder = false
-            }
-        }
     }
 
     private fun applyPagination() {
@@ -251,62 +222,40 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun renderAudioResponse(response: AudioResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            emitNewMessageToSocket(
-                "", AppConstants.AUDIO_MESSAGE, it.data?.file_url.toString(), 0
-            )
+            SocketIO.emitFileID(it.data?.file_id)
             (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(it.data?.identifier.toString())
         }
     }
 
-    private fun logE(msg: String) {
-        Debugger.e(TAG, msg)
-    }
-
-    private fun initRecorderWithPermissions() {
-        Handler().postDelayed(
-            {
-                PermissionHelper.withActivity(this).addPermissions(
-                    Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).listener(object : MediaPermissionListener {
-                    override fun onPermissionGranted() {
-                        if (!isVisibleRecorder) {
-                            binding.lvRecoder.lvForRecorder.visibility = View.VISIBLE
-                            isVisibleRecorder = true
-                        }
-                    }
-
-                    override fun onPermissionDenied() {
-                        logE("onPermissionDenied")
-                    }
-                }).build().init()
-            }, 100
-        )
-    }
-
-    private fun uploadAudioMedia(identifier: String, output: String) {
+    private fun uploadMedia(identifier: String, file: String) {
         val params = HashMap<String, RequestBody>()
         params["identifier"] = RequestBody.create(MediaType.parse("text/plain"), identifier)
-
-
         viewModel.hitUploadAudioApi(
             sharedPrefsHelper.getUser()?.token, params,
-            getFileBody(output, "file")
+            getFileBody(file, "file")
         )
     }
 
-    private fun sendVoiceMessage(output: String) {
-        logE("Output Message $output")
+    private fun sendMediaMessage(file: String, type: String, isImage: Boolean) {
         val identifier = System.currentTimeMillis().toString()
         createChatObject(
             AppConstants.DUMMY_STRING,
-            output,
-            AppConstants.AUDIO_MESSAGE,
+            file,
+            type,
             identifier
         )
-        uploadAudioMedia(identifier, output)
-        logE("Audio Api hit successfully")
+        if (isImage) {
+            messageType = type
+            logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
+            val convertedFile = Compressor(this).compressToFile(File(file))
+            logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
+            uploadMedia(identifier, convertedFile.absolutePath)
+            logE("Image Api hit successfully")
+        } else {
+            messageType = type
+            uploadMedia(identifier, file)
+            logE("Audio Api hit successfully")
+        }
     }
 
     private val inputFinishChecker = Runnable {
@@ -321,7 +270,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun checkSomeoneTyping() {
-        binding.lvRecoder.editTextMessage.addTextChangedListener(object : TextWatcher {
+        binding.lvBottomChat.editTextMessage.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (s?.isNotEmpty() == true) {
                     lastTextEdit = System.currentTimeMillis()
@@ -350,15 +299,21 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun sendMessage() {
         createChatObject(
-            binding.lvRecoder.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
+            binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
             AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING
         )
-        emitNewMessageToSocket(
-            binding.lvRecoder.editTextMessage.text.toString(),
-            AppConstants.TEXT_MESSAGE, "", 0
+        SocketIO.emitNewMessage(
+            sharedPrefsHelper.getUser()?.id.toString(),
+            chatId.toString(),
+            binding.lvBottomChat.editTextMessage.text.toString(),
+            AppConstants.TEXT_MESSAGE,
+            sharedPrefsHelper.getUser()?.firstname.toString()
+                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
+            AppConstants.DUMMY_STRING,
+            0
         )
         logE("Message Emitted to socket")
-        binding.lvRecoder.editTextMessage.setText("")
+        binding.lvBottomChat.editTextMessage.setText("")
     }
 
     override fun socketResponse(jsonObject: JSONObject) {
@@ -394,6 +349,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun createChatObject(message: String, file: String, type: String, identifier: String) {
         addMessage(
             ChatData(
+                AppConstants.DUMMY_STRING,
+                file,
+                AppConstants.DUMMY_STRING,
                 StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
                     sharedPrefsHelper.getUser()?.lastname.toString()
                 ).toString(),
@@ -408,9 +366,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 file,
                 0,
                 0,
-                message
-                , "",
-                identifier
+                message, identifier
             )
         )
     }
@@ -420,35 +376,59 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
 
-    private fun emitNewMessageToSocket(message: String, type: String, file: String, duration: Int) {
-        SocketIO.emitNewMessage(
-            sharedPrefsHelper.getUser()?.id.toString(), chatId.toString(), message, type,
-            sharedPrefsHelper.getUser()?.firstname.toString()
-                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(), file, duration
-        )
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivSend -> {
-                if (isVisibleAttach) {
-                    binding.lvRecoder.lvForAttachment.visibility = View.GONE
-                    isVisibleAttach = false
-                }
-                if (output.isEmpty() && binding.lvRecoder.editTextMessage.text.toString().isNotEmpty()) {
+                if (myMediaRecorder?.fileOutput()?.isEmpty() == true && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()) {
                     sendMessage()
                     logE("Text Message")
                 } else {
-                    /*if (isFileReady!!) {
+                    if (myMediaRecorder?.isFileReady() == true) {
                         logE("Audio Message")
-                        sendVoiceMessage()
-                        binding.lvRecoder.lvForRecorder.visibility = View.GONE
-                        recorderAndPlayer?.cancel( false)
-                    }*/
+                        sendMediaMessage(
+                            myMediaRecorder?.fileOutput().toString(),
+                            AppConstants.AUDIO_MESSAGE,
+                            false
+                        )
+                        myMediaRecorder?.hideRecorder()
+                        myMediaRecorder?.cancel(false)
+                    }
                 }
             }
             R.id.rlBack -> {
                 onBackPressed()
+            }
+            R.id.tvName -> {
+                val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
+                intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+                intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+                startActivity(intent)
+            }
+            R.id.ivCamera -> {
+                checkPixPermission(
+                    this@ChatDetailActivity,
+                    AppConstants.CHAT_IMAGE_CODE
+                )
+            }
+            R.id.ivMic -> {
+                myMediaRecorder?.initRecorderWithPermissions()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                AppConstants.CHAT_IMAGE_CODE -> {
+                    val returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
+                    logE("onActivityResult returnValue: $returnValue")
+                    sendMediaMessage(
+                        returnValue?.get(0).toString(),
+                        AppConstants.IMAGE_MESSAGE,
+                        true
+                    )
+                }
             }
         }
     }
@@ -456,5 +436,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     override fun onBackPressed() {
         setResult(Activity.RESULT_OK)
         finish()
+    }
+
+    private fun logE(msg: String) {
+        Debugger.e(TAG, msg)
     }
 }

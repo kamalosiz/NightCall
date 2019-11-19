@@ -62,4 +62,5 @@
     <string name="labelImageVideo">Img/video</string>
     <string name="labelAudio">Audio</string>
     <string name="labelLocation">Location</string>
+    <string name="labelMyStatus">My Status</string>
 </resources>
