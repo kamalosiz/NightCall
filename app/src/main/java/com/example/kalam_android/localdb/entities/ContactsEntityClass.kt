@@ -1,4 +1,4 @@
-package com.example.kalam_android.localdb
+package com.example.kalam_android.localdb.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

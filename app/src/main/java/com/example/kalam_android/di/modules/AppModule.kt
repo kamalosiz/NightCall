@@ -1,6 +1,5 @@
 package com.example.kalam_android.di.modules
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
@@ -8,12 +7,11 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 import androidx.room.Room
-import com.example.kalam_android.localdb.AllChatListDao
-import com.example.kalam_android.localdb.ContactsDao
+import com.example.kalam_android.localdb.dao.AllChatListDao
+import com.example.kalam_android.localdb.dao.ContactsDao
 import com.example.kalam_android.localdb.RoomDB
 import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.view.activities.MainActivity
 
 
 @Module

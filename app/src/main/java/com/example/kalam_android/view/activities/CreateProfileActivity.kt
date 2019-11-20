@@ -1,6 +1,7 @@
 package com.example.kalam_android.view.activities
 
 import android.app.Activity
+import android.app.SharedElementCallback
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -108,31 +109,6 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         }
 
     }
-
-/*    private fun checkPixPermission() {
-        Handler().postDelayed(
-            {
-                PermissionHelper.withActivity(this).addPermissions(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ).listener(object : MediaPermissionListener {
-                    override fun onPermissionGranted() {
-                        Pix.start(
-                            this@CreateProfileActivity,
-                            Options.init().setRequestCode(AppConstants.PROFILE_IMAGE_CODE)
-                        )
-                    }
-
-                    override fun onPermissionDenied() {
-                        logE("onPermissionDenied")
-                    }
-
-                }).build().init()
-
-            }, 100
-        )
-    }*/
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

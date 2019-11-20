@@ -4,22 +4,18 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.database.Cursor
 import android.os.Bundle
-import android.os.Handler
 import android.provider.ContactsContract
-import android.telephony.SmsManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityContactListBinding
-import com.example.kalam_android.localdb.ContactsEntityClass
+import com.example.kalam_android.localdb.entities.ContactsEntityClass
 import com.example.kalam_android.repository.model.ContactInfo
 import com.example.kalam_android.repository.model.Contacts
 import com.example.kalam_android.repository.model.ContactsData
@@ -31,11 +27,9 @@ import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForContacts
 import com.example.kalam_android.viewmodel.ContactsViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.tbruyelle.rxpermissions2.RxPermissions
-import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import javax.inject.Inject
 
 

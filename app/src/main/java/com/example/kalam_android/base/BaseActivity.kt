@@ -56,7 +56,7 @@ open class BaseActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     fun checkPixPermission(context: FragmentActivity, requestCode: Int) {
-        RxPermissions(this)
+        RxPermissions(context)
             .request(
                 Manifest.permission.CAMERA,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,

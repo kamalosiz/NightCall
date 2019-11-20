@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -15,13 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.AddMyStatusClickListener
 import com.example.kalam_android.databinding.StoriesFragmentBinding
-import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.adapter.StoriesAdapter
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
+import com.sandrios.sandriosCamera.internal.SandriosCamera
+import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.tbruyelle.rxpermissions2.RxPermissions
-import kotlinx.android.synthetic.main.activity_create_profile.view.*
 
 class StoriesFragment : Fragment(), AddMyStatusClickListener {
 
@@ -44,11 +43,14 @@ class StoriesFragment : Fragment(), AddMyStatusClickListener {
     }
 
     override fun addMyStatus(view: View, position: Int) {
-
-        checkPixPermission(
-            activity!!,
-            AppConstants.STATUS_IMAGE_CODE
-        )
+        SandriosCamera
+            .with()
+            .setShowPicker(true)
+//            .setShowPickerType(CameraConfiguration.VIDEO)
+            .setVideoFileSize(20)
+            .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
+            .enableImageCropping(true)
+            .launchCamera(activity);
     }
 
     @SuppressLint("CheckResult")
