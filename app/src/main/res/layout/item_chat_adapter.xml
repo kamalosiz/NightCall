@@ -28,7 +28,7 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
-                android:fontFamily="@font/helvetica_medium"
+                android:fontFamily="@font/roboto_medium"
                 android:maxLength="15"
                 android:singleLine="true"
                 android:textColor="@color/black"
@@ -41,10 +41,10 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
-                android:fontFamily="@font/halvatic_light"
+                android:fontFamily="@font/roboto_light"
                 android:singleLine="true"
                 android:textColor="@color/grey"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_11sdp" />
 
 
         </LinearLayout>
@@ -61,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:fontFamily="@font/halvatic_light"
+                android:fontFamily="@font/roboto_light"
                 android:text="10.10 pm"
                 android:textSize="@dimen/_10sdp" />
 
@@ -79,7 +79,7 @@
                     android:id="@+id/tvUnread"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/helvetica_medium"
+                    android:fontFamily="@font/roboto_regular"
                     android:text="5"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_9sdp" />

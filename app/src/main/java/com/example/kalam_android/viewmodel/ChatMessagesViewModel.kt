@@ -3,7 +3,7 @@ package com.example.kalam_android.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kalam_android.repository.Repository
-import com.example.kalam_android.repository.model.AudioResponse
+import com.example.kalam_android.repository.model.MediaResponse
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,13 +20,13 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
 
     private val disposable = CompositeDisposable()
     private val responsiveLiveData = MutableLiveData<ApiResponse<ChatMessagesResponse>>()
-    private val audioLiveData = MutableLiveData<ApiResponse<AudioResponse>>()
+    private val audioLiveData = MutableLiveData<ApiResponse<MediaResponse>>()
 
     fun allChatResponse(): MutableLiveData<ApiResponse<ChatMessagesResponse>> {
         return responsiveLiveData
     }
 
-    fun audioResponse(): MutableLiveData<ApiResponse<AudioResponse>> {
+    fun audioResponse(): MutableLiveData<ApiResponse<MediaResponse>> {
         return audioLiveData
     }
 
@@ -48,6 +48,23 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>, @Part audio: MultipartBody.Part
     ) {
         disposable.add(repository.uploadAudio(authorization, params, audio)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { audioLiveData.value = ApiResponse.loading() }
+            .subscribe({
+                audioLiveData.value = ApiResponse.success(it)
+            }, {
+                audioLiveData.value = ApiResponse.error(it)
+            })
+        )
+    }
+
+    fun hitUploadAudioApi(
+        authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+        @Part list: ArrayList<MultipartBody.Part>
+    ) {
+        disposable.add(repository.uploadAudio(authorization, params, list)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { audioLiveData.value = ApiResponse.loading() }

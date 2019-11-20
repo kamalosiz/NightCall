@@ -3,7 +3,6 @@ package com.example.kalam_android.view.activities
 import android.app.Activity
 import android.content.Intent
 import android.media.ThumbnailUtils
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -18,10 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
+import com.example.kalam_android.callbacks.MediaListCallBack
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
-import com.example.kalam_android.repository.model.AudioResponse
+import com.example.kalam_android.repository.model.MediaResponse
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
@@ -31,9 +31,8 @@ import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.example.kalam_android.helper.MyMediaRecorder
+import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.wrapper.SocketIO
-import com.fxn.pix.Pix
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -42,15 +41,17 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
-    NewMessageListener, MessageTypingListener {
+    NewMessageListener, MessageTypingListener, MediaListCallBack {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -71,9 +72,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var loading = false
     private var isFromChatFragment = false
     private var messageType = ""
-    private var myMediaRecorder: MyMediaRecorder? = null
+    private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long? = null
+    private var multiPartList: ArrayList<MultipartBody.Part> = ArrayList()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,13 +96,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
-        myMediaRecorder = MyMediaRecorder.getInstance(this, binding)
+        myChatMediaHelper = MyChatMediaHelper.getInstance(this, binding, this)
         applyPagination()
     }
 
     private fun initListeners() {
         binding.lvBottomChat.ivSend.setOnClickListener(this)
         binding.lvBottomChat.ivCamera.setOnClickListener(this)
+        binding.lvBottomChat.ivAttach.setOnClickListener(this)
         binding.header.rlBack.setOnClickListener(this)
         binding.lvBottomChat.ivMic.setOnClickListener(this)
         binding.header.tvName.setOnClickListener(this)
@@ -212,14 +216,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun consumeAudioResponse(apiResponse: ApiResponse<AudioResponse>?) {
+    private fun consumeAudioResponse(apiResponse: ApiResponse<MediaResponse>?) {
         when (apiResponse?.status) {
 
             Status.LOADING -> {
                 logE("Loading Audio")
             }
             Status.SUCCESS -> {
-                renderAudioResponse(apiResponse.data as AudioResponse)
+                renderAudioResponse(apiResponse.data as MediaResponse)
             }
             Status.ERROR -> {
                 toast("Something went wrong please try again")
@@ -230,10 +234,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun renderAudioResponse(response: AudioResponse?) {
+    private fun renderAudioResponse(response: MediaResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            myMediaRecorder?.getTotalDuration()?.let { it1 ->
+            myChatMediaHelper?.getTotalDuration()?.let { it1 ->
                 emitNewMessageToSocket(
                     it.data?.message.toString(),
                     messageType,
@@ -424,24 +428,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivSend -> {
-                if (myMediaRecorder?.fileOutput()?.isEmpty() == true &&
+                if (myChatMediaHelper?.fileOutput()?.isEmpty() == true &&
                     binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
                 ) {
                     sendMessage()
                     logE("Text Message")
                     lastMsgTime = System.currentTimeMillis() / 1000L
                 } else {
-                    if (myMediaRecorder?.isFileReady() == true) {
+                    if (myChatMediaHelper?.isFileReady() == true) {
                         logE("Audio Message")
-                        myMediaRecorder?.getTotalDuration()?.let {
+                        myChatMediaHelper?.getTotalDuration()?.let {
                             sendMediaMessage(
-                                myMediaRecorder?.fileOutput().toString(),
+                                myChatMediaHelper?.fileOutput().toString(),
                                 AppConstants.AUDIO_MESSAGE,
                                 AppConstants.AUDIO_MESSAGE, it
                             )
                         }
-                        myMediaRecorder?.hideRecorder()
-                        myMediaRecorder?.cancel(false)
+                        myChatMediaHelper?.hideRecorder()
+                        myChatMediaHelper?.cancel(false)
                     }
                 }
             }
@@ -463,10 +467,30 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     .launchCamera(this)
             }
             R.id.ivMic -> {
-                myMediaRecorder?.initRecorderWithPermissions()
+                myChatMediaHelper?.initRecorderWithPermissions()
+            }
+            R.id.ivAttach -> {
+                myChatMediaHelper?.openAttachments()
             }
         }
     }
+
+    fun createMultiPartList(list: ArrayList<String>) {
+        for (i in list.indices) {
+            val file = File(list[i])
+            val requestFileProfile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file)
+            val body = MultipartBody.Part.createFormData("images$i", file.name, requestFileProfile)
+            multiPartList.add(body)
+        }
+    }
+
+    override fun MediaListResponse(list: ArrayList<String>?) {
+        myChatMediaHelper?.hideAttachments()
+
+        logE("Media List Response : $list")
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

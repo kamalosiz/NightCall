@@ -20,6 +20,8 @@ object SocketIO {
     fun connectSocket(token: String?) {
         val opts = IO.Options()
         opts.query = "token=$token"
+        Debugger.e("testingSocket", "token : ${opts.query}")
+        Debugger.e("testingSocket", "token : $token")
         socket = IO.socket(Urls.BASE_URL, opts)
         socket?.connect()
         socket?.on(Socket.EVENT_CONNECT) {

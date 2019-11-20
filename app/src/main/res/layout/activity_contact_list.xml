@@ -6,9 +6,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
+        <!--<include
             android:id="@+id/header"
             layout="@layout/header" />
+-->
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/theme_color"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvForContacts"
@@ -24,5 +39,6 @@
             android:layout_height="@dimen/_20sdp"
             android:layout_centerInParent="true"
             android:visibility="visible" />
+
     </RelativeLayout>
 </layout>

@@ -60,7 +60,15 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
         @Part audio: MultipartBody.Part
-    ): Observable<AudioResponse> {
+    ): Observable<MediaResponse> {
         return apiCallInterface.uploadAudio(authorization, params, audio)
+    }
+
+    fun uploadAudio(
+        authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+        @Part list: ArrayList<MultipartBody.Part>
+    ): Observable<MediaResponse> {
+        return apiCallInterface.uploadAudio(authorization, params, list)
     }
 }

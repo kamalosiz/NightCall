@@ -42,7 +42,7 @@ open class BaseActivity : AppCompatActivity() {
         ).matches()
     }*/
 
-    fun popUpMenu(view: View, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
+    fun popUpMenu(view: View?, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(menu)
         popupMenu.setOnMenuItemClickListener(listener)

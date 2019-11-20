@@ -55,6 +55,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         setSpannable()
         binding.hidePassword.setOnClickListener(this)
         binding.btnLogin.setOnClickListener(this)
+        binding.llForgotPass.setOnClickListener(this)
         binding.etUsername.setText("waqarmustafa18@gmail.com")
         binding.etPass.setText("123")
         fcmToken = sharedPrefsHelper.getFCMToken().toString()
@@ -190,6 +191,9 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 params["fcm_token"] = fcmToken
                 logE("FCM Token:${fcmToken}")
                 viewModel.hitLogin(params)
+            }
+            R.id.llForgotPass -> {
+                startActivity(Intent(this, ResetPasswordActivity::class.java))
             }
         }
     }

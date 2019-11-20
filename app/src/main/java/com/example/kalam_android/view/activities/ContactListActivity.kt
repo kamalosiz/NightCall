@@ -2,12 +2,15 @@ package com.example.kalam_android.view.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.SearchManager
+import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.PopupMenu
+import android.widget.*
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -44,6 +47,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
     lateinit var viewModel: ContactsViewModel
     lateinit var contactList: ArrayList<ContactsData>
     private val jsonArray = JsonArray()
+    private var searchView: SearchView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +58,10 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         )
         MyApplication.getAppComponent(this).doInjection(this)
         viewModel = ViewModelProviders.of(this, factory).get(ContactsViewModel::class.java)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Contacts"
+
         if (sharedPrefsHelper.isContactsSynced()) {
             viewModel.getContactsFromLocal()
             logE("loaded from local db")
@@ -68,11 +76,43 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
             consumeResponse(it)
         })
         binding.rvForContacts.adapter =
-            AdapterForContacts(this, sharedPrefsHelper.getUser()?.id.toString())
+            AdapterForContacts(this)
         contactList = ArrayList()
-        binding.header.btnRight.setOnClickListener {
-            popUpMenu(it, R.menu.menu, this)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        searchView = menu?.findItem(R.id.action_search)
+            ?.actionView as SearchView
+        searchView?.setSearchableInfo(
+            searchManager
+                .getSearchableInfo(componentName)
+        )
+        searchView?.maxWidth = Integer.MAX_VALUE
+
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
+                return false
+            }
+
+            override fun onQueryTextChange(query: String): Boolean {
+                (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
+                return false
+            }
+        })
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_search -> return true
+            R.id.item_more -> popUpMenu(this.findViewById(item.itemId), R.menu.menu, this)
+            android.R.id.home -> finish()
+
         }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<Contacts>?) {
@@ -187,7 +227,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         return list
     }
 
-    fun createContactsJson(list: MutableList<ContactInfo>): JsonArray {
+    private fun createContactsJson(list: MutableList<ContactInfo>): JsonArray {
         for (x in list.indices) {
             val jsonObject = JsonObject()
             jsonObject.addProperty("name", list[x].name)
@@ -229,6 +269,15 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
             }
             else -> false
         }
+    }
+
+    override fun onBackPressed() {
+        // close search view on back button pressed
+        /*if (searchView?.isIconified == true) {
+            searchView?.isIconified = true
+            return
+        }*/
+        finish()
     }
 
 

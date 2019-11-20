@@ -28,7 +28,7 @@ data class ChatData(
     var identifier: String?
 )
 
-data class AudioResponse(
+data class MediaResponse(
     val action: String,
     val code: Int,
     val status: Boolean,

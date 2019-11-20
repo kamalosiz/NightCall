@@ -2,34 +2,39 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.media.*
 import android.os.Handler
 import android.os.SystemClock
 import android.view.View
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
+import com.example.kalam_android.callbacks.MediaListCallBack
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
+import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.Global
+import com.marchinram.rxgallery.RxGallery
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
+import kotlinx.android.synthetic.main.layout_for_attachment.view.*
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
 import omrecorder.*
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
-private var instance: MyMediaRecorder? = null
+private var instance: MyChatMediaHelper? = null
 
-class MyMediaRecorder private constructor(
+class MyChatMediaHelper private constructor(
     val context: Context,
-    val binding: ActivityChatDetailBinding
+    val binding: ActivityChatDetailBinding,
+    val mediaList: MediaListCallBack
 ) :
     View.OnClickListener {
     private val TAG = this.javaClass.simpleName
@@ -60,12 +65,18 @@ class MyMediaRecorder private constructor(
     private val recordRed = R.drawable.ic_record_red
     private lateinit var runnable: Runnable
     private var totalDuration: Long = 0
+    private var isAttachmentOpen = true
+    private var fileList: ArrayList<String> = ArrayList()
 
     companion object {
         @Synchronized
-        fun getInstance(context: Context, binding: ActivityChatDetailBinding): MyMediaRecorder? {
+        fun getInstance(
+            context: Context,
+            binding: ActivityChatDetailBinding,
+            mediaList: MediaListCallBack
+        ): MyChatMediaHelper? {
             if (instance == null) {
-                instance = MyMediaRecorder(context, binding)
+                instance = MyChatMediaHelper(context, binding, mediaList)
             }
             return instance
         }
@@ -81,16 +92,17 @@ class MyMediaRecorder private constructor(
             )
             .subscribe { granted ->
                 if (granted) {
+                    isAttachmentOpen = true
+                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
                     binding.lvBottomChat.lvForRecorder.visibility = View.VISIBLE
-                    initListeners()
+                    initRecorderListener()
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
             }
     }
 
-    private fun initListeners() {
-        binding.lvBottomChat.ivMic.setOnClickListener(this)
+    private fun initRecorderListener() {
         binding.lvBottomChat.lvForRecorder.ivRecord.setOnClickListener(this)
         binding.lvBottomChat.lvForRecorder.ivStop.setOnClickListener(this)
         binding.lvBottomChat.lvForRecorder.ivPlay.setOnClickListener(this)
@@ -419,11 +431,53 @@ class MyMediaRecorder private constructor(
         })
     }
 
+    fun openAttachments() {
+        if (isAttachmentOpen) {
+            isAttachmentOpen = false
+            binding.lvBottomChat.lvForRecorder.visibility = View.GONE
+            binding.lvBottomChat.lvForAttachment.visibility = View.VISIBLE
+            initAttachmentListeners()
+        } else {
+            isAttachmentOpen = true
+            binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+        }
+    }
+
+    private fun initAttachmentListeners() {
+        binding.lvBottomChat.lvForAttachment.llGallery.setOnClickListener(this)
+    }
+
+    fun hideAttachments() {
+        binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+    }
+
+
+    @SuppressLint("CheckResult")
+    fun openGallery() {
+        RxGallery.gallery(
+            context as AppCompatActivity,
+            true,
+            RxGallery.MimeType.IMAGE,
+            RxGallery.MimeType.VIDEO
+        ).subscribe(
+            {
+                for (x in it) {
+                    fileList.add(Global.getRealPath(context, x).toString())
+                }
+                mediaList.MediaListResponse(fileList)
+            },
+            { throwable ->
+                Toast.makeText(context, throwable.message, Toast.LENGTH_LONG)
+                    .show()
+            })
+    }
+
+
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.ivMic -> {
-                initRecorderWithPermissions()
-            }
+            /* R.id.ivMic -> {
+                 initRecorderWithPermissions()
+             }*/
             R.id.ivRecord -> {
                 playPauseRecorder()
             }
@@ -443,6 +497,9 @@ class MyMediaRecorder private constructor(
             }
             R.id.ivCancel -> {
                 cancel(true)
+            }
+            R.id.llGallery -> {
+                openGallery()
             }
         }
     }

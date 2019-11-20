@@ -98,6 +98,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 builder1.setPositiveButton("Yes") { dialog, id ->
                     sharedPrefsHelper.put("key_contacts_synced", false)
                     sharedPrefsHelper.put("is_logged_in_kalam", false)
+                    sharedPrefsHelper.put("kalam_user", "")
                     toast("Logout Successfully")
                     setResult(Activity.RESULT_OK)
                     finish()

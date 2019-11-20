@@ -11,7 +11,7 @@
             android:id="@+id/rlImage"
             android:layout_width="@dimen/_220sdp"
             android:layout_height="@dimen/_220sdp"
-            android:background="@drawable/audio_bubble_right"
+            android:background="@drawable/sender_image_video_bg"
             tools:ignore="UselessParent">
 
             <ImageView
