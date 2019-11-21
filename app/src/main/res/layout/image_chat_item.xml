@@ -19,9 +19,9 @@
                 android:layout_width="@dimen/_200sdp"
                 android:layout_height="@dimen/_180sdp"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:scaleType="centerCrop"
-                android:transitionName="myImage"
-                android:layout_marginTop="@dimen/_10sdp" />
+                android:transitionName="@string/image_trans" />
 
             <TextView
                 android:id="@+id/tvTime"
@@ -30,9 +30,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_margin="@dimen/_10sdp"
-                android:fontFamily="@font/halvatic_light"
+                android:fontFamily="@font/roboto_regular"
                 android:text="03:00 PM"
-                android:textSize="@dimen/_11sdp" />
+                android:textColor="@color/theme_color"
+                android:textSize="@dimen/_10ssp" />
 
         </RelativeLayout>
     </RelativeLayout>

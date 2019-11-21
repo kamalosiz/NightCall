@@ -26,19 +26,18 @@
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/editTextMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_toStartOf="@+id/ivCamera"
             android:layout_toEndOf="@id/ivEmoji"
             android:background="@null"
-            android:ems="8"
+            android:scrollbars="vertical"
+            android:inputType="textMultiLine"
             android:hint="Type your message"
             android:imeOptions="actionSend"
-            android:inputType="textPersonName"
-            android:scrollbars="vertical"
             android:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatImageView

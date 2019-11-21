@@ -1,5 +1,7 @@
 package com.example.kalam_android.view.activities
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.SharedElementCallback
 import android.content.Intent
@@ -9,6 +11,7 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -23,8 +26,10 @@ import com.example.kalam_android.util.*
 import com.example.kalam_android.viewmodel.CreateProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
+import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.google.firebase.iid.FirebaseInstanceId
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.yalantis.ucrop.UCrop
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -228,6 +233,26 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("CheckResult")
+    fun checkPixPermission(requestCode: Int) {
+        RxPermissions(this@CreateProfileActivity)
+            .request(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+            .subscribe { granted ->
+                if (granted) {
+                    Pix.start(
+                        this@CreateProfileActivity,
+                        Options.init().setRequestCode(requestCode)
+                    )
+                } else {
+                    Debugger.e("Capturing Image", "onPermissionDenied")
+                }
+            }
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnBack -> finish()
@@ -235,7 +260,6 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                 setData()
             }
             R.id.ivUploadImage -> checkPixPermission(
-                this@CreateProfileActivity,
                 AppConstants.PROFILE_IMAGE_CODE
             )
             R.id.hidePassword -> {

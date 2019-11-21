@@ -1,43 +1,50 @@
 {
   "project_info": {
-    "project_number": "230389003154",
-    "firebase_url": "https://kalam-dev.firebaseio.com",
-    "project_id": "kalam-dev",
-    "storage_bucket": "kalam-dev.appspot.com"
+    "project_number": "734898322273",
+    "firebase_url": "https://kalaam-dev.firebaseio.com",
+    "project_id": "kalaam-dev",
+    "storage_bucket": "kalaam-dev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:230389003154:android:f931898c9f0cd725a0074b",
+        "mobilesdk_app_id": "1:734898322273:android:0da29cdb130b05df86a320",
         "android_client_info": {
           "package_name": "com.example.kalam_android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "230389003154-vmu07p90386b5kbjm35pgb93l84n98rf.apps.googleusercontent.com",
+          "client_id": "734898322273-gg59utol6m7o0sllnf370p0i2hiqv6qe.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.kalam_android",
-            "certificate_hash": "1bb4fd71fc0c3c487794c762eb558999d07c08b7"
+            "certificate_hash": "ae5423f3e5209616793f79926c6933986f141348"
           }
         },
         {
-          "client_id": "230389003154-unut0db7s9t9d5skgjt6adk39ppufo61.apps.googleusercontent.com",
+          "client_id": "734898322273-6rhqanul2urf0gbpulvgg4pitd8ud8ts.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB66xJkLDBIV9jzl6kcnJ7jKlzexxSTAEs"
+          "current_key": "AIzaSyBnEu4YA3hcf6fWCzLYcuiDN2E-vPtksZU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "230389003154-unut0db7s9t9d5skgjt6adk39ppufo61.apps.googleusercontent.com",
+              "client_id": "734898322273-6rhqanul2urf0gbpulvgg4pitd8ud8ts.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "734898322273-avu2jb7tgfk0fm0c14uldlqkmedj7d20.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.softech.kalam.app"
+              }
             }
           ]
         }

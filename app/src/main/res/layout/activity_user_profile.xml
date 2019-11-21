@@ -18,9 +18,9 @@
                 android:id="@+id/collapsingToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                app:collapsedTitleTextAppearance="@color/white"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleGravity="bottom"
-                app:collapsedTitleTextAppearance="@color/white"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
                 app:titleEnabled="true">
 
@@ -28,16 +28,17 @@
                     android:id="@+id/ivUserImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/dummy_placeholder"
+                    android:src="@color/grey"
+                    android:transitionName="@string/profile_trans"
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5" />
-
+                <!--                android:theme="@style/AppTheme.AppBarOverlay"-->
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                    app:layout_collapseMode="pin"
                     app:titleTextColor="@color/white" />
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>

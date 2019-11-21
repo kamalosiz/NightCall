@@ -1,11 +1,16 @@
 package com.example.kalam_android.view.adapter
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings.Global.getString
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
@@ -16,9 +21,16 @@ import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.showAlertDialoge
 import com.example.kalam_android.wrapper.GlideDownloder
+import androidx.core.content.ContextCompat.startActivity
+import com.example.kalam_android.view.activities.OpenMediaActivity
 
 
-class ChatMessagesAdapter(val context: Context, private val userId: String) :
+class ChatMessagesAdapter(
+    val context: Context,
+    private val userId: String,
+    val name: String,
+    val profile: String
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val TAG = this.javaClass.simpleName
@@ -84,7 +96,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                     itemHolder.binding.itemChat.tvTime.setTextColor(
                         Global.setColor(context, R.color.white)
                     )
-                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                     itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
                         Global.setColor(context, R.color.white)
@@ -94,7 +106,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
-                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                     itemHolder.binding.itemChat.tvTime.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
@@ -150,6 +162,22 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 } else {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.START
                     itemHolder.binding.imageHolder.rlImage.setBackgroundResource(R.drawable.receiver_image_video_bg)
+                }
+                itemHolder.binding.imageHolder.rlImage.setOnClickListener {
+                    val intent = Intent(context, OpenMediaActivity::class.java)
+                    intent.putExtra(AppConstants.CHAT_FILE, item.audio_url.toString())
+                    intent.putExtra(AppConstants.CHAT_TYPE, AppConstants.IMAGE_MESSAGE)
+                    intent.putExtra(AppConstants.USER_NAME, name)
+                    intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
+
+                    val transitionName = context.getString(R.string.image_trans)
+                    val options =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as Activity,
+                            itemHolder.binding.imageHolder.ivImage, // Starting view
+                            transitionName    // The String
+                        )
+                    ActivityCompat.startActivity(context, intent, options.toBundle())
                 }
             }
             AppConstants.VIDEO_MESSAGE -> {

@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".view.activities.OpenMediaActivity"></activity>
 
         <service
             android:name=".notification.FCMService"
@@ -89,12 +90,7 @@
         <activity
             android:name=".view.activities.MainActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|adjustPan" /> <!-- Transparent Permission Activity -->
-        <!--      &lt;!&ndash; Just for start if no Sandreas Camera &ndash;&gt;
-                <activity
-                    android:name="com.yalantis.ucrop.UCropActivity"
-                    android:screenOrientation="portrait"
-                    android:theme="@style/ThemeFullscreen.Crop" />-->
+            android:windowSoftInputMode="adjustResize|adjustPan" />
     </application>
 
 </manifest>

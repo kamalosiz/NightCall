@@ -90,6 +90,8 @@ dependencies {
     //Image Compressor
     implementation 'id.zelory:compressor:2.1.0'
 
+    implementation 'com.koushikdutta.ion:ion:3.0.8'
+
 
 }
 apply plugin: 'com.google.gms.google-services'

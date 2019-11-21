@@ -22,7 +22,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
 
     var item = ""
     var position = -1
-    var autoTranslate = -1
+    private var autoTranslate: Int? = null
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     lateinit var binding: ActivitySelectLanguageBinding
@@ -34,10 +34,16 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
         binding.btnUpdateChanges.setOnClickListener(this)
         binding.logout.setOnClickListener(this)
         binding.header.btnRight.visibility = View.GONE
+        /*Debugger.e(
+            "SettingActivity",
+            "Language from login: ${sharedPrefsHelper.getUser()?.language} " +
+                    ", state from login: ${sharedPrefsHelper.getUser()?.auto_translate}"
+        )
         Debugger.e(
             "SettingActivity",
             "Language: ${sharedPrefsHelper.getLanguage()} , isCheck: ${sharedPrefsHelper.getTransState()}"
-        )
+        )*/
+        autoTranslate = sharedPrefsHelper.getTransState()
         binding.checkBox.isChecked = sharedPrefsHelper.getTransState() != 0
         applySpinner()
         checkBoxListener()
@@ -82,13 +88,23 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btnUpdateChanges -> {
-                SocketIO.updateSettings(
-                    AppConstants.UPDATE_SETTINGS, autoTranslate.toString()
-                    , item, sharedPrefsHelper.getUser()?.id.toString()
-                )
-                toast("Language successfully updated")
-                sharedPrefsHelper.saveLanguage(position)
-                sharedPrefsHelper.saveTranslateState(autoTranslate)
+                val builder1 = AlertDialog.Builder(this)
+                builder1.setTitle("Update Language")
+                builder1.setMessage("Do you really want update changes?")
+                builder1.setCancelable(true)
+                builder1.setPositiveButton("Yes") { dialog, id ->
+                    SocketIO.updateSettings(
+                        AppConstants.UPDATE_SETTINGS, autoTranslate.toString()
+                        , item, sharedPrefsHelper.getUser()?.id.toString()
+                    )
+                    toast("Language successfully updated")
+                    sharedPrefsHelper.saveLanguage(position)
+                    autoTranslate?.let { sharedPrefsHelper.saveTranslateState(it) }
+                }
+                builder1.setNegativeButton("No") { dialog, id ->
+                    dialog.cancel()
+                }
+                builder1.create().show()
             }
             R.id.logout -> {
                 val builder1 = AlertDialog.Builder(this)

@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-        android:id="@+id/rlVideoItem"
+        android:id="@+id/rlImageItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_5sdp">
 
         <RelativeLayout
-            android:id="@+id/rlVideo"
+            android:id="@+id/rlImage"
             android:layout_width="@dimen/_220sdp"
             android:layout_height="@dimen/_220sdp"
             android:background="@drawable/sender_image_video_bg"
@@ -16,17 +16,12 @@
 
             <ImageView
                 android:id="@+id/ivImage"
-                android:layout_width="@dimen/_200sdp"
-                android:layout_height="@dimen/_180sdp"
+                android:layout_width="@dimen/_205sdp"
+                android:layout_height="@dimen/_185sdp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:scaleType="centerCrop" />
-
-            <ImageView
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/video_icon" />
+                android:scaleType="centerCrop"
+                android:transitionName="myImage" />
 
             <TextView
                 android:id="@+id/tvTime"
@@ -34,7 +29,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:layout_margin="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="03:00 PM"
                 android:textColor="@color/theme_color"

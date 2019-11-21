@@ -60,6 +60,7 @@
 
     <!--    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />-->
     <style name="AppTheme.AppBarOverlay" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="homeAsUpIndicator">@drawable/ic_chevron_left_black_24dp</item>
         <item name="titleTextColor">@android:color/white</item>
         <item name="android:textColorHint">@android:color/white</item>
         <item name="android:editTextColor">@android:color/white</item>

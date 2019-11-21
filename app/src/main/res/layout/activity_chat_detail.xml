@@ -22,12 +22,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <ProgressBar
-                android:id="@+id/pbHeader"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:visibility="gone" />
+                android:background="@color/white"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/pbHeader"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:visibility="gone" />
+            </LinearLayout>
 
         </RelativeLayout>
 

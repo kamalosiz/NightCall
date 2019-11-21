@@ -10,6 +10,8 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,9 +23,11 @@ import com.example.kalam_android.callbacks.MediaListCallBack
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
-import com.example.kalam_android.repository.model.MediaResponse
+import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.repository.model.ChatMessagesResponse
+import com.example.kalam_android.repository.model.MediaList
+import com.example.kalam_android.repository.model.MediaResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
@@ -31,7 +35,6 @@ import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
@@ -96,7 +99,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
-        myChatMediaHelper = MyChatMediaHelper.getInstance(this, binding, this)
+        myChatMediaHelper = MyChatMediaHelper.getInstance(this@ChatDetailActivity, binding, this)
         applyPagination()
     }
 
@@ -106,7 +109,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.lvBottomChat.ivAttach.setOnClickListener(this)
         binding.header.rlBack.setOnClickListener(this)
         binding.lvBottomChat.ivMic.setOnClickListener(this)
-        binding.header.tvName.setOnClickListener(this)
+        binding.header.llProfile.setOnClickListener(this)
     }
 
     private fun initAdapter() {
@@ -115,7 +118,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         linearLayout.stackFromEnd = false
         binding.chatMessagesRecycler.layoutManager = linearLayout
         binding.chatMessagesRecycler.adapter =
-            ChatMessagesAdapter(this, sharedPrefsHelper.getUser()?.id.toString())
+            ChatMessagesAdapter(
+                this,
+                sharedPrefsHelper.getUser()?.id.toString(),
+                userRealName.toString(),
+                profileImage.toString()
+            )
     }
 
     private fun applyPagination() {
@@ -260,9 +268,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    private fun sendMediaMessage(file: String, type: String, isImage: String, duration: Long) {
+    private fun sendMediaMessage(file: String, type: String, duration: Long) {
         val identifier = System.currentTimeMillis().toString()
-        when (isImage) {
+        when (type) {
             AppConstants.AUDIO_MESSAGE -> {
                 lastMessage = "Audio"
                 messageType = type
@@ -440,7 +448,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         myChatMediaHelper?.getTotalDuration()?.let {
                             sendMediaMessage(
                                 myChatMediaHelper?.fileOutput().toString(),
-                                AppConstants.AUDIO_MESSAGE,
                                 AppConstants.AUDIO_MESSAGE, it
                             )
                         }
@@ -452,11 +459,18 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             R.id.rlBack -> {
                 onBackPressed()
             }
-            R.id.tvName -> {
+            R.id.llProfile -> {
                 val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
                 intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
                 intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
-                startActivity(intent)
+                val transitionName = getString(R.string.profile_trans)
+                val options =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        this,
+                        binding.header.ivProfileImage, // Starting view
+                        transitionName    // The String
+                    )
+                ActivityCompat.startActivity(this, intent, options.toBundle())
             }
             R.id.ivCamera -> {
                 SandriosCamera
@@ -475,20 +489,30 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    fun createMultiPartList(list: ArrayList<String>) {
-        for (i in list.indices) {
-            val file = File(list[i])
-            val requestFileProfile =
-                RequestBody.create(MediaType.parse("multipart/form-data"), file)
-            val body = MultipartBody.Part.createFormData("images$i", file.name, requestFileProfile)
-            multiPartList.add(body)
-        }
-    }
+    /* private fun createMultiPartList(list: ArrayList<MediaList>) {
+         for (i in list.indices) {
+             val file = File(list[i])
+             val requestFileProfile =
+                 RequestBody.create(MediaType.parse("multipart/form-data"), file)
+             val body = MultipartBody.Part.createFormData("images$i", file.name, requestFileProfile)
+             multiPartList.add(body)
+         }
+     }*/
 
-    override fun MediaListResponse(list: ArrayList<String>?) {
+    override fun mediaListResponse(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
-
-        logE("Media List Response : $list")
+        /* list?.let {
+             if (it.size < 4) {
+                 it.forEach { media ->
+                     if (media.type == 0) {
+                         sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
+                     } else {
+                         sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
+                     }
+                 }
+             }
+         }*/
+        logE("List size : $list")
     }
 
 
@@ -503,13 +527,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                             logE("onActivity Received")
                             sendMediaMessage(
                                 media.path,
-                                AppConstants.IMAGE_MESSAGE,
                                 AppConstants.IMAGE_MESSAGE, 0
                             )
                         } else if (media.type == SandriosCamera.MediaType.VIDEO) {
                             sendMediaMessage(
                                 media.path,
-                                AppConstants.VIDEO_MESSAGE,
                                 AppConstants.VIDEO_MESSAGE, 0
                             )
                         }
