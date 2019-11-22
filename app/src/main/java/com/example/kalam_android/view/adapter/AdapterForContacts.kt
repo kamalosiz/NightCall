@@ -8,6 +8,8 @@ import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -23,10 +25,12 @@ import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.JsonObject
 
-class AdapterForContacts(val context: Context, val userID: String) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class AdapterForContacts(val context: Context) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
 
     private var contactList: ArrayList<ContactsData>? = null
+    private var contactList2: ArrayList<ContactsData>? = null
+    private var contactsFilteredList: ArrayList<ContactsData>? = null
     private val TAG = this.javaClass.simpleName
     private val VIEW_HEADER = 0
 
@@ -41,6 +45,8 @@ class AdapterForContacts(val context: Context, val userID: String) :
         contactList?.clear()
         contactList = listOfContact
         contactList?.size?.plus(1)
+        contactsFilteredList = contactList
+        contactList2 = contactList
         notifyDataSetChanged()
     }
 
@@ -96,12 +102,10 @@ class AdapterForContacts(val context: Context, val userID: String) :
                     itemHolder.binding.btnInvite.visibility = View.VISIBLE
                     itemHolder.binding.btnInvite.tag = position - 1
                     itemHolder.binding.rlItem.setOnClickListener(null)
-//                    itemHolder.binding.rlItem.setOnClickListener(null)
                 } else {
                     itemHolder.binding.btnInvite.visibility = View.GONE
                     itemHolder.binding.rlItem.tag = position - 1
                     itemHolder.binding.rlItem.setOnClickListener(onClickListener)
-//                    itemHolder.binding.rlItem.setOnClickListener(onClickListener)
                 }
 
             }
@@ -165,6 +169,44 @@ class AdapterForContacts(val context: Context, val userID: String) :
                         logE("Receiver Id in else: ${item.id}")
                     }
                 }
+            }
+        }
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(charSequence: CharSequence): FilterResults {
+                val charString = charSequence.toString()
+                logE("charString : $charString")
+                if (charString.isEmpty()) {
+                    contactsFilteredList = contactList2
+                } else {
+                    val filteredList = ArrayList<ContactsData>()
+                    contactList2?.let {
+                        for (row in it) {
+                            if (row.name?.toLowerCase()?.contains(charString.toLowerCase()) == true ||
+                                row.number?.contains(charSequence) == true
+                            ) {
+                                filteredList.add(row)
+                            }
+                        }
+                    }
+                    contactsFilteredList = filteredList
+                }
+
+                val filterResults = FilterResults()
+                filterResults.values = contactsFilteredList
+                return filterResults
+            }
+
+            override fun publishResults(
+                charSequence: CharSequence,
+                filterResults: FilterResults
+            ) {
+                contactsFilteredList = filterResults.values as ArrayList<ContactsData>?
+                contactsFilteredList?.size?.plus(1)
+                contactList = contactsFilteredList
+                notifyDataSetChanged()
             }
         }
     }

@@ -37,24 +37,18 @@ class StoriesFragment : Fragment(), AddMyStatusClickListener {
         )
 
         binding.rvStories.layoutManager = LinearLayoutManager(activity)
-        binding.rvStories.adapter = StoriesAdapter(activity!!.applicationContext, this)
+        binding.rvStories.adapter = StoriesAdapter(activity!!, this)
 
         return binding.root
     }
 
     override fun addMyStatus(view: View, position: Int) {
-        SandriosCamera
-            .with()
-            .setShowPicker(true)
-//            .setShowPickerType(CameraConfiguration.VIDEO)
-            .setVideoFileSize(20)
-            .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
-            .enableImageCropping(true)
-            .launchCamera(activity);
+
+        checkPixPermission()
     }
 
     @SuppressLint("CheckResult")
-    fun checkPixPermission(context: FragmentActivity, requestCode: Int) {
+    fun checkPixPermission() {
         RxPermissions(this)
             .request(
                 Manifest.permission.CAMERA,
@@ -63,10 +57,14 @@ class StoriesFragment : Fragment(), AddMyStatusClickListener {
             )
             .subscribe { granted ->
                 if (granted) {
-                    Pix.start(
-                        context,
-                        Options.init().setRequestCode(requestCode)
-                    )
+                    SandriosCamera
+                        .with()
+                        .setShowPicker(true)
+//            .setShowPickerType(CameraConfiguration.VIDEO)
+                        .setVideoFileSize(20)
+                        .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
+                        .enableImageCropping(true)
+                        .launchCamera(activity)
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }

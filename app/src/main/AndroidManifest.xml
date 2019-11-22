@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.activities.CameraActivty"></activity>
+        <activity android:name=".view.activities.StatusDetailActivity"></activity>
 
         <service
             android:name=".notification.FCMService"
@@ -55,7 +55,15 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.activities.ContactListActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".view.activities.WelcomeActivity"
             android:screenOrientation="portrait" />

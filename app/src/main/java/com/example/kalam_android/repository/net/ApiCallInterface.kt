@@ -46,5 +46,13 @@ interface ApiCallInterface {
         @Header("Authorization") authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
         @Part audio: MultipartBody.Part
-    ): Observable<AudioResponse>
+    ): Observable<MediaResponse>
+
+    @Multipart
+    @POST(Urls.UPLOAD_AUDIO)
+    fun uploadAudio(
+        @Header("Authorization") authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+        @Part list: ArrayList<MultipartBody.Part>
+    ): Observable<MediaResponse>
 }

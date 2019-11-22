@@ -4,10 +4,10 @@
     android:layout_height="@dimen/_90sdp"
     android:layout_gravity="center_horizontal"
     android:background="@drawable/recording_background"
-    android:paddingStart="@dimen/_10sdp"
-    android:paddingEnd="@dimen/_10sdp"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/_10sdp"
+    android:paddingEnd="@dimen/_10sdp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -20,14 +20,15 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_file_attach" />
+            android:src="@drawable/file_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/halvatic_light"
-            android:textSize="@dimen/_9sdp"
-            android:text="@string/labelFile" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/file"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_9sdp" />
 
     </LinearLayout>
 
@@ -42,18 +43,20 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_contacts_attach" />
+            android:src="@drawable/contacts_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/halvatic_light"
-            android:textSize="@dimen/_9sdp"
-            android:text="@string/labelContacts" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/contacts"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_9sdp" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/llGallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -64,14 +67,15 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_image_video_attach" />
+            android:src="@drawable/gallery_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/halvatic_light"
-            android:textSize="@dimen/_9sdp"
-            android:text="@string/labelImageVideo" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/gallery"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_9sdp" />
 
     </LinearLayout>
 
@@ -86,14 +90,15 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_audio_attach" />
+            android:src="@drawable/audio_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/halvatic_light"
-            android:textSize="@dimen/_9sdp"
-            android:text="@string/labelAudio" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/audio"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_9sdp" />
 
     </LinearLayout>
 
@@ -108,14 +113,15 @@
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_location_attach" />
+            android:src="@drawable/location_icon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/halvatic_light"
-            android:textSize="@dimen/_9sdp"
-            android:text="@string/labelLocation" />
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/location"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_9sdp" />
 
     </LinearLayout>
 

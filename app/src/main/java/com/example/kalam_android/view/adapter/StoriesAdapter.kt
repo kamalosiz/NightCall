@@ -1,6 +1,7 @@
 package com.example.kalam_android.view.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.AddMyStatusClickListener
 import com.example.kalam_android.databinding.ItemForAddMyStatusBinding
-import com.example.kalam_android.databinding.ItemForStoriesBinding
+import com.example.kalam_android.databinding.ItemForRecentStoriesBinding
 import com.example.kalam_android.util.toast
+import com.example.kalam_android.view.activities.StatusDetailActivity
 
-class StoriesAdapter (val context: Context,val addMyStatusClickListener : AddMyStatusClickListener): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class StoriesAdapter(val context: Context, val addMyStatusClickListener: AddMyStatusClickListener) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var MY_STATUS_VIEW = 0
     private var RECENT_STATUS_VIEW = 1
@@ -31,7 +34,7 @@ class StoriesAdapter (val context: Context,val addMyStatusClickListener : AddMyS
             RecentStatusHolder(
                 DataBindingUtil.inflate(
                     LayoutInflater.from(parent.context),
-                    R.layout.item_for_stories,
+                    R.layout.item_for_recent_stories,
                     parent,
                     false
                 )
@@ -55,7 +58,7 @@ class StoriesAdapter (val context: Context,val addMyStatusClickListener : AddMyS
             MY_STATUS_VIEW -> {
                 val myStatusView = holder as MyStatusHolder
                 myStatusView.binding.lvMyStatus.setOnClickListener {
-                    addMyStatusClickListener.addMyStatus(myStatusView.binding.root,position)
+                    addMyStatusClickListener.addMyStatus(myStatusView.binding.root, position)
                 }
             }
             RECENT_STATUS_VIEW -> {
@@ -67,7 +70,7 @@ class StoriesAdapter (val context: Context,val addMyStatusClickListener : AddMyS
                 }
 
                 recentStatusView.binding.lvRecentStatus.setOnClickListener {
-                    toast(context,"Recent Status")
+                    context.startActivity(Intent(context, StatusDetailActivity::class.java))
                 }
             }
 
@@ -78,7 +81,7 @@ class StoriesAdapter (val context: Context,val addMyStatusClickListener : AddMyS
     inner class MyStatusHolder(val binding: ItemForAddMyStatusBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    inner class RecentStatusHolder(val binding: ItemForStoriesBinding) :
+    inner class RecentStatusHolder(val binding: ItemForRecentStoriesBinding) :
         RecyclerView.ViewHolder(binding.root)
 
 }

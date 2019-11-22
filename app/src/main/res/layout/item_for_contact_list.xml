@@ -28,9 +28,9 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
-                android:fontFamily="@font/helvetica_medium"
+                android:fontFamily="@font/roboto_regular"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_13sdp" />
+                android:textSize="@dimen/_13ssp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvContactPhone"
@@ -39,25 +39,25 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
-                android:fontFamily="@font/halvatic_light"
+                android:fontFamily="@font/roboto_regular"
                 android:textColor="@color/grey"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_12ssp" />
 
 
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnInvite"
-            android:layout_width="@dimen/_50sdp"
+            android:layout_width="@dimen/_45sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_10sdp"
             android:background="@color/theme_color"
-            android:fontFamily="@font/helvetica_medium"
+            android:fontFamily="@font/roboto_regular"
             android:text="invite"
             android:textColor="@color/white"
-            android:textSize="@dimen/_10sdp" />
+            android:textSize="@dimen/_9ssp" />
     </RelativeLayout>
 
 </layout>
