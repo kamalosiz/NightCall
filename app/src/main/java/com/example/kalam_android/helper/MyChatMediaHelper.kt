@@ -15,6 +15,11 @@ import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.marchinram.rxgallery.RxGallery
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
@@ -83,14 +88,13 @@ class MyChatMediaHelper private constructor(
 
     @SuppressLint("CheckResult")
     fun initRecorderWithPermissions() {
-        RxPermissions(context as AppCompatActivity)
-            .request(
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            .subscribe { granted ->
-                if (granted) {
+        Dexter.withActivity(context).withPermissions(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report!!.areAllPermissionsGranted()) {
                     isAttachmentOpen = true
                     binding.lvBottomChat.lvForAttachment.visibility = View.GONE
                     binding.lvBottomChat.lvForRecorder.visibility = View.VISIBLE
@@ -99,6 +103,30 @@ class MyChatMediaHelper private constructor(
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
             }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+            }
+
+        })
+//        RxPermissions(context as AppCompatActivity)
+//            .request(
+//                Manifest.permission.RECORD_AUDIO,
+//                Manifest.permission.READ_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            )
+//            .subscribe { granted ->
+//                if (granted) {
+//                    isAttachmentOpen = true
+//                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+//                    binding.lvBottomChat.lvForRecorder.visibility = View.VISIBLE
+//                    initRecorderListener()
+//                } else {
+//                    Debugger.e("Capturing Image", "onPermissionDenied")
+//                }
+//            }
     }
 
     private fun initRecorderListener() {

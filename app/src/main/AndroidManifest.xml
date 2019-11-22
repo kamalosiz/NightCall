@@ -25,6 +25,7 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".view.activities.StatusDetailActivity"></activity>
         <activity android:name=".view.activities.OpenMediaActivity"></activity>
+        <activity android:name=".view.activities.GalleryPostActivity"></activity>
 
         <service
             android:name=".notification.FCMService"

@@ -59,12 +59,21 @@
             android:background="@drawable/ic_mic" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivCamera"
+            android:id="@+id/ivAttach"
             android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_20sdp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_toStartOf="@id/ivMic"
+            android:background="@drawable/ic_attachment" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCamera"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_toStartOf="@id/ivAttach"
             android:background="@drawable/ic_camera" />
 
 
@@ -76,6 +85,15 @@
         layout="@layout/layout_for_recoder"
         android:layout_width="@dimen/_200sdp"
         android:layout_height="@dimen/_100sdp"
+        android:layout_above="@id/rlBottom"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/lvForAttachment"
+        layout="@layout/layout_for_attachment"
+        android:layout_width="@dimen/_270sdp"
+        android:layout_height="@dimen/_90sdp"
         android:layout_above="@id/rlBottom"
         android:layout_centerHorizontal="true"
         android:visibility="gone" />

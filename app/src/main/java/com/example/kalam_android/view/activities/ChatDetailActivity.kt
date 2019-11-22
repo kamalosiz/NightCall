@@ -45,6 +45,7 @@ import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
+import kotlinx.android.synthetic.main.layout_for_attachment.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -54,6 +55,10 @@ import javax.inject.Inject
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     NewMessageListener, MessageTypingListener, MediaListCallBack {
+
+    companion object {
+        var setGallery = true
+    }
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -105,10 +110,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun initListeners() {
         binding.lvBottomChat.ivSend.setOnClickListener(this)
         binding.lvBottomChat.ivCamera.setOnClickListener(this)
-//        binding.lvBottomChat.ivAttach.setOnClickListener(this)
+        binding.lvBottomChat.ivAttach.setOnClickListener(this)
         binding.header.rlBack.setOnClickListener(this)
         binding.lvBottomChat.ivMic.setOnClickListener(this)
         binding.header.llProfile.setOnClickListener(this)
+        binding.lvBottomChat.lvForAttachment.ivImageOrVideo.setOnClickListener(this)
     }
 
     private fun initAdapter() {
@@ -482,9 +488,17 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             R.id.ivMic -> {
                 myChatMediaHelper?.initRecorderWithPermissions()
             }
-//            R.id.ivAttach -> {
-//                myChatMediaHelper?.openAttachments()
-//            }
+            R.id.ivAttach -> {
+                myChatMediaHelper?.openAttachments()
+            }
+            R.id.ivImageOrVideo -> {
+                startActivityForResult(
+                    Intent(
+                        this@ChatDetailActivity,
+                        GalleryPostActivity::class.java
+                    ), AppConstants.SELECTED_IMAGES
+                )
+            }
         }
     }
 
@@ -500,17 +514,33 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun mediaListResponse(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
-         list?.let {
-           /*  if (it.size < 4) {
-                 it.forEach { media ->
-                     if (media.type == 0) {
-                         sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
-                     } else {
-                         sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
-                     }
-                 }
-             }*/
-         }
+        list?.let {
+            if (it.size < 4) {
+                it.forEach { media ->
+                    if (media.type == 0) {
+                        sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
+                    } else {
+                        sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
+                    }
+                }
+            }
+        }
+        logE("List size : $list")
+    }
+
+    private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
+        myChatMediaHelper?.hideAttachments()
+        list?.let {
+            if (it.size < 4) {
+                it.forEach { media ->
+                    if (media.type == 0) {
+                        sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
+                    } else {
+                        sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
+                    }
+                }
+            }
+        }
         logE("List size : $list")
     }
 
@@ -536,6 +566,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         }
                     }
                 }
+                AppConstants.SELECTED_IMAGES -> {
+                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+                    if (data != null){
+
+                        val list = data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                        sendVideoOrImage(list)
+                    }
+                }
             }
         }
     }
@@ -552,6 +590,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
+
 
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)

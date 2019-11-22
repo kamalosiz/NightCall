@@ -1,9 +1,12 @@
 package com.example.kalam_android.util
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.database.Cursor
+import android.net.Uri
+import android.provider.MediaStore
 import android.widget.Toast
+import com.example.kalam_android.repository.model.MediaList
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -11,7 +14,6 @@ import java.io.File
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -97,4 +99,78 @@ fun getReadableFileSize(size: Long): String {
         size / 1024.0.pow(digitGroups.toDouble())
     ) + " " + units[digitGroups]
 }
+fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {
+    val listOfAllImages = ArrayList<MediaList>()
+    val uri: Uri
+    val cursor: Cursor?
+    val column_index_data: Int
+    val column_index_folder_name: Int
+    var absolutePathOfImage: String? = null
+    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
+    try {
+        val projection =
+            arrayOf(MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+
+        cursor = context.contentResolver.query(uri, projection, null, null, null)
+
+        column_index_data = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+        column_index_folder_name = cursor
+            .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+        while (cursor.moveToNext()) {
+            absolutePathOfImage = cursor.getString(column_index_data)
+            listOfAllImages.add(MediaList(absolutePathOfImage, AppConstants.IMAGE_GALLERY))
+//            D.e("getAllShownImagesPath", "Gallery Image path: " + absolutePathOfImage!!)
+        }
+        cursor.close()
+    } catch (e: Exception) {
+
+    }
+
+    return listOfAllImages
+}
+
+fun getAllShownVideosPath(context: Context): ArrayList<MediaList> {
+    val listOfAllImages = ArrayList<MediaList>()
+    val uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    val cursor: Cursor?
+    val column_index_data: Int
+    val column_index_folder_name: Int
+    var absolutePathOfImage: String? = null
+
+    try {
+        val projection =
+            arrayOf(MediaStore.MediaColumns.DATA, MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+        cursor = context.contentResolver.query(uri, projection, null, null, null)
+        column_index_data = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+        column_index_folder_name = cursor
+            .getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+        while (cursor.moveToNext()) {
+            absolutePathOfImage = cursor.getString(column_index_data)
+            listOfAllImages.add(MediaList(absolutePathOfImage, AppConstants.POST_VIDEO))
+//            D.e("getAllShownVideosPath", "Gallery Video path: " + absolutePathOfImage!!)
+        }
+        cursor.close()
+    } catch (e: Exception) {
+
+    }
+    return listOfAllImages
+}
+
+fun buildMultipartBody(list: ArrayList<PreviewPostModel>): ArrayList<MultipartBody.Part> {
+    var multiPartList: ArrayList<MultipartBody.Part> = ArrayList()
+    for (i in list.indices) {
+        val file = File(list[i].url)
+        val requestFileProfile =
+            RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val body =
+            MultipartBody.Part.createFormData("files[]", file.name, requestFileProfile)
+        multiPartList.add(body)
+    }
+    return multiPartList
+}
+
+fun getEmptyMultipartList(): ArrayList<MultipartBody.Part>{
+    var multiPartList: ArrayList<MultipartBody.Part> = ArrayList()
+    return multiPartList
+}

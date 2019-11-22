@@ -93,7 +93,6 @@ dependencies {
     implementation project(":videocompressor")
 
     implementation 'com.koushikdutta.ion:ion:3.0.8'
-
-
+    implementation 'com.karumi:dexter:6.0.0'
 }
 apply plugin: 'com.google.gms.google-services'
