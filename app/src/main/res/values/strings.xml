@@ -52,7 +52,10 @@
     <string name="location">Location</string>
     <string name="audio">Audio</string>
     <string name="contacts">Contact</string>
-    <string name="search_hint">Type name…</string>
+    <string name="search_hint">Search</string>
+    <string name="image_trans">image</string>
+    <string name="video_trans">video</string>
+    <string name="profile_trans">profile</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

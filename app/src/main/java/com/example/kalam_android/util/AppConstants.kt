@@ -20,6 +20,8 @@ object AppConstants {
     const val LAST_MESSAGE = "lastmessage"
     const val LAST_MESSAGE_TIME = "lastmsgtime"
     const val IsSEEN = "isseen"
+    const val CHAT_FILE = "chatfile"
+    const val CHAT_TYPE = "chattype"
 
 
     //Request Code

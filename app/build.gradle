@@ -92,6 +92,8 @@ dependencies {
 //Video Compressor
     implementation project(":videocompressor")
 
+    implementation 'com.koushikdutta.ion:ion:3.0.8'
+
 
 }
 apply plugin: 'com.google.gms.google-services'

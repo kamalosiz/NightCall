@@ -43,3 +43,8 @@ data class DataResponse(
     val identifier: String,
     val file_id: Long
 )
+
+data class MediaList(
+    val file: String,
+    val type: Int
+)

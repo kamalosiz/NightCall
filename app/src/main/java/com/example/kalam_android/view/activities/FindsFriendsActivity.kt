@@ -25,7 +25,6 @@ import javax.inject.Inject
 
 class FindsFriendsActivity : BaseActivity(), TextWatcher {
 
-
     private lateinit var binding: ActivityFindsFriendsBinding
     private lateinit var adapterForFindFriends: AdapterForFindFriends
     private val TAG = this.javaClass.simpleName

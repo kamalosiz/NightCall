@@ -1,18 +1,11 @@
 package com.example.kalam_android.base
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
-import com.example.kalam_android.util.Debugger
-import com.fxn.pix.Options
-import com.fxn.pix.Pix
-import com.tbruyelle.rxpermissions2.RxPermissions
 
 
 open class BaseActivity : AppCompatActivity() {
@@ -52,25 +45,5 @@ open class BaseActivity : AppCompatActivity() {
              applyFontToMenuItem(mi)
          }*/
         popupMenu.show()
-    }
-
-    @SuppressLint("CheckResult")
-    fun checkPixPermission(context: FragmentActivity, requestCode: Int) {
-        RxPermissions(context)
-            .request(
-                Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-            .subscribe { granted ->
-                if (granted) {
-                    Pix.start(
-                        context,
-                        Options.init().setRequestCode(requestCode)
-                    )
-                } else {
-                    Debugger.e("Capturing Image", "onPermissionDenied")
-                }
-            }
     }
 }

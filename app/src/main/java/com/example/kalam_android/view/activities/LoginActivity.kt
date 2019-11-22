@@ -56,8 +56,8 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         binding.hidePassword.setOnClickListener(this)
         binding.btnLogin.setOnClickListener(this)
         binding.llForgotPass.setOnClickListener(this)
-        binding.etUsername.setText("waqarmustafa18@gmail.com")
-        binding.etPass.setText("123")
+//        binding.etUsername.setText("waqarmustafa18@gmail.com")
+//        binding.etPass.setText("123")
         fcmToken = sharedPrefsHelper.getFCMToken().toString()
         if (fcmToken == "") {
             getFCMToken()
@@ -100,15 +100,27 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
     private fun renderResponse(response: LoginResponse?) {
         logE("socketResponse: $response")
-        response?.let {
-            logE(it.toString())
-            if (it.status) {
-//                toast(it.message)
-                sharedPrefsHelper.setUser(it.data)
+        response?.let { res ->
+            logE(res.toString())
+            if (res.status) {
+//                toast(res.message)
+                sharedPrefsHelper.setUser(res.data)
+
+                //Testing for now
+                res.data?.auto_translate?.let {
+                    sharedPrefsHelper.saveTranslateState(it)
+                }
+                if (res.data?.language == "en") {
+                    sharedPrefsHelper.saveLanguage(0)
+                } else if (res.data?.language == "ar") {
+                    sharedPrefsHelper.saveLanguage(1)
+                }
+                //Testing for now
+                hideProgressDialog()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             } else {
-                showAlertDialoge(this, "Error", it.message.toString())
+                showAlertDialoge(this, "Error", res.message.toString())
             }
         }
     }

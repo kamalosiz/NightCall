@@ -1,17 +1,18 @@
 package com.example.kalam_android.view.adapter
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.AudioManager
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Handler
+import android.provider.Settings.Global.getString
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SeekBar
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
@@ -22,9 +23,16 @@ import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.showAlertDialoge
 import com.example.kalam_android.wrapper.GlideDownloder
+import androidx.core.content.ContextCompat.startActivity
+import com.example.kalam_android.view.activities.OpenMediaActivity
 
 
-class ChatMessagesAdapter(val context: Context, private val userId: String) :
+class ChatMessagesAdapter(
+    val context: Context,
+    private val userId: String,
+    val name: String,
+    val profile: String
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val TAG = this.javaClass.simpleName
@@ -95,7 +103,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                     itemHolder.binding.itemChat.tvTime.setTextColor(
                         Global.setColor(context, R.color.white)
                     )
-                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_send_message)
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                     itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
                         Global.setColor(context, R.color.white)
@@ -105,7 +113,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
-                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.icon_receive_message)
+                    itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                     itemHolder.binding.itemChat.tvTime.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
@@ -127,7 +135,7 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
-                    playVoiceMsg(itemHolder.binding, item.audio_url.toString(), position)
+                   Global.playVoiceMsg(itemHolder.binding, item.audio_url.toString(), position)
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
@@ -160,6 +168,22 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 } else {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.START
                 }
+                itemHolder.binding.imageHolder.rlImage.setOnClickListener {
+                    val intent = Intent(context, OpenMediaActivity::class.java)
+                    intent.putExtra(AppConstants.CHAT_FILE, item.audio_url.toString())
+                    intent.putExtra(AppConstants.CHAT_TYPE, AppConstants.IMAGE_MESSAGE)
+                    intent.putExtra(AppConstants.USER_NAME, name)
+                    intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
+
+                    val transitionName = context.getString(R.string.image_trans)
+                    val options =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as Activity,
+                            itemHolder.binding.imageHolder.ivImage, // Starting view
+                            transitionName    // The String
+                        )
+                    ActivityCompat.startActivity(context, intent, options.toBundle())
+                }
             }
             AppConstants.VIDEO_MESSAGE -> {
                 itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
@@ -186,88 +210,6 @@ class ChatMessagesAdapter(val context: Context, private val userId: String) :
                 )
             }
         }
-    }
-    fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String, currentPos: Int) {
-        try {
-            if (isRelease || currentPos != prePos) {
-                Debugger.e("ChatMessagesAdapter","voiceMessage : $voiceMessage")
-                Debugger.e("ChatMessagesAdapter","currentPos : $currentPos")
-                binding.audioPlayer.ivPlayPause.visibility = View.GONE
-                binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
-                prePos = currentPos
-                mediaPlayer = MediaPlayer()
-                mediaPlayer.setAudioAttributes(
-                    AudioAttributes
-                        .Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                        .build()
-                )
-                isRelease = false
-                mediaPlayer.setDataSource(voiceMessage)
-                mediaPlayer.prepareAsync()
-                mediaPlayer.setOnPreparedListener {
-                    binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
-                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
-                    binding.audioPlayer.ivPlayProgress.visibility = View.GONE
-                    mediaPlayer.start()
-                    initializeSeekBar(binding)
-                }
-            } else {
-                if (!mediaPlayer.isPlaying) {
-                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
-                    mediaPlayer.start()
-                } else {
-                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
-                    mediaPlayer.pause()
-                }
-            }
-
-        } catch (e: IllegalStateException) {
-//            logE("exception:${e.message}")
-        }
-
-        mediaPlayer.setOnCompletionListener { mp ->
-            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
-            mp.stop()
-            mp.reset()
-            mp.release()
-            isRelease = true
-            binding.audioPlayer.seekBar.max = 0
-        }
-
-        binding.audioPlayer.seekBar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    mediaPlayer.seekTo(progress * 1000)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
-
-    }
-
-    private fun initializeSeekBar(binding: ItemChatRightBinding) {
-        binding.audioPlayer.seekBar.max = mediaPlayer.duration
-        runnable = Runnable {
-
-            try {
-                val currentSeconds = mediaPlayer.currentPosition
-                currentSeconds.let {
-                    binding.audioPlayer.seekBar.progress = it
-                }
-                handler.postDelayed(runnable, 1)
-            } catch (e: IllegalStateException) {
-
-            }
-        }
-        handler.postDelayed(runnable, 1)
     }
 
     inner class MyHolder(val binding: ItemChatRightBinding) :

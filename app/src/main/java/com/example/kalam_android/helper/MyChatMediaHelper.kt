@@ -2,7 +2,6 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.media.*
 import android.os.Handler
 import android.os.SystemClock
@@ -13,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.MediaListCallBack
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
-import com.example.kalam_android.repository.model.ChatData
+import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.marchinram.rxgallery.RxGallery
@@ -32,9 +31,9 @@ import kotlin.math.abs
 private var instance: MyChatMediaHelper? = null
 
 class MyChatMediaHelper private constructor(
-    val context: Context,
+    val context: AppCompatActivity,
     val binding: ActivityChatDetailBinding,
-    val mediaList: MediaListCallBack
+    private val mediaList: MediaListCallBack
 ) :
     View.OnClickListener {
     private val TAG = this.javaClass.simpleName
@@ -60,18 +59,18 @@ class MyChatMediaHelper private constructor(
     private val pauseGray = R.drawable.ic_pause_gray
     private val stopGreen = R.drawable.ic_stop_green
     private val stopGray = R.drawable.ic_stop_gray
-    private val recordGreen = R.drawable.ic_record_green
+    private val recordGreen = R.drawable.ic_record_red
     private val recordGray = R.drawable.ic_record_gray
     private val recordRed = R.drawable.ic_record_red
     private lateinit var runnable: Runnable
     private var totalDuration: Long = 0
     private var isAttachmentOpen = true
-    private var fileList: ArrayList<String> = ArrayList()
+    private var fileList: ArrayList<MediaList> = ArrayList()
 
     companion object {
         @Synchronized
         fun getInstance(
-            context: Context,
+            context: AppCompatActivity,
             binding: ActivityChatDetailBinding,
             mediaList: MediaListCallBack
         ): MyChatMediaHelper? {
@@ -455,16 +454,21 @@ class MyChatMediaHelper private constructor(
     @SuppressLint("CheckResult")
     fun openGallery() {
         RxGallery.gallery(
-            context as AppCompatActivity,
+            context,
             true,
             RxGallery.MimeType.IMAGE,
             RxGallery.MimeType.VIDEO
         ).subscribe(
             {
                 for (x in it) {
-                    fileList.add(Global.getRealPath(context, x).toString())
+                    if (x.toString().contains("image")) {
+//                        fileList.add(Global.getRealPath(context, x).toString())
+                        fileList.add(MediaList(Global.getRealPath(context, x).toString(), 0))
+                    } else if (x.toString().contains("video")) {
+                        fileList.add(MediaList(Global.getRealPath(context, x).toString(), 1))
+                    }
                 }
-                mediaList.MediaListResponse(fileList)
+                mediaList.mediaListResponse(fileList)
             },
             { throwable ->
                 Toast.makeText(context, throwable.message, Toast.LENGTH_LONG)
@@ -475,9 +479,6 @@ class MyChatMediaHelper private constructor(
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            /* R.id.ivMic -> {
-                 initRecorderWithPermissions()
-             }*/
             R.id.ivRecord -> {
                 playPauseRecorder()
             }

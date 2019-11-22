@@ -28,10 +28,10 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivRecord"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:background="@drawable/ic_record_green"
+                android:background="@drawable/ic_record_red"
                 android:saveEnabled="true" />
 
             <!--<androidx.appcompat.widget.AppCompatImageView

@@ -55,9 +55,10 @@
                 android:layout_below="@+id/seekBar"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/_20sdp"
-                android:fontFamily="@font/halvatic_light"
+                android:fontFamily="@font/roboto_regular"
                 android:text="03:00 PM"
-                android:textSize="@dimen/_11sdp" />
+                android:textColor="@color/theme_color"
+                android:textSize="@dimen/_10ssp"  />
 
         </RelativeLayout>
     </RelativeLayout>

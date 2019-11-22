@@ -24,6 +24,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".view.activities.StatusDetailActivity"></activity>
+        <activity android:name=".view.activities.OpenMediaActivity"></activity>
 
         <service
             android:name=".notification.FCMService"

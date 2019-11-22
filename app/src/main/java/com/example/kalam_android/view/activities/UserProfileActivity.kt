@@ -36,7 +36,7 @@ class UserProfileActivity : AppCompatActivity() {
             GlideDownloder.load(
                 this,
                 binding.ivUserImage,
-                userImage ?: "",
+                userImage,
                 R.drawable.dummy_placeholder,
                 R.drawable.dummy_placeholder
             )

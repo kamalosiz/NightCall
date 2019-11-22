@@ -20,7 +20,7 @@ class FCMService : FirebaseMessagingService() {
     private lateinit var notificationManager: NotificationManager
 
     override fun onMessageReceived(p0: RemoteMessage) {
-        Log.d(TAG, "Kalam: ${p0.from}")
+        Log.d(TAG, "Kalam: $p0")
 
         if (p0.notification != null) {
             showNotification(p0.notification?.title, p0.notification?.body)
