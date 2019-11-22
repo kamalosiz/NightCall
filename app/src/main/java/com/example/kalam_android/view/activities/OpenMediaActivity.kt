@@ -3,17 +3,18 @@ package com.example.kalam_android.view.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityOpenMediaBinding
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.wrapper.GlideDownloder
+import kotlinx.android.synthetic.main.header_chat.view.*
 
 
-class OpenMediaActivity : AppCompatActivity() {
+class OpenMediaActivity : BaseActivity() {
 
     lateinit var binding: ActivityOpenMediaBinding
     override fun onCreate(savedInstanceState: Bundle?) {
