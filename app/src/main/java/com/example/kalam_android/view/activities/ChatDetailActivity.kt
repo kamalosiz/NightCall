@@ -44,7 +44,6 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
-import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -139,7 +138,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 binding.pbHeader.visibility = View.VISIBLE
                 loading = true
                 index += 20
-                hitAllChatApi(index)
+                hitConversationApi(index)
             }
         })
     }
@@ -148,7 +147,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         isFromChatFragment = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
         if (isFromChatFragment) {
             chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
-            hitAllChatApi(0)
+            hitConversationApi(0)
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
         } else {
             receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
@@ -159,7 +158,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 val chatId = it[0] as Int
                 this.chatId = chatId
                 runOnUiThread {
-                    hitAllChatApi(0)
+                    hitConversationApi(0)
                 }
             })
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
@@ -167,7 +166,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         logE("Chat ID  : $chatId")
     }
 
-    fun hitAllChatApi(offset: Int) {
+    fun hitConversationApi(offset: Int) {
         val params = HashMap<String, String>()
         params["chat_id"] = this.chatId.toString()
         params["offset"] = offset.toString()
@@ -501,8 +500,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun mediaListResponse(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
-        /* list?.let {
-             if (it.size < 4) {
+         list?.let {
+           /*  if (it.size < 4) {
                  it.forEach { media ->
                      if (media.type == 0) {
                          sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
@@ -510,8 +509,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                          sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
                      }
                  }
-             }
-         }*/
+             }*/
+         }
         logE("List size : $list")
     }
 
