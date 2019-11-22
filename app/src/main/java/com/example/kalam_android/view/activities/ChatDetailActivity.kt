@@ -77,8 +77,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long? = null
-    private var multiPartList: ArrayList<MultipartBody.Part> = ArrayList()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -244,11 +242,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun renderAudioResponse(response: MediaResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            myChatMediaHelper?.getTotalDuration()?.let { it1 ->
+            it.data?.duration?.toLong()?.let { it1 ->
                 emitNewMessageToSocket(
-                    it.data?.message.toString(),
+                    it.data.message.toString(),
                     messageType,
-                    it.data?.file_id.toString(),
+                    it.data.file_id.toString(),
                     it1
                 )
             }
@@ -500,17 +498,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun mediaListResponse(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
-         list?.let {
-           /*  if (it.size < 4) {
-                 it.forEach { media ->
-                     if (media.type == 0) {
-                         sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
-                     } else {
-                         sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
-                     }
-                 }
-             }*/
-         }
+        list?.let {
+            it.forEach { media ->
+                if (media.type == 0) {
+                    sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
+                } else {
+                    sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
+                }
+            }
+        }
         logE("List size : $list")
     }
 

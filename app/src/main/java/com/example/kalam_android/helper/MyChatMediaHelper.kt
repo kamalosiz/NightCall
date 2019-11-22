@@ -83,7 +83,7 @@ class MyChatMediaHelper private constructor(
 
     @SuppressLint("CheckResult")
     fun initRecorderWithPermissions() {
-        RxPermissions(context as AppCompatActivity)
+        RxPermissions(context)
             .request(
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE,

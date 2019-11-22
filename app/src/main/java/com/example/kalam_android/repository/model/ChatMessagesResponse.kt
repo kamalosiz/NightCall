@@ -39,7 +39,8 @@ data class MediaResponse(
 data class DataResponse(
     val file_url: String,
     val duration: Double,
-    val message: String,
+    val message: String?,
+    val type: String?,
     val identifier: String,
     val file_id: Long
 )

@@ -27,8 +27,8 @@
             android:id="@+id/llProfile"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center"
             android:background="?attr/selectableItemBackground"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/rlBack"
             app:layout_constraintTop_toTopOf="parent">
@@ -44,14 +44,14 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/rlName"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_10sdp"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvName"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_medium"
                     android:gravity="center"
                     android:singleLine="true"

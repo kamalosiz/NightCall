@@ -29,7 +29,7 @@ class ChatMessagesAdapter(
     val context: Context,
     private val userId: String,
     val name: String,
-    val profile: String
+    private val profile: String
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
