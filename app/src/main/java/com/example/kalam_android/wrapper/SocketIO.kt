@@ -84,7 +84,8 @@ object SocketIO {
         type: String,
         senderName: String,
         fileID: String,
-        duration: Long
+        duration: Long,
+        thumbnail: String
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
@@ -94,6 +95,7 @@ object SocketIO {
         jsonObject.addProperty("sender_name", senderName)
         jsonObject.addProperty("file_id", fileID)
         jsonObject.addProperty("duration", duration)
+        jsonObject.addProperty("thumbnail", thumbnail)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
     }
 }

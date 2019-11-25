@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +20,6 @@ import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.showAlertDialoge
 import com.example.kalam_android.wrapper.GlideDownloder
-import androidx.core.content.ContextCompat.startActivity
 import com.example.kalam_android.view.activities.OpenMediaActivity
 
 
@@ -47,8 +45,8 @@ class ChatMessagesAdapter(
             for (x in it.indices) {
                 if (chatList?.get(x)?.identifier == identifier) {
                     chatList?.get(x)?.identifier = ""
-                    notifyDataSetChanged()
-//                    notifyItemChanged(x)
+//                    notifyDataSetChanged()
+                    notifyItemChanged(x)
                 }
             }
         }
@@ -158,10 +156,8 @@ class ChatMessagesAdapter(
                 )
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.END
-                    itemHolder.binding.imageHolder.rlImage.setBackgroundResource(R.drawable.sender_image_video_bg)
                 } else {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.START
-                    itemHolder.binding.imageHolder.rlImage.setBackgroundResource(R.drawable.receiver_image_video_bg)
                 }
                 itemHolder.binding.imageHolder.rlImage.setOnClickListener {
                     val intent = Intent(context, OpenMediaActivity::class.java)
@@ -170,7 +166,7 @@ class ChatMessagesAdapter(
                     intent.putExtra(AppConstants.USER_NAME, name)
                     intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
 
-                    val transitionName = context.getString(R.string.image_trans)
+                    val transitionName = context.getString(R.string.trans_key)
                     val options =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(
                             context as Activity,
@@ -193,10 +189,8 @@ class ChatMessagesAdapter(
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.videoHolder.rlVideoItem.gravity = Gravity.END
-                    itemHolder.binding.videoHolder.rlVideo.setBackgroundResource(R.drawable.sender_image_video_bg)
                 } else {
                     itemHolder.binding.videoHolder.rlVideoItem.gravity = Gravity.START
-                    itemHolder.binding.videoHolder.rlVideo.setBackgroundResource(R.drawable.receiver_image_video_bg)
                 }
                 GlideDownloder.load(
                     context,
@@ -205,6 +199,22 @@ class ChatMessagesAdapter(
                     R.color.grey,
                     R.color.grey
                 )
+                itemHolder.binding.videoHolder.rlVideoItem.setOnClickListener {
+                    val intent = Intent(context, OpenMediaActivity::class.java)
+                    intent.putExtra(AppConstants.CHAT_FILE, item.audio_url.toString())
+                    intent.putExtra(AppConstants.CHAT_TYPE, AppConstants.VIDEO_MESSAGE)
+                    intent.putExtra(AppConstants.USER_NAME, name)
+                    intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
+
+                    val transitionName = context.getString(R.string.trans_key)
+                    val options =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            context as Activity,
+                            itemHolder.binding.videoHolder.ivImage, // Starting view
+                            transitionName    // The String
+                        )
+                    ActivityCompat.startActivity(context, intent, options.toBundle())
+                }
             }
         }
     }

@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
-import com.example.kalam_android.callbacks.MediaListCallBack
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
@@ -46,14 +45,14 @@ import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.log
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
-    NewMessageListener, MessageTypingListener, MediaListCallBack {
+    NewMessageListener, MessageTypingListener {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -96,7 +95,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
-        myChatMediaHelper = MyChatMediaHelper.getInstance(this@ChatDetailActivity, binding, this)
+        myChatMediaHelper = MyChatMediaHelper.getInstance(this@ChatDetailActivity, binding)
         applyPagination()
     }
 
@@ -247,7 +246,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     it.data.message.toString(),
                     messageType,
                     it.data.file_id.toString(),
-                    it1
+                    it1, it.data.thumbnail
                 )
             }
             lastMsgTime = System.currentTimeMillis() / 1000L
@@ -286,32 +285,36 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             AppConstants.VIDEO_MESSAGE -> {
                 lastMessage = "Video"
                 messageType = type
-                val thumb = ThumbnailUtils.createVideoThumbnail(
-                    File(file).path,
-                    MediaStore.Video.Thumbnails.MINI_KIND
-                )
                 createChatObject(
                     AppConstants.DUMMY_STRING,
-                    Global.bitmapToFile(applicationContext, thumb).absolutePath,
+                    file,
                     type,
                     identifier
                 )
-//                logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
-                val output =
-                    Environment.getExternalStorageDirectory().toString() + File.separator + System.currentTimeMillis() + ".mp4"
-                object : Thread() {
-                    override fun run() {
-                        super.run()
-                        VideoCompressor().compressVideo(file, output)
-                        runOnUiThread {
-                            /*logE("updatePosts: isVideo = 1")
-                            logE(
-                                "After Conversion : ${getReadableFileSize(File(output).length())}"
-                            )*/
-                            uploadMedia(identifier, output, duration)
+                val fileSize = getFileSizeInBytes(file)
+                if (fileSize < 2000) {
+                    logE("File size is less than 2MB : $fileSize")
+                    uploadMedia(identifier, file, duration)
+                } else {
+                    logE("File size is greater than 2MB : $fileSize")
+//                    logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
+                    val output =
+                        Environment.getExternalStorageDirectory().toString() + File.separator + System.currentTimeMillis() + ".mp4"
+                    object : Thread() {
+                        override fun run() {
+                            super.run()
+                            VideoCompressor().compressVideo(file, output)
+                            runOnUiThread {
+                                logE("File size after conversion : ${getFileSizeInBytes(output)}")
+                                //                                logE("updatePosts: isVideo = 1")
+//                                logE(
+//                                    "After Conversion : ${getReadableFileSize(File(output).length())}"
+//                                )
+                                uploadMedia(identifier, output, duration)
+                            }
                         }
-                    }
-                }.start()
+                    }.start()
+                }
             }
         }
     }
@@ -361,12 +364,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun emitNewMessageToSocket(
-        message: String, type: String, fileID: String, duration: Long
+        message: String, type: String, fileID: String, duration: Long, thumbnail: String?
     ) {
         SocketIO.emitNewMessage(
-            sharedPrefsHelper.getUser()?.id.toString(), chatId.toString(), message, type,
+            sharedPrefsHelper.getUser()?.id.toString(),
+            chatId.toString(), message, type,
             sharedPrefsHelper.getUser()?.firstname.toString()
-                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(), fileID, duration
+                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
+            fileID, duration, thumbnail.toString()
         )
     }
 
@@ -404,7 +409,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
         emitNewMessageToSocket(
             binding.lvBottomChat.editTextMessage.text.toString(),
-            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING, 0
+            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING, 0, AppConstants.DUMMY_STRING
         )
         logE("Message Emitted to socket")
         lastMessage = binding.lvBottomChat.editTextMessage.text.toString()
@@ -464,8 +469,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 val options =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(
                         this,
-                        binding.header.ivProfileImage, // Starting view
-                        transitionName    // The String
+                        binding.header.ivProfileImage,
+                        transitionName
                     )
                 ActivityCompat.startActivity(this, intent, options.toBundle())
             }
@@ -478,6 +483,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     .launchCamera(this)
             }
             R.id.ivMic -> {
+                logE("Mic Clicked")
                 myChatMediaHelper?.initRecorderWithPermissions()
             }
             R.id.ivAttach -> {
@@ -486,17 +492,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    /* private fun createMultiPartList(list: ArrayList<MediaList>) {
-         for (i in list.indices) {
-             val file = File(list[i])
-             val requestFileProfile =
-                 RequestBody.create(MediaType.parse("multipart/form-data"), file)
-             val body = MultipartBody.Part.createFormData("images$i", file.name, requestFileProfile)
-             multiPartList.add(body)
-         }
-     }*/
-
-    override fun mediaListResponse(list: ArrayList<MediaList>?) {
+    private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
         list?.let {
             it.forEach { media ->
@@ -532,6 +528,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         }
                     }
                 }
+                AppConstants.SELECTED_IMAGES -> {
+                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+                    if (data != null) {
+                        val list =
+                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                        sendVideoOrImage(list)
+                    }
+                }
             }
         }
     }
@@ -548,6 +552,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
+
 
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)

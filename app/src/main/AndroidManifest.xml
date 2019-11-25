@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <application
         android:name=".base.MyApplication"
         android:allowBackup="true"
@@ -19,7 +23,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".view.activities.OpenMediaActivity"></activity>
+        <activity
+            android:name=".view.activities.StatusDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.OpenMediaActivity"
+            android:configChanges="orientation|screenSize|layoutDirection" />
+        <activity
+            android:name=".view.activities.GalleryPostActivity"
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".notification.FCMService"

@@ -20,6 +20,7 @@
                 android:layout_height="@dimen/_180sdp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_10sdp"
+                android:transitionName="@string/trans_key"
                 android:scaleType="centerCrop" />
 
             <ImageView

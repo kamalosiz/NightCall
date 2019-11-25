@@ -30,8 +30,13 @@ import com.example.kalam_android.wrapper.GlideDownloder
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.google.firebase.iid.FirebaseInstanceId
-import com.tbruyelle.rxpermissions2.RxPermissions
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.yalantis.ucrop.UCrop
+import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -234,16 +239,14 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    @SuppressLint("CheckResult")
     fun checkPixPermission(requestCode: Int) {
-        RxPermissions(this@CreateProfileActivity)
-            .request(
-                Manifest.permission.CAMERA,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-            .subscribe { granted ->
-                if (granted) {
+        Dexter.withActivity(this).withPermissions(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report?.areAllPermissionsGranted() == true) {
                     Pix.start(
                         this@CreateProfileActivity,
                         Options.init().setRequestCode(requestCode)
@@ -252,6 +255,15 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
             }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+                token?.continuePermissionRequest()
+            }
+
+        }).check()
     }
 
     override fun onClick(v: View?) {

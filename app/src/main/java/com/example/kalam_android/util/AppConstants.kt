@@ -22,13 +22,20 @@ object AppConstants {
     const val IsSEEN = "isseen"
     const val CHAT_FILE = "chatfile"
     const val CHAT_TYPE = "chattype"
+    const val POST_AUDIO = "post_audio"
+    const val SELECTED_IMAGES_VIDEOS = "selected_images_videos"
 
 
     //Request Code
+    const val IMAGE_GALLERY = 0
+    const val POST_VIDEO = 1
     const val PROFILE_IMAGE_CODE = 111
     const val CHAT_FRAGMENT_CODE = 1000
     const val LOGOUT_CODE = 1001
     const val CHAT_IMAGE_CODE = 1002
+    const val STATUS_IMAGE_CODE = 112
+    const val SELECTED_IMAGES = 12
+
 
     //Local DB=
     const val DB_NAME = "kalam_local_db"

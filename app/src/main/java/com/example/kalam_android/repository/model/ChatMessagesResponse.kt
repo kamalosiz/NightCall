@@ -1,5 +1,7 @@
 package com.example.kalam_android.repository.model
 
+import java.io.Serializable
+
 data class ChatMessagesResponse(
     val action: String,
     val code: Int,
@@ -42,10 +44,8 @@ data class DataResponse(
     val message: String?,
     val type: String?,
     val identifier: String,
+    val thumbnail: String?,
     val file_id: Long
 )
 
-data class MediaList(
-    val file: String,
-    val type: Int
-)
+data class MediaList(val file: String, val type: Int) : Serializable

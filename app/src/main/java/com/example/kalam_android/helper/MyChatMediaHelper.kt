@@ -2,21 +2,23 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.media.*
 import android.os.Handler
 import android.os.SystemClock
 import android.view.View
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
-import com.example.kalam_android.callbacks.MediaListCallBack
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
-import com.example.kalam_android.repository.model.MediaList
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.Global
-import com.marchinram.rxgallery.RxGallery
-import com.tbruyelle.rxpermissions2.RxPermissions
+import com.example.kalam_android.view.activities.GalleryPostActivity
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_for_attachment.view.*
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
@@ -25,15 +27,13 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 private var instance: MyChatMediaHelper? = null
 
 class MyChatMediaHelper private constructor(
     val context: AppCompatActivity,
-    val binding: ActivityChatDetailBinding,
-    private val mediaList: MediaListCallBack
+    val binding: ActivityChatDetailBinding
 ) :
     View.OnClickListener {
     private val TAG = this.javaClass.simpleName
@@ -65,17 +65,15 @@ class MyChatMediaHelper private constructor(
     private lateinit var runnable: Runnable
     private var totalDuration: Long = 0
     private var isAttachmentOpen = true
-    private var fileList: ArrayList<MediaList> = ArrayList()
 
     companion object {
         @Synchronized
         fun getInstance(
             context: AppCompatActivity,
-            binding: ActivityChatDetailBinding,
-            mediaList: MediaListCallBack
+            binding: ActivityChatDetailBinding
         ): MyChatMediaHelper? {
             if (instance == null) {
-                instance = MyChatMediaHelper(context, binding, mediaList)
+                instance = MyChatMediaHelper(context, binding)
             }
             return instance
         }
@@ -83,15 +81,15 @@ class MyChatMediaHelper private constructor(
 
     @SuppressLint("CheckResult")
     fun initRecorderWithPermissions() {
-        RxPermissions(context)
-            .request(
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            .subscribe { granted ->
-                if (granted) {
-                    isAttachmentOpen = true
+        isAttachmentOpen = true
+        logE("initRecorderWithPermissions")
+        Dexter.withActivity(context).withPermissions(
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report!!.areAllPermissionsGranted()) {
                     binding.lvBottomChat.lvForAttachment.visibility = View.GONE
                     binding.lvBottomChat.lvForRecorder.visibility = View.VISIBLE
                     initRecorderListener()
@@ -99,6 +97,15 @@ class MyChatMediaHelper private constructor(
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
             }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+                token?.continuePermissionRequest()
+            }
+
+        }).check()
     }
 
     private fun initRecorderListener() {
@@ -450,33 +457,6 @@ class MyChatMediaHelper private constructor(
         binding.lvBottomChat.lvForAttachment.visibility = View.GONE
     }
 
-
-    @SuppressLint("CheckResult")
-    fun openGallery() {
-        RxGallery.gallery(
-            context,
-            true,
-            RxGallery.MimeType.IMAGE,
-            RxGallery.MimeType.VIDEO
-        ).subscribe(
-            {
-                for (x in it) {
-                    if (x.toString().contains("image")) {
-//                        fileList.add(Global.getRealPath(context, x).toString())
-                        fileList.add(MediaList(Global.getRealPath(context, x).toString(), 0))
-                    } else if (x.toString().contains("video")) {
-                        fileList.add(MediaList(Global.getRealPath(context, x).toString(), 1))
-                    }
-                }
-                mediaList.mediaListResponse(fileList)
-            },
-            { throwable ->
-                Toast.makeText(context, throwable.message, Toast.LENGTH_LONG)
-                    .show()
-            })
-    }
-
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivRecord -> {
@@ -500,7 +480,14 @@ class MyChatMediaHelper private constructor(
                 cancel(true)
             }
             R.id.llGallery -> {
-                openGallery()
+                context.startActivityForResult(
+                    Intent(
+                        context,
+                        GalleryPostActivity::class.java
+                    ), AppConstants.SELECTED_IMAGES
+                )
+
+
             }
         }
     }

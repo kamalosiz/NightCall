@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.kalam_android.R
+import com.example.kalam_android.util.Debugger
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.util.*
@@ -20,7 +21,8 @@ class FCMService : FirebaseMessagingService() {
     private lateinit var notificationManager: NotificationManager
 
     override fun onMessageReceived(p0: RemoteMessage) {
-        Log.d(TAG, "Kalam: $p0")
+        Debugger.e(TAG, "Kalam: ${p0.data}")
+        Debugger.d(TAG, "Kalam: ${p0.data}")
 
         if (p0.notification != null) {
             showNotification(p0.notification?.title, p0.notification?.body)

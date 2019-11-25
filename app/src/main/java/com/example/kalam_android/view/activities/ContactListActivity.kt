@@ -32,7 +32,12 @@ import com.example.kalam_android.viewmodel.ContactsViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.tbruyelle.rxpermissions2.RxPermissions
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import javax.inject.Inject
 
 
@@ -240,15 +245,13 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         return jsonArray
     }
 
-    @SuppressLint("CheckResult")
     private fun checkPermissions() {
-        RxPermissions(this)
-            .request(
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.WRITE_CONTACTS
-            )
-            .subscribe { granted ->
-                if (granted) {
+        Dexter.withActivity(this).withPermissions(
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report?.areAllPermissionsGranted() == true) {
                     binding.pbCenter.visibility = View.VISIBLE
                     binding.rvForContacts.visibility = View.GONE
                     val params = HashMap<String, String>()
@@ -258,6 +261,15 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
             }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+                token?.continuePermissionRequest()
+            }
+
+        }).check()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {

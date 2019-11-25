@@ -17,6 +17,12 @@
     <color name="colorSeekBar">#158053</color>
     <color name="colorAudioMsg">#E7F2ED</color>
     <color name="lighest_grey">#F5F5F5</color>
+    <color name="recentStoryColor">#43ab9b</color>
+    <color name="recentNameColor">#2b2b2b</color>
+    <color name="dayColor">#179a63</color>
+    <color name="viewStoryColor">#b2b2b2</color>
+
+
 
 
 </resources>
