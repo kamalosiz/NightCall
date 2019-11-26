@@ -197,6 +197,9 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
                 }
             } else {
                 logE("This chat is not present")
+                if (chatList.size == 0) {
+                    binding.tvNoChat.visibility = View.GONE
+                }
                 chatList.add(0, item)
                 chatIDs.add(newChat.chat_id)
                 (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(chatList)

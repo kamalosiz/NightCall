@@ -29,13 +29,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
-private var instance: MyChatMediaHelper? = null
-
-class MyChatMediaHelper private constructor(
+class MyChatMediaHelper(
     val context: AppCompatActivity,
     val binding: ActivityChatDetailBinding
-) :
-    View.OnClickListener {
+) : View.OnClickListener {
     private val TAG = this.javaClass.simpleName
     private lateinit var path: String
     private var output: String = ""
@@ -66,22 +63,11 @@ class MyChatMediaHelper private constructor(
     private var totalDuration: Long = 0
     private var isAttachmentOpen = true
 
-    companion object {
-        @Synchronized
-        fun getInstance(
-            context: AppCompatActivity,
-            binding: ActivityChatDetailBinding
-        ): MyChatMediaHelper? {
-            if (instance == null) {
-                instance = MyChatMediaHelper(context, binding)
-            }
-            return instance
-        }
-    }
 
     @SuppressLint("CheckResult")
     fun initRecorderWithPermissions() {
         isAttachmentOpen = true
+        initRecorderListener()
         logE("initRecorderWithPermissions")
         Dexter.withActivity(context).withPermissions(
             Manifest.permission.RECORD_AUDIO,
@@ -92,7 +78,6 @@ class MyChatMediaHelper private constructor(
                 if (report!!.areAllPermissionsGranted()) {
                     binding.lvBottomChat.lvForAttachment.visibility = View.GONE
                     binding.lvBottomChat.lvForRecorder.visibility = View.VISIBLE
-                    initRecorderListener()
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
@@ -438,12 +423,14 @@ class MyChatMediaHelper private constructor(
     }
 
     fun openAttachments() {
+        initAttachmentListeners()
         if (isAttachmentOpen) {
             isAttachmentOpen = false
             binding.lvBottomChat.lvForRecorder.visibility = View.GONE
             binding.lvBottomChat.lvForAttachment.visibility = View.VISIBLE
-            initAttachmentListeners()
+            logE("Attachment should open")
         } else {
+            logE("Attachment not open")
             isAttachmentOpen = true
             binding.lvBottomChat.lvForAttachment.visibility = View.GONE
         }
@@ -454,6 +441,7 @@ class MyChatMediaHelper private constructor(
     }
 
     fun hideAttachments() {
+        isAttachmentOpen = true
         binding.lvBottomChat.lvForAttachment.visibility = View.GONE
     }
 

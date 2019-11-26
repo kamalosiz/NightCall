@@ -34,7 +34,7 @@ data class MediaResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
-    val data: DataResponse?,
+    val data: ArrayList<DataResponse>?,
     val message: String
 )
 
@@ -49,3 +49,10 @@ data class DataResponse(
 )
 
 data class MediaList(val file: String, val type: Int) : Serializable
+
+data class NotificationResponse(
+    val type: String,
+    val sender_name: String,
+    val message: String?,
+    val original_message: String?
+)

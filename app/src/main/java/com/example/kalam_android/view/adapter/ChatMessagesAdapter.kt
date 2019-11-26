@@ -78,7 +78,7 @@ class ChatMessagesAdapter(
         val item = chatList?.get(position)
         when (item?.type) {
             AppConstants.TEXT_MESSAGE -> {
-                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
+                itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
@@ -91,27 +91,27 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.white)
                     )
-                    itemHolder.binding.itemChat.tvTime.setTextColor(
-                        Global.setColor(context, R.color.white)
-                    )
+                    /*  itemHolder.binding.itemChat.tvTime.setTextColor(
+                          Global.setColor(context, R.color.white)
+                      )*/
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
-                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
-                    itemHolder.binding.itemChat.tvOriginal.setTextColor(
-                        Global.setColor(context, R.color.white)
-                    )
+                    /* itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
+                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
+                         Global.setColor(context, R.color.white)
+                     )*/
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
-                    itemHolder.binding.itemChat.tvTime.setTextColor(
-                        Global.setColor(context, R.color.black)
-                    )
-                    itemHolder.binding.itemChat.view.setBackgroundResource(R.color.black)
-                    itemHolder.binding.itemChat.tvOriginal.setTextColor(
-                        Global.setColor(context, R.color.black)
-                    )
+                    /*   itemHolder.binding.itemChat.tvTime.setTextColor(
+                           Global.setColor(context, R.color.black)
+                       )
+                       itemHolder.binding.itemChat.view.setBackgroundResource(R.color.black)
+                       itemHolder.binding.itemChat.tvOriginal.setTextColor(
+                           Global.setColor(context, R.color.black)
+                       )*/
                 }
             }
             AppConstants.AUDIO_MESSAGE -> {
@@ -121,7 +121,7 @@ class ChatMessagesAdapter(
                 } else {
                     itemHolder.binding.audioPlayer.tvTime.text = "Uploading Audio..."
                 }
-                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.VISIBLE
+                itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.VISIBLE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
@@ -130,10 +130,8 @@ class ChatMessagesAdapter(
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
-                    itemHolder.binding.audioPlayer.cvPlayer.setBackgroundResource(R.drawable.audio_bubble_right)
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
-                    itemHolder.binding.audioPlayer.cvPlayer.setBackgroundResource(R.drawable.audio_bubble_left)
                 }
             }
             AppConstants.IMAGE_MESSAGE -> {
@@ -143,7 +141,7 @@ class ChatMessagesAdapter(
                 } else {
                     itemHolder.binding.imageHolder.tvTime.text = "Uploading Image..."
                 }
-                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
+                itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.VISIBLE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
@@ -177,7 +175,7 @@ class ChatMessagesAdapter(
                 }
             }
             AppConstants.VIDEO_MESSAGE -> {
-                itemHolder.binding.audioPlayer.cvPlayer.visibility = View.GONE
+                itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.VISIBLE

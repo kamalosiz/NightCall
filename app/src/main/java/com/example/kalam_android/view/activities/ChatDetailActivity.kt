@@ -43,6 +43,7 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -95,7 +96,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         checkSomeoneTyping()
         SocketIO.setListener(this)
         SocketIO.setTypingListener(this)
-        myChatMediaHelper = MyChatMediaHelper.getInstance(this@ChatDetailActivity, binding)
+        myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
         applyPagination()
     }
 
@@ -123,7 +124,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun applyPagination() {
-
         binding.chatMessagesRecycler.addOnScrollListener(object :
             PaginationScrollListener(binding.chatMessagesRecycler.layoutManager as LinearLayoutManager) {
             override val isLastPage: Boolean
@@ -241,23 +241,28 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun renderAudioResponse(response: MediaResponse?) {
         logE("socketResponse: $response")
         response?.let {
-            it.data?.duration?.toLong()?.let { it1 ->
+            it.data?.let { list ->
                 emitNewMessageToSocket(
-                    it.data.message.toString(),
+                    list[0].message.toString(),
                     messageType,
-                    it.data.file_id.toString(),
-                    it1, it.data.thumbnail
+                    list[0].file_id.toString(),
+                    list[0].duration.toLong(), list[0].thumbnail
                 )
             }
             lastMsgTime = System.currentTimeMillis() / 1000L
-            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(it.data?.identifier.toString())
+            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
+                it.data?.get(
+                    0
+                )?.identifier.toString()
+            )
         }
     }
 
-    private fun uploadMedia(identifier: String, file: String, duration: Long) {
+    private fun uploadMedia(identifier: String, file: String, duration: Long, type: String) {
         val params = HashMap<String, RequestBody>()
         params["identifier"] = RequestBody.create(MediaType.parse("text/plain"), identifier)
         params["duration"] = RequestBody.create(MediaType.parse("text/plain"), duration.toString())
+        params["type"] = RequestBody.create(MediaType.parse("text/plain"), type)
         viewModel.hitUploadAudioApi(
             sharedPrefsHelper.getUser()?.token, params,
             getFileBody(file, "file")
@@ -271,7 +276,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 lastMessage = "Audio"
                 messageType = type
                 createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
-                uploadMedia(identifier, file, duration)
+                uploadMedia(identifier, file, duration, type)
             }
             AppConstants.IMAGE_MESSAGE -> {
                 lastMessage = "Image"
@@ -280,7 +285,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 //                logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
                 val convertedFile = Compressor(this).compressToFile(File(file))
 //                logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
-                uploadMedia(identifier, convertedFile.absolutePath, duration)
+                uploadMedia(identifier, convertedFile.absolutePath, duration, type)
             }
             AppConstants.VIDEO_MESSAGE -> {
                 lastMessage = "Video"
@@ -294,7 +299,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 val fileSize = getFileSizeInBytes(file)
                 if (fileSize < 2000) {
                     logE("File size is less than 2MB : $fileSize")
-                    uploadMedia(identifier, file, duration)
+                    uploadMedia(identifier, file, duration, type)
                 } else {
                     logE("File size is greater than 2MB : $fileSize")
 //                    logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
@@ -310,7 +315,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 //                                logE(
 //                                    "After Conversion : ${getReadableFileSize(File(output).length())}"
 //                                )
-                                uploadMedia(identifier, output, duration)
+                                uploadMedia(identifier, output, duration, type)
                             }
                         }
                     }.start()
@@ -552,7 +557,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
-
 
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)

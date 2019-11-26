@@ -10,9 +10,13 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.kalam_android.R
+import com.example.kalam_android.repository.model.ChatData
+import com.example.kalam_android.repository.model.NotificationResponse
 import com.example.kalam_android.util.Debugger
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
+import org.json.JSONObject
 import java.util.*
 
 class FCMService : FirebaseMessagingService() {
@@ -20,13 +24,19 @@ class FCMService : FirebaseMessagingService() {
     private val ADMIN_CHANNEL_ID = "com.example.kala_android"
     private lateinit var notificationManager: NotificationManager
 
-    override fun onMessageReceived(p0: RemoteMessage) {
-        Debugger.e(TAG, "Kalam: ${p0.data}")
-        Debugger.d(TAG, "Kalam: ${p0.data}")
-
-        if (p0.notification != null) {
-            showNotification(p0.notification?.title, p0.notification?.body)
-        }
+    override fun onMessageReceived(remoteMSG: RemoteMessage) {
+        Debugger.e(TAG, "Notification Received: ${remoteMSG.data}")
+        /*val gson = Gson()
+        val jsonObject = p0[0] as JSONObject
+        val data = gson.fromJson(jsonObject.toString(), NotificationResponse::class.java)
+        *//* if (p0.notification != null) {
+             showNotification(p0.notification?.title, p0.notification?.body)
+         }*//*
+        if (data != null) {*/
+        val name = remoteMSG.data["sender_name"]
+        val message = remoteMSG.data["message"]
+        showNotification(name, message)
+//        }
     }
 
 

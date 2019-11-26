@@ -5,6 +5,7 @@
     <color name="colorAccent">@color/theme_color</color>
     <color name="theme_color">#179a63</color>
     <color name="text_send_background">#158053</color>
+    <color name="audio_send_background">#4376D395</color>
     <color name="text_receive_background">#EFEFFA</color>
     <color name="white">#fff</color>
     <color name="black">#000</color>
