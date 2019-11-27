@@ -1,12 +1,17 @@
 package com.example.kalam_android.util
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.loader.content.CursorLoader
 import com.example.kalam_android.repository.model.MediaList
+import com.koushikdutta.ion.builder.BitmapBuilder
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -14,6 +19,7 @@ import java.io.File
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -103,6 +109,62 @@ fun getReadableFileSize(size: Long): String {
 fun getFileSizeInBytes(selectedPath: String): Int {
     val file = File(selectedPath)
     return (file.length() / 1024).toString().toInt()
+}
+
+@SuppressLint("Recycle")
+fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
+
+    val listOfAllImages = ArrayList<MediaList>()
+    val column_index_data: Int
+    val projection = arrayOf(
+        MediaStore.Files.FileColumns._ID,
+        MediaStore.Files.FileColumns.DATA,
+        MediaStore.Files.FileColumns.DATE_ADDED,
+        MediaStore.Files.FileColumns.MEDIA_TYPE,
+        MediaStore.Files.FileColumns.MIME_TYPE,
+        MediaStore.Files.FileColumns.TITLE
+    )
+
+// Return only video and image metadata.
+    val selection = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+            + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
+            + " OR "
+            + MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+            + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
+
+    val queryUri = MediaStore.Files.getContentUri("external")
+
+    val cursorLoader = CursorLoader(
+        context,
+        queryUri,
+        projection,
+        selection,
+        null, // Selection args (none).
+        MediaStore.Files.FileColumns.DATE_ADDED + " DESC" // Sort order.
+    )
+
+    val cursor = cursorLoader.loadInBackground()
+    column_index_data = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+    while (cursor.moveToNext()) {
+        val path = cursor?.getString(column_index_data)
+        if (path.contains(".jpg") || path.contains(".png")) {
+            listOfAllImages.add(
+                MediaList(
+                    cursor.getString(column_index_data),
+                    AppConstants.IMAGE_GALLERY
+                )
+            )
+        } else {
+            listOfAllImages.add(
+                MediaList(
+                    cursor.getString(column_index_data),
+                    AppConstants.POST_VIDEO
+                )
+            )
+        }
+    }
+    cursor.close()
+    return listOfAllImages
 }
 
 fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {

@@ -5,7 +5,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/lvStoriesView">
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewPager"
@@ -21,7 +22,10 @@
             android:layout_height="wrap_content"/>
 
         <include layout="@layout/status_bottom_sheet_fragment"
-            android:id="@+id/lvBottomSheet"/>
+            android:id="@+id/lvBottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_300sdp"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 

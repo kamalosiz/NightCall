@@ -10,8 +10,9 @@ open class ImageFetcher(private val context: Context) : AsyncTask<Cursor, Void, 
 
     override fun doInBackground(vararg cursors: Cursor): ArrayList<MediaList> {
         val listOfAllImages = ArrayList<MediaList>()
-        listOfAllImages.addAll(getAllShownImagesPath(context))
-        listOfAllImages.addAll(getAllShownVideosPath(context))
+        /*listOfAllImages.addAll(getAllShownImagesPath(context))
+        listOfAllImages.addAll(getAllShownVideosPath(context))*/
+        listOfAllImages.addAll(getGalleryImagesVideos(context))
         return listOfAllImages
     }
 }
