@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.PagerAdapter
 import com.example.kalam_android.R
+import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.databinding.ItemForStatusDetailBinding
 import com.example.kalam_android.repository.model.ImageModel
 
@@ -15,7 +16,7 @@ class StatusPagerAdapter(
     private val context: Context,
     private val imageModelArrayList: ArrayList<ImageModel>
 ) : PagerAdapter() {
-
+    private var myClickListener : MyClickListener?=null
     private lateinit var binding: ItemForStatusDetailBinding
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -26,8 +27,16 @@ class StatusPagerAdapter(
             false
         )
         binding.ivStatusImage.setImageResource(imageModelArrayList[position].image)
+        binding.ivUpArrow.setOnClickListener {
+
+            myClickListener?.myOnClick(binding.root,position)
+        }
         container.addView(binding.root, 0)
         return binding.root
+    }
+
+    public  fun setClickListener(myClickListener : MyClickListener){
+        this.myClickListener = myClickListener
     }
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {

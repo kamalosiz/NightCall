@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.view.MotionEvent
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.ViewPager
@@ -15,13 +16,17 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.widget.NestedScrollView
+import com.example.kalam_android.callbacks.MyClickListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.status_bottom_sheet_fragment.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class StatusDetailActivity : AppCompatActivity() {
+class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchListener {
+
 
     private lateinit var binding: ActivityStatusDetailBinding
     private lateinit var statusPagerAdapter: StatusPagerAdapter
@@ -33,7 +38,7 @@ class StatusDetailActivity : AppCompatActivity() {
     private var NUM_PAGES = 0
     private var currentPage = 0
     private lateinit var runnable: Runnable
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<NestedScrollView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,38 +55,24 @@ class StatusDetailActivity : AppCompatActivity() {
         statusPagerAdapter = StatusPagerAdapter(this, sliderItem)
         binding.viewPager.adapter = statusPagerAdapter
         dotsCount = statusPagerAdapter.count
+        statusPagerAdapter.setClickListener(this)
 
         viewPagerPagerSelected()
-//        initBottomSheet()
+        initBottomSheet()
+        binding.viewPager.setOnTouchListener(this)
+
 //        autoScrollImages()
     }
 
     @SuppressLint("SwitchIntDef")
     private fun initBottomSheet() {
         bottomSheetBehavior =
-            BottomSheetBehavior.from<LinearLayout>(binding.lvBottomSheet.bottomSheet)
-        bottomSheetBehavior.setBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                    }
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-                    }
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-                    }
-                    BottomSheetBehavior.STATE_DRAGGING -> {
-                    }
-                    BottomSheetBehavior.STATE_SETTLING -> {
-                    }
-                }
-            }
+            BottomSheetBehavior.from(bottom_sheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-        })
     }
-
 
     private fun viewPagerPagerSelected() {
         try {
@@ -168,5 +159,33 @@ class StatusDetailActivity : AppCompatActivity() {
 
     }
 
+    override fun myOnClick(view: View, position: Int) {
+        slideUpDownBottomSheet()
+    }
 
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when (event?.action) {
+
+            MotionEvent.ACTION_UP -> {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                return true
+            }
+            MotionEvent.ACTION_DOWN -> {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                return true
+            }
+            else -> {
+                return false
+            }
+        }
+    }
+
+    fun slideUpDownBottomSheet() {
+        if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        } else {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED;
+        }
+    }
 }
