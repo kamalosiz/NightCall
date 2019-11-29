@@ -12,6 +12,7 @@ import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.databinding.ItemChatAdapterBinding
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.calculateLocalDate
 import com.example.kalam_android.wrapper.GlideDownloder
 
@@ -71,14 +72,14 @@ class AllChatListAdapter(
         holderItem.binding.tvLastMessage.text = item.message.toString()
         if (item.un_read_count == 0) {
             holderItem.binding.llUnread.visibility = View.GONE
+            holderItem.binding.tvAgo.setTextColor(
+                Global.setColor(context, R.color.black)
+            )
         } else {
             holderItem.binding.llUnread.visibility = View.VISIBLE
             holder.binding.tvUnread.text = item.un_read_count.toString()
             holderItem.binding.tvAgo.setTextColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.light_green
-                )
+                Global.setColor(context, R.color.light_green)
             )
         }
         holderItem.binding.tvAgo.text = item.unix_time?.let { calculateLocalDate(it) }

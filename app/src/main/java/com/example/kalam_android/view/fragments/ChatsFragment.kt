@@ -217,11 +217,13 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
                     val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
                     if (isSeen == true) {
                         logE("If Part")
-                        chatList[position].un_read_count = 0
-                        (binding.chatRecycler.adapter as AllChatListAdapter).updateReadCount(
-                            chatList, position
-                        )
-                        viewModel.updateReadCountDB(chatList[position].chat_id, 0)
+                        if (chatList[position].un_read_count != 0) {
+                            chatList[position].un_read_count = 0
+                            (binding.chatRecycler.adapter as AllChatListAdapter).updateReadCount(
+                                chatList, position
+                            )
+                            viewModel.updateReadCountDB(chatList[position].chat_id, 0)
+                        }
                     } else {
                         logE("Else Part")
                         val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)

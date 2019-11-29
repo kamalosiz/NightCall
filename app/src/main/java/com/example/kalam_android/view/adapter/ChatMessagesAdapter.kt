@@ -1,6 +1,5 @@
 package com.example.kalam_android.view.adapter
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -19,8 +18,8 @@ import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.showAlertDialoge
-import com.example.kalam_android.wrapper.GlideDownloder
 import com.example.kalam_android.view.activities.OpenMediaActivity
+import com.example.kalam_android.wrapper.GlideDownloder
 
 
 class ChatMessagesAdapter(
@@ -72,7 +71,6 @@ class ChatMessagesAdapter(
         return chatList?.size ?: 0
     }
 
-    @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val itemHolder = holder as MyHolder
         val item = chatList?.get(position)
@@ -91,27 +89,13 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.white)
                     )
-                    /*  itemHolder.binding.itemChat.tvTime.setTextColor(
-                          Global.setColor(context, R.color.white)
-                      )*/
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
-                    /* itemHolder.binding.itemChat.view.setBackgroundResource(R.color.white)
-                     itemHolder.binding.itemChat.tvOriginal.setTextColor(
-                         Global.setColor(context, R.color.white)
-                     )*/
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
-                    /*   itemHolder.binding.itemChat.tvTime.setTextColor(
-                           Global.setColor(context, R.color.black)
-                       )
-                       itemHolder.binding.itemChat.view.setBackgroundResource(R.color.black)
-                       itemHolder.binding.itemChat.tvOriginal.setTextColor(
-                           Global.setColor(context, R.color.black)
-                       )*/
                 }
             }
             AppConstants.AUDIO_MESSAGE -> {
@@ -125,8 +109,10 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
-                itemHolder.binding.audioPlayer.rlPlay.setOnClickListener {
-                    Global.playVoiceMsg(itemHolder.binding, item.audio_url.toString(), position)
+                itemHolder.binding.audioPlayer.ivPlayPause.setOnClickListener {
+                    Global.playVoiceMsg(
+                        itemHolder.binding, item.audio_url.toString(), item.id, context
+                    )
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
@@ -168,8 +154,8 @@ class ChatMessagesAdapter(
                     val options =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(
                             context as Activity,
-                            itemHolder.binding.imageHolder.ivImage, // Starting view
-                            transitionName    // The String
+                            itemHolder.binding.imageHolder.ivImage,
+                            transitionName
                         )
                     ActivityCompat.startActivity(context, intent, options.toBundle())
                 }
@@ -208,8 +194,8 @@ class ChatMessagesAdapter(
                     val options =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(
                             context as Activity,
-                            itemHolder.binding.videoHolder.ivImage, // Starting view
-                            transitionName    // The String
+                            itemHolder.binding.videoHolder.ivImage,
+                            transitionName
                         )
                     ActivityCompat.startActivity(context, intent, options.toBundle())
                 }
@@ -217,8 +203,7 @@ class ChatMessagesAdapter(
         }
     }
 
-    inner class MyHolder(val binding: ItemChatRightBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    inner class MyHolder(val binding: ItemChatRightBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     private fun logE(msg: String) {

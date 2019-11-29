@@ -42,5 +42,15 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/video_icon" />
         </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/ivDeliver"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_10sdp"
+            android:layout_below="@id/rlVideo"
+            android:layout_alignEnd="@id/rlVideo"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:src="@drawable/icon_message_read" />
     </RelativeLayout>
 </layout>

@@ -1,23 +1,18 @@
 package com.example.kalam_android.view.fragments
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.AddMyStatusClickListener
 import com.example.kalam_android.databinding.StoriesFragmentBinding
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.adapter.StoriesAdapter
-import com.fxn.pix.Options
-import com.fxn.pix.Pix
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -25,7 +20,6 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
-import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 
 class StoriesFragment : Fragment(), AddMyStatusClickListener {
 

@@ -1,106 +1,135 @@
 package com.example.kalam_android.util
 
-import android.annotation.SuppressLint
-import android.content.ContentUris
 import android.content.Context
-import android.content.ContextWrapper
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.os.Handler
-import android.provider.DocumentsContract
-import android.provider.MediaStore
 import android.view.View
 import android.widget.SeekBar
 import androidx.core.content.ContextCompat
-import androidx.loader.content.CursorLoader
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
-import com.yalantis.ucrop.util.FileUtils.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
-import java.util.*
 
 object Global {
-    //    private var isRelease = false
-    private lateinit var mediaPlayer: MediaPlayer
+    private var isRelease = true
+    private var isPlayerRunning = false
+    private var alreadyClicked = false
+    var mediaPlayer: MediaPlayer = MediaPlayer()
     private var handler: Handler = Handler()
     private lateinit var runnable: Runnable
-    private var prePos = -1
+    private var prePos: Long = -111098
 
-    fun playVoiceMsg(binding: ItemChatRightBinding, voiceMessage: String, currentPos: Int) {
-        try {
-//            if (isRelease || currentPos != prePos) {
-            Debugger.e("ChatMessagesAdapter", "If voiceMessage : $voiceMessage")
-            Debugger.e("ChatMessagesAdapter", "If currentPos : $currentPos")
-            binding.audioPlayer.ivPlayPause.visibility = View.GONE
-            binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
-            prePos = currentPos
-            mediaPlayer = MediaPlayer()
-            mediaPlayer.setAudioAttributes(
-                AudioAttributes
-                    .Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                    .build()
-            )
-//            isRelease = false
-            mediaPlayer.setDataSource(voiceMessage)
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
-                binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
-                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
-                binding.audioPlayer.ivPlayProgress.visibility = View.GONE
-                mediaPlayer.start()
-                initializeSeekBar(binding)
-            }
-            /*  } else {
-                  Debugger.e("ChatMessagesAdapter","Else voiceMessage : $voiceMessage")
-                  Debugger.e("ChatMessagesAdapter","Else currentPos : $currentPos")
-                  if (!mediaPlayer.isPlaying) {
-                      binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
-                      mediaPlayer.start()
-                  } else {
-                      binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
-                      mediaPlayer.pause()
-                  }
-              }*/
+    val TAG = "ChatMessagesAdapter"
 
-        } catch (e: IllegalStateException) {
-//            logE("exception:${e.message}")
-        }
+    fun playVoiceMsg(
+        binding: ItemChatRightBinding,
+        voiceMessage: String,
+        currentPos: Long,
+        context: Context
+    ) {
+        if (!alreadyClicked) {
+            try {
+                if (isRelease || currentPos != prePos) {
+                    alreadyClicked = true
+                    /*if (alreadyClicked) {
+                        logE("alreadyClicked is true")
+                        binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+                        binding.audioPlayer.ivPlayProgress.visibility = View.GONE
+                        *//*mediaPlayer.stop()
+                    mediaPlayer.reset()
+                    mediaPlayer.release()*//*
+                    isRelease = true
+                }*/
+                    if (isPlayerRunning) {
+                        if (mediaPlayer.isPlaying) {
+                            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
+                            logE("already playing")
+                            mediaPlayer.stop()
+                            alreadyClicked = false
+                            mediaPlayer = MediaPlayer()
+                        }
+                    }
 
-        mediaPlayer.setOnCompletionListener { mp ->
-            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
-            mp.stop()
-            mp.reset()
-            mp.release()
-//            isRelease = true
-            binding.audioPlayer.seekBar.max = 0
-        }
-
-        binding.audioPlayer.seekBar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    mediaPlayer.seekTo(progress * 1000)
+                    Debugger.e("ChatMessagesAdapter", "If voiceMessage : $voiceMessage")
+                    Debugger.e("ChatMessagesAdapter", "If currentPos : $currentPos")
+                    binding.audioPlayer.ivPlayPause.visibility = View.GONE
+                    binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
+                    prePos = currentPos
+                    mediaPlayer = MediaPlayer()
+                    mediaPlayer.setAudioAttributes(
+                        AudioAttributes
+                            .Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                            .build()
+                    )
+                    isRelease = false
+                    mediaPlayer.setDataSource(voiceMessage)
+                    mediaPlayer.prepareAsync()
+                    mediaPlayer.setOnPreparedListener {
+                        binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+                        binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
+                        binding.audioPlayer.ivPlayProgress.visibility = View.GONE
+                        mediaPlayer.start()
+                        initializeSeekBar(binding)
+                        alreadyClicked = false
+                        isPlayerRunning = true
+                    }
+                } else {
+                    Debugger.e("ChatMessagesAdapter", "Else voiceMessage : $voiceMessage")
+                    Debugger.e("ChatMessagesAdapter", "Else currentPos : $currentPos")
+                    if (!mediaPlayer.isPlaying) {
+                        binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
+                        mediaPlayer.start()
+                    } else {
+                        binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
+                        mediaPlayer.pause()
+                    }
                 }
+
+            } catch (e: IllegalStateException) {
+                Debugger.e("ChatMessagesAdapter", "exception:${e.message}")
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            mediaPlayer.setOnCompletionListener { mp ->
+                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
+                mp.stop()
+                mp.reset()
+                mp.release()
+                isRelease = true
+                alreadyClicked = false
+                isPlayerRunning = false
+                Debugger.e("ChatMessagesAdapter", "setOnCompletionListener")
+                binding.audioPlayer.seekBar.max = 0
+            }
+            mediaPlayer.setOnErrorListener { mp, what, extra ->
+                logE("on Error Called")
+                true
             }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-        })
+            binding.audioPlayer.seekBar.setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    if (fromUser) {
+                        mediaPlayer.seekTo(progress * 1000)
+                    }
+                }
 
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                }
+            })
+
+        } else {
+            toast(context, "Processing previous media...")
+        }
     }
 
     private fun initializeSeekBar(binding: ItemChatRightBinding) {
@@ -127,7 +156,7 @@ object Global {
         )
     }
 
-    fun bitmapToFile(context: Context, bitmap: Bitmap?): File {
+    /*fun bitmapToFile(context: Context, bitmap: Bitmap?): File {
         val wrapper = ContextWrapper(context)
         var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
         file = File(file, "${UUID.randomUUID()}.jpg")
@@ -171,12 +200,16 @@ object Global {
                 val type = split[0]
 
                 var contentUri: Uri? = null
-                if ("image" == type) {
-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                } else if ("video" == type) {
-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                } else if ("audio" == type) {
-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                when (type) {
+                    "image" -> {
+                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    }
+                    "video" -> {
+                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                    }
+                    "audio" -> {
+                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                    }
                 }
 
                 val selection = "_id=?"
@@ -201,5 +234,9 @@ object Global {
         // MediaStore (and general)
 
         return null
+    }*/
+
+    private fun logE(msg: String) {
+        Debugger.e(TAG, msg)
     }
 }

@@ -6,6 +6,7 @@ object AppConstants {
     const val USER_NAME = "user_name_kalam"
     const val RECEIVER_ID = "user_receiver_id"
     const val IS_FROM_CHAT_FRAGMENT = "is_chat_boolean"
+    const val IS_FROM_CHAT_OUTSIDE = "is_outside_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
     const val CHAT_USER_PICTURE = "chat_user_picture"
     const val CHAT_ID = "kalam_chat_id"
@@ -24,6 +25,14 @@ object AppConstants {
     const val CHAT_TYPE = "chattype"
     const val POST_AUDIO = "post_audio"
     const val SELECTED_IMAGES_VIDEOS = "selected_images_videos"
+
+    val NOTIFICATION_TYPE = "notification_type"
+    val CONTENT_TYPE = "content_type"
+    val FIREBASE_CHAT_ID = "chat_id"
+    val NOTIFICATION_TYPE_POST = "1"
+    val GROUP_KALAM = "com.kalam.group"
+    val NOTIFICATION_BODY = "message"
+    val SENDER_NAME = "sender_name"
 
 
     //Request Code

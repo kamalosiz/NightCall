@@ -73,7 +73,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var profileImage: String? = null
     private var loading = false
     private var isFromChatFragment = false
-    private var messageType = ""
+    private var isFromOutside = false
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long? = null
@@ -168,11 +168,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         params["chat_id"] = this.chatId.toString()
         params["offset"] = offset.toString()
         viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
+
     }
 
     private fun setUserData() {
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
         profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
+        isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_OUTSIDE, false)
         binding.header.tvName.text = userRealName
         GlideDownloder.load(
             this,
@@ -244,16 +246,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             it.data?.let { list ->
                 emitNewMessageToSocket(
                     list[0].message.toString(),
-                    messageType,
+                    list[0].type.toString(),
                     list[0].file_id.toString(),
                     list[0].duration.toLong(), list[0].thumbnail
                 )
             }
             lastMsgTime = System.currentTimeMillis() / 1000L
             (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
-                it.data?.get(
-                    0
-                )?.identifier.toString()
+                it.data?.get(0)?.identifier.toString()
             )
         }
     }
@@ -274,13 +274,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         when (type) {
             AppConstants.AUDIO_MESSAGE -> {
                 lastMessage = "Audio"
-                messageType = type
                 createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
                 uploadMedia(identifier, file, duration, type)
             }
             AppConstants.IMAGE_MESSAGE -> {
                 lastMessage = "Image"
-                messageType = type
                 createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
 //                logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
                 val convertedFile = Compressor(this).compressToFile(File(file))
@@ -289,7 +287,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             }
             AppConstants.VIDEO_MESSAGE -> {
                 lastMessage = "Video"
-                messageType = type
                 createChatObject(
                     AppConstants.DUMMY_STRING,
                     file,
@@ -380,6 +377,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
+    //Sending Identifier as a message id for now
     private fun createChatObject(message: String, file: String, type: String, identifier: String) {
         addMessage(
             ChatData(
@@ -388,7 +386,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
                     sharedPrefsHelper.getUser()?.lastname.toString()
                 ).toString(),
-                AppConstants.DUMMY_DATA, chatId, sharedPrefsHelper.getUser()?.id,
+                identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
                 AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
                 type, file, 0, 0, message, identifier
             )
@@ -406,11 +404,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-
+    //Sending dummy identifier for now until i don't have message id
     private fun sendMessage() {
         createChatObject(
             binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
-            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING
+            AppConstants.TEXT_MESSAGE, "1"
         )
         emitNewMessageToSocket(
             binding.lvBottomChat.editTextMessage.text.toString(),
@@ -545,17 +543,29 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
+    /*override fun onPause() {
+        super.onPause()
+        if (Global.mediaPlayer.isPlaying) {
+            Global.mediaPlayer.stop()
+        }
+    }*/
+
     override fun onBackPressed() {
         val intent = Intent()
-        if (lastMessage?.isNotEmpty() == true && lastMsgTime != null) {
-            intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
-            intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
-            intent.putExtra(AppConstants.IsSEEN, false)
+        if (isFromOutside) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         } else {
-            intent.putExtra(AppConstants.IsSEEN, true)
+            if (lastMessage?.isNotEmpty() == true && lastMsgTime != null) {
+                intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
+                intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
+                intent.putExtra(AppConstants.IsSEEN, false)
+            } else {
+                intent.putExtra(AppConstants.IsSEEN, true)
+            }
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
-        setResult(Activity.RESULT_OK, intent)
-        finish()
     }
 
     private fun logE(msg: String) {

@@ -5,6 +5,7 @@ import com.example.kalam_android.callbacks.NewMessageListener
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.github.nkzawa.socketio.client.Ack
 import com.github.nkzawa.socketio.client.IO
 import com.github.nkzawa.socketio.client.Socket
 import com.google.gson.JsonObject
@@ -96,6 +97,9 @@ object SocketIO {
         jsonObject.addProperty("file_id", fileID)
         jsonObject.addProperty("duration", duration)
         jsonObject.addProperty("thumbnail", thumbnail)
-        socket?.emit(AppConstants.SEND_MESSAGE, jsonObject)
+        socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
+            val isDelivered = it[0] as Boolean
+            Debugger.e("ChatDetailActivity", "isDelivered $isDelivered")
+        })
     }
 }

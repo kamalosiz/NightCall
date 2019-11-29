@@ -3,6 +3,7 @@ package com.example.kalam_android.di.component
 import com.example.kalam_android.di.modules.AppModule
 import com.example.kalam_android.di.modules.UtilsModule
 import com.example.kalam_android.di.modules.ViewModelsModule
+import com.example.kalam_android.notification.FCMService
 import com.example.kalam_android.view.activities.*
 import com.example.kalam_android.view.fragments.ChatsFragment
 import com.example.kalam_android.view.fragments.MoreFragment
@@ -26,4 +27,5 @@ interface AppComponents {
     fun doInjection(activity: FindsFriendsActivity)
     fun doInjection(fragment: MoreFragment)
     fun doInjection(activity: SettingActivity)
+    fun doInjection(firebase: FCMService)
 }
