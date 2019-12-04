@@ -1,7 +1,6 @@
 package com.example.kalam_android.wrapper
 
-import com.example.kalam_android.callbacks.MessageTypingListener
-import com.example.kalam_android.callbacks.NewMessageListener
+import com.example.kalam_android.callbacks.*
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
@@ -15,7 +14,7 @@ import org.json.JSONObject
 object SocketIO {
     private val TAG = this.javaClass.simpleName
     var socket: Socket? = null
-    private var newMessageListener: NewMessageListener? = null
+    private var socketCallback: SocketCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null
 
     fun connectSocket(token: String?) {
@@ -26,14 +25,14 @@ object SocketIO {
         socket = IO.socket(Urls.BASE_URL, opts)
         socket?.connect()
         socket?.on(Socket.EVENT_CONNECT) {
-            Debugger.e(TAG, "==============================CONNECTED")
+            Debugger.e(TAG, "==============CONNECTED==============")
         }?.on(Socket.EVENT_DISCONNECT) {
-            Debugger.e(TAG, "==============================OFF")
+            Debugger.e(TAG, "===============OFF===============")
 
         }?.on(AppConstants.NEW_MESSAGE) {
 
             val jsonObject = it[0] as JSONObject
-            newMessageListener?.socketResponse(jsonObject)
+            socketCallback?.socketResponse(jsonObject, AppConstants.NEW_MESSAGE)
 
         }?.on(AppConstants.MESSAGE_TYPING) {
 
@@ -44,6 +43,16 @@ object SocketIO {
 
             val jsonObject = it[0] as JSONObject
             messageTypingResponse?.typingResponse(jsonObject, false)
+
+        }?.on(AppConstants.ALL_MESSAGES_READ) {
+
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.ALL_MESSAGES_READ)
+
+        }?.on(AppConstants.MESSAGE_DELIVERED) {
+
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.MESSAGE_DELIVERED)
 
         }
     }
@@ -70,23 +79,17 @@ object SocketIO {
         socket?.emit(action, jsonObject)
     }
 
-    fun setListener(newMessageListener: NewMessageListener) {
-        this.newMessageListener = newMessageListener
+    fun setSocketCallbackListener(socketCallback: SocketCallback) {
+        this.socketCallback = socketCallback
     }
 
-    fun setTypingListener(messageTypingResponse: MessageTypingListener) {
+    fun setTypingListeners(messageTypingResponse: MessageTypingListener) {
         this.messageTypingResponse = messageTypingResponse
     }
 
     fun emitNewMessage(
-        id: String,
-        chatID: String,
-        message: String,
-        type: String,
-        senderName: String,
-        fileID: String,
-        duration: Long,
-        thumbnail: String
+        id: String, chatID: String, message: String, type: String, senderName: String,
+        fileID: String, duration: Long, thumbnail: String, identifier: String
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
@@ -97,9 +100,17 @@ object SocketIO {
         jsonObject.addProperty("file_id", fileID)
         jsonObject.addProperty("duration", duration)
         jsonObject.addProperty("thumbnail", thumbnail)
+        jsonObject.addProperty("identifier", identifier)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
-            val isDelivered = it[0] as Boolean
-            Debugger.e("ChatDetailActivity", "isDelivered $isDelivered")
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)
         })
+    }
+
+    fun emitReadAllMessages(chatID: String, userId: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("chat_id", chatID)
+        jsonObject.addProperty("user_id", userId)
+        socket?.emit(AppConstants.READ_ALL_MESSAGES, jsonObject)
     }
 }

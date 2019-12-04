@@ -18,5 +18,6 @@ data class ContactsData(
     val id: Int?,
     val name: String?,
     val profile_image: String?,
-    val kalam_number: String?
+    val kalam_number: String?,
+    val kalam_name: String?
 )

@@ -39,13 +39,36 @@ class ChatMessagesAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateIdentifier(identifier: String) {
+    fun updateIdentifier(identifier: String, isDelivered: Boolean) {
         chatList?.let {
             for (x in it.indices) {
                 if (chatList?.get(x)?.identifier == identifier) {
                     chatList?.get(x)?.identifier = ""
+                    if (isDelivered) {
+                        chatList?.get(x)?.is_read = 1
+                    } else {
+                        chatList?.get(x)?.is_read = 0
+                    }
 //                    notifyDataSetChanged()
                     notifyItemChanged(x)
+                }
+            }
+        }
+    }
+
+    fun updateReadStatus(isSeen: Boolean) {
+        chatList?.let {
+            for (x in it.indices) {
+                if (isSeen) {
+                    if (chatList?.get(x)?.is_read == 0 || chatList?.get(x)?.is_read == 1) {
+                        chatList?.get(x)?.is_read = 2
+                        notifyItemChanged(x)
+                    }
+                } else {
+                    if (chatList?.get(x)?.is_read == 0) {
+                        chatList?.get(x)?.is_read = 1
+                        notifyItemChanged(x)
+                    }
                 }
             }
         }
@@ -97,6 +120,16 @@ class ChatMessagesAdapter(
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                 }
+                if (userId.toInt() == item.sender_id) {
+                    itemHolder.binding.itemChat.ivDeliver.visibility = View.VISIBLE
+                    when (item.is_read) {
+                        0 -> itemHolder.binding.itemChat.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
+                        1 -> itemHolder.binding.itemChat.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
+                        2 -> itemHolder.binding.itemChat.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
+                    }
+                } else {
+                    itemHolder.binding.itemChat.ivDeliver.visibility = View.GONE
+                }
             }
             AppConstants.AUDIO_MESSAGE -> {
                 logE("Identifier: ${item.identifier}")
@@ -118,6 +151,16 @@ class ChatMessagesAdapter(
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
+                }
+                if (userId.toInt() == item.sender_id) {
+                    itemHolder.binding.audioPlayer.ivDeliver.visibility = View.VISIBLE
+                    when (item.is_read) {
+                        0 -> itemHolder.binding.audioPlayer.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
+                        1 -> itemHolder.binding.audioPlayer.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
+                        2 -> itemHolder.binding.audioPlayer.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
+                    }
+                } else {
+                    itemHolder.binding.audioPlayer.ivDeliver.visibility = View.GONE
                 }
             }
             AppConstants.IMAGE_MESSAGE -> {
@@ -144,20 +187,21 @@ class ChatMessagesAdapter(
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.START
                 }
                 itemHolder.binding.imageHolder.rlImage.setOnClickListener {
-                    val intent = Intent(context, OpenMediaActivity::class.java)
-                    intent.putExtra(AppConstants.CHAT_FILE, item.audio_url.toString())
-                    intent.putExtra(AppConstants.CHAT_TYPE, AppConstants.IMAGE_MESSAGE)
-                    intent.putExtra(AppConstants.USER_NAME, name)
-                    intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
-
-                    val transitionName = context.getString(R.string.trans_key)
-                    val options =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            context as Activity,
-                            itemHolder.binding.imageHolder.ivImage,
-                            transitionName
-                        )
-                    ActivityCompat.startActivity(context, intent, options.toBundle())
+                    startOpenMediaActivity(
+                        item.audio_url.toString(),
+                        AppConstants.IMAGE_MESSAGE,
+                        itemHolder.binding.imageHolder.ivImage
+                    )
+                }
+                if (userId.toInt() == item.sender_id) {
+                    itemHolder.binding.imageHolder.ivDeliver.visibility = View.VISIBLE
+                    when (item.is_read) {
+                        0 -> itemHolder.binding.imageHolder.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
+                        1 -> itemHolder.binding.imageHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
+                        2 -> itemHolder.binding.imageHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
+                    }
+                } else {
+                    itemHolder.binding.imageHolder.ivDeliver.visibility = View.GONE
                 }
             }
             AppConstants.VIDEO_MESSAGE -> {
@@ -184,26 +228,44 @@ class ChatMessagesAdapter(
                     R.color.grey
                 )
                 itemHolder.binding.videoHolder.rlVideoItem.setOnClickListener {
-                    val intent = Intent(context, OpenMediaActivity::class.java)
-                    intent.putExtra(AppConstants.CHAT_FILE, item.audio_url.toString())
-                    intent.putExtra(AppConstants.CHAT_TYPE, AppConstants.VIDEO_MESSAGE)
-                    intent.putExtra(AppConstants.USER_NAME, name)
-                    intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
-
-                    val transitionName = context.getString(R.string.trans_key)
-                    val options =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            context as Activity,
-                            itemHolder.binding.videoHolder.ivImage,
-                            transitionName
-                        )
-                    ActivityCompat.startActivity(context, intent, options.toBundle())
+                    startOpenMediaActivity(
+                        item.audio_url.toString(),
+                        AppConstants.VIDEO_MESSAGE,
+                        itemHolder.binding.videoHolder.ivImage
+                    )
+                }
+                if (userId.toInt() == item.sender_id) {
+                    itemHolder.binding.videoHolder.ivDeliver.visibility = View.VISIBLE
+                    when (item.is_read) {
+                        0 -> itemHolder.binding.videoHolder.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
+                        1 -> itemHolder.binding.videoHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
+                        2 -> itemHolder.binding.videoHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
+                    }
+                } else {
+                    itemHolder.binding.videoHolder.ivDeliver.visibility = View.GONE
                 }
             }
         }
     }
 
     inner class MyHolder(val binding: ItemChatRightBinding) : RecyclerView.ViewHolder(binding.root)
+
+    private fun startOpenMediaActivity(file: String, type: String, view: View) {
+        val intent = Intent(context, OpenMediaActivity::class.java)
+        intent.putExtra(AppConstants.CHAT_FILE, file)
+        intent.putExtra(AppConstants.CHAT_TYPE, type)
+        intent.putExtra(AppConstants.USER_NAME, name)
+        intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
+
+        val transitionName = context.getString(R.string.trans_key)
+        val options =
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
+                context as Activity,
+                view,
+                transitionName
+            )
+        ActivityCompat.startActivity(context, intent, options.toBundle())
+    }
 
 
     private fun logE(msg: String) {

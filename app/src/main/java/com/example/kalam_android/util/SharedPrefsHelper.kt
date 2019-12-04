@@ -11,12 +11,10 @@ import javax.inject.Singleton
 @Singleton
 class SharedPrefsHelper @Inject
 constructor(private val mSharedPreferences: SharedPreferences) {
-    val PHONE = "key_phoneno"
-    private val KEY_USER_OBJECT = "kalam_user"
-    private val KEY_IS_LOGIN = "is_logged_in_kalam"
+
     private val KEY_PHONE = "key_phone_kalam"
     private val IMAGE_INDEX = "key_image_index_kalam"
-    private val CONTACTS_SYNCED = "key_contacts_synced"
+
     private val ALL_CHAT_ITEM_SYNCED = "key_all_chat_item_synced"
     private val LANGUAGE = "kalam_user_language"
     private val SELECT_AUTO = "kalam_translate_data"
@@ -62,7 +60,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     }
 
     fun setNumber(phone: String) {
-        put(PHONE, phone)
+        put(AppConstants.PHONE, phone)
     }
 
     fun setImageIndex(index: Int) {
@@ -70,7 +68,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     }
 
     fun getNumber(): String? {
-        return get(PHONE, "")
+        return get(AppConstants.PHONE, "")
     }
 
     fun getImageIndex(): Int? {
@@ -78,18 +76,18 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     }
 
     fun isLoggedIn(): Boolean {
-        return get(KEY_IS_LOGIN, false) ?: false
+        return get(AppConstants.KEY_IS_LOGIN, false) ?: false
     }
 
     fun setUser(user: UserData?) {
-        put(KEY_IS_LOGIN, true)
+        put(AppConstants.KEY_IS_LOGIN, true)
         val json = Gson().toJson(user)
-        put(KEY_USER_OBJECT, json)
+        put(AppConstants.KEY_USER_OBJECT, json)
     }
 
     fun getUser(): UserData? {
         return try {
-            val json = get(KEY_USER_OBJECT, "")
+            val json = get(AppConstants.KEY_USER_OBJECT, "")
             Gson().fromJson(json, UserData::class.java)
         } catch (e: JsonSyntaxException) {
             null
@@ -115,11 +113,11 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     }
 
     fun contactsSynced() {
-        put(CONTACTS_SYNCED, true)
+        put(AppConstants.CONTACTS_SYNCED, true)
     }
 
     fun isContactsSynced(): Boolean {
-        return get(CONTACTS_SYNCED, false) ?: false
+        return get(AppConstants.CONTACTS_SYNCED, false) ?: false
     }
 
     fun allChatItemSynced() {

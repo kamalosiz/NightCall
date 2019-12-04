@@ -21,7 +21,6 @@ import com.google.firebase.messaging.RemoteMessage
 
 class FCMService : FirebaseMessagingService() {
     val TAG = "FirebaseMessaging"
-    val NOTIFICATION_ID = 1
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
         Debugger.e(TAG, "Notification Received: ${remoteMSG.data}")
         Debugger.e(TAG, "Notification Received: ${remoteMSG.notification}")
@@ -47,14 +46,14 @@ class FCMService : FirebaseMessagingService() {
         var body: String? = ""
         var title: String? = ""
         try {
-            body = remoteMessage.notification!!.body
+            body = remoteMessage.notification?.body
 //            body = remoteMessage.data[AppConstants.NOTIFICATION_BODY]
             logE("notification body $body")
         } catch (e: Exception) {
 
         }
         try {
-            title = remoteMessage.notification!!.title
+            title = remoteMessage.notification?.title
 //            title = remoteMessage.data[AppConstants.SENDER_NAME]
             logE("notification body $title")
         } catch (e: Exception) {
@@ -85,16 +84,16 @@ class FCMService : FirebaseMessagingService() {
         val mNotificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotificationChannels(mNotificationManager, notificationType.toString())
+            setupNotificationChannels(mNotificationManager, notificationType)
         }
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        mBuilder = NotificationCompat.Builder(this, notificationType.toString())
+        mBuilder = NotificationCompat.Builder(this, notificationType)
             .setContentTitle(title)
             .setSmallIcon(getNotificationIcon())
             .setContentText(body)
             .setColor(Color.parseColor("#179a63"))
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentIntent(
                 if (isAppRunning(this, packageName)) pendingIntent else null
             )

@@ -158,7 +158,7 @@ class AdapterForContacts(val context: Context) :
                         val intent = Intent(context, ChatDetailActivity::class.java)
                         intent.putExtra(AppConstants.RECEIVER_ID, item?.id.toString())
                         intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
-                        intent.putExtra(AppConstants.CHAT_USER_NAME, item?.name.toString())
+                        intent.putExtra(AppConstants.CHAT_USER_NAME, item?.kalam_name.toString())
                         intent.putExtra(
                             AppConstants.CHAT_USER_PICTURE,
                             item?.profile_image.toString()

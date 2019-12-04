@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.kalam_android.R
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.MyClickListener
-import com.example.kalam_android.callbacks.NewMessageListener
+import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.databinding.ChatsFragmentBinding
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.model.AllChatListResponse
@@ -36,7 +36,7 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
+class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
 
     private val TAG = this.javaClass.simpleName
     private lateinit var binding: ChatsFragmentBinding
@@ -60,23 +60,23 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         )
         MyApplication.getAppComponent(activity as Context).doInjection(this)
         viewModel = ViewModelProviders.of(this, factory).get(AllChatListViewModel::class.java)
-        viewModel.allChatLocalResponse().observe(this, Observer {
-            consumeLocalResponse(it)
-        })
+        /* viewModel.allChatLocalResponse().observe(this, Observer {
+             consumeLocalResponse(it)
+         })*/
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        if (sharedPrefsHelper.isAllChatsItemsSynced()) {
+        /*if (sharedPrefsHelper.isAllChatsItemsSynced()) {
             viewModel.getAllchatItemFromDB()
             logE("loaded from local db")
         } else {
             hitAllChatApi()
             logE("loaded from live server")
-        }
-//        hitAllChatApi()
+        }*/
+        hitAllChatApi()
 
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
-        SocketIO.setListener(this)
+        SocketIO.setSocketCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {
             isRefresh = true
             hitAllChatApi()
@@ -176,36 +176,38 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         Debugger.e(TAG, message)
     }
 
-    override fun socketResponse(jsonObject: JSONObject) {
-        val gson = Gson()
-        logE("New Message : $jsonObject")
-        val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-        val unixTime = System.currentTimeMillis() / 1000L
-        activity?.runOnUiThread {
-            val name = newChat.sender_name.split(" ")
-            val item = ChatListData(
-                newChat.chat_id, "", unixTime, name[0], name[1],
-                "", newChat.message, 1
-            )
-            if (chatIDs.contains(newChat.chat_id)) {
-                logE("Chat ID matched")
-                for (x in chatList.indices) {
-                    if (chatList[x].chat_id == newChat.chat_id) {
-                        chatList[x].un_read_count += 1
-                        modifyItem(x, item.message.toString(), unixTime, chatList[x].un_read_count)
-                    }
-                }
-            } else {
-                logE("This chat is not present")
-                if (chatList.size == 0) {
-                    binding.tvNoChat.visibility = View.GONE
-                }
-                chatList.add(0, item)
-                chatIDs.add(newChat.chat_id)
-                (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(chatList)
-                viewModel.insertChat(item)
+    override fun socketResponse(jsonObject: JSONObject, type: String) {
+        if (type == AppConstants.NEW_MESSAGE) {
+            val gson = Gson()
+            logE("New Message : $jsonObject")
+            val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+            val unixTime = System.currentTimeMillis() / 1000L
+            activity?.runOnUiThread {
+                /* val name = newChat.sender_name.split(" ")
+                 val item = ChatListData(
+                     newChat.chat_id, "", unixTime, name[0], name[1],
+                     "", newChat.message, 1
+                 )
+                 if (chatIDs.contains(newChat.chat_id)) {
+                     logE("Chat ID matched")
+                     for (x in chatList.indices) {
+                         if (chatList[x].chat_id == newChat.chat_id) {
+                             chatList[x].un_read_count += 1
+                             modifyItem(x, item.message.toString(), unixTime, chatList[x].un_read_count)
+                         }
+                     }
+                 } else {
+                     logE("This chat is not present")
+                     if (chatList.size == 0) {
+                         binding.tvNoChat.visibility = View.GONE
+                     }
+                     chatList.add(0, item)
+                     chatIDs.add(newChat.chat_id)
+                     (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(chatList)
+                     viewModel.insertChat(item)
+                 }*/
+                hitAllChatApi()
             }
-//            hitAllChatApi()
         }
     }
 
@@ -214,7 +216,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
-                    val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
+                    /*val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
                     if (isSeen == true) {
                         logE("If Part")
                         if (chatList[position].un_read_count != 0) {
@@ -229,9 +231,9 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
                         val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
-                    }
-                    SocketIO.setListener(this)
-//                    hitAllChatApi()
+                    }*/
+                    SocketIO.setSocketCallbackListener(this)
+                    hitAllChatApi()
                 }
             }
         }
@@ -279,7 +281,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
             isRefresh = true
             hitAllChatApi()
-            SocketIO.setListener(this)
+            SocketIO.setSocketCallbackListener(this)
             logE("OnResume of Chat Fragment")
         }
     }

@@ -2,11 +2,9 @@ package com.example.kalam_android.view.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.media.ThumbnailUtils
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -19,8 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
-import com.example.kalam_android.callbacks.MessageTypingListener
-import com.example.kalam_android.callbacks.NewMessageListener
+import com.example.kalam_android.callbacks.*
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.repository.model.ChatData
@@ -43,17 +40,15 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
-import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
-import kotlin.math.log
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
-    NewMessageListener, MessageTypingListener {
+    SocketCallback, MessageTypingListener {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -86,16 +81,16 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        viewModel.audioResponse().observe(this, Observer {
-            consumeAudioResponse(it)
+        viewModel.mediaResponse().observe(this, Observer {
+            consumeMediaResponse(it)
         })
         gettingChatId()
         setUserData()
         initAdapter()
         initListeners()
         checkSomeoneTyping()
-        SocketIO.setListener(this)
-        SocketIO.setTypingListener(this)
+        SocketIO.setSocketCallbackListener(this)
+        SocketIO.setTypingListeners(this)
         myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
         applyPagination()
     }
@@ -145,6 +140,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (isFromChatFragment) {
             chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
             hitConversationApi(0)
+            SocketIO.emitReadAllMessages(
+                chatId.toString(),
+                sharedPrefsHelper.getUser()?.id.toString()
+            )
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
         } else {
             receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
@@ -222,14 +221,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun consumeAudioResponse(apiResponse: ApiResponse<MediaResponse>?) {
+    private fun consumeMediaResponse(apiResponse: ApiResponse<MediaResponse>?) {
         when (apiResponse?.status) {
 
             Status.LOADING -> {
                 logE("Loading Audio")
             }
             Status.SUCCESS -> {
-                renderAudioResponse(apiResponse.data as MediaResponse)
+                renderMediaResponse(apiResponse.data as MediaResponse)
             }
             Status.ERROR -> {
                 toast("Something went wrong please try again")
@@ -240,7 +239,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun renderAudioResponse(response: MediaResponse?) {
+    private fun renderMediaResponse(response: MediaResponse?) {
         logE("socketResponse: $response")
         response?.let {
             it.data?.let { list ->
@@ -248,13 +247,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     list[0].message.toString(),
                     list[0].type.toString(),
                     list[0].file_id.toString(),
-                    list[0].duration.toLong(), list[0].thumbnail
+                    list[0].duration.toLong(), list[0].thumbnail,
+                    list[0].identifier
                 )
             }
             lastMsgTime = System.currentTimeMillis() / 1000L
-            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
+            /*(binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
                 it.data?.get(0)?.identifier.toString()
-            )
+            )*/
         }
     }
 
@@ -366,14 +366,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun emitNewMessageToSocket(
-        message: String, type: String, fileID: String, duration: Long, thumbnail: String?
+        message: String, type: String, fileID: String,
+        duration: Long, thumbnail: String?, identifier: String
     ) {
         SocketIO.emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(),
             chatId.toString(), message, type,
             sharedPrefsHelper.getUser()?.firstname.toString()
                     + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
-            fileID, duration, thumbnail.toString()
+            fileID, duration, thumbnail.toString(), identifier
         )
     }
 
@@ -393,49 +394,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    override fun socketResponse(jsonObject: JSONObject) {
-        val gson = Gson()
-        logE("New Message : $jsonObject")
-        val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-        if (data.chat_id == chatId) {
-            runOnUiThread {
-                addMessage(data)
-            }
-        }
-    }
-
     //Sending dummy identifier for now until i don't have message id
     private fun sendMessage() {
+        val identifier = System.currentTimeMillis().toString()
         createChatObject(
             binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
-            AppConstants.TEXT_MESSAGE, "1"
+            AppConstants.TEXT_MESSAGE, identifier
         )
         emitNewMessageToSocket(
-            binding.lvBottomChat.editTextMessage.text.toString(),
-            AppConstants.TEXT_MESSAGE, AppConstants.DUMMY_STRING, 0, AppConstants.DUMMY_STRING
+            binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.TEXT_MESSAGE,
+            AppConstants.DUMMY_STRING, 0, AppConstants.DUMMY_STRING, identifier
         )
         logE("Message Emitted to socket")
         lastMessage = binding.lvBottomChat.editTextMessage.text.toString()
         binding.lvBottomChat.editTextMessage.setText("")
-    }
-
-    override fun typingResponse(jsonObject: JSONObject, isTyping: Boolean) {
-        logE("typing response: $jsonObject")
-        val chatId1 = jsonObject.getString("chat_id")
-        if (chatId1.toInt() == chatId) {
-            runOnUiThread {
-                if (isTyping) {
-                    val user: String? = jsonObject.getString("user")
-                    if (user.equals(userRealName)) {
-                        logE("Is Typing")
-                        binding.header.tvTyping.visibility = View.VISIBLE
-                    }
-                } else {
-                    logE("Not Typing")
-                    binding.header.tvTyping.visibility = View.GONE
-                }
-            }
-        }
     }
 
     override fun onClick(v: View?) {
@@ -509,7 +481,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         logE("List size : $list")
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -543,13 +514,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    /*override fun onPause() {
-        super.onPause()
-        if (Global.mediaPlayer.isPlaying) {
-            Global.mediaPlayer.stop()
-        }
-    }*/
-
     override fun onBackPressed() {
         val intent = Intent()
         if (isFromOutside) {
@@ -568,7 +532,71 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
+
+    //Socket Listeners
+
+    override fun socketResponse(jsonObject: JSONObject, type: String) {
+        runOnUiThread {
+            when (type) {
+                AppConstants.NEW_MESSAGE -> {
+                    val gson = Gson()
+                    val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+                    if (data.chat_id == chatId) {
+                        addMessage(data)
+                    }
+                }
+                AppConstants.ALL_MESSAGES_READ -> {
+                    logE("Chat ID received : $jsonObject")
+                    val chatId = jsonObject.getString("chat_id").toInt()
+                    if (this.chatId == chatId) {
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
+                            true
+                        )
+                    }
+                }
+                AppConstants.MESSAGE_DELIVERED -> {
+                    val chatId = jsonObject.getString("chat_id")
+                    val userId = jsonObject.getString("user_id")
+                    if (chatId.toInt() == this.chatId) {
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
+                            false
+                        )
+                    }
+                }
+                AppConstants.SEND_MESSAGE -> {
+                    logE("AppConstants.SEND_MESSAGE status: $jsonObject")
+                    val isDelivered = jsonObject.getBoolean("delivered")
+                    val identifier = jsonObject.getString("identifier")
+                    (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
+                        identifier, isDelivered
+                    )
+
+                }
+            }
+        }
+    }
+
+    override fun typingResponse(jsonObject: JSONObject, isTyping: Boolean) {
+        logE("typing response: $jsonObject")
+        val chatId1 = jsonObject.getString("chat_id")
+        if (chatId1.toInt() == chatId) {
+            runOnUiThread {
+                if (isTyping) {
+                    val user: String? = jsonObject.getString("user")
+                    if (user.equals(userRealName)) {
+                        logE("Is Typing")
+                        binding.header.tvTyping.visibility = View.VISIBLE
+                    }
+                } else {
+                    logE("Not Typing")
+                    binding.header.tvTyping.visibility = View.GONE
+                }
+            }
+        }
+    }
+
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)
     }
+
 }

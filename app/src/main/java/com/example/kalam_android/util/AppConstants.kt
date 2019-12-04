@@ -25,6 +25,10 @@ object AppConstants {
     const val CHAT_TYPE = "chattype"
     const val POST_AUDIO = "post_audio"
     const val SELECTED_IMAGES_VIDEOS = "selected_images_videos"
+    const val KEY_USER_OBJECT = "kalam_user"
+    const val CONTACTS_SYNCED = "key_contacts_synced"
+    const val KEY_IS_LOGIN = "is_logged_in_kalam"
+    const val PHONE = "key_phoneno"
 
     val NOTIFICATION_TYPE = "notification_type"
     val CONTENT_TYPE = "content_type"
@@ -57,10 +61,13 @@ object AppConstants {
     const val START_TYPING = "start_typing"
     const val STOP_TYPING = "stop_typing"
     const val UPDATE_SETTINGS = "update_settings"
+    const val READ_ALL_MESSAGES = "read_all_messages"
 
     //Listeners
     const val MESSAGE_TYPING = "message_typing"
     const val NEW_MESSAGE = "new_message"
     const val MESSAGE_STOPS_TYPING = "message_stop_typing"
+    const val ALL_MESSAGES_READ = "all_messages_read"
+    const val MESSAGE_DELIVERED = "messages_delivered"
 
 }

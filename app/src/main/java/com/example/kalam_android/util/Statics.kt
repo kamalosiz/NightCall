@@ -170,7 +170,7 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     val cursor = cursorLoader.loadInBackground()
     column_index_data = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
     while (cursor.moveToNext()) {
-        val path = cursor?.getString(column_index_data)
+        val path = cursor.getString(column_index_data)
         if (path.contains(".jpg") || path.contains(".png")) {
             listOfAllImages.add(
                 MediaList(
@@ -191,7 +191,7 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     return listOfAllImages
 }
 
-fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {
+/*fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {
     val listOfAllImages = ArrayList<MediaList>()
     val uri: Uri
     val cursor: Cursor?
@@ -252,4 +252,4 @@ fun getAllShownVideosPath(context: Context): ArrayList<MediaList> {
 fun getEmptyMultipartList(): ArrayList<MultipartBody.Part> {
     var multiPartList: ArrayList<MultipartBody.Part> = ArrayList()
     return multiPartList
-}
+}*/
