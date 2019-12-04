@@ -17,7 +17,7 @@
             android:fontFamily="@font/roboto_regular"
             android:text="03:00 PM"
             android:textColor="@color/theme_color"
-            android:textSize="@dimen/_10ssp" />
+            android:textSize="@dimen/_8ssp" />
 
         <RelativeLayout
             android:id="@+id/rlImage"

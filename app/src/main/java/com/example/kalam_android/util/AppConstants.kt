@@ -62,6 +62,8 @@ object AppConstants {
     const val STOP_TYPING = "stop_typing"
     const val UPDATE_SETTINGS = "update_settings"
     const val READ_ALL_MESSAGES = "read_all_messages"
+    const val MESSAGE_SEEN = "message_seen"
+    const val SEEN_MESSAGE = "seen_message"
 
     //Listeners
     const val MESSAGE_TYPING = "message_typing"

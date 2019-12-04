@@ -24,7 +24,7 @@ class FCMService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
         Debugger.e(TAG, "Notification Received: ${remoteMSG.data}")
         Debugger.e(TAG, "Notification Received: ${remoteMSG.notification}")
-        showNotification(remoteMSG)
+//        showNotification(remoteMSG)
     }
 
     private fun logE(message: String) {
@@ -95,7 +95,7 @@ class FCMService : FirebaseMessagingService() {
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentIntent(
-                if (isAppRunning(this, packageName)) pendingIntent else null
+                if (!isAppRunning(this, packageName)) pendingIntent else null
             )
             .setSound(defaultSoundUri)
             .setGroup(title)

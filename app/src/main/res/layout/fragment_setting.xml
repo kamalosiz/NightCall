@@ -16,7 +16,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/settings"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp" />
+            android:textSize="@dimen/_12ssp" />
 
         <View
             android:layout_width="match_parent"
@@ -32,7 +32,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelFindFriends"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp" />
+            android:textSize="@dimen/_12ssp"/>
 
         <View
             android:layout_width="match_parent"
@@ -48,7 +48,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelPrivacyPolicy"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp" />
+            android:textSize="@dimen/_12ssp" />
 
         <View
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelTermCondition"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp" />
+            android:textSize="@dimen/_12ssp" />
 
         <View
             android:layout_width="match_parent"
@@ -80,7 +80,7 @@
             android:padding="@dimen/_15sdp"
             android:text="@string/labelAbout"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13ssp" />
+            android:textSize="@dimen/_12ssp" />
 
         <View
             android:layout_width="match_parent"

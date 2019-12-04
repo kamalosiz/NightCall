@@ -54,6 +54,9 @@ object SocketIO {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.MESSAGE_DELIVERED)
 
+        }?.on(AppConstants.SEEN_MESSAGE) {
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.SEEN_MESSAGE)
         }
     }
 
@@ -112,5 +115,13 @@ object SocketIO {
         jsonObject.addProperty("chat_id", chatID)
         jsonObject.addProperty("user_id", userId)
         socket?.emit(AppConstants.READ_ALL_MESSAGES, jsonObject)
+    }
+
+    fun emitMessageSeen(chatId: String, msgId: String, userId: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("chat_id", chatId)
+        jsonObject.addProperty("user_id", userId)
+        jsonObject.addProperty("message_id", msgId)
+        socket?.emit(AppConstants.MESSAGE_SEEN, jsonObject)
     }
 }

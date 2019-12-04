@@ -17,7 +17,7 @@
             android:fontFamily="@font/roboto_regular"
             android:text="5:30 pm"
             android:textColor="@color/theme_color"
-            android:textSize="@dimen/_10ssp" />
+            android:textSize="@dimen/_8ssp" />
 
         <ImageView
             android:id="@+id/ivMessage"
@@ -50,7 +50,7 @@
                 android:text="This is a dummy message"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_12ssp"
+                android:textSize="@dimen/_10ssp"
                 tools:ignore="RtlCompat" />
         </RelativeLayout>
 
@@ -70,7 +70,7 @@
                 android:fontFamily="@font/roboto_regular"
                 android:text="View Original"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_9ssp" />
+                android:textSize="@dimen/_7ssp" />
 
             <View
                 android:id="@+id/view"

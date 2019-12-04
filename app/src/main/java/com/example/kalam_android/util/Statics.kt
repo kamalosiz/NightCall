@@ -109,6 +109,12 @@ fun printDifference(endDate: Date): String {
     }
     return duration
 }
+fun getTimeStamp(unixTime: Long): String {
+    val date = Date(unixTime * 1000L)
+    val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
+    sdf.timeZone = TimeZone.getDefault()
+    return sdf.format(date)
+}
 
 fun showAlertDialoge(context: Context, title: String, message: String) {
     val builder1 = AlertDialog.Builder(context)
