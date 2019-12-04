@@ -78,10 +78,34 @@ fun printDifference(endDate: Date): String {
     val elapsedSeconds = difference / secondsInMilli
     var duration = ""
     when {
-        elapsedDays.toInt() != 0 -> duration = "$elapsedDays days ago"
-        elapsedHours.toInt() != 0 -> duration = "$elapsedHours hours ago"
-        elapsedMinutes.toInt() != 0 -> duration = "$elapsedMinutes minutes ago"
-        elapsedSeconds.toInt() != 0 -> duration = "$elapsedSeconds seconds ago"
+        elapsedDays.toInt() != 0 -> {
+            duration = if (elapsedDays.toInt() == 1) {
+                "$elapsedDays day ago"
+            } else {
+                "$elapsedDays days ago"
+            }
+        }
+        elapsedHours.toInt() != 0 -> {
+            duration = if (elapsedHours.toInt() == 1) {
+                "$elapsedHours hour ago"
+            } else {
+                "$elapsedHours hours ago"
+            }
+        }
+        elapsedMinutes.toInt() != 0 -> {
+            duration = if (elapsedMinutes.toInt() == 1) {
+                "$elapsedMinutes minute ago"
+            } else {
+                "$elapsedMinutes minutes ago"
+            }
+        }
+        elapsedSeconds.toInt() != 0 -> {
+            duration = if (elapsedSeconds.toInt() == 1) {
+                "$elapsedSeconds second ago"
+            } else {
+                "$elapsedSeconds seconds ago"
+            }
+        }
     }
     return duration
 }
@@ -146,7 +170,7 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     val cursor = cursorLoader.loadInBackground()
     column_index_data = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
     while (cursor.moveToNext()) {
-        val path = cursor?.getString(column_index_data)
+        val path = cursor.getString(column_index_data)
         if (path.contains(".jpg") || path.contains(".png")) {
             listOfAllImages.add(
                 MediaList(
@@ -167,7 +191,7 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     return listOfAllImages
 }
 
-fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {
+/*fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {
     val listOfAllImages = ArrayList<MediaList>()
     val uri: Uri
     val cursor: Cursor?
@@ -228,4 +252,4 @@ fun getAllShownVideosPath(context: Context): ArrayList<MediaList> {
 fun getEmptyMultipartList(): ArrayList<MultipartBody.Part> {
     var multiPartList: ArrayList<MultipartBody.Part> = ArrayList()
     return multiPartList
-}
+}*/

@@ -1,77 +1,137 @@
 package com.example.kalam_android.notification
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
-import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.kalam_android.R
-import com.example.kalam_android.repository.model.ChatData
-import com.example.kalam_android.repository.model.NotificationResponse
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.view.activities.ChatDetailActivity
+import com.example.kalam_android.view.activities.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
-import org.json.JSONObject
-import java.util.*
+
 
 class FCMService : FirebaseMessagingService() {
     val TAG = "FirebaseMessaging"
-    private val ADMIN_CHANNEL_ID = "com.example.kala_android"
-    private lateinit var notificationManager: NotificationManager
-
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
         Debugger.e(TAG, "Notification Received: ${remoteMSG.data}")
-        /*val gson = Gson()
-        val jsonObject = p0[0] as JSONObject
-        val data = gson.fromJson(jsonObject.toString(), NotificationResponse::class.java)
-        *//* if (p0.notification != null) {
-             showNotification(p0.notification?.title, p0.notification?.body)
-         }*//*
-        if (data != null) {*/
-        val name = remoteMSG.data["sender_name"]
-        val message = remoteMSG.data["message"]
-        showNotification(name, message)
-//        }
+        Debugger.e(TAG, "Notification Received: ${remoteMSG.notification}")
+        showNotification(remoteMSG)
     }
 
+    private fun logE(message: String) {
+        Debugger.e(TAG, message)
+    }
 
-    private fun showNotification(title: String?, body: String?) {
+    private fun showNotification(remoteMessage: RemoteMessage) {
 
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        //Setting up Notification channels for android O and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupNotificationChannels(notificationManager)
+        logE("chatId: " + remoteMessage.data[AppConstants.FIREBASE_CHAT_ID])
+        logE("notificationType: " + remoteMessage.data[AppConstants.NOTIFICATION_TYPE])
+        logE("content_type: " + remoteMessage.data[AppConstants.CONTENT_TYPE])
+        var notifyId = -1
+        try {
+            notifyId = Integer.valueOf(remoteMessage.data[AppConstants.FIREBASE_CHAT_ID].toString())
+        } catch (e: NumberFormatException) {
+
         }
-        val notificationId = Random().nextInt(60000)
 
+        var body: String? = ""
+        var title: String? = ""
+        try {
+            body = remoteMessage.notification?.body
+//            body = remoteMessage.data[AppConstants.NOTIFICATION_BODY]
+            logE("notification body $body")
+        } catch (e: Exception) {
+
+        }
+        try {
+            title = remoteMessage.notification?.title
+//            title = remoteMessage.data[AppConstants.SENDER_NAME]
+            logE("notification body $title")
+        } catch (e: Exception) {
+
+        }
+        val intent = Intent(this, ChatDetailActivity::class.java)
+        intent.putExtra(AppConstants.CHAT_ID, notifyId)
+        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+        intent.putExtra(AppConstants.IS_FROM_CHAT_OUTSIDE, true)
+        intent.putExtra(
+            AppConstants.CHAT_USER_NAME,
+            remoteMessage.data[AppConstants.SENDER_NAME]
+        )
+//        intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
+//        val notificationType = remoteMessage.data[AppConstants.NOTIFICATION_TYPE]
+        val notificationType = "Kalam Messages"
+
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                notifyId,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+        val mBuilder: NotificationCompat.Builder
+
+        val mNotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setupNotificationChannels(mNotificationManager, notificationType)
+        }
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val notificationBuilder = NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+        mBuilder = NotificationCompat.Builder(this, notificationType)
             .setContentTitle(title)
+            .setSmallIcon(getNotificationIcon())
             .setContentText(body)
+            .setColor(Color.parseColor("#179a63"))
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setContentIntent(
+                if (isAppRunning(this, packageName)) pendingIntent else null
+            )
             .setSound(defaultSoundUri)
+            .setGroup(title)
+            .setGroupSummary(true)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
 
-//        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager.notify(notifyId, mBuilder.build())
+    }
 
-        notificationManager.notify(notificationId, notificationBuilder.build())
+    private fun getNotificationIcon(): Int {
+        val useWhiteIcon = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+        return if (useWhiteIcon) R.drawable.ic_notification else R.drawable.app_icon
+    }
+
+    fun isAppRunning(context: Context, packageName: String): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val procInfos = activityManager.runningAppProcesses
+        if (procInfos != null) {
+            for (processInfo in procInfos) {
+                if (processInfo.processName == packageName) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private fun setupNotificationChannels(notification: NotificationManager) {
+    private fun setupNotificationChannels(notification: NotificationManager, type: String) {
         val adminChannelName = getString(R.string.notifications_admin_channel_name)
         val adminChannelDescription = getString(R.string.notifications_admin_channel_description)
 
-        val adminChannel: NotificationChannel
-        adminChannel = NotificationChannel(
-            ADMIN_CHANNEL_ID,
-            adminChannelName,
-            NotificationManager.IMPORTANCE_DEFAULT
+        val adminChannel = NotificationChannel(
+            type,
+            type,
+            NotificationManager.IMPORTANCE_HIGH
         )
         adminChannel.description = adminChannelDescription
         adminChannel.enableLights(true)
@@ -80,3 +140,11 @@ class FCMService : FirebaseMessagingService() {
         notification.createNotificationChannel(adminChannel)
     }
 }
+
+
+/* .setStyle(
+     NotificationCompat.BigPictureStyle()
+//                    .bigPicture(bigBitmap)
+         .setSummaryText(body)
+         .setBigContentTitle(title)
+ )*/

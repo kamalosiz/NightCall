@@ -38,7 +38,6 @@ class MainActivity : BaseActivity() {
         binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
-
         }
 
 

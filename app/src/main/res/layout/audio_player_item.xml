@@ -87,5 +87,14 @@
                 android:layout_height="1dp"
                 android:background="@color/black" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivDeliver"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_10sdp"
+            android:layout_below="@id/cvPlayer"
+            android:layout_alignEnd="@id/cvPlayer"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_marginEnd="@dimen/_10sdp"/>
     </RelativeLayout>
 </layout>

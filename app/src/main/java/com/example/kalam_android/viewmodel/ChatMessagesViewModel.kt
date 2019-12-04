@@ -26,7 +26,7 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
         return responsiveLiveData
     }
 
-    fun audioResponse(): MutableLiveData<ApiResponse<MediaResponse>> {
+    fun mediaResponse(): MutableLiveData<ApiResponse<MediaResponse>> {
         return audioLiveData
     }
 

@@ -93,7 +93,7 @@
         <item name="android:background">@drawable/bg_bottom_sheet</item>
     </style>
     <style name="PrimaryActionButton" parent="Theme.AppCompat.Light">
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
     </style>
 
 </resources>

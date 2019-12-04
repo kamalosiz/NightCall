@@ -282,7 +282,7 @@ class MyChatMediaHelper(
     }
 
     fun getTotalDuration(): Long {
-        return totalDuration
+        return (totalDuration / 1000) % 60
     }
 
     fun hideRecorder() {
@@ -309,11 +309,9 @@ class MyChatMediaHelper(
     }
 
     private fun playAudio() {
-
         isPlayPlayer = true
         isStopPlayer = true
         initMediaPlayer()
-
     }
 
     private fun initMediaPlayer() {

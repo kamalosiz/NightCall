@@ -157,7 +157,8 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                         i.id,
                         i.name,
                         i.profile_image,
-                        i.kalam_number
+                        i.kalam_number,
+                        i.kalam_name
                     )
                 )
             }
@@ -198,7 +199,8 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                         item.contact_id,
                         item.name,
                         item.profile_image,
-                        item.kalam_number
+                        item.kalam_number,
+                        item.kalam_name
                     )
                 )
             }

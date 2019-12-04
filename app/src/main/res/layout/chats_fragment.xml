@@ -50,6 +50,7 @@
             android:focusable="true"
             android:theme="@style/PrimaryActionButton"
             app:fabSize="normal"
+            android:src="@drawable/ic_mic_white"
             app:rippleColor="@color/colorAccent" />
 
     </RelativeLayout>

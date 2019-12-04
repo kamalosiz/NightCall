@@ -15,7 +15,7 @@ data class ChatData(
     val audio_url: String?,
     val original_audio_url: String?,
     val sender_name: String,
-    val id: Int,
+    var id: Long,
     val chat_id: Int,
     val sender_id: Int?,
     val receiver_id: Int,
@@ -24,7 +24,7 @@ data class ChatData(
     val receiver_deleted: Int,
     val type: String,
     val file: String?,
-    val is_read: Int,
+    var is_read: Int,
     val duration: Long,
     val original_message: String?,
     var identifier: String?

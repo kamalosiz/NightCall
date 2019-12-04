@@ -73,4 +73,6 @@
     <string name="labelAudio">Audio</string>
     <string name="labelLocation">Location</string>
     <string name="labelMyStatus">My Status</string>
+    <string name="speech_prompt">Speak now</string>
+    <string name="speech_not_supported">Your device does not support speech</string>
 </resources>
