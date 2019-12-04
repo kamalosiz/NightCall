@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -15,6 +16,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.AddMyStatusClickListener
 import com.example.kalam_android.databinding.StoriesFragmentBinding
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.StoriesAdapter
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
@@ -60,13 +62,14 @@ class StoriesFragment : Fragment(), AddMyStatusClickListener {
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report?.areAllPermissionsGranted() == true) {
-                    SandriosCamera
+                    /*SandriosCamera
                         .with()
                         .setShowPicker(true)
                         .setVideoFileSize(20)
                         .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
                         .enableImageCropping(true)
-                        .launchCamera(activity)
+                        .launchCamera(activity)*/
+                    toast(activity,"My Status")
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }

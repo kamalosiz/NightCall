@@ -4,6 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,12 +35,19 @@ import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
 import com.google.gson.Gson
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import org.json.JSONObject
+import java.util.jar.Manifest
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
+class ChatsFragment : Fragment(), NewMessageListener, MyClickListener, RecognitionListener {
 
     private val TAG = this.javaClass.simpleName
     private lateinit var binding: ChatsFragmentBinding
@@ -49,6 +60,8 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
     private var chatIDs: ArrayList<Int> = ArrayList()
     var position = -1
     private var isRefresh = false
+    private var speech: SpeechRecognizer? = null
+    private var recognizerIntent: Intent? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,7 +94,53 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
             isRefresh = true
             hitAllChatApi()
         }
+        checkPermission()
+        binding.fabSpeech.isClickable = false
+        binding.fabSpeech.setOnClickListener {
+
+            speech!!.startListening(recognizerIntent)
+
+        }
         return binding.root
+    }
+
+    private fun checkPermission() {
+        Dexter.withActivity(activity).withPermission(android.Manifest.permission.RECORD_AUDIO)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+
+                    initVoiceToText()
+
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    response?.requestedPermission
+                }
+
+            }).onSameThread().check()
+    }
+
+    private fun initVoiceToText() {
+
+        speech = SpeechRecognizer.createSpeechRecognizer(activity)
+        speech!!.setRecognitionListener(this)
+        recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en")
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity?.packageName)
+        recognizerIntent!!.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+        )
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity?.packageName)
+
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<AllChatListResponse>?) {
@@ -133,6 +192,9 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
         list?.let {
             chatList.clear()
             chatIDs.clear()
+            if (list.isNotEmpty()) {
+                binding.fabSpeech.isClickable = true
+            }
             chatList.addAll(list)
             list.forEach {
                 chatIDs.add(it.chat_id)
@@ -218,6 +280,7 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
                     if (isSeen == true) {
                         logE("If Part")
                         chatList[position].un_read_count = 0
+                        initVoiceToText()
                         (binding.chatRecycler.adapter as AllChatListAdapter).updateReadCount(
                             chatList, position
                         )
@@ -281,4 +344,107 @@ class ChatsFragment : Fragment(), NewMessageListener, MyClickListener {
             logE("OnResume of Chat Fragment")
         }
     }
+
+    override fun onPause() {
+        super.onPause()
+        if (speech != null) {
+            speech!!.destroy()
+            Log.i("Voice To Text", "destroy")
+        }
+
+    }
+
+    override fun onReadyForSpeech(params: Bundle?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onRmsChanged(rmsdB: Float) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onBufferReceived(buffer: ByteArray?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onPartialResults(partialResults: Bundle?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onEvent(eventType: Int, params: Bundle?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onBeginningOfSpeech() {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onEndOfSpeech() {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onError(error: Int) {
+        binding.fabSpeech.isClickable = true
+        val errorMessage = getErrorText(error)
+        toast(activity, errorMessage)
+    }
+
+    override fun onResults(results: Bundle?) {
+        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        if (matches?.size!! > 0 && chatList.size > 0) {
+            matches.forEach { speechName: String ->
+
+                for (i in chatList.indices) {
+                    if (speechName.startsWith(
+                            chatList[i].firstname,
+                            ignoreCase = true
+                        ) || speechName.endsWith(chatList[i].lastname, ignoreCase = true)
+                    ) {
+                        position = i
+                        val intent = Intent(activity, ChatDetailActivity::class.java)
+                        intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
+                        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                        intent.putExtra(
+                            AppConstants.CHAT_USER_NAME,
+                            StringBuilder(chatList[i].firstname).append(" ").append(chatList[i].lastname).toString()
+                        )
+                        intent.putExtra(AppConstants.CHAT_USER_PICTURE, chatList[i].profile_image)
+                        startActivityForResult(
+                            intent,
+                            AppConstants.CHAT_FRAGMENT_CODE
+                        )
+                        return
+
+                    } else {
+//                        toast(activity, "no match")
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun getErrorText(errorCode: Int): String {
+        val message: String
+        when (errorCode) {
+            SpeechRecognizer.ERROR_AUDIO -> message = "Audio recording error"
+            SpeechRecognizer.ERROR_CLIENT -> message = "Client side error"
+            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> message = "Insufficient permissions"
+            SpeechRecognizer.ERROR_NETWORK -> message = "Network error"
+            SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> message = "Network timeout"
+            SpeechRecognizer.ERROR_NO_MATCH -> message = "No match"
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> message = "RecognitionService busy"
+            SpeechRecognizer.ERROR_SERVER -> message = "error from server"
+            SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> message = "No speech input"
+            else -> message = "Didn't understand, please try again."
+        }
+        return message
+    }
+
 }

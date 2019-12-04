@@ -59,7 +59,8 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
 
         viewPagerPagerSelected()
         initBottomSheet()
-        binding.viewPager.setOnTouchListener(this)
+//        binding.lvStoriesView.setOnTouchListener(this)
+
 
 //        autoScrollImages()
     }
@@ -71,6 +72,15 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+             }
+
+        })
 
     }
 
@@ -82,7 +92,7 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
                     positionOffset: Float,
                     positionOffsetPixels: Int
                 ) {
-
+                    binding.viewPager.parent.requestDisallowInterceptTouchEvent(true)
                 }
 
                 override fun onPageSelected(position: Int) {
@@ -163,6 +173,7 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
         slideUpDownBottomSheet()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
 
@@ -176,6 +187,7 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
                 return true
             }
             else -> {
+
                 return false
             }
         }
@@ -185,7 +197,7 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
         if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         } else {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED;
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 }

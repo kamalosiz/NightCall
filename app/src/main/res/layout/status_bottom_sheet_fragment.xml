@@ -9,7 +9,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/_300sdp"
             android:id="@+id/bottom_sheet"
-            android:background="@color/white"
+            android:background="@drawable/bg_bottom_sheet"
             android:clipToPadding="true"
             app:behavior_hideable="true"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
