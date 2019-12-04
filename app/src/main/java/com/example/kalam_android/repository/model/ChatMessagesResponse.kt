@@ -27,7 +27,8 @@ data class ChatData(
     var is_read: Int,
     val duration: Long,
     val original_message: String?,
-    var identifier: String?
+    var identifier: String?,
+    val unix_time: Double
 )
 
 data class MediaResponse(

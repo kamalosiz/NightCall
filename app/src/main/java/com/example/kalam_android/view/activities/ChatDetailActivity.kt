@@ -71,7 +71,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var isFromOutside = false
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
-    private var lastMsgTime: Long? = null
+    private var lastMsgTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -251,7 +251,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     list[0].identifier
                 )
             }
-            lastMsgTime = System.currentTimeMillis() / 1000L
             /*(binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
                 it.data?.get(0)?.identifier.toString()
             )*/
@@ -380,6 +379,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     //Sending Identifier as a message id for now
     private fun createChatObject(message: String, file: String, type: String, identifier: String) {
+        lastMsgTime = System.currentTimeMillis() / 1000L
         addMessage(
             ChatData(
                 AppConstants.DUMMY_STRING,
@@ -389,7 +389,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 ).toString(),
                 identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
                 AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
-                type, file, 0, 0, message, identifier
+                type, file, 0, 0, message, identifier, lastMsgTime.toDouble()
             )
         )
     }
@@ -418,7 +418,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 ) {
                     sendMessage()
                     logE("Text Message")
-                    lastMsgTime = System.currentTimeMillis() / 1000L
                 } else {
                     if (myChatMediaHelper?.isFileReady() == true) {
                         logE("Audio Message")
@@ -543,6 +542,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
                     if (data.chat_id == chatId) {
                         addMessage(data)
+                        SocketIO.emitMessageSeen(
+                            data.chat_id.toString(),
+                            data.id.toString(),
+                            sharedPrefsHelper.getUser()?.id.toString()
+                        )
                     }
                 }
                 AppConstants.ALL_MESSAGES_READ -> {
@@ -555,6 +559,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     }
                 }
                 AppConstants.MESSAGE_DELIVERED -> {
+                    logE("MESSAGE_DELIVERED  : $jsonObject")
                     val chatId = jsonObject.getString("chat_id")
                     val userId = jsonObject.getString("user_id")
                     if (chatId.toInt() == this.chatId) {
@@ -567,10 +572,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     logE("AppConstants.SEND_MESSAGE status: $jsonObject")
                     val isDelivered = jsonObject.getBoolean("delivered")
                     val identifier = jsonObject.getString("identifier")
+                    val msgId = jsonObject.getString("message_id")
                     (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
-                        identifier, isDelivered
+                        identifier, isDelivered, msgId
                     )
-
+                }
+                AppConstants.SEEN_MESSAGE -> {
+                    logE("Message Seen")
+                    val msgId = jsonObject.getString("message_id")
+                    val chatId = jsonObject.getString("chat_id")
+                    if (chatId.toInt() == this.chatId) {
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateSeenStatus(
+                            msgId.toLong()
+                        )
+                    }
                 }
             }
         }

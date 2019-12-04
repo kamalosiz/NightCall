@@ -14,10 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.repository.model.ChatData
-import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.Global
-import com.example.kalam_android.util.showAlertDialoge
+import com.example.kalam_android.util.*
 import com.example.kalam_android.view.activities.OpenMediaActivity
 import com.example.kalam_android.wrapper.GlideDownloder
 
@@ -39,17 +36,29 @@ class ChatMessagesAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateIdentifier(identifier: String, isDelivered: Boolean) {
+    fun updateIdentifier(identifier: String, isDelivered: Boolean, msgId: String) {
         chatList?.let {
             for (x in it.indices) {
                 if (chatList?.get(x)?.identifier == identifier) {
                     chatList?.get(x)?.identifier = ""
+                    chatList?.get(x)?.id = msgId.toLong()
                     if (isDelivered) {
                         chatList?.get(x)?.is_read = 1
                     } else {
                         chatList?.get(x)?.is_read = 0
                     }
 //                    notifyDataSetChanged()
+                    notifyItemChanged(x)
+                }
+            }
+        }
+    }
+
+    fun updateSeenStatus(msgId: Long) {
+        chatList?.let {
+            for (x in it.indices) {
+                if (chatList?.get(x)?.id?.toInt() == msgId.toInt()) {
+                    chatList?.get(x)?.is_read = 2
                     notifyItemChanged(x)
                 }
             }
@@ -99,6 +108,7 @@ class ChatMessagesAdapter(
         val item = chatList?.get(position)
         when (item?.type) {
             AppConstants.TEXT_MESSAGE -> {
+                itemHolder.binding.itemChat.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
@@ -134,7 +144,7 @@ class ChatMessagesAdapter(
             AppConstants.AUDIO_MESSAGE -> {
                 logE("Identifier: ${item.identifier}")
                 if (item.identifier.isNullOrEmpty()) {
-                    itemHolder.binding.audioPlayer.tvTime.text = "3:15 pm"
+                    itemHolder.binding.audioPlayer.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.audioPlayer.tvTime.text = "Uploading Audio..."
                 }
@@ -166,7 +176,7 @@ class ChatMessagesAdapter(
             AppConstants.IMAGE_MESSAGE -> {
                 logE("Identifier: ${item.identifier}")
                 if (item.identifier.isNullOrEmpty()) {
-                    itemHolder.binding.imageHolder.tvTime.text = "3:15 pm"
+                    itemHolder.binding.imageHolder.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.imageHolder.tvTime.text = "Uploading Image..."
                 }
@@ -211,7 +221,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.VISIBLE
                 logE("Identifier: ${item.identifier}")
                 if (item.identifier.isNullOrEmpty()) {
-                    itemHolder.binding.videoHolder.tvTime.text = "3:15 pm"
+                    itemHolder.binding.videoHolder.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.videoHolder.tvTime.text = "Uploading Video..."
                 }

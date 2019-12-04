@@ -32,6 +32,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/_5sdp"
+                android:textSize="@dimen/_10ssp"
                 android:background="@android:drawable/btn_dropdown"
                 android:spinnerMode="dropdown" />
         </RelativeLayout>
@@ -83,6 +84,7 @@
                 android:background="@drawable/theme_button"
                 android:paddingStart="@dimen/_5sdp"
                 android:paddingEnd="@dimen/_5sdp"
+                android:textSize="@dimen/_10ssp"
                 android:text="Update Changes"
                 android:textColor="@color/white" />
         </RelativeLayout>
@@ -101,6 +103,7 @@
                 android:background="@drawable/theme_button"
                 android:paddingStart="@dimen/_5sdp"
                 android:paddingEnd="@dimen/_5sdp"
+                android:textSize="@dimen/_10ssp"
                 android:text="Logout"
                 android:textColor="@color/white" />
         </RelativeLayout>

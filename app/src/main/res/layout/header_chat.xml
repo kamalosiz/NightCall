@@ -58,18 +58,18 @@
                     android:singleLine="true"
                     android:text="Waqar Mustafa"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_13ssp"
+                    android:textSize="@dimen/_12ssp"
                     android:transitionName="@string/profile_trans" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvTyping"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/halvatic_light"
+                    android:fontFamily="@font/helvetica_medium"
                     android:singleLine="true"
                     android:text="@string/typing"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_11ssp"
+                    android:textSize="@dimen/_10ssp"
                     android:visibility="gone" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
