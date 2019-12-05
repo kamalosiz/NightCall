@@ -26,7 +26,7 @@
                     android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/_35sdp"
-                    android:background="@drawable/kalam_circle" />
+                    android:background="@drawable/app_icon" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etUsername"
