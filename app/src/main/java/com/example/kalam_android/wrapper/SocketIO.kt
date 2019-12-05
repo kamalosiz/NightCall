@@ -64,6 +64,9 @@ object SocketIO {
         socket?.off(AppConstants.NEW_MESSAGE)
         socket?.off(AppConstants.MESSAGE_TYPING)
         socket?.off(AppConstants.MESSAGE_STOPS_TYPING)
+        socket?.off(AppConstants.ALL_MESSAGES_READ)
+        socket?.off(AppConstants.MESSAGE_DELIVERED)
+        socket?.off(AppConstants.SEEN_MESSAGE)
         socket?.disconnect()
     }
 
@@ -92,7 +95,7 @@ object SocketIO {
 
     fun emitNewMessage(
         id: String, chatID: String, message: String, type: String, senderName: String,
-        fileID: String, duration: Long, thumbnail: String, identifier: String
+        fileID: String, duration: Long, thumbnail: String, identifier: String, language: String
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
@@ -104,6 +107,7 @@ object SocketIO {
         jsonObject.addProperty("duration", duration)
         jsonObject.addProperty("thumbnail", thumbnail)
         jsonObject.addProperty("identifier", identifier)
+        jsonObject.addProperty("language", language)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)

@@ -50,7 +50,7 @@
                 android:text="This is a dummy message"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_10ssp"
+                android:textSize="@dimen/_11ssp"
                 tools:ignore="RtlCompat" />
         </RelativeLayout>
 

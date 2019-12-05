@@ -28,7 +28,8 @@ data class ChatData(
     val duration: Long,
     val original_message: String?,
     var identifier: String?,
-    val unix_time: Double
+    val unix_time: Double,
+    val language: String?
 )
 
 data class MediaResponse(

@@ -376,6 +376,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             sharedPrefsHelper.getUser()?.firstname.toString()
                     + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
             fileID, duration, thumbnail.toString(), identifier
+            , sharedPrefsHelper.getLanguage().toString()
         )
     }
 
@@ -391,7 +392,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 ).toString(),
                 identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
                 AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
-                type, file, 0, 0, message, identifier, lastMsgTime.toDouble()
+                type, file, 0, 0, message, identifier,
+                lastMsgTime.toDouble(), sharedPrefsHelper.getLanguage()
             )
         )
     }

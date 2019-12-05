@@ -106,7 +106,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
         }
     }
 
-    private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
+   /* private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
         when (apiResponse?.status) {
 
             Status.LOADING -> {
@@ -126,9 +126,9 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
             else -> {
             }
         }
-    }
+    }*/
 
-    private fun renderLocalResponse(list: List<ChatListData>?) {
+   /* private fun renderLocalResponse(list: List<ChatListData>?) {
         logE("renderLocalResponse: $list")
         list?.let {
             chatList.clear()
@@ -139,7 +139,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
             }
             (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
         }
-    }
+    }*/
 
     private fun renderResponse(response: AllChatListResponse?) {
         logE("socketResponse: $response")
@@ -178,10 +178,10 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
 
     override fun socketResponse(jsonObject: JSONObject, type: String) {
         if (type == AppConstants.NEW_MESSAGE) {
-            val gson = Gson()
-            logE("New Message : $jsonObject")
-            val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-            val unixTime = System.currentTimeMillis() / 1000L
+//            val gson = Gson()
+//            logE("New Message : $jsonObject")
+//            val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+//            val unixTime = System.currentTimeMillis() / 1000L
             activity?.runOnUiThread {
                 /* val name = newChat.sender_name.split(" ")
                  val item = ChatListData(
@@ -239,7 +239,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
         }
     }
 
-    private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
+   /* private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
         chatList[position].message = lastMessage
         chatList[position].unix_time = unixTime
         chatList[position].un_read_count = unReadCount
@@ -252,7 +252,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
             unixTime.toString(), lastMessage,
             item.chat_id, unReadCount
         )
-    }
+    }*/
 
     override fun myOnClick(view: View, position: Int) {
         when (view.id) {

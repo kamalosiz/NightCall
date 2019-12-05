@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -111,14 +112,10 @@ class ChatMessagesAdapter(
         val item = chatList?.get(position)
         when (item?.type) {
             AppConstants.TEXT_MESSAGE -> {
-                /*if (translateState == 1) {
-                    itemHolder.binding.itemChat.tvOriginal.visibility = View.VISIBLE
-                    if (language == 0) {
-
-                    }
-                } else {
-                    itemHolder.binding.itemChat.tvOriginal.visibility = View.GONE
-                }*/
+                hideShowViewOriginal(
+                    itemHolder.binding.itemChat.llOriginal,
+                    item.language.toString()
+                )
                 itemHolder.binding.itemChat.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
@@ -147,6 +144,10 @@ class ChatMessagesAdapter(
                 )
             }
             AppConstants.AUDIO_MESSAGE -> {
+                hideShowViewOriginal(
+                    itemHolder.binding.audioPlayer.llOriginal,
+                    item.language.toString()
+                )
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.audioPlayer.tvTime.text =
                         getTimeStamp(item.unix_time.toLong())
@@ -271,6 +272,19 @@ class ChatMessagesAdapter(
                 0 -> view.setBackgroundResource(R.drawable.icon_sent)
                 1 -> view.setBackgroundResource(R.drawable.icon_message_sent)
                 2 -> view.setBackgroundResource(R.drawable.icon_message_read)
+            }
+        } else {
+            view.visibility = View.GONE
+        }
+    }
+
+    private fun hideShowViewOriginal(view: LinearLayout, msgLng: String) {
+        if (translateState == 1) {
+            view.visibility = View.VISIBLE
+            if (language == msgLng) {
+                view.visibility = View.GONE
+            } else {
+                view.visibility = View.VISIBLE
             }
         } else {
             view.visibility = View.GONE

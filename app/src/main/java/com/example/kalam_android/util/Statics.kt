@@ -48,13 +48,13 @@ fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
 }
 
-fun calculateLocalDate(unixTime: Long): String {
+/*fun calculateLocalDate(unixTime: Long): String {
     val date = Date(unixTime * 1000L)
     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.getDefault())
     sdf.timeZone = TimeZone.getDefault()
     return printDifference(sdf.parse(sdf.format(date)))
-}
-
+}*/
+/*
 fun printDifference(endDate: Date): String {
     val c = Calendar.getInstance().time
     val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.getDefault())
@@ -108,7 +108,7 @@ fun printDifference(endDate: Date): String {
         }
     }
     return duration
-}
+}*/
 fun getTimeStamp(unixTime: Long): String {
     val date = Date(unixTime * 1000L)
     val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())

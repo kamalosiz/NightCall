@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
@@ -13,7 +12,7 @@ import com.example.kalam_android.databinding.ItemChatAdapterBinding
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
-import com.example.kalam_android.util.calculateLocalDate
+import com.example.kalam_android.util.getTimeStamp
 import com.example.kalam_android.wrapper.GlideDownloder
 
 
@@ -82,7 +81,8 @@ class AllChatListAdapter(
                 Global.setColor(context, R.color.light_green)
             )
         }
-        holderItem.binding.tvAgo.text = item.unix_time?.let { calculateLocalDate(it) }
+
+        holderItem.binding.tvAgo.text = item.unix_time?.let { getTimeStamp(it) }
         GlideDownloder.load(
             context,
             holderItem.binding.ivImage,
