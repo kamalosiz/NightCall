@@ -1,5 +1,6 @@
 package com.example.kalam_android.view.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -10,6 +11,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -50,7 +52,8 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionListener {
+class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionListener,
+    View.OnTouchListener {
 
     private val TAG = this.javaClass.simpleName
     private lateinit var binding: ChatsFragmentBinding
@@ -66,6 +69,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
     private var speech: SpeechRecognizer? = null
     private var recognizerIntent: Intent? = null
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -98,11 +102,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
             hitAllChatApi()
         }
         binding.fabSpeech.isClickable = false
-        binding.fabSpeech.setOnClickListener {
-
-            promptSpeechInput()
-
-        }
+        binding.fabSpeech.setOnTouchListener(this)
+        checkPermission()
         return binding.root
     }
 
@@ -299,52 +300,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
                     SocketIO.setSocketCallbackListener(this)
                     hitAllChatApi()
                 }
-                AppConstants.REQ_CODE_SPEECH_INPUT -> {
 
-                    val result = data
-                        ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-
-                    result?.forEach { speechName: String ->
-
-                        for (i in chatList.indices) {
-                            val name =
-                                if (speechName.equals(
-                                        "chat with" + " " + chatList[i].firstname + " " + chatList[i].lastname,
-                                        true
-                                    ) || speechName.equals(
-                                        "chat with" + " " + chatList[i].firstname,
-                                        true
-                                    ) || speechName.equals(
-                                        "chat with" + " " + chatList[i].lastname,
-                                        true
-                                    )
-                                ) {
-                                    val intent = Intent(activity, ChatDetailActivity::class.java)
-                                    intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
-                                    intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
-                                    intent.putExtra(
-                                        AppConstants.CHAT_USER_NAME,
-                                        StringBuilder(chatList[i].firstname).append(" ").append(
-                                            chatList[i].lastname
-                                        ).toString()
-                                    )
-                                    intent.putExtra(
-                                        AppConstants.CHAT_USER_PICTURE,
-                                        chatList[i].profile_image
-                                    )
-                                    startActivityForResult(
-                                        intent,
-                                        AppConstants.CHAT_FRAGMENT_CODE
-                                    )
-                                    return
-
-                                } else {
-                                    toast(activity, "no match")
-                                }
-                        }
-
-                    }
-                }
             }
         }
     }
@@ -394,6 +350,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
             SocketIO.setSocketCallbackListener(this)
             logE("OnResume of Chat Fragment")
         }
+        checkPermission()
     }
 
     override fun onPause() {
@@ -407,7 +364,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
 
     override fun onReadyForSpeech(params: Bundle?) {
         binding.fabSpeech.isClickable = true
-        binding.pbCenter.visibility = View.VISIBLE
 
     }
 
@@ -445,7 +401,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
     override fun onError(error: Int) {
         binding.fabSpeech.isClickable = true
         val errorMessage = getErrorText(error)
-        binding.pbCenter.visibility = View.GONE
         toast(activity, errorMessage)
     }
 
@@ -455,60 +410,42 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
             matches.forEach { speechName: String ->
 
                 for (i in chatList.indices) {
-                    if (speechName.startsWith(
-                            chatList[i].firstname,
-                            ignoreCase = true
-                        ) || speechName.endsWith(chatList[i].lastname, ignoreCase = true)
+                    if (speechName.equals(
+                            "chat with" + " " + chatList[i].firstname + " " + chatList[i].lastname,
+                            true
+                        ) || speechName.equals(
+                            "chat with" + " " + chatList[i].firstname,
+                            true
+                        ) || speechName.equals(
+                            "chat with" + " " + chatList[i].lastname,
+                            true
+                        )
                     ) {
-                        binding.pbCenter.visibility = View.GONE
-                        position = i
+                        toast(activity,"chat with ${chatList[i].firstname + " " + chatList[i].lastname}")
                         val intent = Intent(activity, ChatDetailActivity::class.java)
                         intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
                         intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
                         intent.putExtra(
                             AppConstants.CHAT_USER_NAME,
-                            StringBuilder(chatList[i].firstname).append(" ").append(chatList[i].lastname).toString()
+                            StringBuilder(chatList[i].firstname).append(" ").append(
+                                chatList[i].lastname
+                            ).toString()
                         )
-                        intent.putExtra(AppConstants.CHAT_USER_PICTURE, chatList[i].profile_image)
+                        intent.putExtra(
+                            AppConstants.CHAT_USER_PICTURE,
+                            chatList[i].profile_image
+                        )
                         startActivityForResult(
                             intent,
                             AppConstants.CHAT_FRAGMENT_CODE
                         )
                         return
 
-                    } else {
-                        binding.pbCenter.visibility = View.GONE
-//                        toast(activity, "no match")
                     }
                 }
-
             }
         }
     }
-
-    private fun promptSpeechInput() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-        intent.putExtra(
-            RecognizerIntent.EXTRA_PROMPT,
-            getString(R.string.speech_prompt)
-        )
-        try {
-            startActivityForResult(intent, AppConstants.REQ_CODE_SPEECH_INPUT)
-        } catch (a: ActivityNotFoundException) {
-            /*Toast.makeText(
-                activity,
-                getString(R.string.speech_not_supported),
-                Toast.LENGTH_SHORT
-            ).show()*/
-        }
-
-    }
-
 
     fun getErrorText(errorCode: Int): String {
         val message: String
@@ -525,6 +462,22 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionLi
             else -> message = "Didn't understand, please try again."
         }
         return message
+    }
+
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+         when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+
+                speech!!.startListening(recognizerIntent)
+            }
+            MotionEvent.ACTION_UP -> {
+                speech!!.stopListening()
+
+            }
+
+
+        }
+        return v?.onTouchEvent(event) ?: true
     }
 
 }

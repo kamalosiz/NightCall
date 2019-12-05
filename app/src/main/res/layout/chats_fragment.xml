@@ -49,7 +49,7 @@
             android:clickable="true"
             android:focusable="true"
             android:theme="@style/PrimaryActionButton"
-            app:fabSize="normal"
+            app:fabSize="auto"
             android:src="@drawable/ic_mic_white"
             app:rippleColor="@color/colorAccent" />
 

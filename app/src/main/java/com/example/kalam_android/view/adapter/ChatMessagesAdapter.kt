@@ -17,6 +17,14 @@ import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.*
 import com.example.kalam_android.view.activities.OpenMediaActivity
 import com.example.kalam_android.wrapper.GlideDownloder
+import kotlinx.android.synthetic.main.audio_player_item.view.*
+import kotlinx.android.synthetic.main.audio_player_item.view.ivDeliver
+import kotlinx.android.synthetic.main.audio_player_item.view.llOriginal
+import kotlinx.android.synthetic.main.audio_player_item.view.tvTime
+import kotlinx.android.synthetic.main.image_chat_item.view.*
+import kotlinx.android.synthetic.main.image_chat_item.view.ivImage
+import kotlinx.android.synthetic.main.item_chat.view.*
+import kotlinx.android.synthetic.main.video_item.view.*
 
 
 class ChatMessagesAdapter(

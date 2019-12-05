@@ -9,8 +9,8 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnBack"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_width="@dimen/back_button_size"
+            android:layout_height="@dimen/back_button_size"
             android:layout_marginStart="@dimen/_15sdp"
             android:layout_marginLeft="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_15sdp"
@@ -20,8 +20,8 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageView"
-            android:layout_width="@dimen/_130sdp"
-            android:layout_height="@dimen/_130sdp"
+            android:layout_width="@dimen/logo_size"
+            android:layout_height="@dimen/logo_size"
             android:layout_marginTop="@dimen/_5sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,31 +37,31 @@
             android:text="@string/select_country_code"
             android:textAlignment="center"
             android:textColor="@color/theme_color"
-            android:textSize="@dimen/_15sdp"
+            android:textSize="@dimen/button_text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvCountry"
-            android:layout_width="@dimen/_274sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:layout_marginTop="@dimen/_57sdp"
+            android:layout_width="@dimen/standard_width"
+            android:layout_height="@dimen/standard_height"
+            android:layout_marginTop="@dimen/_60sdp"
             android:background="@drawable/box_theme_outine"
             android:drawableEnd="@drawable/down_arrow"
             android:fontFamily="@font/roboto_regular"
             android:hint="Select Country"
             android:padding="@dimen/_10sdp"
             android:paddingEnd="@dimen/_13sdp"
-            android:textSize="@dimen/_13sdp"
+            android:textSize="@dimen/standard_text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
         <LinearLayout
             android:id="@+id/llPhone"
-            android:layout_width="@dimen/_274sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/standard_width"
+            android:layout_height="@dimen/standard_height"
             android:layout_marginTop="@dimen/_10sdp"
             android:background="@drawable/box_theme_outine"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,7 +101,7 @@
                 android:maxLength="15"
                 android:padding="@dimen/_8sdp"
                 android:singleLine="true"
-                android:textSize="@dimen/_13sdp"
+                android:textSize="@dimen/standard_text_size"
                 app:layout_constraintBottom_toBottomOf="@+id/llPhone"
                 app:layout_constraintStart_toEndOf="@+id/tvDialCode"
                 app:layout_constraintTop_toTopOf="@+id/llPhone" />
@@ -111,19 +111,19 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnNext"
-            android:layout_width="@dimen/_274sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/standard_width"
+            android:layout_height="@dimen/standard_height"
             android:background="@drawable/theme_button"
             android:fontFamily="@font/roboto_regular"
             android:text="@string/next"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="@dimen/_17sdp"
+            android:textSize="@dimen/button_text_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/llPhone"
-            app:layout_constraintVertical_bias="0.47000003" />
+            app:layout_constraintVertical_bias="0.60000003" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
