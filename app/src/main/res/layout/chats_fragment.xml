@@ -6,10 +6,34 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+<!--        <androidx.cardview.widget.CardView
+            android:id="@+id/cvSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_5sdp"
+            app:cardCornerRadius="@dimen/_8sdp"
+            app:cardElevation="0dp">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="@string/labelSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:minLines="1"
+                android:padding="@dimen/_10sdp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/grey" />
+
+        </androidx.cardview.widget.CardView>-->
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_below="@+id/cvSearch">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_recycler"
