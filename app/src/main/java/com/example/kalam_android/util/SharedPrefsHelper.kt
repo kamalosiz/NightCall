@@ -128,12 +128,15 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         return get(ALL_CHAT_ITEM_SYNCED, false) ?: false
     }
 
-    fun saveLanguage(language: Int) {
+    /*fun saveLanguage(language: Int) {
+        put(LANGUAGE, language)
+    }*/
+    fun saveLanguage(language: String) {
         put(LANGUAGE, language)
     }
 
-    fun getLanguage(): Int? {
-        return get(LANGUAGE, 0)
+    fun getLanguage(): String? {
+        return get(LANGUAGE, "")
     }
 
     fun saveTranslateState(translate: Int) {

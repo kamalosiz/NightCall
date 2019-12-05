@@ -114,7 +114,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 this,
                 sharedPrefsHelper.getUser()?.id.toString(),
                 userRealName.toString(),
-                profileImage.toString()
+                profileImage.toString(),
+                sharedPrefsHelper.getTransState(),
+                sharedPrefsHelper.getLanguage()
             )
     }
 

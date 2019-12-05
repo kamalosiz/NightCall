@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -23,7 +24,9 @@ class ChatMessagesAdapter(
     val context: Context,
     private val userId: String,
     val name: String,
-    private val profile: String
+    private val profile: String,
+    private val translateState: Int?,
+    private val language: String?
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -108,6 +111,14 @@ class ChatMessagesAdapter(
         val item = chatList?.get(position)
         when (item?.type) {
             AppConstants.TEXT_MESSAGE -> {
+                /*if (translateState == 1) {
+                    itemHolder.binding.itemChat.tvOriginal.visibility = View.VISIBLE
+                    if (language == 0) {
+
+                    }
+                } else {
+                    itemHolder.binding.itemChat.tvOriginal.visibility = View.GONE
+                }*/
                 itemHolder.binding.itemChat.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
@@ -130,21 +141,15 @@ class ChatMessagesAdapter(
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                 }
-                if (userId.toInt() == item.sender_id) {
-                    itemHolder.binding.itemChat.ivDeliver.visibility = View.VISIBLE
-                    when (item.is_read) {
-                        0 -> itemHolder.binding.itemChat.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
-                        1 -> itemHolder.binding.itemChat.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
-                        2 -> itemHolder.binding.itemChat.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
-                    }
-                } else {
-                    itemHolder.binding.itemChat.ivDeliver.visibility = View.GONE
-                }
+                applyReadStatus(
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.itemChat.ivDeliver, item.is_read
+                )
             }
             AppConstants.AUDIO_MESSAGE -> {
-                logE("Identifier: ${item.identifier}")
                 if (item.identifier.isNullOrEmpty()) {
-                    itemHolder.binding.audioPlayer.tvTime.text = getTimeStamp(item.unix_time.toLong())
+                    itemHolder.binding.audioPlayer.tvTime.text =
+                        getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.audioPlayer.tvTime.text = "Uploading Audio..."
                 }
@@ -162,21 +167,15 @@ class ChatMessagesAdapter(
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
                 }
-                if (userId.toInt() == item.sender_id) {
-                    itemHolder.binding.audioPlayer.ivDeliver.visibility = View.VISIBLE
-                    when (item.is_read) {
-                        0 -> itemHolder.binding.audioPlayer.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
-                        1 -> itemHolder.binding.audioPlayer.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
-                        2 -> itemHolder.binding.audioPlayer.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
-                    }
-                } else {
-                    itemHolder.binding.audioPlayer.ivDeliver.visibility = View.GONE
-                }
+                applyReadStatus(
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.audioPlayer.ivDeliver, item.is_read
+                )
             }
             AppConstants.IMAGE_MESSAGE -> {
-                logE("Identifier: ${item.identifier}")
                 if (item.identifier.isNullOrEmpty()) {
-                    itemHolder.binding.imageHolder.tvTime.text = getTimeStamp(item.unix_time.toLong())
+                    itemHolder.binding.imageHolder.tvTime.text =
+                        getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.imageHolder.tvTime.text = "Uploading Image..."
                 }
@@ -203,25 +202,19 @@ class ChatMessagesAdapter(
                         itemHolder.binding.imageHolder.ivImage
                     )
                 }
-                if (userId.toInt() == item.sender_id) {
-                    itemHolder.binding.imageHolder.ivDeliver.visibility = View.VISIBLE
-                    when (item.is_read) {
-                        0 -> itemHolder.binding.imageHolder.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
-                        1 -> itemHolder.binding.imageHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
-                        2 -> itemHolder.binding.imageHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
-                    }
-                } else {
-                    itemHolder.binding.imageHolder.ivDeliver.visibility = View.GONE
-                }
+                applyReadStatus(
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.imageHolder.ivDeliver, item.is_read
+                )
             }
             AppConstants.VIDEO_MESSAGE -> {
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.VISIBLE
-                logE("Identifier: ${item.identifier}")
                 if (item.identifier.isNullOrEmpty()) {
-                    itemHolder.binding.videoHolder.tvTime.text = getTimeStamp(item.unix_time.toLong())
+                    itemHolder.binding.videoHolder.tvTime.text =
+                        getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.videoHolder.tvTime.text = "Uploading Video..."
                 }
@@ -244,16 +237,10 @@ class ChatMessagesAdapter(
                         itemHolder.binding.videoHolder.ivImage
                     )
                 }
-                if (userId.toInt() == item.sender_id) {
-                    itemHolder.binding.videoHolder.ivDeliver.visibility = View.VISIBLE
-                    when (item.is_read) {
-                        0 -> itemHolder.binding.videoHolder.ivDeliver.setBackgroundResource(R.drawable.icon_sent)
-                        1 -> itemHolder.binding.videoHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_sent)
-                        2 -> itemHolder.binding.videoHolder.ivDeliver.setBackgroundResource(R.drawable.icon_message_read)
-                    }
-                } else {
-                    itemHolder.binding.videoHolder.ivDeliver.visibility = View.GONE
-                }
+                applyReadStatus(
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.videoHolder.ivDeliver, item.is_read
+                )
             }
         }
     }
@@ -277,6 +264,18 @@ class ChatMessagesAdapter(
         ActivityCompat.startActivity(context, intent, options.toBundle())
     }
 
+    private fun applyReadStatus(userId: Int, senderId: Int?, view: ImageView, isRead: Int) {
+        if (userId == senderId) {
+            view.visibility = View.VISIBLE
+            when (isRead) {
+                0 -> view.setBackgroundResource(R.drawable.icon_sent)
+                1 -> view.setBackgroundResource(R.drawable.icon_message_sent)
+                2 -> view.setBackgroundResource(R.drawable.icon_message_read)
+            }
+        } else {
+            view.visibility = View.GONE
+        }
+    }
 
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)

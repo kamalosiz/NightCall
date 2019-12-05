@@ -79,7 +79,7 @@
                 android:fontFamily="@font/roboto_regular"
                 android:text="Play Original"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_7ssp" />
+                android:textSize="@dimen/_8ssp" />
 
             <View
                 android:id="@+id/view"

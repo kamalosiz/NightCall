@@ -82,7 +82,12 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
             ArrayAdapter(this, android.R.layout.simple_spinner_item, languages)
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinner1.adapter = aa
-        binding.spinner1.setSelection(sharedPrefsHelper.getLanguage() ?: 0)
+        if (sharedPrefsHelper.getLanguage() == "en") {
+            binding.spinner1.setSelection(0)
+        } else if (sharedPrefsHelper.getLanguage() == "ar") {
+            binding.spinner1.setSelection(1)
+        }
+//        binding.spinner1.setSelection(sharedPrefsHelper.getLanguage() ?: 0)
     }
 
     override fun onClick(v: View?) {
@@ -98,7 +103,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                         , item, sharedPrefsHelper.getUser()?.id.toString()
                     )
                     toast("Language successfully updated")
-                    sharedPrefsHelper.saveLanguage(position)
+                    sharedPrefsHelper.saveLanguage(item)
                     autoTranslate?.let { sharedPrefsHelper.saveTranslateState(it) }
                 }
                 builder1.setNegativeButton("No") { dialog, id ->

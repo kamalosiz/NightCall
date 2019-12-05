@@ -110,11 +110,11 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 res.data?.auto_translate?.let {
                     sharedPrefsHelper.saveTranslateState(it)
                 }
-                if (res.data?.language == "en") {
-                    sharedPrefsHelper.saveLanguage(0)
-                } else if (res.data?.language == "ar") {
-                    sharedPrefsHelper.saveLanguage(1)
-                }
+//                if (res.data?.language == "en") {
+                sharedPrefsHelper.saveLanguage(res.data?.language.toString())
+//                } else if (res.data?.language == "ar") {
+//                    sharedPrefsHelper.saveLanguage(1)
+//                }
                 //Testing for now
                 hideProgressDialog()
                 startActivity(Intent(this, MainActivity::class.java))
@@ -125,7 +125,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    fun setSpannable() {
+    private fun setSpannable() {
         setSpannableTextView(
             resources.getString(R.string.tap_login),
             resources.getString(R.string.kalam_terms),
