@@ -106,40 +106,41 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
         }
     }
 
-   /* private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
-        when (apiResponse?.status) {
 
-            Status.LOADING -> {
-            }
-            Status.SUCCESS -> {
-                binding.pbCenter.visibility = View.GONE
-                binding.swipeRefreshLayout.isRefreshing = false
-                renderLocalResponse(apiResponse.data)
-                logE("consumeResponse SUCCESS : ${apiResponse.data}")
-            }
-            Status.ERROR -> {
-                binding.pbCenter.visibility = View.GONE
-                binding.swipeRefreshLayout.isRefreshing = false
-                logE("consumeResponse ERROR: " + apiResponse.error.toString())
-                toast(activity, "Something went wrong please try again")
-            }
-            else -> {
-            }
-        }
-    }*/
+    /* private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
+         when (apiResponse?.status) {
 
-   /* private fun renderLocalResponse(list: List<ChatListData>?) {
-        logE("renderLocalResponse: $list")
-        list?.let {
-            chatList.clear()
-            chatIDs.clear()
-            chatList.addAll(list)
-            list.forEach {
-                chatIDs.add(it.chat_id)
-            }
-            (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-        }
-    }*/
+             Status.LOADING -> {
+             }
+             Status.SUCCESS -> {
+                 binding.pbCenter.visibility = View.GONE
+                 binding.swipeRefreshLayout.isRefreshing = false
+                 renderLocalResponse(apiResponse.data)
+                 logE("consumeResponse SUCCESS : ${apiResponse.data}")
+             }
+             Status.ERROR -> {
+                 binding.pbCenter.visibility = View.GONE
+                 binding.swipeRefreshLayout.isRefreshing = false
+                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
+                 toast(activity, "Something went wrong please try again")
+             }
+             else -> {
+             }
+         }
+     }*/
+
+    /* private fun renderLocalResponse(list: List<ChatListData>?) {
+         logE("renderLocalResponse: $list")
+         list?.let {
+             chatList.clear()
+             chatIDs.clear()
+             chatList.addAll(list)
+             list.forEach {
+                 chatIDs.add(it.chat_id)
+             }
+             (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
+         }
+     }*/
 
     private fun renderResponse(response: AllChatListResponse?) {
         logE("socketResponse: $response")
@@ -148,18 +149,18 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
                 it.data.reverse()
                 chatList.clear()
                 chatList = it.data
-                chatIDs.clear()
+                /*chatIDs.clear()
                 it.data.forEach {
                     chatIDs.add(it.chat_id)
-                }
+                }*/
                 (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-                if (isRefresh) {
+                /*if (isRefresh) {
                     isRefresh = false
                     viewModel.deleteAllChats()
-                }
+                }*/
                 binding.tvNoChat.visibility = View.GONE
-                viewModel.addAllChatItemsToDB(chatList)
-                sharedPrefsHelper.allChatItemSynced()
+//                viewModel.addAllChatItemsToDB(chatList)
+//                sharedPrefsHelper.allChatItemSynced()
             } else {
                 binding.tvNoChat.visibility = View.VISIBLE
             }
@@ -170,6 +171,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
         val params = HashMap<String, String>()
         params["user_id"] = sharedPrefsHelper.getUser()?.id.toString()
         viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
+    }
+
+    private fun hitSearchMessage(query: String) {
+        val params = HashMap<String, String>()
+        params["query"] = query
+        viewModel.hitSearchMessage(sharedPrefsHelper.getUser()?.token.toString(), params)
     }
 
     private fun logE(message: String) {
@@ -239,20 +246,20 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
         }
     }
 
-   /* private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
-        chatList[position].message = lastMessage
-        chatList[position].unix_time = unixTime
-        chatList[position].un_read_count = unReadCount
-        val item = chatList[position]
-        chatList.remove(chatList[position])
-        chatList.add(0, item)
-        (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-        binding.chatRecycler.scrollToPosition(0)
-        viewModel.updateItemToDB(
-            unixTime.toString(), lastMessage,
-            item.chat_id, unReadCount
-        )
-    }*/
+    /* private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
+         chatList[position].message = lastMessage
+         chatList[position].unix_time = unixTime
+         chatList[position].un_read_count = unReadCount
+         val item = chatList[position]
+         chatList.remove(chatList[position])
+         chatList.add(0, item)
+         (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
+         binding.chatRecycler.scrollToPosition(0)
+         viewModel.updateItemToDB(
+             unixTime.toString(), lastMessage,
+             item.chat_id, unReadCount
+         )
+     }*/
 
     override fun myOnClick(view: View, position: Int) {
         when (view.id) {

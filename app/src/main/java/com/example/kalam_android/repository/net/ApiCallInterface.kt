@@ -33,6 +33,10 @@ interface ApiCallInterface {
     @POST(Urls.ALL_CHATS_LIST)
     fun getAllChats(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
 
+    @POST(Urls.SEARCH_MSG)
+    fun getSearchMessage(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
+
+
     @POST(Urls.ALL_CHATS_MESSAGES)
     fun getAllMessages(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<ChatMessagesResponse>
 

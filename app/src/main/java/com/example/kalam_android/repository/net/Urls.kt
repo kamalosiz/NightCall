@@ -10,6 +10,7 @@ class Urls {
         const val SIGN_IN = "api/user/signin"
         const val VERIFY_CONTACTS = "api/user/sync_contacts"
         const val ALL_CHATS_LIST = "/api/chat/get_all_conversations"
+        const val SEARCH_MSG = "/api/chat/search_messages"
         const val ALL_CHATS_MESSAGES = "/api/chat/get_chat_messages"
         const val FIND_FRIENDS = "/api/user/search"
         const val UPLOAD_AUDIO = "/api/chat/upload_file"
