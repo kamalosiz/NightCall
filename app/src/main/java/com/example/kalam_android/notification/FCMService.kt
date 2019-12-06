@@ -22,9 +22,7 @@ import com.google.firebase.messaging.RemoteMessage
 class FCMService : FirebaseMessagingService() {
     val TAG = "FirebaseMessaging"
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
-        Debugger.e(TAG, "Notification Received: ${remoteMSG.data}")
-        Debugger.e(TAG, "Notification Received: ${remoteMSG.notification}")
-//        showNotification(remoteMSG)
+        showNotification(remoteMSG)
     }
 
     private fun logE(message: String) {
@@ -60,6 +58,11 @@ class FCMService : FirebaseMessagingService() {
 
         }
         val intent = Intent(this, ChatDetailActivity::class.java)
+        /*if (isAppRunning(this, packageName)){
+
+        } else {
+
+        }*/
         intent.putExtra(AppConstants.CHAT_ID, notifyId)
         intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
         intent.putExtra(AppConstants.IS_FROM_CHAT_OUTSIDE, true)
@@ -93,10 +96,10 @@ class FCMService : FirebaseMessagingService() {
             .setContentText(body)
             .setColor(Color.parseColor("#179a63"))
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setContentIntent(
-                if (!isAppRunning(this, packageName)) pendingIntent else null
-            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            /*.setContentIntent(
+                if (isAppRunning(this, packageName)) pendingIntent else null
+            )*/
             .setSound(defaultSoundUri)
             .setGroup(title)
             .setGroupSummary(true)
@@ -110,7 +113,7 @@ class FCMService : FirebaseMessagingService() {
         return if (useWhiteIcon) R.drawable.ic_notification else R.drawable.app_icon
     }
 
-    fun isAppRunning(context: Context, packageName: String): Boolean {
+    private fun isAppRunning(context: Context, packageName: String): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val procInfos = activityManager.runningAppProcesses
         if (procInfos != null) {
@@ -131,7 +134,7 @@ class FCMService : FirebaseMessagingService() {
         val adminChannel = NotificationChannel(
             type,
             type,
-            NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_DEFAULT
         )
         adminChannel.description = adminChannelDescription
         adminChannel.enableLights(true)

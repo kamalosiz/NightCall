@@ -22,24 +22,24 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/ivLogo"
-                    android:layout_width="@dimen/logo_size"
-                    android:layout_height="@dimen/logo_size"
+                    android:layout_width="@dimen/_130sdp"
+                    android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/logo_top_margin"
+                    android:layout_marginTop="@dimen/_35sdp"
                     android:background="@drawable/kalam_circle" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etUsername"
-                    android:layout_width="@dimen/standard_width"
-                    android:layout_height="@dimen/standard_height"
+                    android:layout_width="@dimen/_274sdp"
+                    android:layout_height="@dimen/_40sdp"
                     android:layout_below="@+id/ivLogo"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/logo_top_margin"
+                    android:layout_marginTop="@dimen/_35sdp"
                     android:background="@drawable/box_theme_outine"
                     android:fontFamily="@font/roboto_regular"
                     android:gravity="center"
                     android:hint="Email"
-                    android:textSize="@dimen/standard_text_size" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <RelativeLayout
                     android:id="@+id/rlPassword"
@@ -51,8 +51,8 @@
 
                     <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/etPass"
-                        android:layout_width="@dimen/standard_width"
-                        android:layout_height="@dimen/standard_height"
+                        android:layout_width="@dimen/_274sdp"
+                        android:layout_height="@dimen/_40sdp"
                         android:layout_centerInParent="true"
                         android:background="@drawable/box_theme_outine"
                         android:fontFamily="@font/roboto_regular"
@@ -60,13 +60,13 @@
                         android:hint="@string/password"
                         android:inputType="textPassword"
                         android:padding="@dimen/_10sdp"
-                        android:paddingRight="@dimen/password_end_padding"
-                        android:textSize="@dimen/standard_text_size" />
+                        android:paddingRight="@dimen/_13sdp"
+                        android:textSize="@dimen/_13sdp" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/hidePassword"
-                        android:layout_width="@dimen/password_image_width"
-                        android:layout_height="@dimen/password_image_height"
+                        android:layout_width="@dimen/_23sdp"
+                        android:layout_height="@dimen/_18sdp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:layout_marginEnd="@dimen/_35sdp"
@@ -80,8 +80,9 @@
                     android:layout_below="@+id/rlPassword"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
-                    android:layout_marginTop="@dimen/forget_password_top_margin"
-                    android:layout_marginRight="@dimen/forget_password_end_margin"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginEnd="@dimen/_22sdp"
+                    android:layout_marginRight="@dimen/_22sdp"
                     android:orientation="vertical">
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -91,11 +92,11 @@
                         android:fontFamily="@font/roboto_regular"
                         android:text="@string/forget_pass"
                         android:textColor="@color/theme_color"
-                        android:textSize="@dimen/forget_password_text_size" />
+                        android:textSize="@dimen/_12sdp" />
 
                     <View
                         android:id="@+id/view"
-                        android:layout_width="@dimen/forget_password_view_width"
+                        android:layout_width="@dimen/_95sdp"
                         android:layout_height="0.5dp"
                         android:background="@color/theme_color" />
                 </LinearLayout>
@@ -106,26 +107,26 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/llForgotPass"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/logo_top_margin"
+                    android:layout_marginTop="@dimen/_35sdp"
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/tap_login"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/standard_text_size" />
+                    android:textSize="@dimen/_13sdp" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnLogin"
-                    android:layout_width="@dimen/standard_width"
-                    android:layout_height="@dimen/standard_height"
+                    android:layout_width="@dimen/_274sdp"
+                    android:layout_height="@dimen/_40sdp"
                     android:layout_below="@id/tvTermsPolicy"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/login_button_top_margin"
+                    android:layout_marginTop="@dimen/_50sdp"
                     android:background="@drawable/theme_button"
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/login"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/button_text_size" />
+                    android:textSize="@dimen/_17sdp" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvSignUp"
@@ -138,7 +139,7 @@
                     android:text="@string/signup"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/standard_text_size" />
+                    android:textSize="@dimen/_13sdp" />
             </RelativeLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
