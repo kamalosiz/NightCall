@@ -71,4 +71,9 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     ): Observable<MediaResponse> {
         return apiCallInterface.uploadAudio(authorization, params, list)
     }
+    fun logout(
+        authorization: String?,parameters: Map<String, String>
+    ): Observable<Logout> {
+        return apiCallInterface.logout(authorization,parameters)
+    }
 }

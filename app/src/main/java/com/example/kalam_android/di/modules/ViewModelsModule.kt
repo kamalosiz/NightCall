@@ -50,4 +50,9 @@ abstract class ViewModelsModule {
     @ViewModelKey(FindFriendsViewModel::class)
     abstract fun bindFindFriendsViewModel(viewModel: FindFriendsViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(LogoutViewModel::class)
+    abstract fun bindLogoutViewModel(viewModel: LogoutViewModel): ViewModel
+
 }

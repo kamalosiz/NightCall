@@ -13,5 +13,6 @@ class Urls {
         const val ALL_CHATS_MESSAGES = "/api/chat/get_chat_messages"
         const val FIND_FRIENDS = "/api/user/search"
         const val UPLOAD_AUDIO = "/api/chat/upload_file"
+        const val LOGOUT = "/api/user/logout"
     }
 }

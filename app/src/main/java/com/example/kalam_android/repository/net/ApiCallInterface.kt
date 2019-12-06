@@ -55,4 +55,7 @@ interface ApiCallInterface {
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
         @Part list: ArrayList<MultipartBody.Part>
     ): Observable<MediaResponse>
+
+    @POST(Urls.LOGOUT)
+    fun logout(@Header("Authorization") authorization: String?,@Body parameters: Map<String, String>): Observable<Logout>
 }
