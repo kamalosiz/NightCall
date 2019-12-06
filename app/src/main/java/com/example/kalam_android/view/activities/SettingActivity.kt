@@ -165,6 +165,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 sharedPrefsHelper.setFCMToken("")
 //                    sharedPrefsHelper.put(AppConstants.PHONE, AppConstants.DUMMY_STRING)
                 sharedPrefsHelper.setNumber("")
+                sharedPrefsHelper.put(AppConstants.KEY_IS_LOGIN,false)
                 toast("Logout Successfully")
                 setResult(Activity.RESULT_OK)
                 finish()
