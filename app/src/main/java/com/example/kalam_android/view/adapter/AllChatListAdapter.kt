@@ -82,7 +82,7 @@ class AllChatListAdapter(
             )
         }
 
-        holderItem.binding.tvAgo.text = item.unix_time?.let { getTimeStamp(it) }
+        holderItem.binding.tvAgo.text = item.unix_time?.let { getTimeStamp(it.toLong()) }
         GlideDownloder.load(
             context,
             holderItem.binding.ivImage,

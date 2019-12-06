@@ -5,8 +5,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/lvStoriesView">
+        android:layout_height="match_parent">
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewPager"
@@ -15,17 +14,23 @@
 
         <LinearLayout
             android:id="@+id/SliderDots"
-            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_15sdp"
             android:gravity="center_vertical|center_horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:orientation="horizontal" />
 
-        <include layout="@layout/status_bottom_sheet_fragment"
+        <RelativeLayout
+            android:id="@+id/lvStoriesView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
             android:id="@+id/lvBottomSheet"
+            layout="@layout/status_bottom_sheet_fragment"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_300sdp"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
 

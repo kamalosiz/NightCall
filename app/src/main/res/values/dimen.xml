@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Login margin-->
+
+    <dimen name="logo_top_margin">@dimen/_35sdp</dimen>
+    <dimen name="password_end_padding">@dimen/_13sdp</dimen>
+    <dimen name="password_image_width">@dimen/_23sdp</dimen>
+    <dimen name="password_image_height">@dimen/_18sdp</dimen>
+    <dimen name="forget_password_text_size">@dimen/_12sdp</dimen>
+    <dimen name="forget_password_end_margin">@dimen/_22sdp</dimen>
+    <dimen name="forget_password_view_width">@dimen/_95sdp</dimen>
+    <dimen name="forget_password_top_margin">@dimen/_5sdp</dimen>
+    <dimen name="forget_password_msg_text_size">@dimen/_15sdp</dimen>
+    <dimen name="login_button_top_margin">@dimen/_50sdp</dimen>
+
+
+    <!--Standard height width-->
+    <dimen name="standard_width">@dimen/_274sdp</dimen>
+    <dimen name="standard_height">@dimen/_40sdp</dimen>
+    <dimen name="logo_size">@dimen/_130sdp</dimen>
+    <dimen name="standard_text_size">@dimen/_13sdp</dimen>
+    <dimen name="back_button_size">@dimen/_20sdp</dimen>
+    <dimen name="button_text_size">@dimen/_17sdp</dimen>
+
+    <!--Create Profile-->
+    <dimen name="upload_text_size">@dimen/_15sdp</dimen>
+
+    <!--Main -->
+    <dimen name="home_button_size">@dimen/_50sdp</dimen>
+    <dimen name="home_button_image_size">@dimen/_35sdp</dimen>
+    <dimen name="home_setting_image_size">@dimen/_25sdp</dimen>
+
+</resources>

@@ -1,12 +1,22 @@
 package com.example.kalam_android.view.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -31,12 +41,21 @@ import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
 import com.google.gson.Gson
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import org.json.JSONObject
+import java.util.*
+import java.util.jar.Manifest
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
+class ChatsFragment : Fragment(), SocketCallback, MyClickListener, RecognitionListener,
+    View.OnTouchListener {
 
     private val TAG = this.javaClass.simpleName
     private lateinit var binding: ChatsFragmentBinding
@@ -49,7 +68,10 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
     private var chatIDs: ArrayList<Int> = ArrayList()
     var position = -1
     private var isRefresh = false
+    private var speech: SpeechRecognizer? = null
+    private var recognizerIntent: Intent? = null
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,7 +103,63 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
             isRefresh = true
             hitAllChatApi()
         }
+        binding.fabSpeech.isClickable = false
+        binding.fabSpeech.setOnTouchListener(this)
+        checkPermission()
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s?.length == 0) {
+                    binding.pbCenter.visibility = View.VISIBLE
+                    hitAllChatApi()
+                } else {
+                    hitSearchMessage(s.toString())
+                }
+            }
+        })
         return binding.root
+    }
+
+    private fun checkPermission() {
+        Dexter.withActivity(activity).withPermission(android.Manifest.permission.RECORD_AUDIO)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    initVoiceToText()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    response?.requestedPermission
+                }
+
+            }).onSameThread().check()
+    }
+
+    private fun initVoiceToText() {
+
+        speech = SpeechRecognizer.createSpeechRecognizer(activity)
+        speech!!.setRecognitionListener(this)
+        recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en")
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity?.packageName)
+        recognizerIntent!!.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+        )
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity?.packageName)
+
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<AllChatListResponse>?) {
@@ -99,7 +177,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
                 binding.pbCenter.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
-                toast(activity, "Something went wrong please try again")
+//                toast(activity, "Something went wrong please try again")
             }
             else -> {
             }
@@ -242,6 +320,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
                     SocketIO.setSocketCallbackListener(this)
                     hitAllChatApi()
                 }
+
             }
         }
     }
@@ -265,19 +344,21 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
         when (view.id) {
             R.id.rlItem -> {
                 val item = chatList[position]
-                this.position = position
-                val intent = Intent(activity, ChatDetailActivity::class.java)
-                intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
-                intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
-                intent.putExtra(
-                    AppConstants.CHAT_USER_NAME,
-                    StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
-                )
-                intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
-                startActivityForResult(
-                    intent,
-                    AppConstants.CHAT_FRAGMENT_CODE
-                )
+                if (item.chat_id != 0) {
+                    this.position = position
+                    val intent = Intent(activity, ChatDetailActivity::class.java)
+                    intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
+                    intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                    intent.putExtra(
+                        AppConstants.CHAT_USER_NAME,
+                        StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
+                    )
+                    intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
+                    startActivityForResult(
+                        intent,
+                        AppConstants.CHAT_FRAGMENT_CODE
+                    )
+                }
             }
         }
     }
@@ -291,5 +372,137 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener {
             SocketIO.setSocketCallbackListener(this)
             logE("OnResume of Chat Fragment")
         }
+        checkPermission()
     }
+
+    override fun onPause() {
+        super.onPause()
+        if (speech != null) {
+            speech!!.destroy()
+            Log.i("Voice To Text", "destroy")
+        }
+
+    }
+
+    override fun onReadyForSpeech(params: Bundle?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onRmsChanged(rmsdB: Float) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onBufferReceived(buffer: ByteArray?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onPartialResults(partialResults: Bundle?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onEvent(eventType: Int, params: Bundle?) {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onBeginningOfSpeech() {
+        binding.fabSpeech.isClickable = true
+
+    }
+
+    override fun onEndOfSpeech() {
+        binding.fabSpeech.isClickable = true
+
+
+    }
+
+    override fun onError(error: Int) {
+        binding.fabSpeech.isClickable = true
+        val errorMessage = getErrorText(error)
+        toast(activity, errorMessage)
+    }
+
+    override fun onResults(results: Bundle?) {
+        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        if (matches?.size!! > 0 && chatList.size > 0) {
+            matches.forEach { speechName: String ->
+
+                for (i in chatList.indices) {
+                    if (speechName.equals(
+                            "chat with" + " " + chatList[i].firstname + " " + chatList[i].lastname,
+                            true
+                        ) || speechName.equals(
+                            "chat with" + " " + chatList[i].firstname,
+                            true
+                        ) || speechName.equals(
+                            "chat with" + " " + chatList[i].lastname,
+                            true
+                        )
+                    ) {
+                        toast(
+                            activity,
+                            "chat with ${chatList[i].firstname + " " + chatList[i].lastname}"
+                        )
+                        val intent = Intent(activity, ChatDetailActivity::class.java)
+                        intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
+                        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                        intent.putExtra(
+                            AppConstants.CHAT_USER_NAME,
+                            StringBuilder(chatList[i].firstname).append(" ").append(
+                                chatList[i].lastname
+                            ).toString()
+                        )
+                        intent.putExtra(
+                            AppConstants.CHAT_USER_PICTURE,
+                            chatList[i].profile_image
+                        )
+                        startActivityForResult(
+                            intent,
+                            AppConstants.CHAT_FRAGMENT_CODE
+                        )
+                        return
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getErrorText(errorCode: Int): String {
+        val message: String
+        when (errorCode) {
+            SpeechRecognizer.ERROR_AUDIO -> message = "Audio recording error"
+            SpeechRecognizer.ERROR_CLIENT -> message = "Client side error"
+            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> message = "Insufficient permissions"
+            SpeechRecognizer.ERROR_NETWORK -> message = "Network error"
+            SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> message = "Network timeout"
+            SpeechRecognizer.ERROR_NO_MATCH -> message = "No match"
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> message = "RecognitionService busy"
+            SpeechRecognizer.ERROR_SERVER -> message = "error from server"
+            SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> message = "No speech input"
+            else -> message = "Didn't understand, please try again."
+        }
+        return message
+    }
+
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+
+                speech!!.startListening(recognizerIntent)
+            }
+            MotionEvent.ACTION_UP -> {
+                speech!!.stopListening()
+
+            }
+
+
+        }
+        return v?.onTouchEvent(event) ?: true
+    }
+
 }

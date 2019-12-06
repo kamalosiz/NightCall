@@ -1,13 +1,21 @@
 package com.example.kalam_android.view.activities
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -35,6 +43,12 @@ import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import com.nagihong.videocompressor.VideoCompressor
 import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
@@ -48,7 +62,7 @@ import java.io.File
 import javax.inject.Inject
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
-    SocketCallback, MessageTypingListener {
+    SocketCallback, MessageTypingListener, View.OnTouchListener, RecognitionListener {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -72,6 +86,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
+    private var speech: SpeechRecognizer? = null
+    private var recognizerIntent: Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +109,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         SocketIO.setTypingListeners(this)
         myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
         applyPagination()
+        binding.fabSpeech.setOnTouchListener(this)
+        checkPermission()
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkPermission()
     }
 
     private fun initListeners() {
@@ -253,9 +277,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     list[0].identifier
                 )
             }
-            /*(binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
-                it.data?.get(0)?.identifier.toString()
-            )*/
         }
     }
 
@@ -380,7 +401,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    //Sending Identifier as a message id for now
     private fun createChatObject(message: String, file: String, type: String, identifier: String) {
         lastMsgTime = System.currentTimeMillis() / 1000L
         addMessage(
@@ -398,7 +418,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    //Sending dummy identifier for now until i don't have message id
     private fun sendMessage() {
         val identifier = System.currentTimeMillis().toString()
         createChatObject(
@@ -618,4 +637,116 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         Debugger.e(TAG, msg)
     }
 
+    private fun checkPermission() {
+        Dexter.withActivity(this).withPermission(android.Manifest.permission.RECORD_AUDIO)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+
+                    initVoiceToText()
+
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    response?.requestedPermission
+                }
+
+            }).onSameThread().check()
+    }
+
+    private fun initVoiceToText() {
+
+        speech = SpeechRecognizer.createSpeechRecognizer(this)
+        speech!!.setRecognitionListener(this)
+        recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en")
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
+        recognizerIntent!!.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
+        )
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
+
+        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+    }
+
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+
+                speech!!.startListening(recognizerIntent)
+
+            }
+            MotionEvent.ACTION_UP -> {
+                binding.pbCenter.visibility = View.GONE
+                speech!!.stopListening()
+
+            }
+
+
+        }
+        return v?.onTouchEvent(event) ?: true
+    }
+
+    override fun onReadyForSpeech(params: Bundle?) {
+
+    }
+
+    override fun onRmsChanged(rmsdB: Float) {
+    }
+
+    override fun onBufferReceived(buffer: ByteArray?) {
+    }
+
+    override fun onPartialResults(partialResults: Bundle?) {
+    }
+
+    override fun onEvent(eventType: Int, params: Bundle?) {
+    }
+
+    override fun onBeginningOfSpeech() {
+    }
+
+    override fun onEndOfSpeech() {
+    }
+
+    override fun onError(error: Int) {
+    }
+
+    override fun onResults(results: Bundle?) {
+        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        if (matches != null) {
+            if (matches[0] == "type message") {
+                showKeyBoard()
+            } else {
+                if (matches[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
+                ) {
+                    sendMessage()
+
+                } else {
+                    binding.lvBottomChat.editTextMessage.setText(matches[0])
+                    binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
+                }
+            }
+        }
+
+    }
+
+    private fun showKeyBoard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+        setFocusCursor()
+    }
+
+    private fun setFocusCursor() {
+        binding.lvBottomChat.editTextMessage.isFocusable = true
+        binding.lvBottomChat.editTextMessage.isFocusableInTouchMode = true
+        binding.lvBottomChat.editTextMessage.requestFocus()
+    }
 }

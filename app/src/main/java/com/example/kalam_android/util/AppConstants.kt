@@ -48,6 +48,7 @@ object AppConstants {
     const val CHAT_IMAGE_CODE = 1002
     const val STATUS_IMAGE_CODE = 112
     const val SELECTED_IMAGES = 12
+    val REQ_CODE_SPEECH_INPUT=222
 
 
     //Local DB=
