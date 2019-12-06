@@ -1,5 +1,6 @@
 package com.example.kalam_android.view.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,6 +17,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -28,6 +30,7 @@ import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.*
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
+import com.example.kalam_android.helper.MyVoiceToTextHelper
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.model.MediaList
@@ -62,7 +65,8 @@ import java.io.File
 import javax.inject.Inject
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
-    SocketCallback, MessageTypingListener, View.OnTouchListener, RecognitionListener {
+    SocketCallback, MessageTypingListener, View.OnTouchListener,
+    ResultVoiceToText {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -86,9 +90,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
-    private var speech: SpeechRecognizer? = null
-    private var recognizerIntent: Intent? = null
+    private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
 
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat_detail)
@@ -108,15 +113,22 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         SocketIO.setSocketCallbackListener(this)
         SocketIO.setTypingListeners(this)
         myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
+        myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
+        myVoiceToTextHelper?.checkPermissionForVoiceToText()
         applyPagination()
         binding.fabSpeech.setOnTouchListener(this)
-        checkPermission()
 
     }
 
     override fun onResume() {
         super.onResume()
-        checkPermission()
+        myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
+        myVoiceToTextHelper?.checkPermissionForVoiceToText()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        myVoiceToTextHelper?.destroy()
     }
 
     private fun initListeners() {
@@ -637,56 +649,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         Debugger.e(TAG, msg)
     }
 
-    private fun checkPermission() {
-        Dexter.withActivity(this).withPermission(android.Manifest.permission.RECORD_AUDIO)
-            .withListener(object : PermissionListener {
-                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-
-                    initVoiceToText()
-
-                }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    permission: PermissionRequest?,
-                    token: PermissionToken?
-                ) {
-                    token?.continuePermissionRequest()
-                }
-
-                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-                    response?.requestedPermission
-                }
-
-            }).onSameThread().check()
-    }
-
-    private fun initVoiceToText() {
-
-        speech = SpeechRecognizer.createSpeechRecognizer(this)
-        speech!!.setRecognitionListener(this)
-        recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en")
-        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
-        recognizerIntent!!.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH
-        )
-        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
-
-        recognizerIntent!!.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
-    }
-
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-
-                speech!!.startListening(recognizerIntent)
-
+                myVoiceToTextHelper!!.startVoiceToText()
             }
             MotionEvent.ACTION_UP -> {
-                binding.pbCenter.visibility = View.GONE
-                speech!!.stopListening()
-
+                myVoiceToTextHelper!!.stopVoiceToText()
             }
 
 
@@ -694,52 +663,25 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         return v?.onTouchEvent(event) ?: true
     }
 
-    override fun onReadyForSpeech(params: Bundle?) {
 
-    }
+    override fun onResultVoiceToText(list: ArrayList<String>) {
+        if (list[0] == "type message") {
+            showKeyBoard()
+        } else {
+            if (list[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
+            ) {
+                sendMessage()
 
-    override fun onRmsChanged(rmsdB: Float) {
-    }
-
-    override fun onBufferReceived(buffer: ByteArray?) {
-    }
-
-    override fun onPartialResults(partialResults: Bundle?) {
-    }
-
-    override fun onEvent(eventType: Int, params: Bundle?) {
-    }
-
-    override fun onBeginningOfSpeech() {
-    }
-
-    override fun onEndOfSpeech() {
-    }
-
-    override fun onError(error: Int) {
-    }
-
-    override fun onResults(results: Bundle?) {
-        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-        if (matches != null) {
-            if (matches[0] == "type message") {
-                showKeyBoard()
             } else {
-                if (matches[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
-                ) {
-                    sendMessage()
-
-                } else {
-                    binding.lvBottomChat.editTextMessage.setText(matches[0])
-                    binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
-                }
+                binding.lvBottomChat.editTextMessage.setText(list[0])
+                binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
             }
         }
-
     }
 
     private fun showKeyBoard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
         setFocusCursor()
     }

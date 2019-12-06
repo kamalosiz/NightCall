@@ -46,19 +46,17 @@
             android:layout_centerInParent="true"
             android:visibility="visible" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <ImageButton
             android:id="@+id/fabSpeech"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_85sdp"
+            android:background="@drawable/ic_voice_recording"
             android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_mic_white"
-            android:theme="@style/PrimaryActionButton"
-            app:rippleColor="@color/colorAccent" />
+            android:focusable="true" />
 
         <include
             android:id="@+id/lvBottomChat"
