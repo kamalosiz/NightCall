@@ -27,6 +27,11 @@ interface ApiCallInterface {
     @POST(Urls.SIGN_IN)
     fun login(@Body parameters: Map<String, String>): Observable<LoginResponse>
 
+
+    @POST(Urls.LOGOUT)
+    fun logout(@Header("Authorization") authorization: String?): Observable<LogOutResponse>
+
+
     @POST(Urls.VERIFY_CONTACTS)
     fun getContacts(@Body parameters: Map<String, String>): Observable<Contacts>
 

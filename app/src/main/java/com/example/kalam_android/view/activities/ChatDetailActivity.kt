@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -87,6 +88,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var loading = false
     private var isFromChatFragment = false
     private var isFromOutside = false
+    private var callerID: Long = -1
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
@@ -117,7 +119,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         applyPagination()
         binding.fabSpeech.setOnTouchListener(this)
-
     }
 
     override fun onResume() {
@@ -128,6 +129,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onPause() {
         super.onPause()
+        try {
+            if (Global.mediaPlayer.isPlaying) {
+                Global.isRelease = true
+                Global.isPlayerRunning = false
+                Global.alreadyClicked = false
+                Global.prePos = -111098
+                Global.mediaPlayer.stop()
+                Global.mediaPlayer.reset()
+                Global.mediaPlayer.release()
+                Global.mediaPlayer = MediaPlayer()
+            }
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+        }
         myVoiceToTextHelper?.destroy()
     }
 
@@ -138,6 +153,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.header.rlBack.setOnClickListener(this)
         binding.lvBottomChat.ivMic.setOnClickListener(this)
         binding.header.llProfile.setOnClickListener(this)
+        binding.header.ivAudio.setOnClickListener(this)
     }
 
     private fun initAdapter() {
@@ -212,6 +228,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
         profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
         isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_OUTSIDE, false)
+        callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
         binding.header.tvName.text = userRealName
         GlideDownloder.load(
             this,
@@ -282,7 +299,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         response?.let {
             it.data?.let { list ->
                 emitNewMessageToSocket(
-                    list[0].message.toString(),
+                    "",
                     list[0].type.toString(),
                     list[0].file_id.toString(),
                     list[0].duration.toLong(), list[0].thumbnail,
@@ -498,6 +515,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             R.id.ivAttach -> {
                 myChatMediaHelper?.openAttachments()
             }
+            R.id.ivAudio -> {
+//                val intent = Intent(this, CallActivity::class.java)
+//                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+//                startActivity(intent)
+            }
         }
     }
 
@@ -565,8 +587,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             finish()
         }
     }
-
-
     //Socket Listeners
 
     override fun socketResponse(jsonObject: JSONObject, type: String) {
@@ -657,12 +677,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             MotionEvent.ACTION_UP -> {
                 myVoiceToTextHelper!!.stopVoiceToText()
             }
-
-
         }
         return v?.onTouchEvent(event) ?: true
     }
-
 
     override fun onResultVoiceToText(list: ArrayList<String>) {
         if (list[0] == "type message") {
@@ -678,6 +695,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             }
         }
     }
+
 
     private fun showKeyBoard() {
         val imm =

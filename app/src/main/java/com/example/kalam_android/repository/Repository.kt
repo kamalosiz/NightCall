@@ -31,6 +31,10 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.login(parameters)
     }
 
+    fun logout(authorization: String?): Observable<LogOutResponse> {
+        return apiCallInterface.logout(authorization)
+    }
+
     fun getContacts(parameters: Map<String, String>): Observable<Contacts> {
         return apiCallInterface.getContacts(parameters)
     }

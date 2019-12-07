@@ -7,6 +7,7 @@ import com.example.kalam_android.notification.FCMService
 import com.example.kalam_android.view.activities.*
 import com.example.kalam_android.view.fragments.ChatsFragment
 import com.example.kalam_android.view.fragments.MoreFragment
+import com.example.kalam_android.view.fragments.ProfileFragment
 import dagger.Component
 import javax.inject.Singleton
 
@@ -27,5 +28,5 @@ interface AppComponents {
     fun doInjection(activity: FindsFriendsActivity)
     fun doInjection(fragment: MoreFragment)
     fun doInjection(activity: SettingActivity)
-    fun doInjection(firebase: FCMService)
+    fun doInjection(fragment: ProfileFragment)
 }

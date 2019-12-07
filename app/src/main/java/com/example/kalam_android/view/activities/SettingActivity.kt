@@ -2,19 +2,29 @@ package com.example.kalam_android.view.activities
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivitySelectLanguageBinding
+import com.example.kalam_android.repository.model.ChatMessagesResponse
+import com.example.kalam_android.repository.model.LogOutResponse
+import com.example.kalam_android.repository.net.ApiResponse
+import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.util.toast
+import com.example.kalam_android.viewmodel.ChatMessagesViewModel
+import com.example.kalam_android.viewmodel.LogoutViewModel
+import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
 import javax.inject.Inject
 
@@ -26,11 +36,18 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     lateinit var binding: ActivitySelectLanguageBinding
+    @Inject
+    lateinit var factory: ViewModelFactory
+    lateinit var viewModel: LogoutViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_select_language)
         MyApplication.getAppComponent(this).doInjection(this)
+        viewModel = ViewModelProviders.of(this, factory).get(LogoutViewModel::class.java)
+        viewModel.logOutResponse().observe(this, Observer {
+            consumeResponse(it)
+        })
         binding.btnUpdateChanges.setOnClickListener(this)
         binding.logout.setOnClickListener(this)
         binding.header.btnRight.visibility = View.GONE
@@ -47,6 +64,32 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
         binding.checkBox.isChecked = sharedPrefsHelper.getTransState() != 0
         applySpinner()
         checkBoxListener()
+    }
+
+    private fun consumeResponse(apiResponse: ApiResponse<LogOutResponse>?) {
+        when (apiResponse?.status) {
+
+            Status.LOADING -> {
+                showProgressDialog(this)
+            }
+            Status.SUCCESS -> {
+                hideProgressDialog()
+                toast("Logout Successfully")
+                val sharedPrefsHelper = getSharedPreferences("kalam-prefs", Context.MODE_PRIVATE)
+                val editor = sharedPrefsHelper.edit()
+                editor.clear().apply()
+                toast("Logout Successfully")
+                setResult(Activity.RESULT_OK)
+                finish()
+
+            }
+            Status.ERROR -> {
+                hideProgressDialog()
+
+            }
+            else -> {
+            }
+        }
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -117,17 +160,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 builder1.setMessage("Are you sure you want to logout?")
                 builder1.setCancelable(true)
                 builder1.setPositiveButton("Yes") { dialog, id ->
-                    sharedPrefsHelper.put(AppConstants.CONTACTS_SYNCED, false)
-                    sharedPrefsHelper.put(AppConstants.KEY_IS_LOGIN, false)
-//                    sharedPrefsHelper.put(AppConstants.KEY_USER_OBJECT, AppConstants.DUMMY_STRING)
-                    sharedPrefsHelper.setUser(null)
-//                    sharedPrefsHelper.put(AppConstants.FCM_TOKEN, AppConstants.DUMMY_STRING)
-                    sharedPrefsHelper.setFCMToken("")
-//                    sharedPrefsHelper.put(AppConstants.PHONE, AppConstants.DUMMY_STRING)
-                    sharedPrefsHelper.setNumber("")
-                    toast("Logout Successfully")
-                    setResult(Activity.RESULT_OK)
-                    finish()
+                    viewModel.hitLogOutApi(sharedPrefsHelper.getUser()?.token.toString())
                 }
                 builder1.setNegativeButton("No") { dialog, id ->
                     dialog.cancel()

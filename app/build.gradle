@@ -25,6 +25,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
     dataBinding {
         enabled = true
     }
@@ -81,5 +84,8 @@ dependencies {
     //Room Database
     implementation "android.arch.persistence.room:runtime:1.1.1"
     kapt "android.arch.persistence.room:compiler:1.1.1"
+
+    //Webrtc
+    implementation 'org.webrtc:google-webrtc:1.0.22672'
 }
 apply plugin: 'com.google.gms.google-services'

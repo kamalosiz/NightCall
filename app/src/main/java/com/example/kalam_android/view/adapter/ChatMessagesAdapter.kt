@@ -42,7 +42,6 @@ class ChatMessagesAdapter(
     private val TAG = this.javaClass.simpleName
     private var chatList: ArrayList<ChatData>? = ArrayList()
 
-
     fun updateList(list: ArrayList<ChatData>) {
         chatList?.addAll(list)
         notifyDataSetChanged()
@@ -180,6 +179,21 @@ class ChatMessagesAdapter(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.audioPlayer.ivDeliver, item.is_read
                 )
+                var isTrans = true
+                var audioUrl = ""
+                itemHolder.binding.audioPlayer.llOriginal.setOnClickListener {
+                    if (isTrans) {
+                        isTrans = false
+                        audioUrl = item.audio_url.toString()
+                        itemHolder.binding.audioPlayer.tvOriginal.text = "Play Translated"
+                        item.audio_url = item.original_audio_url
+                    } else {
+                        isTrans = true
+                        itemHolder.binding.audioPlayer.tvOriginal.text = "Play Original"
+                        item.audio_url = audioUrl
+                    }
+
+                }
             }
             AppConstants.IMAGE_MESSAGE -> {
                 if (item.identifier.isNullOrEmpty()) {

@@ -6,6 +6,7 @@ object AppConstants {
     const val USER_NAME = "user_name_kalam"
     const val RECEIVER_ID = "user_receiver_id"
     const val IS_FROM_CHAT_FRAGMENT = "is_chat_boolean"
+    const val CALLER_USER_ID = "caller_user_id"
     const val IS_FROM_CHAT_OUTSIDE = "is_outside_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
     const val CHAT_USER_PICTURE = "chat_user_picture"
@@ -72,5 +73,9 @@ object AppConstants {
     const val MESSAGE_STOPS_TYPING = "message_stop_typing"
     const val ALL_MESSAGES_READ = "all_messages_read"
     const val MESSAGE_DELIVERED = "messages_delivered"
+
+    //Webrtc
+    const val LOGIN = "login"
+
 
 }

@@ -38,6 +38,8 @@
                     android:background="@drawable/box_theme_outine"
                     android:fontFamily="@font/roboto_regular"
                     android:gravity="center"
+                    android:inputType="textEmailAddress"
+                    android:imeOptions="actionNext"
                     android:hint="Email"
                     android:textSize="@dimen/_13sdp" />
 

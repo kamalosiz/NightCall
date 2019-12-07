@@ -12,13 +12,13 @@ import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
 
 object Global {
-    private var isRelease = true
-    private var isPlayerRunning = false
-    private var alreadyClicked = false
+    var isRelease = true
+    var isPlayerRunning = false
+    var alreadyClicked = false
     var mediaPlayer: MediaPlayer = MediaPlayer()
     private var handler: Handler = Handler()
     private lateinit var runnable: Runnable
-    private var prePos: Long = -111098
+    var prePos: Long = -111098
 
     val TAG = "ChatMessagesAdapter"
 

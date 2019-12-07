@@ -300,6 +300,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     val intent = Intent(activity, ChatDetailActivity::class.java)
                     intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
                     intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                    intent.putExtra(AppConstants.CALLER_USER_ID, item.user_id)
                     intent.putExtra(
                         AppConstants.CHAT_USER_NAME,
                         StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
