@@ -52,6 +52,7 @@ class ProfileFragment : Fragment() {
             R.drawable.dummy_placeholder
         )
         binding.content.tvEmail.text = sharedPrefsHelper.getUser()?.email.toString()
+//        binding.content.tvPhone.text = sharedPrefsHelper.getNumber().toString()
     }
 
     private fun toolbarTextAppearance() {

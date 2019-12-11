@@ -9,7 +9,9 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityMainBinding
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.adapter.HomePagerAdapter
 import com.example.kalam_android.wrapper.SocketIO
@@ -100,8 +102,24 @@ class MainActivity : BaseActivity() {
                 }
             }
         })
+        val isOutside = intent.getBooleanExtra(AppConstants.IS_FROM_OUTSIDE, false)
+        logE("chat ID received : $isOutside")
+        if (isOutside) {
+            val chatID = intent.getIntExtra(AppConstants.CHAT_ID, 0)
+            val name = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
 
-
+            logE("ChatID : $chatID")
+            logE("Name : $name")
+            val intent = Intent(this, ChatDetailActivity::class.java)
+            intent.putExtra(AppConstants.CHAT_ID, chatID)
+//            intent.putExtra(AppConstants.IS_FROM_OUTSIDE, true)
+            intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
+            intent.putExtra(
+                AppConstants.CHAT_USER_NAME,
+                name
+            )
+            startActivityForResult(intent, AppConstants.CHAT_FRAGMENT_CODE)
+        }
     }
 
     override fun onBackPressed() {

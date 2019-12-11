@@ -1,18 +1,20 @@
 package com.example.kalam_android.notification
 
-import android.app.*
+import android.app.ActivityManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.kalam_android.R
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.Global
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.activities.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -22,7 +24,11 @@ import com.google.firebase.messaging.RemoteMessage
 class FCMService : FirebaseMessagingService() {
     val TAG = "FirebaseMessaging"
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
-        showNotification(remoteMSG)
+//        logE("remoteMSG data: ${remoteMSG.data}")
+//        logE("remoteMSG notification: ${remoteMSG.notification}")
+        if (Integer.valueOf(remoteMSG.data[AppConstants.FIREBASE_CHAT_ID].toString()) != Global.currentChatID) {
+            showNotification(remoteMSG)
+        }
     }
 
     private fun logE(message: String) {
@@ -30,56 +36,41 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun showNotification(remoteMessage: RemoteMessage) {
-
-        logE("chatId: " + remoteMessage.data[AppConstants.FIREBASE_CHAT_ID])
-        logE("notificationType: " + remoteMessage.data[AppConstants.NOTIFICATION_TYPE])
-        logE("content_type: " + remoteMessage.data[AppConstants.CONTENT_TYPE])
-        var notifyId = -1
-        try {
-            notifyId = Integer.valueOf(remoteMessage.data[AppConstants.FIREBASE_CHAT_ID].toString())
-        } catch (e: NumberFormatException) {
-
-        }
-
         var body: String? = ""
         var title: String? = ""
+        var chatID = -1
         try {
             body = remoteMessage.notification?.body
-//            body = remoteMessage.data[AppConstants.NOTIFICATION_BODY]
-            logE("notification body $body")
+            title = remoteMessage.notification?.title
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
         try {
-            title = remoteMessage.notification?.title
-//            title = remoteMessage.data[AppConstants.SENDER_NAME]
-            logE("notification body $title")
+            chatID =
+                Integer.valueOf(remoteMessage.data[AppConstants.FIREBASE_CHAT_ID].toString())
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
-        val intent = Intent(this, ChatDetailActivity::class.java)
-        /*if (isAppRunning(this, packageName)){
-
-        } else {
-
-        }*/
-        intent.putExtra(AppConstants.CHAT_ID, notifyId)
-        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
-        intent.putExtra(AppConstants.IS_FROM_CHAT_OUTSIDE, true)
-        intent.putExtra(
-            AppConstants.CHAT_USER_NAME,
-            remoteMessage.data[AppConstants.SENDER_NAME]
-        )
-//        intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
-//        val notificationType = remoteMessage.data[AppConstants.NOTIFICATION_TYPE]
+        logE("chatId: $chatID")
+        var intent = Intent(this, SplashActivity::class.java)
+        if (isAppRunning(this, packageName)) {
+            intent = Intent(this, ChatDetailActivity::class.java)
+            intent.putExtra(AppConstants.IS_FROM_OUTSIDE, false)
+            intent.putExtra(AppConstants.CHAT_ID, chatID)
+            intent.putExtra(
+                AppConstants.CHAT_USER_NAME,
+                remoteMessage.data[AppConstants.SENDER_NAME]
+            )
+            intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
+        }
         val notificationType = "Kalam Messages"
 
         val pendingIntent =
             PendingIntent.getActivity(
                 this,
-                notifyId,
+                System.currentTimeMillis().toInt(),
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_ONE_SHOT
             )
 
         val mBuilder: NotificationCompat.Builder
@@ -97,15 +88,13 @@ class FCMService : FirebaseMessagingService() {
             .setColor(Color.parseColor("#179a63"))
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            /*.setContentIntent(
-                if (isAppRunning(this, packageName)) pendingIntent else null
-            )*/
+            .setContentIntent(pendingIntent)
             .setSound(defaultSoundUri)
             .setGroup(title)
             .setGroupSummary(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
 
-        mNotificationManager.notify(notifyId, mBuilder.build())
+        mNotificationManager.notify(chatID, mBuilder.build())
     }
 
     private fun getNotificationIcon(): Int {

@@ -21,6 +21,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chat_messages_recycler"
                 android:layout_width="match_parent"
+                android:paddingBottom="@dimen/_32sdp"
+                android:clipToPadding="false"
                 android:layout_height="match_parent" />
 
             <LinearLayout
@@ -44,16 +46,16 @@
             android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_20sdp"
             android:layout_centerInParent="true"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <ImageButton
             android:id="@+id/fabSpeech"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="@dimen/_10sdp"
-            android:layout_marginBottom="@dimen/_85sdp"
+            android:layout_marginBottom="@dimen/_58sdp"
             android:background="@drawable/ic_voice_recording"
             android:clickable="true"
             android:focusable="true" />

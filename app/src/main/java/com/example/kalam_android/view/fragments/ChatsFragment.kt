@@ -27,10 +27,7 @@ import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.model.AllChatListResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
-import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.util.toast
+import com.example.kalam_android.util.*
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.adapter.AllChatListAdapter
 import com.example.kalam_android.viewmodel.AllChatListViewModel
@@ -115,6 +112,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         when (apiResponse?.status) {
 
             Status.LOADING -> {
+                binding.pbCenter.visibility = View.VISIBLE
             }
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
@@ -268,6 +266,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
                     }*/
+                    logE("onActivityResult of chats Fragment is called")
                     SocketIO.setSocketCallbackListener(this)
                     hitAllChatApi()
                 }
@@ -299,7 +298,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     this.position = position
                     val intent = Intent(activity, ChatDetailActivity::class.java)
                     intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
-                    intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                    intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
                     intent.putExtra(AppConstants.CALLER_USER_ID, item.user_id)
                     intent.putExtra(
                         AppConstants.CHAT_USER_NAME,
@@ -309,6 +308,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     startActivityForResult(
                         intent,
                         AppConstants.CHAT_FRAGMENT_CODE
+                    )
+                } else {
+                    showAlertDialoge(
+                        activity as Context,
+                        StringBuilder(item.firstname).append(" ").append(item.lastname).toString(),
+                        item.message.toString()
                     )
                 }
             }
@@ -373,7 +378,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         )
                         val intent = Intent(activity, ChatDetailActivity::class.java)
                         intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
-                        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                        intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
                         intent.putExtra(
                             AppConstants.CHAT_USER_NAME,
                             StringBuilder(chatList[i].firstname).append(" ").append(

@@ -2,23 +2,16 @@ package com.example.kalam_android.view.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.DialogInterface
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -47,12 +40,6 @@ import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionDeniedResponse
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.single.PermissionListener
 import com.nagihong.videocompressor.VideoCompressor
 import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
@@ -86,8 +73,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var chatList1: ArrayList<ChatData> = ArrayList()
     private var profileImage: String? = null
     private var loading = false
-    private var isFromChatFragment = false
-    private var isFromOutside = false
+    private var isChatIdAvailable = false
+    //    private var isFromOutside = false
     private var callerID: Long = -1
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
@@ -107,43 +94,64 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         viewModel.mediaResponse().observe(this, Observer {
             consumeMediaResponse(it)
         })
-        gettingChatId()
-        setUserData()
-        initAdapter()
+        myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
+        handleIntent(intent)
         initListeners()
         checkSomeoneTyping()
         SocketIO.setSocketCallbackListener(this)
         SocketIO.setTypingListeners(this)
-        myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
         myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         applyPagination()
         binding.fabSpeech.setOnTouchListener(this)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null) {
+            handleIntent(intent)
+        }
+    }
+
+    private fun handleIntent(intent: Intent) {
+        binding.pbCenter.visibility = View.VISIBLE
+        isChatIdAvailable = intent.getBooleanExtra(AppConstants.IS_CHATID_AVAILABLE, false)
+        chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
+        Global.currentChatID = chatId
+        logE("isChatIDAvailabel: $isChatIdAvailable")
+        logE("chatId: $chatId")
+        userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
+//        isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_OUTSIDE, false)
+        setUserData()
+        initAdapter()
+        if (isChatIdAvailable) {
+            hitConversationApi(0)
+            SocketIO.emitReadAllMessages(
+                chatId.toString(),
+                sharedPrefsHelper.getUser()?.id.toString()
+            )
+            sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
+        } else {
+            receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("user_id", sharedPrefsHelper.getUser()?.id.toString())
+            jsonObject.addProperty("receiver_id", receiverId)
+            SocketIO.socket?.emit(AppConstants.START_CAHT, jsonObject, Ack {
+                val chatId = it[0] as Int
+                this.chatId = chatId
+                Global.currentChatID = chatId
+                runOnUiThread {
+                    hitConversationApi(0)
+                }
+            })
+            sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        try {
-            if (Global.mediaPlayer.isPlaying) {
-                Global.isRelease = true
-                Global.isPlayerRunning = false
-                Global.alreadyClicked = false
-                Global.prePos = -111098
-                Global.mediaPlayer.stop()
-                Global.mediaPlayer.reset()
-                Global.mediaPlayer.release()
-                Global.mediaPlayer = MediaPlayer()
-            }
-        } catch (e: IllegalStateException) {
-            e.printStackTrace()
-        }
-        myVoiceToTextHelper?.destroy()
     }
 
     private fun initListeners() {
@@ -168,7 +176,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 userRealName.toString(),
                 profileImage.toString(),
                 sharedPrefsHelper.getTransState(),
-                sharedPrefsHelper.getLanguage()
+                sharedPrefsHelper.getLanguage(), myChatMediaHelper
             )
     }
 
@@ -189,33 +197,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         })
     }
 
-    private fun gettingChatId() {
-        isFromChatFragment = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
-        if (isFromChatFragment) {
-            chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
-            hitConversationApi(0)
-            SocketIO.emitReadAllMessages(
-                chatId.toString(),
-                sharedPrefsHelper.getUser()?.id.toString()
-            )
-            sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
-        } else {
-            receiverId = intent.getStringExtra(AppConstants.RECEIVER_ID)
-            val jsonObject = JsonObject()
-            jsonObject.addProperty("user_id", sharedPrefsHelper.getUser()?.id.toString())
-            jsonObject.addProperty("receiver_id", receiverId)
-            SocketIO.socket?.emit(AppConstants.START_CAHT, jsonObject, Ack {
-                val chatId = it[0] as Int
-                this.chatId = chatId
-                runOnUiThread {
-                    hitConversationApi(0)
-                }
-            })
-            sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
-        }
-        logE("Chat ID  : $chatId")
-    }
-
     fun hitConversationApi(offset: Int) {
         val params = HashMap<String, String>()
         params["chat_id"] = this.chatId.toString()
@@ -225,9 +206,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun setUserData() {
-        userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
+//        userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
         profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
-        isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_CHAT_OUTSIDE, false)
+//        isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_OUTSIDE, false)
         callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
         binding.header.tvName.text = userRealName
         GlideDownloder.load(
@@ -570,22 +551,46 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        try {
+            if (myChatMediaHelper?.myPlayer != null) {
+                if (myChatMediaHelper?.myPlayer?.isPlaying == true) {
+                    logE("Media Player is playing")
+                    myChatMediaHelper?.myPlayer?.stop()
+                    myChatMediaHelper?.myPlayer?.reset()
+                    myChatMediaHelper?.myPlayer?.release()
+                    myChatMediaHelper?.myPlayer = null
+                }
+            } else {
+                logE("Media Player is null")
+            }
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+        }
+        Global.currentChatID = -1
+        myChatMediaHelper?.myPlayer = MediaPlayer()
+        myVoiceToTextHelper?.destroy()
+    }
+
     override fun onBackPressed() {
-        val intent = Intent()
-        if (isFromOutside) {
+//        val intent = Intent()
+        /*if (isFromOutside) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
-        } else {
-            if (lastMessage?.isNotEmpty() == true && lastMsgTime != null) {
-                intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
-                intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
-                intent.putExtra(AppConstants.IsSEEN, false)
-            } else {
-                intent.putExtra(AppConstants.IsSEEN, true)
-            }
-            setResult(Activity.RESULT_OK, intent)
-            finish()
-        }
+        }*/ /*else {
+               if (lastMessage?.isNotEmpty() == true && lastMsgTime != null) {
+                   intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
+                   intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
+                   intent.putExtra(AppConstants.IsSEEN, false)
+               } else {
+                   intent.putExtra(AppConstants.IsSEEN, true)
+               }
+               setResult(Activity.RESULT_OK, intent)
+               finish()
+        }*/
+        setResult(Activity.RESULT_OK)
+        finish()
     }
     //Socket Listeners
 
@@ -682,7 +687,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     override fun onResultVoiceToText(list: ArrayList<String>) {
-        if (list[0] == "type message") {
+        if (list[0] == "type") {
             showKeyBoard()
         } else {
             if (list[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()

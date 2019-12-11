@@ -15,18 +15,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
+import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.util.*
 import com.example.kalam_android.view.activities.OpenMediaActivity
 import com.example.kalam_android.wrapper.GlideDownloder
-import kotlinx.android.synthetic.main.audio_player_item.view.*
-import kotlinx.android.synthetic.main.audio_player_item.view.ivDeliver
-import kotlinx.android.synthetic.main.audio_player_item.view.llOriginal
-import kotlinx.android.synthetic.main.audio_player_item.view.tvTime
-import kotlinx.android.synthetic.main.image_chat_item.view.*
-import kotlinx.android.synthetic.main.image_chat_item.view.ivImage
-import kotlinx.android.synthetic.main.item_chat.view.*
-import kotlinx.android.synthetic.main.video_item.view.*
 
 
 class ChatMessagesAdapter(
@@ -35,7 +28,8 @@ class ChatMessagesAdapter(
     val name: String,
     private val profile: String,
     private val translateState: Int?,
-    private val language: String?
+    private val language: String?,
+    private val myChatMediaHelper: MyChatMediaHelper?
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -129,8 +123,18 @@ class ChatMessagesAdapter(
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.itemChat.tvMessage.text = item.message
+                val regex = "(?s).*\\p{InArabic}.*"
+                if (item.message?.matches(Regex(regex)) == true) {
+                    itemHolder.binding.itemChat.tvMessage.typeface = Global.changeText(context, 0)
+                } else {
+                    itemHolder.binding.itemChat.tvMessage.typeface = Global.changeText(context, 1)
+                }
                 itemHolder.binding.itemChat.llOriginal.setOnClickListener {
-                    showAlertDialoge(context, "Original Message", item.original_message.toString())
+                    showAlertDialoge(
+                        context,
+                        "Original Message",
+                        item.original_message.toString()
+                    )
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
@@ -166,7 +170,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.ivPlayPause.setOnClickListener {
-                    Global.playVoiceMsg(
+                    myChatMediaHelper?.playVoiceMsg(
                         itemHolder.binding, item.audio_url.toString(), item.id, context
                     )
                 }

@@ -20,7 +20,7 @@
     <dimen name="logo_size">@dimen/_130sdp</dimen>
     <dimen name="standard_text_size">@dimen/_13sdp</dimen>
     <dimen name="back_button_size">@dimen/_20sdp</dimen>
-    <dimen name="button_text_size">@dimen/_17sdp</dimen>
+    <dimen name="button_text_size">@dimen/_15sdp</dimen>
 
     <!--Create Profile-->
     <dimen name="upload_text_size">@dimen/_15sdp</dimen>

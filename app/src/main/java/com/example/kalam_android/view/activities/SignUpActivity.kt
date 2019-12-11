@@ -84,6 +84,8 @@ class SignUpActivity : BaseActivity() {
             logE(it.toString())
             if (it.status) {
                 logE("status true: ${it.data?.verification_code}")
+                logE("Phone number on sucess : $phone")
+
                 sharedPrefsHelper.setNumber(phone)
                 val intent = Intent(this@SignUpActivity, VerifyCodeActivity::class.java)
                 intent.putExtra(AppConstants.VERIFICATION_CODE, it.data?.verification_code)
@@ -106,6 +108,7 @@ class SignUpActivity : BaseActivity() {
         }
         phone = StringBuilder(binding.tvDialCode.text).append(binding.etNumber.text.toString())
             .toString()
+        logE("Phone number : $phone")
         val params = HashMap<String, String>()
         params["number"] = phone
         viewModel.hitSignUpApi(params)

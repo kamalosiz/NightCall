@@ -29,4 +29,5 @@ interface AppComponents {
     fun doInjection(fragment: MoreFragment)
     fun doInjection(activity: SettingActivity)
     fun doInjection(fragment: ProfileFragment)
+    fun doInjection(fcm: FCMService)
 }
