@@ -35,6 +35,7 @@ import com.example.kalam_android.util.*
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
+import com.example.kalam_android.webrtc.CallActivity
 import com.example.kalam_android.wrapper.GlideDownloder
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
@@ -74,7 +75,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var profileImage: String? = null
     private var loading = false
     private var isChatIdAvailable = false
-    //    private var isFromOutside = false
     private var callerID: Long = -1
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
@@ -108,23 +108,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (intent != null) {
-            handleIntent(intent)
-        }
+        if (intent != null) handleIntent(intent)
     }
 
     private fun handleIntent(intent: Intent) {
         binding.pbCenter.visibility = View.VISIBLE
         isChatIdAvailable = intent.getBooleanExtra(AppConstants.IS_CHATID_AVAILABLE, false)
         chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
-        Global.currentChatID = chatId
         logE("isChatIDAvailabel: $isChatIdAvailable")
         logE("chatId: $chatId")
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
-//        isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_OUTSIDE, false)
         setUserData()
         initAdapter()
         if (isChatIdAvailable) {
+            Global.currentChatID = chatId
             hitConversationApi(0)
             SocketIO.emitReadAllMessages(
                 chatId.toString(),
@@ -497,9 +494,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 myChatMediaHelper?.openAttachments()
             }
             R.id.ivAudio -> {
-//                val intent = Intent(this, CallActivity::class.java)
-//                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
-//                startActivity(intent)
+                val intent = Intent(this, CallActivity::class.java)
+                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+                intent.putExtra(AppConstants.INITIATOR, true)
+                startActivity(intent)
             }
         }
     }

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/theme_color"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:background="@drawable/ic_notification" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_7sdp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="Voice Call"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_11sdp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="Dummy Name"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_18sdp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="INCOMING"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_11sdp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlCameras"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/remoteVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/localVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ivUser"
+        android:layout_width="@dimen/_200sdp"
+        android:layout_height="@dimen/_200sdp"
+        android:layout_below="@id/header"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@drawable/dummy_placeholder"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/rlBottomCalls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/_30sdp"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/ibAnswer"
+            android:layout_width="@dimen/_45sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:background="@drawable/call_receive" />
+
+        <ImageButton
+            android:id="@+id/ibHangUp"
+            android:layout_width="@dimen/_45sdp"
+            android:layout_height="@dimen/_45sdp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:background="@drawable/call_cancel" />
+
+    </RelativeLayout>
+
+    <!--  <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="bottom"
+          android:orientation="horizontal">
+
+          <Button
+              android:id="@+id/hangup"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_margin="5dp"
+              android:text="Hangup" />
+
+          <Button
+              android:id="@+id/startCall"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_margin="5dp"
+              android:text="Call" />
+
+          <Button
+              android:id="@+id/answer"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_margin="5dp"
+              android:text="Answer" />
+      </LinearLayout>-->
+</RelativeLayout>

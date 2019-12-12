@@ -36,6 +36,10 @@
             android:value="@string/app_name" />
 
         <activity
+            android:name=".webrtc.CallActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".view.activities.StatusDetailActivity"
             android:screenOrientation="portrait" />
         <activity

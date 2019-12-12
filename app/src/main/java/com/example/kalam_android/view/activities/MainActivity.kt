@@ -8,21 +8,28 @@ import androidx.viewpager.widget.ViewPager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
+import com.example.kalam_android.callbacks.WebSocketCallback
+import com.example.kalam_android.callbacks.WebSocketOfferCallback
 import com.example.kalam_android.databinding.ActivityMainBinding
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.adapter.HomePagerAdapter
+import com.example.kalam_android.webrtc.CallActivity
+import com.example.kalam_android.webrtc.CustomWebSocketListener
 import com.example.kalam_android.wrapper.SocketIO
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
 import javax.inject.Inject
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), WebSocketOfferCallback {
 
     private lateinit var binding: ActivityMainBinding
     private val TAG = this.javaClass.simpleName
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
+    private var customWebSocketListener: CustomWebSocketListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +44,12 @@ class MainActivity : BaseActivity() {
         binding.llProfile.setOnClickListener { binding.viewPager.setCurrentItem(3, true) }
         binding.ivSettings.setOnClickListener { binding.viewPager.setCurrentItem(4, true) }
         SocketIO.connectSocket(sharedPrefsHelper.getUser()?.token)
+        createLocalSocket()
         binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
         }
+
 
 
         binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -122,6 +131,17 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun createLocalSocket() {
+        val request = Request.Builder().url("http://192.168.0.39:9090").build()
+        customWebSocketListener = CustomWebSocketListener.getInstance(sharedPrefsHelper)
+        val okHttpClientBuilder = OkHttpClient.Builder()
+        val webSocket1 = okHttpClientBuilder.build()
+        val webSocket = webSocket1.newWebSocket(request, customWebSocketListener)
+        customWebSocketListener?.setWebSocket(webSocket)
+        customWebSocketListener?.setOfferListener(this)
+        webSocket1.dispatcher().executorService().shutdown()
+    }
+
     override fun onBackPressed() {
         if (binding.viewPager.currentItem == 0) {
             super.onBackPressed()
@@ -137,5 +157,16 @@ class MainActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         SocketIO.disconnectSocket()
+    }
+
+    override fun offerCallback(jsonObject: JSONObject) {
+        when (jsonObject.getString("type")) {
+            "offer" -> {
+                logE("offer received")
+                val intent = Intent(this, CallActivity::class.java)
+                intent.putExtra("json", jsonObject.toString())
+                startActivity(intent)
+            }
+        }
     }
 }

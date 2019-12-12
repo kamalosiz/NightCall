@@ -7,6 +7,7 @@ object AppConstants {
     const val RECEIVER_ID = "user_receiver_id"
     const val IS_CHATID_AVAILABLE = "is_chat_boolean"
     const val CALLER_USER_ID = "caller_user_id"
+    const val INITIATOR = "caller_initiator"
     const val IS_FROM_OUTSIDE = "is_outside_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
     const val CHAT_USER_PICTURE = "chat_user_picture"
@@ -29,6 +30,7 @@ object AppConstants {
     const val CONTACTS_SYNCED = "key_contacts_synced"
     const val KEY_IS_LOGIN = "is_logged_in_kalam"
     const val PHONE = "key_phoneno"
+    const val CONNECTED_USER_ID = "connectedUserId"
 
     val FIREBASE_CHAT_ID = "chat_id"
     val SENDER_NAME = "sender_name"
