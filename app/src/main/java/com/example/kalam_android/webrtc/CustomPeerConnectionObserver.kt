@@ -1,12 +1,7 @@
 package com.example.kalam_android.webrtc
 
-import android.util.Log
-
-import org.webrtc.DataChannel
-import org.webrtc.IceCandidate
-import org.webrtc.MediaStream
-import org.webrtc.PeerConnection
-import org.webrtc.RtpReceiver
+import com.example.kalam_android.util.Debugger
+import org.webrtc.*
 
 internal open class CustomPeerConnectionObserver(logTag: String) : PeerConnection.Observer {
 
@@ -18,46 +13,64 @@ internal open class CustomPeerConnectionObserver(logTag: String) : PeerConnectio
     }
 
     override fun onSignalingChange(signalingState: PeerConnection.SignalingState) {
-        Log.d(logTag, "onSignalingChange() called with: signalingState = [$signalingState]")
+        Debugger.d(
+            logTag.toString(),
+            "onSignalingChange() called with: signalingState = [$signalingState]"
+        )
     }
 
     override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
-        Log.d(logTag, "onIceConnectionChange() called with: iceConnectionState = [$iceConnectionState]")
+        Debugger.d(
+            logTag.toString(),
+            "onIceConnectionChange() called with: iceConnectionState = [$iceConnectionState]"
+        )
     }
 
     override fun onIceConnectionReceivingChange(b: Boolean) {
-        Log.d(logTag, "onIceConnectionReceivingChange() called with: b = [$b]")
+        Debugger.d(logTag.toString(), "onIceConnectionReceivingChange() called with: b = [$b]")
     }
 
     override fun onIceGatheringChange(iceGatheringState: PeerConnection.IceGatheringState) {
-        Log.d(logTag, "onIceGatheringChange() called with: iceGatheringState = [$iceGatheringState]")
+        Debugger.d(
+            logTag.toString(),
+            "onIceGatheringChange() called with: iceGatheringState = [$iceGatheringState]"
+        )
     }
 
     override fun onIceCandidate(iceCandidate: IceCandidate) {
-        Log.d(logTag, "onIceCandidate() called with: iceCandidate = [$iceCandidate]")
+        Debugger.d(
+            logTag.toString(),
+            "onIceCandidate() called with: iceCandidate = [$iceCandidate]"
+        )
     }
 
     override fun onIceCandidatesRemoved(iceCandidates: Array<IceCandidate>) {
-        Log.d(logTag, "onIceCandidatesRemoved() called with: iceCandidates = [$iceCandidates]")
+        Debugger.d(
+            logTag.toString(),
+            "onIceCandidatesRemoved() called with: iceCandidates = [$iceCandidates]"
+        )
     }
 
     override fun onAddStream(mediaStream: MediaStream) {
-        Log.d(logTag, "onAddStream() called with: mediaStream = [$mediaStream]")
+        Debugger.d(logTag.toString(), "onAddStream() called with: mediaStream = [$mediaStream]")
     }
 
     override fun onRemoveStream(mediaStream: MediaStream) {
-        Log.d(logTag, "onRemoveStream() called with: mediaStream = [$mediaStream]")
+        Debugger.d(logTag.toString(), "onRemoveStream() called with: mediaStream = [$mediaStream]")
     }
 
     override fun onDataChannel(dataChannel: DataChannel) {
-        Log.d(logTag, "onDataChannel() called with: dataChannel = [$dataChannel]")
+        Debugger.d(logTag.toString(), "onDataChannel() called with: dataChannel = [$dataChannel]")
     }
 
     override fun onRenegotiationNeeded() {
-        Log.d(logTag, "onRenegotiationNeeded() called")
+        Debugger.d(logTag.toString(), "onRenegotiationNeeded() called")
     }
 
     override fun onAddTrack(rtpReceiver: RtpReceiver, mediaStreams: Array<MediaStream>) {
-        Log.d(logTag, "onAddTrack() called with: rtpReceiver = [$rtpReceiver], mediaStreams = [$mediaStreams]")
+        Debugger.d(
+            logTag.toString(),
+            "onAddTrack() called with: rtpReceiver = [$rtpReceiver], mediaStreams = [$mediaStreams]"
+        )
     }
 }

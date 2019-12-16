@@ -2,6 +2,7 @@ package com.example.kalam_android.webrtc
 
 import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.callbacks.WebSocketOfferCallback
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import okhttp3.Response
@@ -53,7 +54,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         logE("onMessage string" + text!!)
         try {
             val json = JSONObject(text)
-            if (json.getString("type") == "offer") {
+            if (json.getString(AppConstants.TYPE) == AppConstants.OFFER) {
                 webSocketOfferCallback?.offerCallback(json)
             } else {
                 webSocketCallback?.webSocketCallback(json)
@@ -81,7 +82,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
     fun login() {
         val json = JSONObject()
         try {
-            json.put("type", "login")
+            json.put("type", AppConstants.LOGIN)
             json.put(
                 "name",
                 StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
@@ -103,7 +104,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         logE("onIceCandidateReceived normal :$iceCandidate")
         val obj = JSONObject()
         try {
-            obj.put("type", "candidate")
+            obj.put("type", AppConstants.CANDIDATE)
             obj.put("label", iceCandidate.sdpMLineIndex)
             obj.put("id", iceCandidate.sdpMid)
             obj.put("candidate", iceCandidate.sdp)
@@ -114,7 +115,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         }
     }
 
-    fun createOffer(sessionDescription: SessionDescription, callerID: Long) {
+    fun createOffer(sessionDescription: SessionDescription, callerID: Long, isVideo: Boolean) {
         try {
             logE("Emit Description [ $sessionDescription]")
             val obj = JSONObject()
@@ -122,6 +123,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
             obj.put("sdp", sessionDescription.description)
             obj.put("candidate", "")
             obj.put("connectedUserId", callerID)
+            obj.put("isVideo", isVideo)
             webSocket?.send(obj.toString())
 
         } catch (e: JSONException) {
@@ -142,6 +144,22 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
             e.printStackTrace()
         }
     }
+
+    fun onHangout(id: Long) {
+        try {
+            val obj = JSONObject()
+            obj.put("type", "reject")
+            obj.put("connectedUserId", id)
+            webSocket?.send(obj.toString())
+        } catch (e: JSONException) {
+            logE("onSetFailure" + e.message)
+            e.printStackTrace()
+        }
+    }
+
+    /*fun disconnectSocket() {
+        webSocket?.close(1,"")
+    }*/
 
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)

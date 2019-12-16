@@ -8,14 +8,15 @@ import androidx.viewpager.widget.ViewPager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
-import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.callbacks.WebSocketOfferCallback
 import com.example.kalam_android.databinding.ActivityMainBinding
+import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.adapter.HomePagerAdapter
-import com.example.kalam_android.webrtc.CallActivity
+import com.example.kalam_android.webrtc.AudioCallActivity
+import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.webrtc.CustomWebSocketListener
 import com.example.kalam_android.wrapper.SocketIO
 import okhttp3.OkHttpClient
@@ -44,17 +45,14 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         binding.llProfile.setOnClickListener { binding.viewPager.setCurrentItem(3, true) }
         binding.ivSettings.setOnClickListener { binding.viewPager.setCurrentItem(4, true) }
         SocketIO.connectSocket(sharedPrefsHelper.getUser()?.token)
-        createLocalSocket()
+        connectWebSocket()
         binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
         }
 
-
-
         binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
-
             }
 
             override fun onPageScrolled(
@@ -67,7 +65,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             override fun onPageSelected(position: Int) {
                 when (position) {
                     0 -> {
-                        logE("position: $position")
                         binding.ivChats.setBackgroundResource(R.drawable.icon_chat_colored)
                         binding.ivCalls.setBackgroundResource(R.drawable.icon_call_grey)
                         binding.ivStories.setBackgroundResource(R.drawable.icon_stories_grey)
@@ -75,7 +72,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
                         binding.ivSettings.setBackgroundResource(R.drawable.icon_settings)
                     }
                     1 -> {
-                        logE("position: $position")
                         binding.ivChats.setBackgroundResource(R.drawable.icon_chat_grey)
                         binding.ivCalls.setBackgroundResource(R.drawable.icon_call_colored)
                         binding.ivStories.setBackgroundResource(R.drawable.icon_stories_grey)
@@ -83,7 +79,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
                         binding.ivSettings.setBackgroundResource(R.drawable.icon_settings)
                     }
                     2 -> {
-                        logE("position: $position")
                         binding.ivChats.setBackgroundResource(R.drawable.icon_chat_grey)
                         binding.ivCalls.setBackgroundResource(R.drawable.icon_call_grey)
                         binding.ivStories.setBackgroundResource(R.drawable.icon_stories_colored)
@@ -91,7 +86,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
                         binding.ivSettings.setBackgroundResource(R.drawable.icon_settings)
                     }
                     3 -> {
-                        logE("position: $position")
                         binding.ivChats.setBackgroundResource(R.drawable.icon_chat_grey)
                         binding.ivCalls.setBackgroundResource(R.drawable.icon_call_grey)
                         binding.ivStories.setBackgroundResource(R.drawable.icon_stories_grey)
@@ -99,7 +93,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
                         binding.ivSettings.setBackgroundResource(R.drawable.icon_settings)
                     }
                     4 -> {
-                        logE("position: $position")
                         binding.ivChats.setBackgroundResource(R.drawable.icon_chat_grey)
                         binding.ivCalls.setBackgroundResource(R.drawable.icon_call_grey)
                         binding.ivStories.setBackgroundResource(R.drawable.icon_stories_grey)
@@ -112,16 +105,11 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             }
         })
         val isOutside = intent.getBooleanExtra(AppConstants.IS_FROM_OUTSIDE, false)
-        logE("chat ID received : $isOutside")
         if (isOutside) {
             val chatID = intent.getIntExtra(AppConstants.CHAT_ID, 0)
             val name = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
-
-            logE("ChatID : $chatID")
-            logE("Name : $name")
             val intent = Intent(this, ChatDetailActivity::class.java)
             intent.putExtra(AppConstants.CHAT_ID, chatID)
-//            intent.putExtra(AppConstants.IS_FROM_OUTSIDE, true)
             intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
             intent.putExtra(
                 AppConstants.CHAT_USER_NAME,
@@ -131,8 +119,8 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         }
     }
 
-    private fun createLocalSocket() {
-        val request = Request.Builder().url("http://192.168.0.39:9090").build()
+    private fun connectWebSocket() {
+        val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
         customWebSocketListener = CustomWebSocketListener.getInstance(sharedPrefsHelper)
         val okHttpClientBuilder = OkHttpClient.Builder()
         val webSocket1 = okHttpClientBuilder.build()
@@ -150,23 +138,30 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         }
     }
 
-    private fun logE(message: String) {
-        Debugger.e(TAG, message)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         SocketIO.disconnectSocket()
     }
 
     override fun offerCallback(jsonObject: JSONObject) {
-        when (jsonObject.getString("type")) {
-            "offer" -> {
-                logE("offer received")
-                val intent = Intent(this, CallActivity::class.java)
-                intent.putExtra("json", jsonObject.toString())
-                startActivity(intent)
+        when (jsonObject.getString(AppConstants.TYPE)) {
+            AppConstants.OFFER -> {
+                if (jsonObject.getBoolean("isVideo")) {
+                    logE("video received")
+                    val intent = Intent(this, VideoCallActivity::class.java)
+                    intent.putExtra(AppConstants.JSON, jsonObject.toString())
+                    startActivity(intent)
+                } else {
+                    logE("audio received")
+                    val intent = Intent(this, AudioCallActivity::class.java)
+                    intent.putExtra(AppConstants.JSON, jsonObject.toString())
+                    startActivity(intent)
+                }
             }
         }
+    }
+
+    private fun logE(message: String) {
+        Debugger.e(TAG, message)
     }
 }

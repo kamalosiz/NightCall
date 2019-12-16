@@ -1,6 +1,7 @@
 package com.example.kalam_android.webrtc
 
 import android.util.Log
+import com.example.kalam_android.util.Debugger
 
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
@@ -17,19 +18,22 @@ internal open class CustomSdpObserver(logTag: String) : SdpObserver {
 
 
     override fun onCreateSuccess(sessionDescription: SessionDescription) {
-        Log.d(tag, "onCreateSuccess() called with: sessionDescription = [$sessionDescription]")
+        Debugger.e(
+            tag.toString(),
+            "onCreateSuccess() called with: sessionDescription = [$sessionDescription]"
+        )
     }
 
     override fun onSetSuccess() {
-        Log.d(tag, "onSetSuccess() called")
+        Debugger.e(tag.toString(), "onSetSuccess() called")
     }
 
     override fun onCreateFailure(s: String) {
-        Log.d(tag, "onCreateFailure() called with: s = [$s]")
+        Debugger.e(tag.toString(), "onCreateFailure() called with: s = [$s]")
     }
 
     override fun onSetFailure(s: String) {
-        Log.d(tag, "onSetFailure() called with: s = [$s]")
+        Debugger.e(tag.toString(), "onSetFailure() called with: s = [$s]")
     }
 
 }

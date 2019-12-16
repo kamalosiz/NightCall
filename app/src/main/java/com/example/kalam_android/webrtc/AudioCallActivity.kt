@@ -2,13 +2,13 @@ package com.example.kalam_android.webrtc
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.DisplayMetrics
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
@@ -17,27 +17,25 @@ import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.util.toast
+import com.example.kalam_android.wrapper.GlideDownloder
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.call_activity.*
+import kotlinx.android.synthetic.main.activity_audio_call.*
+import kotlinx.android.synthetic.main.call_activity.ibAnswer
+import kotlinx.android.synthetic.main.call_activity.ibHangUp
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
-
-class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
+class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
     private lateinit var peerConnectionFactory: PeerConnectionFactory
-    private lateinit var audioConstraints: MediaConstraints
-    private lateinit var videoConstraints: MediaConstraints
+    private var audioConstraints: MediaConstraints? = null
     private lateinit var sdpConstraints: MediaConstraints
-    private lateinit var videoSource: VideoSource
-    private lateinit var localVideoTrack: VideoTrack
     private lateinit var audioSource: AudioSource
     private lateinit var localAudioTrack: AudioTrack
     internal var localPeer: PeerConnection? = null
@@ -49,24 +47,27 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private var mediaPlayer: MediaPlayer? = null
+    lateinit var audioManager: AudioManager
+    private var calleeName: String? = null
+    private var profileImage: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.call_activity)
+        setContentView(R.layout.activity_audio_call)
         MyApplication.getAppComponent(this).doInjection(this)
-        initRecorderWithPermissions()
+        initPermissions()
     }
 
     @SuppressLint("CheckResult")
-    fun initRecorderWithPermissions() {
+    fun initPermissions() {
         Dexter.withActivity(this).withPermissions(
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()) {
-                    start()
+                    startWebrtc()
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }
@@ -83,26 +84,20 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
     }
 
     private fun initViews() {
-        callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
         ibHangUp.setOnClickListener(this)
-//        startCall.setOnClickListener(this)
         ibAnswer.setOnClickListener(this)
         rootEglBase = EglBase.create()
-        localVideoView.init(rootEglBase.eglBaseContext, null)
-        remoteVideoView.init(rootEglBase.eglBaseContext, null)
-        localVideoView.setZOrderMediaOverlay(true)
-        remoteVideoView.setZOrderMediaOverlay(true)
         webSocketListener = CustomWebSocketListener.getInstance(sharedPrefsHelper)
         webSocketListener?.setSocketCallback(this)
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
 
-    fun start() {
+    fun startWebrtc() {
         initViews()
-        //        getIceServers();
-        /*   PeerConnection.IceServer peerIceServer = PeerConnection.IceServer
-                .builder("stun:stun.l.google.com:19302")
-                .createIceServer();
-        peerIceServers.add(peerIceServer);*/
+        /* val peerIceServer = PeerConnection.IceServer
+             .builder("stun:stun.l.google.com:19302")
+             .createIceServer()
+         peerIceServers.add(peerIceServer)*/
         val peerIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
             .setUsername("webrtc@live.com")
             .setPassword("muazkh")
@@ -115,58 +110,54 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
 
         val options = PeerConnectionFactory.Options()
         val defaultVideoEncoderFactory = DefaultVideoEncoderFactory(
-            rootEglBase.eglBaseContext, /* enableIntelVp8Encoder */
-            true, /* enableH264HighProfile */
+            rootEglBase.eglBaseContext,
+            true,
             true
         )
         val defaultVideoDecoderFactory = DefaultVideoDecoderFactory(rootEglBase.eglBaseContext)
         peerConnectionFactory =
             PeerConnectionFactory(options, defaultVideoEncoderFactory, defaultVideoDecoderFactory)
 
-        val videoCapturerAndroid: VideoCapturer? = createCameraCapturer(Camera1Enumerator(false))
         audioConstraints = MediaConstraints()
-        videoConstraints = MediaConstraints()
-        if (videoCapturerAndroid != null) {
-            videoSource = peerConnectionFactory.createVideoSource(videoCapturerAndroid)
-        }
-        localVideoTrack = peerConnectionFactory.createVideoTrack("100", videoSource)
+
         audioSource = peerConnectionFactory.createAudioSource(audioConstraints)
         localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource)
-        videoCapturerAndroid?.startCapture(1024, 720, 30)
-        localVideoView.visibility = View.VISIBLE
-        localVideoTrack.addSink(localVideoView)
-        localVideoView.setMirror(true)
-        remoteVideoView.setMirror(true)
         mediaPlayer = MediaPlayer.create(this, R.raw.incoming)
-        val json = intent.getStringExtra("json")
         val initiator = intent.getBooleanExtra(AppConstants.INITIATOR, false)
-        when {
-            initiator -> {
-                createPeerConnection()
-                doCall()
-                ibAnswer.visibility = View.GONE
-            }
-            json?.isNotEmpty() == true -> {
-                mediaPlayer?.start()
-                mediaPlayer?.isLooping = true
-                logE("Json is not empty offer is received")
-                val data = JSONObject(json)
-                callerID = data.getLong(AppConstants.CONNECTED_USER_ID)
-                createPeerConnection()
-                localPeer!!.setRemoteDescription(
-                    CustomSdpObserver("localSetRemote"),
-                    SessionDescription(SessionDescription.Type.OFFER, data.getString("sdp"))
-                )
-            }
-            else -> {
-                logE("What are you doing here")
-            }
+        if (initiator) {
+            callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
+            calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
+            profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
+            createPeerConnection()
+            doCall()
+            ibAnswer.visibility = View.GONE
+            tvCallStatus.text = "Outgoing"
+        } else {
+            val json = intent.getStringExtra(AppConstants.JSON)
+            mediaPlayer?.start()
+            mediaPlayer?.isLooping = true
+            val data = JSONObject(json)
+            callerID = data.getLong(AppConstants.CONNECTED_USER_ID)
+            createPeerConnection()
+            localPeer?.setRemoteDescription(
+                CustomSdpObserver("localSetRemote"),
+                SessionDescription(SessionDescription.Type.OFFER, data.getString("sdp"))
+            )
+            profileImage = data.getString("photoUrl")
+            calleeName = data.getString("name")
+            tvCallStatus.text = "Incoming"
         }
+        GlideDownloder.load(
+            this,
+            ivUser,
+            profileImage,
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
+        )
+        tvName.text = calleeName.toString()
     }
 
     private fun createPeerConnection() {
-
-        logE("createPeerConnection")
         val rtcConfig = PeerConnection.RTCConfiguration(peerIceServers)
         rtcConfig.tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED
         rtcConfig.bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE
@@ -183,7 +174,6 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
                 }
 
                 override fun onAddStream(mediaStream: MediaStream) {
-//                    showToast("Received Remote stream")
                     super.onAddStream(mediaStream)
                     gotRemoteStream(mediaStream)
                 }
@@ -192,24 +182,30 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
     }
 
     private fun gotRemoteStream(stream: MediaStream) {
-        val videoTrack = stream.videoTracks[0]
+        val audioTrack = stream.audioTracks[0]
         runOnUiThread {
             try {
-//                updateVideoViews(true)
-                remoteVideoView.visibility = View.VISIBLE
-                videoTrack.addSink(remoteVideoView)
+                toast("gotRemoteStream")
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
+    /*private fun openSpeakerOn() {
+        try {
+            if (!audioManager.isSpeakerphoneOn) audioManager.isSpeakerphoneOn = true
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }*/
+
     private fun addStreamToLocalPeer() {
         val stream = peerConnectionFactory.createLocalMediaStream("102")
         stream.addTrack(localAudioTrack)
-        stream.addTrack(localVideoTrack)
         logE("addStreamToLocalPeer : Stream : $stream")
-        localPeer!!.addStream(stream)
+        localPeer?.addStream(stream)
     }
 
     private fun doCall() {
@@ -217,20 +213,15 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
         sdpConstraints.mandatory.add(
             MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true")
         )
-        sdpConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair(
-                "OfferToReceiveVideo", "true"
-            )
-        )
-        localPeer!!.createOffer(object : CustomSdpObserver("localCreateOffer") {
+        localPeer?.createOffer(object : CustomSdpObserver("localCreateOffer") {
             override fun onCreateSuccess(sessionDescription: SessionDescription) {
                 super.onCreateSuccess(sessionDescription)
-                localPeer!!.setLocalDescription(
+                localPeer?.setLocalDescription(
                     CustomSdpObserver("localSetLocalDesc"),
                     sessionDescription
                 )
                 logE("doCall : onCreateSuccess : SignallingClient emit ")
-                webSocketListener?.createOffer(sessionDescription, callerID)
+                webSocketListener?.createOffer(sessionDescription, callerID, false)
 
             }
         }, sdpConstraints)
@@ -240,30 +231,31 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
         logE("onOfferReceived")
         try {
             doAnswer()
-            updateVideoViews(true)
+            startChronometer()
         } catch (e: JSONException) {
             e.printStackTrace()
         }
     }
 
+    fun startChronometer() {
+        tvCallStatus.visibility = View.GONE
+        chronometer.visibility = View.VISIBLE
+        chronometer.base = SystemClock.elapsedRealtime()
+        chronometer.start()
+    }
+
     private fun doAnswer() {
-        localPeer!!.createAnswer(object : CustomSdpObserver("localCreateAnswer") {
+        localPeer?.createAnswer(object : CustomSdpObserver("localCreateAnswer") {
             override fun onCreateSuccess(sessionDescription: SessionDescription) {
                 super.onCreateSuccess(sessionDescription)
 
                 logE("doAnswer : onCreateSuccess $sessionDescription")
-                localPeer!!.setLocalDescription(
+                localPeer?.setLocalDescription(
                     CustomSdpObserver("localSetLocal"),
                     sessionDescription
                 )
                 Log.e("testingSocket", "Emit Description [ $sessionDescription]")
                 webSocketListener?.doAnswer(sessionDescription, callerID)
-
-            }
-
-            override fun onSetFailure(s: String) {
-                super.onSetFailure(s)
-                logE("onSetFailure$s")
             }
         }, MediaConstraints())
     }
@@ -271,7 +263,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
     private fun saveIceCandidates(data: JSONObject) {
         try {
             logE("onIceCandidateReceived : $data")
-            localPeer!!.addIceCandidate(
+            localPeer?.addIceCandidate(
                 IceCandidate(
                     data.getString("id"),
                     data.getInt("label"),
@@ -284,39 +276,20 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
 
     }
 
-    private fun onAnswerSave(data: JSONObject) {
-//        showToast("Received Answer")
+    private fun onAnswerReceived(data: JSONObject) {
         try {
 
             logE("onAnswerReceived : $data")
-            localPeer!!.setRemoteDescription(
+            localPeer?.setRemoteDescription(
                 CustomSdpObserver("localSetRemote"),
                 SessionDescription(
                     SessionDescription.Type.fromCanonicalForm(data.getString("type").toLowerCase()),
                     data.getString("sdp")
                 )
             )
-            updateVideoViews(true)
+            startChronometer()
         } catch (e: JSONException) {
             e.printStackTrace()
-        }
-
-    }
-
-    private fun updateVideoViews(remoteVisible: Boolean) {
-        runOnUiThread {
-            toast("updateVideoViews")
-            var params = localVideoView.layoutParams
-            if (remoteVisible) {
-                params.height = dpToPx()
-                params.width = dpToPx()
-            } else {
-                params = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            }
-            localVideoView.layoutParams = params
         }
 
     }
@@ -325,7 +298,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
         when (v.id) {
             R.id.ibHangUp -> {
                 hangup()
-                mediaPlayer?.stop()
+                webSocketListener?.onHangout(callerID)
             }
             R.id.ibAnswer -> {
                 mediaPlayer?.stop()
@@ -337,46 +310,19 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
 
     private fun hangup() {
         try {
-            localPeer!!.close()
+            mediaPlayer?.stop()
+            peerConnectionFactory.stopAecDump()
+            localPeer?.close()
             localPeer = null
+            if (audioConstraints != null) {
+                audioConstraints = null
+            }
+            audioSource.dispose()
+            localAudioTrack.dispose()
             finish()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-    }
-
-    private fun dpToPx(): Int {
-        val displayMetrics = resources.displayMetrics
-        return (resources.getDimension(R.dimen._70sdp) * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
-    }
-
-    private fun createCameraCapturer(enumerator: CameraEnumerator): VideoCapturer? {
-        val deviceNames = enumerator.deviceNames
-
-        logE("Looking for front facing cameras.")
-        for (deviceName in deviceNames) {
-            if (enumerator.isFrontFacing(deviceName)) {
-                logE("Creating front facing camera capturer.")
-                val videoCapture = enumerator.createCapturer(deviceName, null)
-                if (videoCapture != null) {
-                    return videoCapture
-                }
-            }
-        }
-        logE("Looking for other cameras.")
-        for (deviceName in deviceNames) {
-            if (!enumerator.isFrontFacing(deviceName)) {
-                logE("Creating other camera capturer.")
-                val videoCapture = enumerator.createCapturer(deviceName, null)
-
-                if (videoCapture != null) {
-                    return videoCapture
-                }
-            }
-        }
-
-        return null
     }
 
     private fun logE(msg: String) {
@@ -385,17 +331,19 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
 
     override fun webSocketCallback(jsonObject: JSONObject) {
         runOnUiThread {
-            when (jsonObject.getString("type")) {
-                "candidate" -> {
+            when (jsonObject.getString(AppConstants.TYPE)) {
+                AppConstants.CANDIDATE -> {
                     logE("webSocketCallback candidate")
                     saveIceCandidates(jsonObject)
                 }
-                "answer" -> {
+                AppConstants.ANSWER -> {
                     logE("webSocketCallback answer")
-                    onAnswerSave(jsonObject)
+                    onAnswerReceived(jsonObject)
+                }
+                AppConstants.REJECT -> {
+                    hangup()
                 }
             }
         }
-
     }
 }
