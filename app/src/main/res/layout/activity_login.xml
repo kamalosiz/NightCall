@@ -25,8 +25,8 @@
                     android:layout_width="@dimen/_130sdp"
                     android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/_35sdp"
-                    android:background="@drawable/kalam_circle" />
+                    android:layout_marginTop="@dimen/logo_top_margin"
+                    android:background="@drawable/app_icon" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etUsername"
@@ -38,6 +38,8 @@
                     android:background="@drawable/box_theme_outine"
                     android:fontFamily="@font/roboto_regular"
                     android:gravity="center"
+                    android:inputType="textEmailAddress"
+                    android:imeOptions="actionNext"
                     android:hint="Email"
                     android:textSize="@dimen/_13sdp" />
 

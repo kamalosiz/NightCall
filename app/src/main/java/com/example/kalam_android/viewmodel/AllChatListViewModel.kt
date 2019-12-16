@@ -96,6 +96,7 @@ class AllChatListViewModel @Inject constructor(
                 })
         )
     }
+
     fun updateReadCountDB(uid: Int, unReadcount: Int) {
         disposable.add(
             Completable.fromAction {
@@ -120,6 +121,17 @@ class AllChatListViewModel @Inject constructor(
                     responsiveRoomData.value = ApiResponse.error(it)
                 })
         )
+    }
+
+    fun hitSearchMessage(auth: String, parameters: Map<String, String>) {
+        disposable.add(repository.getSearchMessage(auth, parameters)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { responsiveLiveData.setValue(ApiResponse.loading()) }
+            .subscribe(
+                { responsiveLiveData.setValue(ApiResponse.success(it)) },
+                { responsiveLiveData.setValue(ApiResponse.error(it)) }
+            ))
     }
 
 

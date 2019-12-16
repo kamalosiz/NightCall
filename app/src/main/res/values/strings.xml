@@ -44,7 +44,7 @@
     <string name="labelPrivacyPolicy">Privacy Policy</string>
     <string name="labelEnglish">English</string>
     <string name="labelArabic">Arabic</string>
-    <string name="selectAuto">Select Automatically</string>
+    <string name="selectAuto">Auto Translate</string>
     <string name="typing">typing…</string>
 
     <string name="file">File</string>

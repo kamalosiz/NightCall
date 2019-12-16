@@ -2,8 +2,11 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.media.*
+import android.os.AsyncTask
+import android.os.Environment
 import android.os.Handler
 import android.os.SystemClock
 import android.view.View
@@ -11,8 +14,10 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
+import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.activities.GalleryPostActivity
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -23,12 +28,14 @@ import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_for_attachment.view.*
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
 import omrecorder.*
-import java.io.File
-import java.io.IOException
+import java.io.*
+import java.net.URL
+import java.net.URLConnection
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MyChatMediaHelper(
     val context: AppCompatActivity,
     val binding: ActivityChatDetailBinding
@@ -47,7 +54,7 @@ class MyChatMediaHelper(
     private var isStopRecording = false
     private var isPlayerRelease = false
     private var isFileReady = false
-    private var mediaPlayer: MediaPlayer? = null
+    var mediaPlayer: MediaPlayer? = null
     private val gone = View.GONE
     private val visible = View.VISIBLE
     private val playGreen = R.drawable.ic_play_green
@@ -476,6 +483,231 @@ class MyChatMediaHelper(
 
             }
         }
+    }
+
+    var isRelease = true
+    var isPlayerRunning = false
+    var alreadyClicked = false
+    var prePos: Long = -111098
+    var myPlayer: MediaPlayer? = null
+
+    fun playVoiceMsg(
+        binding: ItemChatRightBinding,
+        voiceMessage: String,
+        currentPos: Long,
+        context: Context,
+        unixTime: Double,
+        language: String
+    ) {
+        if (!File(context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3").exists() && voiceMessage.contains("https://")) {
+            DownloadAudioFileFromURL(context, binding, unixTime, language).execute(voiceMessage)
+
+        } else {
+            if (!alreadyClicked) {
+                try {
+                    if (isRelease || currentPos != prePos) {
+                        alreadyClicked = true
+                        if (isPlayerRunning) {
+                            if (myPlayer?.isPlaying == true) {
+                                binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
+                                logE("already playing")
+                                myPlayer?.stop()
+                                alreadyClicked = false
+                                myPlayer = MediaPlayer()
+                            }
+                        }
+
+                        Debugger.e("ChatMessagesAdapter", "If voiceMessage : $voiceMessage")
+                        Debugger.e("ChatMessagesAdapter", "If currentPos : $currentPos")
+                        binding.audioPlayer.ivPlayPause.visibility = View.GONE
+                        binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
+                        prePos = currentPos
+                        myPlayer = MediaPlayer()
+                        myPlayer?.setAudioAttributes(
+                            AudioAttributes
+                                .Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                                .build()
+                        )
+                        isRelease = false
+                        if (voiceMessage.contains("https://")) {
+                            val path =
+                                File(context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3").absolutePath
+                            myPlayer?.setDataSource(path)
+                        } else {
+                            myPlayer?.setDataSource(voiceMessage)
+                        }
+
+//                        myPlayer?.setDataSource(path)
+                        myPlayer?.prepareAsync()
+                        myPlayer?.setOnPreparedListener {
+                            binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+                            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
+                            binding.audioPlayer.ivPlayProgress.visibility = View.GONE
+                            myPlayer?.start()
+                            initializeSeekBar(binding)
+                            alreadyClicked = false
+                            isPlayerRunning = true
+                        }
+                    } else {
+                        Debugger.e("ChatMessagesAdapter", "Else voiceMessage : $voiceMessage")
+                        Debugger.e("ChatMessagesAdapter", "Else currentPos : $currentPos")
+                        if (myPlayer?.isPlaying == false) {
+                            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_pause_audio)
+                            myPlayer?.start()
+                        } else {
+                            binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
+                            myPlayer?.pause()
+                        }
+                    }
+
+                } catch (e: IllegalStateException) {
+                    Debugger.e("ChatMessagesAdapter", "exception:${e.message}")
+                }
+
+                myPlayer?.setOnCompletionListener { mp ->
+                    binding.audioPlayer.ivPlayPause.setBackgroundResource(R.drawable.ic_play_audio)
+                    mp.stop()
+                    mp.reset()
+                    mp.release()
+                    isRelease = true
+                    alreadyClicked = false
+                    isPlayerRunning = false
+                    Debugger.e("ChatMessagesAdapter", "setOnCompletionListener")
+                    binding.audioPlayer.seekBar.max = 0
+                }
+                myPlayer?.setOnErrorListener { mp, what, extra ->
+                    logE("on Error Called")
+                    true
+                }
+
+                binding.audioPlayer.seekBar.setOnSeekBarChangeListener(object :
+                    SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
+                        if (fromUser) {
+                            myPlayer?.seekTo(progress * 1000)
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    }
+                })
+
+            } else {
+                toast(context, "Processing previous media...")
+            }
+        }
+
+
+    }
+
+    private fun initializeSeekBar(binding: ItemChatRightBinding) {
+        binding.audioPlayer.seekBar.max = myPlayer?.duration!!
+        runnable = Runnable {
+            try {
+                val currentSeconds = myPlayer?.currentPosition
+                currentSeconds.let {
+                    if (it != null) {
+                        binding.audioPlayer.seekBar.progress = it
+                    }
+                }
+                handler.postDelayed(runnable, 1)
+            } catch (e: IllegalStateException) {
+
+            }
+        }
+        handler.postDelayed(runnable, 1)
+    }
+
+    internal class DownloadAudioFileFromURL(
+        val context: Context,
+        val binding: ItemChatRightBinding
+        , val unixTime: Double, val language: String
+    ) :
+        AsyncTask<String?, String?, String?>() {
+        private val TAG = this.javaClass.simpleName
+        override fun doInBackground(vararg f_url: String?): String? {
+            var count: Int = 0
+            try {
+                val url = URL(f_url[0])
+                val connection: URLConnection = url.openConnection()
+                connection.connect()
+                val lenghtOfFile: Int = connection.contentLength
+                // download the file
+                val input: InputStream = BufferedInputStream(
+                    url.openStream(),
+                    8192
+                )
+                val path =
+                    context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3"
+                val output: OutputStream = FileOutputStream(path)
+                val data = ByteArray(1024)
+                var total: Long = 0
+                while (input.read(data).also { count = it } != -1) {
+                    total += count.toLong()
+                    publishProgress("" + (total * 100 / lenghtOfFile).toInt())
+                    output.write(data, 0, count)
+                }
+                // flushing output
+                output.flush()
+                // closing streams
+                output.close()
+                input.close()
+            } catch (e: Exception) {
+                logE("Error: ${e.message}")
+            }
+            return null
+        }
+
+
+        override fun onProgressUpdate(vararg values: String?) {
+            super.onProgressUpdate(*values)
+            binding.audioPlayer.ivPlayProgress.progress = values[0]!!.toInt()
+
+        }
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            binding.audioPlayer.ivPlayProgress.visibility = View.VISIBLE
+            binding.audioPlayer.ivPlayPause.visibility = View.GONE
+        }
+
+        override fun onPostExecute(file_url: String?) {
+            binding.audioPlayer.ivPlayProgress.visibility = View.GONE
+            binding.audioPlayer.ivPlayPause.visibility = View.VISIBLE
+        }
+
+        private fun logE(msg: String) {
+            Debugger.e(TAG, msg)
+        }
+    }
+
+    private fun getAudio(): Array<File>? {
+        var fileOutput: String? = null
+        var dirFiles: Array<File>? = null
+        val fileDirectory =
+            File(context.getExternalFilesDir(null)?.absolutePath)
+        if (fileDirectory.exists()) {
+            dirFiles = fileDirectory.listFiles()
+
+            /*if (dirFiles.isNotEmpty()) { // loops through the array of files, outputing the name to console
+                for (ii in dirFiles.indices) {
+                    if (dirFiles[ii].absolutePath.contains(unixTime.toString())){
+                        fileOutput = dirFiles[ii].toString()
+
+                    }
+                }
+            }*/
+        }
+        return dirFiles
     }
 
     private fun logE(msg: String) {

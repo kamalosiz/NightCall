@@ -5,8 +5,9 @@ object AppConstants {
     const val PROFILE_IMAGE_KEY = "profileImage_kalam"
     const val USER_NAME = "user_name_kalam"
     const val RECEIVER_ID = "user_receiver_id"
-    const val IS_FROM_CHAT_FRAGMENT = "is_chat_boolean"
-    const val IS_FROM_CHAT_OUTSIDE = "is_outside_boolean"
+    const val IS_CHATID_AVAILABLE = "is_chat_boolean"
+    const val CALLER_USER_ID = "caller_user_id"
+    const val IS_FROM_OUTSIDE = "is_outside_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
     const val CHAT_USER_PICTURE = "chat_user_picture"
     const val CHAT_ID = "kalam_chat_id"
@@ -23,19 +24,13 @@ object AppConstants {
     const val IsSEEN = "isseen"
     const val CHAT_FILE = "chatfile"
     const val CHAT_TYPE = "chattype"
-    const val POST_AUDIO = "post_audio"
     const val SELECTED_IMAGES_VIDEOS = "selected_images_videos"
     const val KEY_USER_OBJECT = "kalam_user"
     const val CONTACTS_SYNCED = "key_contacts_synced"
     const val KEY_IS_LOGIN = "is_logged_in_kalam"
     const val PHONE = "key_phoneno"
 
-    val NOTIFICATION_TYPE = "notification_type"
-    val CONTENT_TYPE = "content_type"
     val FIREBASE_CHAT_ID = "chat_id"
-    val NOTIFICATION_TYPE_POST = "1"
-    val GROUP_KALAM = "com.kalam.group"
-    val NOTIFICATION_BODY = "message"
     val SENDER_NAME = "sender_name"
 
 
@@ -45,10 +40,7 @@ object AppConstants {
     const val PROFILE_IMAGE_CODE = 111
     const val CHAT_FRAGMENT_CODE = 1000
     const val LOGOUT_CODE = 1001
-    const val CHAT_IMAGE_CODE = 1002
-    const val STATUS_IMAGE_CODE = 112
     const val SELECTED_IMAGES = 12
-    val REQ_CODE_SPEECH_INPUT=222
 
 
     //Local DB=
@@ -72,5 +64,9 @@ object AppConstants {
     const val MESSAGE_STOPS_TYPING = "message_stop_typing"
     const val ALL_MESSAGES_READ = "all_messages_read"
     const val MESSAGE_DELIVERED = "messages_delivered"
+
+    //Webrtc
+    const val LOGIN = "login"
+
 
 }

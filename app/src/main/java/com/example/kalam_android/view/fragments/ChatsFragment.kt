@@ -2,19 +2,16 @@ package com.example.kalam_android.view.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -28,31 +25,16 @@ import com.example.kalam_android.databinding.ChatsFragmentBinding
 import com.example.kalam_android.helper.MyVoiceToTextHelper
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.model.AllChatListResponse
-import com.example.kalam_android.repository.model.ChatData
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
-import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.util.toast
+import com.example.kalam_android.util.*
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.adapter.AllChatListAdapter
 import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
-import com.google.gson.Gson
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionDeniedResponse
-import com.karumi.dexter.listener.PermissionGrantedResponse
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.single.PermissionListener
 import org.json.JSONObject
-import java.util.*
-import java.util.jar.Manifest
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     View.OnTouchListener, ResultVoiceToText {
@@ -105,6 +87,22 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         }
         binding.fabSpeech.isClickable = false
         binding.fabSpeech.setOnTouchListener(this)
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s?.length == 0) {
+                    binding.pbCenter.visibility = View.VISIBLE
+                    hitAllChatApi()
+                } else {
+                    hitSearchMessage(s.toString())
+                }
+            }
+        })
         myVoiceToTextHelper = MyVoiceToTextHelper(activity!!, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         return binding.root
@@ -114,6 +112,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         when (apiResponse?.status) {
 
             Status.LOADING -> {
+                binding.pbCenter.visibility = View.VISIBLE
             }
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
@@ -125,13 +124,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 binding.pbCenter.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
-                toast(activity, "Something went wrong please try again")
+//                toast(activity, "Something went wrong please try again")
             }
             else -> {
             }
         }
     }
-
     /* private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
          when (apiResponse?.status) {
 
@@ -159,6 +157,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
          list?.let {
              chatList.clear()
              chatIDs.clear()
+
              if (list.isNotEmpty()) {
                  binding.fabSpeech.isClickable = true
              }
@@ -177,18 +176,18 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 it.data.reverse()
                 chatList.clear()
                 chatList = it.data
-                chatIDs.clear()
+                /*chatIDs.clear()
                 it.data.forEach {
                     chatIDs.add(it.chat_id)
-                }
+                }*/
                 (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-                if (isRefresh) {
+                /*if (isRefresh) {
                     isRefresh = false
                     viewModel.deleteAllChats()
-                }
+                }*/
                 binding.tvNoChat.visibility = View.GONE
-                viewModel.addAllChatItemsToDB(chatList)
-                sharedPrefsHelper.allChatItemSynced()
+//                viewModel.addAllChatItemsToDB(chatList)
+//                sharedPrefsHelper.allChatItemSynced()
             } else {
                 binding.tvNoChat.visibility = View.VISIBLE
             }
@@ -199,6 +198,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         val params = HashMap<String, String>()
         params["user_id"] = sharedPrefsHelper.getUser()?.id.toString()
         viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
+    }
+
+    private fun hitSearchMessage(query: String) {
+        val params = HashMap<String, String>()
+        params["query"] = query
+        viewModel.hitSearchMessage(sharedPrefsHelper.getUser()?.token.toString(), params)
     }
 
     private fun logE(message: String) {
@@ -261,6 +266,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
                     }*/
+                    logE("onActivityResult of chats Fragment is called")
                     SocketIO.setSocketCallbackListener(this)
                     hitAllChatApi()
                 }
@@ -288,19 +294,28 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         when (view.id) {
             R.id.rlItem -> {
                 val item = chatList[position]
-                this.position = position
-                val intent = Intent(activity, ChatDetailActivity::class.java)
-                intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
-                intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
-                intent.putExtra(
-                    AppConstants.CHAT_USER_NAME,
-                    StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
-                )
-                intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
-                startActivityForResult(
-                    intent,
-                    AppConstants.CHAT_FRAGMENT_CODE
-                )
+                if (item.chat_id != 0) {
+                    this.position = position
+                    val intent = Intent(activity, ChatDetailActivity::class.java)
+                    intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
+                    intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
+                    intent.putExtra(AppConstants.CALLER_USER_ID, item.user_id)
+                    intent.putExtra(
+                        AppConstants.CHAT_USER_NAME,
+                        StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
+                    )
+                    intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
+                    startActivityForResult(
+                        intent,
+                        AppConstants.CHAT_FRAGMENT_CODE
+                    )
+                } else {
+                    showAlertDialoge(
+                        activity as Context,
+                        StringBuilder(item.firstname).append(" ").append(item.lastname).toString(),
+                        item.message.toString()
+                    )
+                }
             }
         }
     }
@@ -363,7 +378,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         )
                         val intent = Intent(activity, ChatDetailActivity::class.java)
                         intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
-                        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, true)
+                        intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
                         intent.putExtra(
                             AppConstants.CHAT_USER_NAME,
                             StringBuilder(chatList[i].firstname).append(" ").append(
@@ -385,5 +400,4 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             }
         }
     }
-
 }

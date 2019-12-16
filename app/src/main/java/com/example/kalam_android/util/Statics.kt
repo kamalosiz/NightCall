@@ -2,14 +2,17 @@ package com.example.kalam_android.util
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
+import android.view.Window
 import android.widget.Toast
 import androidx.loader.content.CursorLoader
+import com.example.kalam_android.R
 import com.example.kalam_android.repository.model.MediaList
 import com.koushikdutta.ion.builder.BitmapBuilder
 import okhttp3.MediaType
@@ -196,6 +199,55 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     cursor.close()
     return listOfAllImages
 }
+
+/*@SuppressLint("SetTextI18n")
+private fun showMarkerDialog(file: String, context: Context) {
+    val dialog = Dialog(context)
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    val window = dialog.window
+    window?.setBackgroundDrawableResource(android.R.color.transparent)
+    dialog.setContentView(R.layout.map_place_dialog_item)
+
+    dialog.findViewById<AppCompatTextView>(R.id.tvTitle).text = name
+    dialog.findViewById<AppCompatTextView>(R.id.tvDescription)
+        .text = "Distance: $dist KM"
+
+    if (placeID != null) {
+        if (placeID.equals("")) {
+            dialog.findViewById<AppCompatButton>(R.id.btnProfile).visibility = View.GONE
+        } else {
+            dialog.findViewById<AppCompatButton>(R.id.btnProfile).visibility = View.VISIBLE
+            dialog.findViewById<AppCompatButton>(R.id.btnProfile).setOnClickListener {
+                val intent = Intent(activity, ProfileActivity::class.java)
+                intent.putExtra(AppConstants.PLACE_ID, placeID)
+                activity?.startActivity(intent)
+                dialog.dismiss()
+            }
+        }
+    } else {
+        dialog.findViewById<AppCompatButton>(R.id.btnProfile).visibility = View.GONE
+    }
+
+    dialog.findViewById<AppCompatButton>(R.id.btnNavigate).setOnClickListener {
+        val gmmIntentUri = Uri.parse(
+            "google.navigation:" +
+                    "q=${selectedPoint.lat},${selectedPoint.long}" +
+                    "&mode=d"
+        )
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent)
+        dialog.dismiss()
+    }
+
+    dialog.findViewById<AppCompatButton>(R.id.btnDirections).setOnClickListener {
+        val origin = "${currentPoint.lat},${currentPoint.long}"
+        val destination = "${selectedPoint.lat},${selectedPoint.long}"
+        getDirections(origin, destination)
+        dialog.dismiss()
+    }
+    dialog.show()
+}*/
 
 /*fun getAllShownImagesPath(context: Context): ArrayList<MediaList> {
     val listOfAllImages = ArrayList<MediaList>()

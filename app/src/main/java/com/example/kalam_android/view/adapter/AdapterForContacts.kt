@@ -21,9 +21,6 @@ import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.example.kalam_android.wrapper.SocketIO
-import com.github.nkzawa.socketio.client.Ack
-import com.google.gson.JsonObject
 
 class AdapterForContacts(val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
@@ -157,7 +154,7 @@ class AdapterForContacts(val context: Context) :
                     if (item?.id != 0) {
                         val intent = Intent(context, ChatDetailActivity::class.java)
                         intent.putExtra(AppConstants.RECEIVER_ID, item?.id.toString())
-                        intent.putExtra(AppConstants.IS_FROM_CHAT_FRAGMENT, false)
+                        intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, false)
                         intent.putExtra(AppConstants.CHAT_USER_NAME, item?.kalam_name.toString())
                         intent.putExtra(
                             AppConstants.CHAT_USER_PICTURE,

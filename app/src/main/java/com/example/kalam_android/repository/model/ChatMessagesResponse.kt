@@ -12,7 +12,7 @@ data class ChatMessagesResponse(
 
 data class ChatData(
     val original_audio_text: String?,
-    val audio_url: String?,
+    var audio_url: String?,
     val original_audio_url: String?,
     val sender_name: String,
     var id: Long,

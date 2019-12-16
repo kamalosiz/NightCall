@@ -1,19 +1,16 @@
 package com.example.kalam_android.view.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityUserProfileBinding
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.wrapper.GlideDownloder
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.view.MenuItem
 
 
-class UserProfileActivity : AppCompatActivity() {
+class UserProfileActivity : BaseActivity() {
 
     private var userName: String = ""
     private var userImage: String = ""
@@ -53,7 +50,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home ->
                 onBackPressed()
         }

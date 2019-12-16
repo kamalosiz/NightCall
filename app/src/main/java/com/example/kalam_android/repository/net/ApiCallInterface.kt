@@ -27,11 +27,20 @@ interface ApiCallInterface {
     @POST(Urls.SIGN_IN)
     fun login(@Body parameters: Map<String, String>): Observable<LoginResponse>
 
+
+    @POST(Urls.LOGOUT)
+    fun logout(@Header("Authorization") authorization: String?): Observable<LogOutResponse>
+
+
     @POST(Urls.VERIFY_CONTACTS)
     fun getContacts(@Body parameters: Map<String, String>): Observable<Contacts>
 
     @POST(Urls.ALL_CHATS_LIST)
     fun getAllChats(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
+
+    @POST(Urls.SEARCH_MSG)
+    fun getSearchMessage(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
+
 
     @POST(Urls.ALL_CHATS_MESSAGES)
     fun getAllMessages(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<ChatMessagesResponse>
@@ -56,6 +65,4 @@ interface ApiCallInterface {
         @Part list: ArrayList<MultipartBody.Part>
     ): Observable<MediaResponse>
 
-    @POST(Urls.LOGOUT)
-    fun logout(@Header("Authorization") authorization: String?,@Body parameters: Map<String, String>): Observable<Logout>
 }

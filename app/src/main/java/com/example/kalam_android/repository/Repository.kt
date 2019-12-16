@@ -31,6 +31,10 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.login(parameters)
     }
 
+    fun logout(authorization: String?): Observable<LogOutResponse> {
+        return apiCallInterface.logout(authorization)
+    }
+
     fun getContacts(parameters: Map<String, String>): Observable<Contacts> {
         return apiCallInterface.getContacts(parameters)
     }
@@ -40,6 +44,13 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         parameters: Map<String, String>
     ): Observable<AllChatListResponse> {
         return apiCallInterface.getAllChats(authorization, parameters)
+    }
+
+    fun getSearchMessage(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<AllChatListResponse> {
+        return apiCallInterface.getSearchMessage(authorization, parameters)
     }
 
     fun getAllMessages(
@@ -71,9 +82,5 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     ): Observable<MediaResponse> {
         return apiCallInterface.uploadAudio(authorization, params, list)
     }
-    fun logout(
-        authorization: String?,parameters: Map<String, String>
-    ): Observable<Logout> {
-        return apiCallInterface.logout(authorization,parameters)
-    }
+
 }
