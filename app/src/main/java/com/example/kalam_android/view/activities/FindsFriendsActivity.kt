@@ -17,7 +17,6 @@ import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForFindFriends
 import com.example.kalam_android.viewmodel.FindFriendsViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory

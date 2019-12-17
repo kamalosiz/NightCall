@@ -2,29 +2,18 @@ package com.example.kalam_android.util
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
-import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.provider.MediaStore
-import android.view.Window
 import android.widget.Toast
 import androidx.loader.content.CursorLoader
-import com.example.kalam_android.R
 import com.example.kalam_android.repository.model.MediaList
-import com.koushikdutta.ion.builder.BitmapBuilder
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.log10
-import kotlin.math.pow
 
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -128,7 +117,7 @@ fun showAlertDialoge(context: Context, title: String, message: String) {
     builder1.create().show()
 }
 
-fun getReadableFileSize(size: Long): String {
+/*fun getReadableFileSize(size: Long): String {
     if (size <= 0) {
         return "0"
     }
@@ -137,7 +126,7 @@ fun getReadableFileSize(size: Long): String {
     return DecimalFormat("#,##0.#").format(
         size / 1024.0.pow(digitGroups.toDouble())
     ) + " " + units[digitGroups]
-}
+}*/
 
 fun getFileSizeInBytes(selectedPath: String): Int {
     val file = File(selectedPath)
@@ -148,7 +137,7 @@ fun getFileSizeInBytes(selectedPath: String): Int {
 fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
 
     val listOfAllImages = ArrayList<MediaList>()
-    val column_index_data: Int
+    val columnIndexData: Int
     val projection = arrayOf(
         MediaStore.Files.FileColumns._ID,
         MediaStore.Files.FileColumns.DATA,
@@ -177,20 +166,20 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     )
 
     val cursor = cursorLoader.loadInBackground()
-    column_index_data = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+    columnIndexData = cursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
     while (cursor.moveToNext()) {
-        val path = cursor.getString(column_index_data)
+        val path = cursor.getString(columnIndexData)
         if (path.contains(".jpg") || path.contains(".png")) {
             listOfAllImages.add(
                 MediaList(
-                    cursor.getString(column_index_data),
+                    cursor.getString(columnIndexData),
                     AppConstants.IMAGE_GALLERY
                 )
             )
         } else {
             listOfAllImages.add(
                 MediaList(
-                    cursor.getString(column_index_data),
+                    cursor.getString(columnIndexData),
                     AppConstants.POST_VIDEO
                 )
             )

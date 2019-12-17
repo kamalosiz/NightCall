@@ -36,7 +36,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
 
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityLoginBinding
-    var HIDE_PASSWORD = true
+    private var HIDE_PASSWORD = true
     @Inject
     lateinit var factory: ViewModelFactory
     lateinit var viewModel: LoginViewModel
@@ -103,19 +103,11 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         response?.let { res ->
             logE(res.toString())
             if (res.status) {
-//                toast(res.message)
                 sharedPrefsHelper.setUser(res.data)
-
-                //Testing for now
                 res.data?.auto_translate?.let {
                     sharedPrefsHelper.saveTranslateState(it)
                 }
-//                if (res.data?.language == "en") {
                 sharedPrefsHelper.saveLanguage(res.data?.language.toString())
-//                } else if (res.data?.language == "ar") {
-//                    sharedPrefsHelper.saveLanguage(1)
-//                }
-                //Testing for now
                 hideProgressDialog()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()

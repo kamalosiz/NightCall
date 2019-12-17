@@ -35,6 +35,8 @@ import com.example.kalam_android.util.*
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
+import com.example.kalam_android.webrtc.AudioCallActivity
+import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.wrapper.GlideDownloder
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
@@ -45,6 +47,7 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -74,7 +77,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var profileImage: String? = null
     private var loading = false
     private var isChatIdAvailable = false
-    //    private var isFromOutside = false
     private var callerID: Long = -1
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
@@ -108,23 +110,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        if (intent != null) {
-            handleIntent(intent)
-        }
+        if (intent != null) handleIntent(intent)
     }
 
     private fun handleIntent(intent: Intent) {
         binding.pbCenter.visibility = View.VISIBLE
         isChatIdAvailable = intent.getBooleanExtra(AppConstants.IS_CHATID_AVAILABLE, false)
         chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
-        Global.currentChatID = chatId
         logE("isChatIDAvailabel: $isChatIdAvailable")
         logE("chatId: $chatId")
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
-//        isFromOutside = intent.getBooleanExtra(AppConstants.IS_FROM_OUTSIDE, false)
         setUserData()
         initAdapter()
         if (isChatIdAvailable) {
+            Global.currentChatID = chatId
             hitConversationApi(0)
             SocketIO.emitReadAllMessages(
                 chatId.toString(),
@@ -162,6 +161,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.lvBottomChat.ivMic.setOnClickListener(this)
         binding.header.llProfile.setOnClickListener(this)
         binding.header.ivAudio.setOnClickListener(this)
+        binding.header.ivVideo.setOnClickListener(this)
     }
 
     private fun initAdapter() {
@@ -283,7 +283,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     "",
                     list[0].type.toString(),
                     list[0].file_id.toString(),
-                    list[0].duration.toLong(), list[0].thumbnail,
+                    list[0].duration.toLong(),
+                    list[0].thumbnail,
                     list[0].identifier
                 )
             }
@@ -497,9 +498,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 myChatMediaHelper?.openAttachments()
             }
             R.id.ivAudio -> {
-//                val intent = Intent(this, CallActivity::class.java)
-//                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
-//                startActivity(intent)
+                val intent = Intent(this, AudioCallActivity::class.java)
+                intent.putExtra(AppConstants.INITIATOR, true)
+                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+                intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+                intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+                startActivity(intent)
+            }
+            R.id.ivVideo -> {
+                val intent = Intent(this, VideoCallActivity::class.java)
+                intent.putExtra(AppConstants.INITIATOR, true)
+                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+                intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+                intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+                startActivity(intent)
             }
         }
     }
