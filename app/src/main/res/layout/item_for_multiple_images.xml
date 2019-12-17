@@ -1,0 +1,102 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:id="@+id/rlMultiImageItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_4sdp">
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/rlImage"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_3sdp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="03:00 PM"
+            android:textColor="@color/theme_color"
+            android:textSize="@dimen/_8ssp" />
+
+        <RelativeLayout
+            android:id="@+id/rlImage"
+            android:layout_width="@dimen/_220sdp"
+            android:layout_height="@dimen/_220sdp"
+            android:layout_below="@id/tvTime"
+            android:background="@drawable/media_background"
+            android:gravity="center"
+            tools:ignore="UselessParent">
+
+            <ImageView
+                android:id="@+id/ivImage1"
+                android:layout_width="@dimen/_103sdp"
+                android:layout_height="@dimen/_103sdp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:background="@drawable/media_background"
+                android:scaleType="centerCrop"
+                android:transitionName="@string/trans_key" />
+
+            <ImageView
+                android:id="@+id/ivImage3"
+                android:layout_width="@dimen/_103sdp"
+                android:layout_height="@dimen/_103sdp"
+                android:layout_below="@id/ivImage1"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:background="@drawable/media_background"
+                android:scaleType="centerCrop"
+                android:transitionName="@string/trans_key" />
+
+            <ImageView
+                android:id="@+id/ivImage2"
+                android:layout_width="@dimen/_103sdp"
+                android:layout_height="@dimen/_103sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@drawable/media_background"
+                android:scaleType="centerCrop"
+                android:transitionName="@string/trans_key" />
+
+            <ImageView
+                android:id="@+id/ivImage4"
+                android:layout_width="@dimen/_103sdp"
+                android:layout_height="@dimen/_103sdp"
+                android:layout_below="@id/ivImage2"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@drawable/media_background"
+                android:scaleType="centerCrop"
+                android:transitionName="@string/trans_key" />
+
+            <TextView
+                android:id="@+id/tvRemainingImages"
+                android:layout_width="@dimen/_103sdp"
+                android:layout_height="@dimen/_103sdp"
+                android:layout_below="@id/ivImage2"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:text="+5"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_22ssp"
+                android:transitionName="@string/trans_key"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/ivDeliver"
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="@dimen/_10sdp"
+            android:layout_below="@id/rlImage"
+            android:layout_alignEnd="@id/rlImage"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_marginEnd="@dimen/_10sdp" />
+    </RelativeLayout>
+</layout>
