@@ -74,18 +74,15 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
             }
             Status.SUCCESS -> {
                 hideProgressDialog()
-                toast("Logout Successfully")
                 val sharedPrefsHelper = getSharedPreferences("kalam-prefs", Context.MODE_PRIVATE)
                 val editor = sharedPrefsHelper.edit()
                 editor.clear().apply()
                 toast("Logout Successfully")
                 setResult(Activity.RESULT_OK)
                 finish()
-
             }
             Status.ERROR -> {
                 hideProgressDialog()
-
             }
             else -> {
             }
@@ -130,7 +127,6 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
         } else if (sharedPrefsHelper.getLanguage() == "ar") {
             binding.spinner1.setSelection(1)
         }
-//        binding.spinner1.setSelection(sharedPrefsHelper.getLanguage() ?: 0)
     }
 
     override fun onClick(v: View?) {
@@ -138,16 +134,16 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
             R.id.btnUpdateChanges -> {
                 val builder1 = AlertDialog.Builder(this)
                 builder1.setTitle("Update Language")
-                builder1.setMessage("Do you really want update changes?")
+                builder1.setMessage("Do you really want to update changes?")
                 builder1.setCancelable(true)
                 builder1.setPositiveButton("Yes") { dialog, id ->
                     SocketIO.updateSettings(
                         AppConstants.UPDATE_SETTINGS, autoTranslate.toString()
                         , item, sharedPrefsHelper.getUser()?.id.toString()
                     )
-                    toast("Language successfully updated")
                     sharedPrefsHelper.saveLanguage(item)
                     autoTranslate?.let { sharedPrefsHelper.saveTranslateState(it) }
+                    toast("Language successfully updated")
                 }
                 builder1.setNegativeButton("No") { dialog, id ->
                     dialog.cancel()

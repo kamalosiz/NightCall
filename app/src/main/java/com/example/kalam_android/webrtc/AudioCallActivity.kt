@@ -94,15 +94,15 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
     fun startWebrtc() {
         initViews()
-        /* val peerIceServer = PeerConnection.IceServer
-             .builder("stun:stun.l.google.com:19302")
-             .createIceServer()
-         peerIceServers.add(peerIceServer)*/
-        val peerIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
+        val stunIceServer = PeerConnection.IceServer
+            .builder("stun:stun.l.google.com:19302")
+            .createIceServer()
+        peerIceServers.add(stunIceServer)
+        val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
             .setUsername("webrtc@live.com")
             .setPassword("muazkh")
             .createIceServer()
-        peerIceServers.add(peerIceServer)
+        peerIceServers.add(turnIceServer)
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
             .setEnableVideoHwAcceleration(true)
             .createInitializationOptions()
@@ -237,7 +237,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         }
     }
 
-    fun startChronometer() {
+    private fun startChronometer() {
         tvCallStatus.visibility = View.GONE
         chronometer.visibility = View.VISIBLE
         chronometer.base = SystemClock.elapsedRealtime()

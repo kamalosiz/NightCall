@@ -47,6 +47,7 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
@@ -282,7 +283,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     "",
                     list[0].type.toString(),
                     list[0].file_id.toString(),
-                    list[0].duration.toLong(), list[0].thumbnail,
+                    list[0].duration.toLong(),
+                    list[0].thumbnail,
                     list[0].identifier
                 )
             }

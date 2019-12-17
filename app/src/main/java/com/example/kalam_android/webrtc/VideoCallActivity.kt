@@ -99,15 +99,15 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     fun startWebrtc() {
         initViews()
         //        getIceServers();
-        /*val peerIceServer = PeerConnection.IceServer
+        val stunIceServer = PeerConnection.IceServer
             .builder("stun:stun.l.google.com:19302")
             .createIceServer()
-        peerIceServers.add(peerIceServer)*/
-        val peerIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
+        peerIceServers.add(stunIceServer)
+        val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
             .setUsername("webrtc@live.com")
             .setPassword("muazkh")
             .createIceServer()
-        peerIceServers.add(peerIceServer)
+        peerIceServers.add(turnIceServer)
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
             .setEnableVideoHwAcceleration(true)
             .createInitializationOptions()
