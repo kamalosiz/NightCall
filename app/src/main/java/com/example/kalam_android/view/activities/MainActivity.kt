@@ -146,22 +146,20 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     override fun offerCallback(jsonObject: JSONObject) {
         when (jsonObject.getString(AppConstants.TYPE)) {
             AppConstants.OFFER -> {
+                Debugger.e("moezzBhai", "offer : $jsonObject")
                 if (jsonObject.getBoolean("isVideo")) {
-                    logE("video received")
-                    val intent = Intent(this, VideoCallActivity::class.java)
-                    intent.putExtra(AppConstants.JSON, jsonObject.toString())
-                    startActivity(intent)
+                    startNewActivity(VideoCallActivity::class.java, jsonObject)
                 } else {
-                    logE("audio received")
-                    val intent = Intent(this, AudioCallActivity::class.java)
-                    intent.putExtra(AppConstants.JSON, jsonObject.toString())
-                    startActivity(intent)
+                    startNewActivity(AudioCallActivity::class.java, jsonObject)
                 }
             }
         }
     }
 
-    private fun logE(message: String) {
-        Debugger.e(TAG, message)
+    private fun startNewActivity(mClass: Class<*>, jsonObject: JSONObject) {
+        val intent = Intent(this, mClass)
+        intent.putExtra(AppConstants.JSON, jsonObject.toString())
+        startActivity(intent)
+        overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
     }
 }

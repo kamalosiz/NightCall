@@ -24,7 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".webrtc.AudioCallActivity"></activity>
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -35,6 +38,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/app_name" />
+
+        <activity
+            android:name=".webrtc.AudioCallActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".webrtc.VideoCallActivity"
@@ -70,10 +77,6 @@
             android:name=".view.activities.ChatDetailActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
 
         <activity
             android:name=".view.activities.ResetPasswordActivity"

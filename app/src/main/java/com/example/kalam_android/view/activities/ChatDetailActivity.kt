@@ -498,23 +498,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 myChatMediaHelper?.openAttachments()
             }
             R.id.ivAudio -> {
-                val intent = Intent(this, AudioCallActivity::class.java)
-                intent.putExtra(AppConstants.INITIATOR, true)
-                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
-                intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
-                intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
-                startActivity(intent)
+                startNewActivity(AudioCallActivity::class.java)
             }
             R.id.ivVideo -> {
-                val intent = Intent(this, VideoCallActivity::class.java)
-                intent.putExtra(AppConstants.INITIATOR, true)
-                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
-                intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
-                intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
-                startActivity(intent)
+                startNewActivity(VideoCallActivity::class.java)
             }
         }
     }
+
+    private fun startNewActivity(mClass: Class<*>) {
+        val intent = Intent(this, mClass)
+        intent.putExtra(AppConstants.INITIATOR, true)
+        intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+        intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+        intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+        startActivity(intent)
+        overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
+    }
+
 
     private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()

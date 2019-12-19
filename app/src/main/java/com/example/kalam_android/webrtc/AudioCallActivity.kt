@@ -33,11 +33,11 @@ import java.util.*
 import javax.inject.Inject
 
 class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
-    private lateinit var peerConnectionFactory: PeerConnectionFactory
+    private var peerConnectionFactory: PeerConnectionFactory? = null
     private var audioConstraints: MediaConstraints? = null
     private lateinit var sdpConstraints: MediaConstraints
-    private lateinit var audioSource: AudioSource
-    private lateinit var localAudioTrack: AudioTrack
+    private var audioSource: AudioSource? = null
+    private var localAudioTrack: AudioTrack? = null
     internal var localPeer: PeerConnection? = null
     private lateinit var rootEglBase: EglBase
     private var peerIceServers: MutableList<PeerConnection.IceServer> = ArrayList()
@@ -94,10 +94,10 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
     fun startWebrtc() {
         initViews()
-        val stunIceServer = PeerConnection.IceServer
-            .builder("stun:stun.l.google.com:19302")
-            .createIceServer()
-        peerIceServers.add(stunIceServer)
+        /* val stunIceServer = PeerConnection.IceServer
+             .builder("stun:stun.l.google.com:19302")
+             .createIceServer()
+         peerIceServers.add(stunIceServer)*/
         val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
             .setUsername("webrtc@live.com")
             .setPassword("muazkh")
@@ -120,8 +120,8 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
         audioConstraints = MediaConstraints()
 
-        audioSource = peerConnectionFactory.createAudioSource(audioConstraints)
-        localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource)
+        audioSource = peerConnectionFactory?.createAudioSource(audioConstraints)
+        localAudioTrack = peerConnectionFactory?.createAudioTrack("101", audioSource)
         mediaPlayer = MediaPlayer.create(this, R.raw.incoming)
         val initiator = intent.getBooleanExtra(AppConstants.INITIATOR, false)
         if (initiator) {
@@ -137,11 +137,12 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             mediaPlayer?.start()
             mediaPlayer?.isLooping = true
             val data = JSONObject(json)
+            val offer = JSONObject(data.getString("offer"))
             callerID = data.getLong(AppConstants.CONNECTED_USER_ID)
             createPeerConnection()
             localPeer?.setRemoteDescription(
                 CustomSdpObserver("localSetRemote"),
-                SessionDescription(SessionDescription.Type.OFFER, data.getString("sdp"))
+                SessionDescription(SessionDescription.Type.OFFER, offer.getString("sdp"))
             )
             profileImage = data.getString("photoUrl")
             calleeName = data.getString("name")
@@ -165,17 +166,38 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         rtcConfig.continualGatheringPolicy =
             PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY
         rtcConfig.keyType = PeerConnection.KeyType.ECDSA
-        localPeer = peerConnectionFactory.createPeerConnection(
+        localPeer = peerConnectionFactory?.createPeerConnection(
             rtcConfig,
             object : CustomPeerConnectionObserver("localPeerCreation") {
                 override fun onIceCandidate(iceCandidate: IceCandidate) {
                     super.onIceCandidate(iceCandidate)
-                    webSocketListener?.onIceCandidateReceived(iceCandidate, callerID)
+                    val json = JSONObject()
+                    json.put("sdp", iceCandidate.sdp)
+                    json.put("sdpMLineIndex", iceCandidate.sdpMLineIndex)
+                    json.put("sdpMid", iceCandidate.sdpMid)
+                    webSocketListener?.onIceCandidateReceived(json, callerID)
                 }
 
                 override fun onAddStream(mediaStream: MediaStream) {
                     super.onAddStream(mediaStream)
                     gotRemoteStream(mediaStream)
+                }
+
+                override fun onIceConnectionChange(iceConnectionState: PeerConnection.IceConnectionState) {
+                    runOnUiThread {
+                        when (iceConnectionState) {
+                            PeerConnection.IceConnectionState.CONNECTED -> {
+                                logE("Peer Connection CONNECTED")
+                                startChronometer()
+                            }
+                            PeerConnection.IceConnectionState.DISCONNECTED -> {
+                                logE("Peer Connection DISCONNECTED")
+                            }
+                            PeerConnection.IceConnectionState.FAILED -> {
+                                logE("Peer Connection FAILED")
+                            }
+                        }
+                    }
                 }
             })
         addStreamToLocalPeer()
@@ -202,8 +224,8 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     }*/
 
     private fun addStreamToLocalPeer() {
-        val stream = peerConnectionFactory.createLocalMediaStream("102")
-        stream.addTrack(localAudioTrack)
+        val stream = peerConnectionFactory?.createLocalMediaStream("102")
+        stream?.addTrack(localAudioTrack)
         logE("addStreamToLocalPeer : Stream : $stream")
         localPeer?.addStream(stream)
     }
@@ -230,12 +252,14 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private fun answerCall() {
         logE("onOfferReceived")
         try {
+            mediaPlayer?.pause()
+            ibAnswer.visibility = View.GONE
             doAnswer()
-            startChronometer()
         } catch (e: JSONException) {
             e.printStackTrace()
         }
     }
+
 
     private fun startChronometer() {
         tvCallStatus.visibility = View.GONE
@@ -263,35 +287,35 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private fun saveIceCandidates(data: JSONObject) {
         try {
             logE("onIceCandidateReceived : $data")
+            val candidates = JSONObject(data.getString("candidate"))
             localPeer?.addIceCandidate(
                 IceCandidate(
-                    data.getString("id"),
-                    data.getInt("label"),
-                    data.getString("candidate")
+                    candidates.getString("sdpMid"),
+                    candidates.getInt("sdpMLineIndex"),
+                    candidates.getString("sdp")
                 )
             )
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
 
     private fun onAnswerReceived(data: JSONObject) {
         try {
 
             logE("onAnswerReceived : $data")
+            val answer = JSONObject(data.getString("offer"))
+            logE("onAnswerReceived : $answer")
             localPeer?.setRemoteDescription(
                 CustomSdpObserver("localSetRemote"),
                 SessionDescription(
                     SessionDescription.Type.fromCanonicalForm(data.getString("type").toLowerCase()),
-                    data.getString("sdp")
+                    answer.getString("sdp")
                 )
             )
-            startChronometer()
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-
     }
 
     override fun onClick(v: View) {
@@ -301,27 +325,38 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 webSocketListener?.onHangout(callerID)
             }
             R.id.ibAnswer -> {
-                mediaPlayer?.stop()
                 answerCall()
-                ibAnswer.visibility = View.GONE
             }
         }
     }
 
     private fun hangup() {
         try {
-            mediaPlayer?.stop()
-            peerConnectionFactory.stopAecDump()
-            localPeer?.close()
-            localPeer = null
-            if (audioConstraints != null) {
-                audioConstraints = null
+            if (mediaPlayer != null && mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.pause()
             }
-            audioSource.dispose()
-            localAudioTrack.dispose()
+            if (peerConnectionFactory != null) {
+                peerConnectionFactory?.stopAecDump()
+            }
+            if (localPeer != null) {
+                localPeer?.close()
+                localPeer?.dispose()
+                localPeer = null
+
+            }
+            if (audioSource != null) {
+                audioSource?.dispose()
+            }
+            /*if (peerConnectionFactory != null) {
+                peerConnectionFactory?.dispose()
+                peerConnectionFactory = null
+            }*/
+            PeerConnectionFactory.stopInternalTracingCapture()
+            PeerConnectionFactory.shutdownInternalTracer()
             finish()
+            overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logE("Exception Occurred ${e.message}")
         }
     }
 
