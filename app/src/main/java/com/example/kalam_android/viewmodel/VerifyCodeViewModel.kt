@@ -3,7 +3,7 @@ package com.example.kalam_android.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kalam_android.repository.Repository
-import com.example.kalam_android.repository.model.VerifyCodeResponse
+import com.example.kalam_android.repository.model.BasicResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -12,9 +12,9 @@ import javax.inject.Inject
 
 class VerifyCodeViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
     private val disposable = CompositeDisposable()
-    private val responseLiveData = MutableLiveData<ApiResponse<VerifyCodeResponse>>()
+    private val responseLiveData = MutableLiveData<ApiResponse<BasicResponse>>()
 
-    fun verificationResponse(): MutableLiveData<ApiResponse<VerifyCodeResponse>> {
+    fun verificationResponse(): MutableLiveData<ApiResponse<BasicResponse>> {
         return responseLiveData
     }
 

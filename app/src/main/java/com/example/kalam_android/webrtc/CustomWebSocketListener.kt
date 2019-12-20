@@ -92,7 +92,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
                     sharedPrefsHelper.getUser()?.lastname.toString()
                 )
             )
-            json.put("userId", sharedPrefsHelper.getUser()?.id)
+            json.put("userId", sharedPrefsHelper.getUser()?.id.toString())
             json.put("phone", "")
             json.put("photoUrl", sharedPrefsHelper.getUser()?.profile_image.toString())
             webSocket?.send(json.toString())
@@ -103,7 +103,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
     }
 
 
-    fun onIceCandidateReceived(iceCandidate: JSONObject, callerID: Long) {
+    fun onIceCandidateReceived(iceCandidate: JSONObject, callerID: String) {
         logE("onIceCandidateReceived normal :$iceCandidate")
         val obj = JSONObject()
         try {
@@ -118,7 +118,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         }
     }
 
-    fun createOffer(sessionDescription: SessionDescription, callerID: Long, isVideo: Boolean) {
+    fun createOffer(sessionDescription: SessionDescription, callerID: String, isVideo: Boolean) {
         try {
             logE("Emit Description [ $sessionDescription]")
             val obj = JSONObject()
@@ -135,7 +135,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         }
     }
 
-    fun doAnswer(sessionDescription: SessionDescription, callerID: Long) {
+    fun doAnswer(sessionDescription: SessionDescription, callerID: String) {
         try {
             val obj = JSONObject()
             obj.put("type", sessionDescription.type.canonicalForm())
@@ -148,7 +148,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         }
     }
 
-    fun onHangout(id: Long) {
+    fun onHangout(id: String) {
         try {
             val obj = JSONObject()
             obj.put("type", "reject")

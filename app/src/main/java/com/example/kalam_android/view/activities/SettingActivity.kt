@@ -14,15 +14,12 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivitySelectLanguageBinding
-import com.example.kalam_android.repository.model.ChatMessagesResponse
-import com.example.kalam_android.repository.model.LogOutResponse
+import com.example.kalam_android.repository.model.BasicResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.util.toast
-import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.LogoutViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
@@ -66,7 +63,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
         checkBoxListener()
     }
 
-    private fun consumeResponse(apiResponse: ApiResponse<LogOutResponse>?) {
+    private fun consumeResponse(apiResponse: ApiResponse<BasicResponse>?) {
         when (apiResponse?.status) {
 
             Status.LOADING -> {

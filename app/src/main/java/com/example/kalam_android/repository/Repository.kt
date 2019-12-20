@@ -15,7 +15,7 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.signUp(parameters)
     }
 
-    fun executeVerifyCode(parameters: Map<String, String>): Observable<VerifyCodeResponse> {
+    fun executeVerifyCode(parameters: Map<String, String>): Observable<BasicResponse> {
         return apiCallInterface.verifyCode(parameters)
     }
 
@@ -31,7 +31,7 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.login(parameters)
     }
 
-    fun logout(authorization: String?): Observable<LogOutResponse> {
+    fun logout(authorization: String?): Observable<BasicResponse> {
         return apiCallInterface.logout(authorization)
     }
 
@@ -81,5 +81,12 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         @Part list: ArrayList<MultipartBody.Part>
     ): Observable<MediaResponse> {
         return apiCallInterface.uploadAudio(authorization, params, list)
+    }
+
+    fun updateFcm(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<BasicResponse> {
+        return apiCallInterface.updateFcm(authorization, parameters)
     }
 }

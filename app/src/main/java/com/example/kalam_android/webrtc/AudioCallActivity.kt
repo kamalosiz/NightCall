@@ -16,7 +16,6 @@ import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.util.toast
 import com.example.kalam_android.wrapper.GlideDownloder
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -138,7 +137,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             mediaPlayer?.isLooping = true
             val data = JSONObject(json)
             val offer = JSONObject(data.getString("offer"))
-            callerID = data.getLong(AppConstants.CONNECTED_USER_ID)
+            callerID = data.getString(AppConstants.CONNECTED_USER_ID).toLong()
             createPeerConnection()
             localPeer?.setRemoteDescription(
                 CustomSdpObserver("localSetRemote"),
@@ -175,7 +174,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     json.put("sdp", iceCandidate.sdp)
                     json.put("sdpMLineIndex", iceCandidate.sdpMLineIndex)
                     json.put("sdpMid", iceCandidate.sdpMid)
-                    webSocketListener?.onIceCandidateReceived(json, callerID)
+                    webSocketListener?.onIceCandidateReceived(json, callerID.toString())
                 }
 
                 override fun onAddStream(mediaStream: MediaStream) {
@@ -196,6 +195,11 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                             PeerConnection.IceConnectionState.FAILED -> {
                                 logE("Peer Connection FAILED")
                             }
+                            PeerConnection.IceConnectionState.CHECKING -> {
+                                logE("Peer Connection CHECKING")
+                                tvCallStatus.text = "Connecting"
+                            }
+                            else -> {}
                         }
                     }
                 }
@@ -207,21 +211,12 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         val audioTrack = stream.audioTracks[0]
         runOnUiThread {
             try {
-                toast("gotRemoteStream")
+                logE("gotRemoteStream audioTrack: $audioTrack")
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
-
-    /*private fun openSpeakerOn() {
-        try {
-            if (!audioManager.isSpeakerphoneOn) audioManager.isSpeakerphoneOn = true
-            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }*/
 
     private fun addStreamToLocalPeer() {
         val stream = peerConnectionFactory?.createLocalMediaStream("102")
@@ -243,7 +238,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     sessionDescription
                 )
                 logE("doCall : onCreateSuccess : SignallingClient emit ")
-                webSocketListener?.createOffer(sessionDescription, callerID, false)
+                webSocketListener?.createOffer(sessionDescription, callerID.toString(), false)
 
             }
         }, sdpConstraints)
@@ -279,7 +274,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     sessionDescription
                 )
                 Log.e("testingSocket", "Emit Description [ $sessionDescription]")
-                webSocketListener?.doAnswer(sessionDescription, callerID)
+                webSocketListener?.doAnswer(sessionDescription, callerID.toString())
             }
         }, MediaConstraints())
     }
@@ -302,7 +297,6 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
     private fun onAnswerReceived(data: JSONObject) {
         try {
-
             logE("onAnswerReceived : $data")
             val answer = JSONObject(data.getString("offer"))
             logE("onAnswerReceived : $answer")
@@ -322,7 +316,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         when (v.id) {
             R.id.ibHangUp -> {
                 hangup()
-                webSocketListener?.onHangout(callerID)
+                webSocketListener?.onHangout(callerID.toString())
             }
             R.id.ibAnswer -> {
                 answerCall()
@@ -340,19 +334,12 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             }
             if (localPeer != null) {
                 localPeer?.close()
-                localPeer?.dispose()
                 localPeer = null
 
             }
             if (audioSource != null) {
                 audioSource?.dispose()
             }
-            /*if (peerConnectionFactory != null) {
-                peerConnectionFactory?.dispose()
-                peerConnectionFactory = null
-            }*/
-            PeerConnectionFactory.stopInternalTracingCapture()
-            PeerConnectionFactory.shutdownInternalTracer()
             finish()
             overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
         } catch (e: Exception) {

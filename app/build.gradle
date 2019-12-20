@@ -64,6 +64,7 @@ dependencies {
     implementation 'com.github.nkzawa:socket.io-client:0.6.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.7.3'
     implementation 'com.google.android.material:material:1.0.0'
+    implementation 'ch.acra:acra:4.9.0'
 
     //SQUARE-UP RETROFIT
     implementation 'com.squareup.retrofit2:retrofit:2.6.1'

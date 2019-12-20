@@ -1,9 +1,7 @@
 package com.example.kalam_android.view.activities
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.SharedElementCallback
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,8 +9,6 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -36,7 +32,6 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.yalantis.ucrop.UCrop
-import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -77,7 +72,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
             if (task.isSuccessful) {
                 if (task.result != null) {
                     fcmToken = task.result!!.token
-                    sharedPrefsHelper.setFCMToken(fcmToken)
+                    sharedPrefsHelper.saveFCMToken(fcmToken)
                     logE("FCM Token:${fcmToken}")
                 }
             } else {

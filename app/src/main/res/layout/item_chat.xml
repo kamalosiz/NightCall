@@ -27,6 +27,7 @@
             android:layout_alignTop="@id/rlLayout"
             android:layout_alignEnd="@id/rlLayout"
             android:layout_alignBottom="@id/rlLayout"
+            android:background="@drawable/text_send_background"
             android:scaleType="fitXY" />
 
         <RelativeLayout
@@ -38,16 +39,17 @@
 
             <TextView
                 android:id="@+id/tvMessage"
-                android:layout_width="@dimen/_250sdp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:gravity="center_horizontal"
+                android:minEms="6"
                 android:paddingStart="@dimen/_10sdp"
                 android:paddingTop="@dimen/_6sdp"
                 android:paddingEnd="@dimen/_10sdp"
                 android:paddingBottom="@dimen/_3sdp"
                 android:singleLine="false"
-                android:text="This is a dummy message"
+                android:text="This is a dummy textiew"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_11ssp"

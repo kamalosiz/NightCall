@@ -18,6 +18,7 @@ constructor(private val mSharedPreferences: SharedPreferences) {
     private val ALL_CHAT_ITEM_SYNCED = "key_all_chat_item_synced"
     private val LANGUAGE = "kalam_user_language"
     private val SELECT_AUTO = "kalam_translate_data"
+    private val KEY_IS_NEW_FCM = "key_kalam_is_new_FCM"
 
     fun put(key: String, value: String) {
         mSharedPreferences.edit().putString(key, value).apply()
@@ -51,7 +52,15 @@ constructor(private val mSharedPreferences: SharedPreferences) {
         return mSharedPreferences.getBoolean(key, defaultValue)
     }
 
-    fun setFCMToken(fcmToken: String) {
+    fun saveIsNewFcmToken(isNewToken: Boolean) {
+        put(KEY_IS_NEW_FCM, isNewToken)
+    }
+
+    fun isNewFcmToken(): Boolean? {
+        return get(KEY_IS_NEW_FCM, false)
+    }
+
+    fun saveFCMToken(fcmToken: String) {
         put(AppConstants.FCM_TOKEN, fcmToken)
     }
 

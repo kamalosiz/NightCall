@@ -4,20 +4,28 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.WebSocketOfferCallback
 import com.example.kalam_android.databinding.ActivityMainBinding
+import com.example.kalam_android.repository.model.BasicResponse
+import com.example.kalam_android.repository.net.ApiResponse
+import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
+import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.HomePagerAdapter
+import com.example.kalam_android.viewmodel.MainViewModel
+import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.webrtc.AudioCallActivity
-import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.webrtc.CustomWebSocketListener
+import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.wrapper.SocketIO
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -30,12 +38,17 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     private val TAG = this.javaClass.simpleName
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
+    private lateinit var viewModel: MainViewModel
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
     private var customWebSocketListener: CustomWebSocketListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         MyApplication.getAppComponent(this).doInjection(this)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
         val homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         binding.viewPager.adapter = homePagerAdapter
         binding.viewPager.offscreenPageLimit = 4
@@ -49,6 +62,16 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
+        }
+        viewModel.updateFcmTokenResponse().observe(this,
+            Observer<ApiResponse<BasicResponse>> { t ->
+                consumeUpdateFcmResponse(t)
+            })
+
+        if (sharedPrefsHelper.isNewFcmToken() == true) {
+            val params = HashMap<String, String>()
+            params["fcm_token"] = sharedPrefsHelper.getFCMToken().toString()
+            viewModel.hitUpdateFcmToken(sharedPrefsHelper.getUser()?.token.toString(), params)
         }
 
         binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -119,6 +142,29 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         }
     }
 
+    private fun consumeUpdateFcmResponse(apiResponse: ApiResponse<BasicResponse>?) {
+        when (apiResponse?.status) {
+            Status.LOADING -> {
+                Debugger.e(TAG, "consumeUpdateFcmResponse LOADING")
+            }
+            Status.SUCCESS -> {
+                Debugger.e(TAG, "consumeUpdateFcmResponse SUCCESS")
+                toast(apiResponse.data?.message.toString())
+                apiResponse.data?.let {
+                    sharedPrefsHelper.saveIsNewFcmToken(false)
+                }
+            }
+            Status.ERROR -> {
+                Debugger.e(
+                    TAG,
+                    "consumeUpdateFcmResponse ERROR: " + apiResponse.error.toString()
+                )
+            }
+            else -> {
+            }
+        }
+    }
+
     private fun connectWebSocket() {
         val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
         customWebSocketListener = CustomWebSocketListener.getInstance(sharedPrefsHelper)
@@ -146,7 +192,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     override fun offerCallback(jsonObject: JSONObject) {
         when (jsonObject.getString(AppConstants.TYPE)) {
             AppConstants.OFFER -> {
-                Debugger.e("moezzBhai", "offer : $jsonObject")
                 if (jsonObject.getBoolean("isVideo")) {
                     startNewActivity(VideoCallActivity::class.java, jsonObject)
                 } else {

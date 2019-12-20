@@ -10,22 +10,25 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class LogoutViewModel @Inject constructor(val repository: Repository) : ViewModel() {
-    private val disposables = CompositeDisposable()
-    private val responseLiveData = MutableLiveData<ApiResponse<BasicResponse>>()
+class MainViewModel @Inject constructor(val repository: Repository) : ViewModel() {
 
-    fun logOutResponse(): MutableLiveData<ApiResponse<BasicResponse>> {
-        return responseLiveData
+    private val disposables = CompositeDisposable()
+    private val updateFcmLiveData = MutableLiveData<ApiResponse<BasicResponse>>()
+
+    fun updateFcmTokenResponse(): MutableLiveData<ApiResponse<BasicResponse>> {
+        return updateFcmLiveData
     }
 
-    fun hitLogOutApi(authorization: String?) {
-        disposables.add(repository.logout(authorization)
+    fun hitUpdateFcmToken(
+        authorization: String?, parameters: Map<String, String>
+    ) {
+        disposables.add(repository.updateFcm(authorization, parameters)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
+            .doOnSubscribe { d -> updateFcmLiveData.setValue(ApiResponse.loading()) }
             .subscribe(
-                { responseLiveData.setValue(ApiResponse.success(it)) },
-                { responseLiveData.setValue(ApiResponse.error(it)) }
+                { result -> updateFcmLiveData.setValue(ApiResponse.success(result)) },
+                { throwable -> updateFcmLiveData.setValue(ApiResponse.error(throwable)) }
             ))
     }
 

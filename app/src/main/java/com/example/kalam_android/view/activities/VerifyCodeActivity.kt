@@ -10,7 +10,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityVerifyCodeBinding
-import com.example.kalam_android.repository.model.VerifyCodeResponse
+import com.example.kalam_android.repository.model.BasicResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
@@ -44,7 +44,7 @@ class VerifyCodeActivity : BaseActivity(), View.OnClickListener {
         })
     }
 
-    private fun consumeResponse(apiResponse: ApiResponse<VerifyCodeResponse>) {
+    private fun consumeResponse(apiResponse: ApiResponse<BasicResponse>) {
         when (apiResponse.status) {
             Status.LOADING -> showProgressDialog(this)
             Status.SUCCESS -> {
@@ -62,7 +62,7 @@ class VerifyCodeActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun renderResponse(response: VerifyCodeResponse?) {
+    private fun renderResponse(response: BasicResponse?) {
         logE("socketResponse $response")
         response?.let {
             if (it.status) {

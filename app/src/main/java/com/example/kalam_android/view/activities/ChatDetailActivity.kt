@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -82,7 +83,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
-
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
