@@ -21,6 +21,10 @@
             android:id="@+id/videoHolder"
             layout="@layout/video_item" />
 
+        <include
+            android:id="@+id/groupHolder"
+            layout="@layout/item_for_multiple_images" />
+
 
     </RelativeLayout>
 </layout>

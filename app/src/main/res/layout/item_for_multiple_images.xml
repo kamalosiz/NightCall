@@ -1,4 +1,5 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
@@ -6,6 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_4sdp">
+
+
 
         <TextView
             android:id="@+id/tvTime"
@@ -28,69 +31,111 @@
             android:gravity="center"
             tools:ignore="UselessParent">
 
-            <ImageView
-                android:id="@+id/ivImage1"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvImage1"
                 android:layout_width="@dimen/_103sdp"
                 android:layout_height="@dimen/_103sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="@dimen/_8sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivImage1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:background="@drawable/media_background"
+                    android:scaleType="centerCrop"
+                    android:transitionName="@string/trans_key"
+                    app:srcCompat="@drawable/dummy_placeholder_1" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvImage3"
+                android:layout_width="@dimen/_103sdp"
+                android:layout_height="@dimen/_103sdp"
+                android:layout_below="@id/cvImage1"
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="@dimen/_5sdp"
-                android:background="@drawable/media_background"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/trans_key" />
+                android:layout_marginTop="@dimen/_3sdp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="@dimen/_8sdp">
 
-            <ImageView
-                android:id="@+id/ivImage3"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivImage3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:transitionName="@string/trans_key"
+                    app:srcCompat="@drawable/dummy_placeholder_1" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvImage2"
                 android:layout_width="@dimen/_103sdp"
                 android:layout_height="@dimen/_103sdp"
-                android:layout_below="@id/ivImage1"
-                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
                 android:layout_marginStart="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:background="@drawable/media_background"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/trans_key" />
-
-            <ImageView
-                android:id="@+id/ivImage2"
-                android:layout_width="@dimen/_103sdp"
-                android:layout_height="@dimen/_103sdp"
-                android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/_5sdp"
-                android:background="@drawable/media_background"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/trans_key" />
+                app:cardElevation="0dp"
+                app:cardCornerRadius="@dimen/_8sdp">
 
-            <ImageView
-                android:id="@+id/ivImage4"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivImage2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:transitionName="@string/trans_key"
+                    app:srcCompat="@drawable/dummy_placeholder_1" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvImage4"
                 android:layout_width="@dimen/_103sdp"
                 android:layout_height="@dimen/_103sdp"
-                android:layout_below="@id/ivImage2"
+                android:layout_below="@id/cvImage2"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="@dimen/_3sdp"
                 android:layout_marginEnd="@dimen/_5sdp"
-                android:background="@drawable/media_background"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/trans_key" />
+                app:cardElevation="0dp"
+                app:cardCornerRadius="@dimen/_8sdp">
 
-            <TextView
-                android:id="@+id/tvRemainingImages"
-                android:layout_width="@dimen/_103sdp"
-                android:layout_height="@dimen/_103sdp"
-                android:layout_below="@id/ivImage2"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginEnd="@dimen/_5sdp"
-                android:fontFamily="@font/roboto_medium"
-                android:gravity="center"
-                android:text="+5"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_22ssp"
-                android:transitionName="@string/trans_key"
-                android:visibility="gone" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivImage4"
+                        android:layout_width="@dimen/_103sdp"
+                        android:layout_height="@dimen/_103sdp"
+                        android:background="@drawable/media_background"
+                        android:scaleType="centerCrop"
+                        android:transitionName="@string/trans_key"
+                        app:srcCompat="@drawable/dummy_placeholder_1" />
+
+                    <TextView
+                        android:id="@+id/tvRemainingImages"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/roboto_medium"
+                        android:gravity="center"
+                        android:text="+5"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_22ssp"
+                        android:transitionName="@string/trans_key"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone"/>
         </RelativeLayout>
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivDeliver"
             android:layout_width="@dimen/_10sdp"
             android:layout_height="@dimen/_10sdp"

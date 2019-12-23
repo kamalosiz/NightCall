@@ -125,6 +125,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.VISIBLE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
+                itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 itemHolder.binding.itemChat.tvMessage.text = item.message
                 val regex = "(?s).*\\p{InArabic}.*"
                 if (item.message?.matches(Regex(regex)) == true) {
@@ -172,6 +173,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
+                itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.ivPlayPause.setOnClickListener {
                     myChatMediaHelper?.playVoiceMsg(
                         itemHolder.binding,
@@ -218,6 +220,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.VISIBLE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
+                itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 GlideDownloder.load(
                     context,
                     itemHolder.binding.imageHolder.ivImage,
@@ -247,6 +250,8 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.VISIBLE
+                itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
+
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.videoHolder.tvTime.text =
                         getTimeStamp(item.unix_time.toLong())
@@ -277,6 +282,7 @@ class ChatMessagesAdapter(
                     itemHolder.binding.videoHolder.ivDeliver, item.is_read
                 )
             }
+
         }
     }
 

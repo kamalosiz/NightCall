@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivImageViewer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/viewVideoHolder"
+            layout="@layout/item_for_view_video" />
+        <include
+            android:id="@+id/viewAudiHolder"
+            layout="@layout/item_for_view_audio" />
+    </RelativeLayout>
+
+</layout>

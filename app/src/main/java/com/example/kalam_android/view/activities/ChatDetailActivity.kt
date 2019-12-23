@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -82,6 +83,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
+    private var galleryList: ArrayList<MediaList>? = null
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -285,38 +287,74 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     list[0].file_id.toString(),
                     list[0].duration.toLong(),
                     list[0].thumbnail,
-                    list[0].identifier
+                    list[0].identifier,
+                    list[0].groupId,
+                    list[0].isGroup
                 )
             }
         }
     }
 
-    private fun uploadMedia(identifier: String, file: String, duration: Long, type: String) {
+    private fun uploadMedia(
+        identifier: String,
+        file: String,
+        duration: Long,
+        type: String,
+        groupId: Long,
+        isGroup: Int
+    ) {
         val params = HashMap<String, RequestBody>()
         params["identifier"] = RequestBody.create(MediaType.parse("text/plain"), identifier)
         params["duration"] = RequestBody.create(MediaType.parse("text/plain"), duration.toString())
         params["type"] = RequestBody.create(MediaType.parse("text/plain"), type)
+        params["group_id"] = RequestBody.create(MediaType.parse("text/plain"), groupId.toString())
+        params["is_group"] = RequestBody.create(MediaType.parse("text/plain"), isGroup.toString())
         viewModel.hitUploadAudioApi(
             sharedPrefsHelper.getUser()?.token, params,
             getFileBody(file, "file")
         )
     }
 
-    private fun sendMediaMessage(file: String, type: String, duration: Long) {
+    private fun sendMediaMessage(
+        file: String,
+        type: String,
+        duration: Long,
+        groupId: Long,
+        isGroup: Int
+    ) {
         val identifier = System.currentTimeMillis().toString()
         when (type) {
             AppConstants.AUDIO_MESSAGE -> {
                 lastMessage = "Audio"
-                createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
-                uploadMedia(identifier, file, duration, type)
+                createChatObject(
+                    AppConstants.DUMMY_STRING,
+                    file,
+                    type,
+                    identifier
+                    , groupId, isGroup
+                )
+                uploadMedia(identifier, file, duration, type, groupId, isGroup)
             }
             AppConstants.IMAGE_MESSAGE -> {
                 lastMessage = "Image"
-                createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
+                createChatObject(
+                    AppConstants.DUMMY_STRING,
+                    file,
+                    type,
+                    identifier
+                    , groupId, isGroup
+                )
 //                logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
                 val convertedFile = Compressor(this).compressToFile(File(file))
 //                logE("After Conversion : ${getReadableFileSize(convertedFile.length())}")
-                uploadMedia(identifier, convertedFile.absolutePath, duration, type)
+                uploadMedia(
+                    identifier,
+                    convertedFile.absolutePath,
+                    duration,
+                    type,
+                    groupId,
+                    isGroup
+                )
             }
             AppConstants.VIDEO_MESSAGE -> {
                 lastMessage = "Video"
@@ -324,12 +362,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     AppConstants.DUMMY_STRING,
                     file,
                     type,
-                    identifier
+                    identifier,
+                    groupId, isGroup
                 )
                 val fileSize = getFileSizeInBytes(file)
                 if (fileSize < 2000) {
                     logE("File size is less than 2MB : $fileSize")
-                    uploadMedia(identifier, file, duration, type)
+                    uploadMedia(identifier, file, duration, type, groupId, isGroup)
                 } else {
                     logE("File size is greater than 2MB : $fileSize")
 //                    logE("Before Conversion : ${getReadableFileSize(File(file).length())}")
@@ -345,7 +384,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 //                                logE(
 //                                    "After Conversion : ${getReadableFileSize(File(output).length())}"
 //                                )
-                                uploadMedia(identifier, output, duration, type)
+                                uploadMedia(identifier, output, duration, type, groupId, isGroup)
                             }
                         }
                     }.start()
@@ -400,7 +439,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun emitNewMessageToSocket(
         message: String, type: String, fileID: String,
-        duration: Long, thumbnail: String?, identifier: String
+        duration: Long, thumbnail: String?, identifier: String, groupId: String, isGroup: Int
     ) {
         SocketIO.emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(),
@@ -408,11 +447,18 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             sharedPrefsHelper.getUser()?.firstname.toString()
                     + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
             fileID, duration, thumbnail.toString(), identifier
-            , sharedPrefsHelper.getLanguage().toString()
+            , sharedPrefsHelper.getLanguage().toString(), groupId, isGroup
         )
     }
 
-    private fun createChatObject(message: String, file: String, type: String, identifier: String) {
+    private fun createChatObject(
+        message: String,
+        file: String,
+        type: String,
+        identifier: String,
+        groupId: Long,
+        isGroup: Int
+    ) {
         lastMsgTime = System.currentTimeMillis() / 1000L
         addMessage(
             ChatData(
@@ -424,7 +470,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
                 AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
                 type, file, 0, 0, message, identifier,
-                lastMsgTime.toDouble(), sharedPrefsHelper.getLanguage()
+                lastMsgTime.toDouble(), sharedPrefsHelper.getLanguage(), groupId, isGroup
             )
         )
     }
@@ -433,11 +479,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         val identifier = System.currentTimeMillis().toString()
         createChatObject(
             binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
-            AppConstants.TEXT_MESSAGE, identifier
+            AppConstants.TEXT_MESSAGE, identifier,
+            0, 0
         )
         emitNewMessageToSocket(
             binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.TEXT_MESSAGE,
-            AppConstants.DUMMY_STRING, 0, AppConstants.DUMMY_STRING, identifier
+            AppConstants.DUMMY_STRING, 0, AppConstants.DUMMY_STRING, identifier, identifier, 0
         )
         logE("Message Emitted to socket")
         lastMessage = binding.lvBottomChat.editTextMessage.text.toString()
@@ -458,7 +505,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         myChatMediaHelper?.getTotalDuration()?.let {
                             sendMediaMessage(
                                 myChatMediaHelper?.fileOutput().toString(),
-                                AppConstants.AUDIO_MESSAGE, it
+                                AppConstants.AUDIO_MESSAGE, it,
+                                0, 0
                             )
                         }
                         myChatMediaHelper?.hideRecorder()
@@ -518,14 +566,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
-        list?.let {
-            it.forEach { media ->
-                if (media.type == 0) {
-                    sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0)
-                } else {
-                    sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0)
-                }
-            }
+        val groupId = System.currentTimeMillis()
+        if (list?.size!! > 3) {
+            list?.let { uploadMediaList(it, groupId, 1) }
+
+        } else {
+            list?.let { uploadMediaList(it, groupId, 0) }
+
         }
         logE("List size : $list")
     }
@@ -541,12 +588,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                             logE("onActivity Received")
                             sendMediaMessage(
                                 media.path,
-                                AppConstants.IMAGE_MESSAGE, 0
+                                AppConstants.IMAGE_MESSAGE, 0,
+                                0, 0
                             )
                         } else if (media.type == SandriosCamera.MediaType.VIDEO) {
                             sendMediaMessage(
                                 media.path,
-                                AppConstants.VIDEO_MESSAGE, 0
+                                AppConstants.VIDEO_MESSAGE, 0,
+                                0, 0
                             )
                         }
                     }
@@ -556,7 +605,18 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (data != null) {
                         val list =
                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                        val intent = Intent(this, AttachmentActivity::class.java)
+                        intent.putExtra(AppConstants.SELECTED_IMAGES_VIDEOS, list)
+                        startActivityForResult(intent, AppConstants.SELECT_IMAGES_VIDEOS)
+
+                    }
+                }
+                AppConstants.SELECT_IMAGES_VIDEOS -> {
+                    if (data != null) {
+                        val list =
+                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
                         sendVideoOrImage(list)
+
                     }
                 }
             }
@@ -725,5 +785,18 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.lvBottomChat.editTextMessage.isFocusable = true
         binding.lvBottomChat.editTextMessage.isFocusableInTouchMode = true
         binding.lvBottomChat.editTextMessage.requestFocus()
+    }
+
+    private fun uploadMediaList(list: ArrayList<MediaList>, groupId: Long, isGroup: Int) {
+        list.let {
+            it?.forEach { media ->
+                if (media.type == 0) {
+
+                    sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0, groupId, isGroup)
+                } else {
+                    sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0, groupId, isGroup)
+                }
+            }
+        }
     }
 }

@@ -24,7 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".webrtc.AudioCallActivity"></activity>
+        <activity android:name=".view.activities.AudioFileActivity"></activity>
+        <activity android:name=".view.activities.AttachmentActivity" />
+        <activity android:name=".view.activities.MultipleMediasGroupActivity" />
+        <activity android:name=".webrtc.AudioCallActivity" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

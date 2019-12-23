@@ -17,6 +17,7 @@ object AppConstants {
     const val TEXT_MESSAGE = "text"
     const val AUDIO_MESSAGE = "audio"
     const val IMAGE_MESSAGE = "image"
+    const val GROUP = "group"
     const val VIDEO_MESSAGE = "video"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
@@ -38,10 +39,15 @@ object AppConstants {
     //Request Code
     const val IMAGE_GALLERY = 0
     const val POST_VIDEO = 1
+    const val AUDIO_GALLERY = 2
     const val PROFILE_IMAGE_CODE = 111
     const val CHAT_FRAGMENT_CODE = 1000
     const val LOGOUT_CODE = 1001
     const val SELECTED_IMAGES = 12
+    const val SELECT_IMAGES_VIDEOS = 14
+    const val SELECT_AUDIO = 15
+
+
 
     //Local DB=
     const val DB_NAME = "kalam_local_db"

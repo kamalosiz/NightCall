@@ -96,7 +96,7 @@ object SocketIO {
     fun emitNewMessage(
         id: String, chatID: String, message: String, type: String, senderName: String,
         fileID: String, duration: Long, thumbnail: String, identifier: String, language: String
-    ) {
+    ,groupId:String,isGroup:Int) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
         jsonObject.addProperty("chat_id", chatID)
@@ -108,6 +108,8 @@ object SocketIO {
         jsonObject.addProperty("thumbnail", thumbnail)
         jsonObject.addProperty("identifier", identifier)
         jsonObject.addProperty("language", language)
+        jsonObject.addProperty("group_id", groupId)
+        jsonObject.addProperty("is_group", isGroup)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)

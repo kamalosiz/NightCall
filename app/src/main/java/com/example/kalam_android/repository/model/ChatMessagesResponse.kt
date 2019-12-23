@@ -29,7 +29,9 @@ data class ChatData(
     val original_message: String?,
     var identifier: String?,
     val unix_time: Double,
-    val language: String?
+    val language: String?,
+    val group_id: Long,
+    val is_group :Int
 )
 
 data class MediaResponse(
@@ -47,7 +49,9 @@ data class DataResponse(
     val type: String?,
     val identifier: String,
     val thumbnail: String?,
-    val file_id: Long
+    val file_id: Long,
+    val groupId: String,
+    val isGroup: Int
 )
 
 data class MediaList(val file: String, val type: Int) : Serializable

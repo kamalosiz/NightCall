@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlAudio"
+        android:layout_margin="@dimen/_8sdp">
+
+        <RelativeLayout
+            android:id="@+id/ivAudio"
+            android:layout_width="@dimen/_45sdp"
+            android:layout_height="@dimen/_45sdp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                app:srcCompat="@drawable/ic_audio_music" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="@dimen/_15sdp"
+                android:layout_height="@dimen/_15sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:id="@+id/ivAudioSelect"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_audio_select" />
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAudioTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toEndOf="@id/ivAudio"
+            android:fontFamily="@font/roboto_medium"
+            android:maxLines="1"
+            android:minLines="1"
+            android:text="Audio"
+            android:textColor="@color/black" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvAudioDurationSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvAudioTitle"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_toEndOf="@id/ivAudio"
+            android:fontFamily="@font/roboto_regular"
+            android:text="Audio" />
+    </RelativeLayout>
+
+</layout>
