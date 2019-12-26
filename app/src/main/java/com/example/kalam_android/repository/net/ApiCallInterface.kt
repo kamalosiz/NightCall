@@ -12,7 +12,7 @@ interface ApiCallInterface {
     fun signUp(@Body parameters: Map<String, String>): Observable<SignUpResponse>
 
     @POST(Urls.VERIFY_PHONE_CODE)
-    fun verifyCode(@Body parameters: Map<String, String>): Observable<VerifyCodeResponse>
+    fun verifyCode(@Body parameters: Map<String, String>): Observable<BasicResponse>
 
     @POST(Urls.CREATE_PROFILE)
     fun createProfile(@Body parameters: Map<String, String>): Observable<CreateProfileResponse>
@@ -29,7 +29,7 @@ interface ApiCallInterface {
 
 
     @POST(Urls.LOGOUT)
-    fun logout(@Header("Authorization") authorization: String?): Observable<LogOutResponse>
+    fun logout(@Header("Authorization") authorization: String?): Observable<BasicResponse>
 
 
     @POST(Urls.VERIFY_CONTACTS)
@@ -65,4 +65,6 @@ interface ApiCallInterface {
         @Part list: ArrayList<MultipartBody.Part>
     ): Observable<MediaResponse>
 
+    @POST(Urls.UPDATE_FCM_TOKEN)
+    fun updateFcm(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>
 }

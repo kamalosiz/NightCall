@@ -69,7 +69,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
             if (task.isSuccessful) {
                 if (task.result != null) {
                     fcmToken = task.result!!.token
-                    sharedPrefsHelper.setFCMToken(fcmToken)
+                    sharedPrefsHelper.saveFCMToken(fcmToken)
                     logE("FCM Token:${fcmToken}")
                 }
             } else {
@@ -193,7 +193,6 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 params["login"] = binding.etUsername.text.toString()
                 params["password"] = binding.etPass.text.toString()
                 params["fcm_token"] = fcmToken
-                logE("FCM Token:${fcmToken}")
                 viewModel.hitLogin(params)
             }
             R.id.llForgotPass -> {

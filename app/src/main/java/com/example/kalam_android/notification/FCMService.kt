@@ -12,27 +12,35 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.kalam_android.R
+import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
+import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.activities.SplashActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import javax.inject.Inject
 
 
 class FCMService : FirebaseMessagingService() {
     val TAG = "FirebaseMessaging"
+    @Inject
+    lateinit var sharedPrefsHelper: SharedPrefsHelper
+
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
-//        logE("remoteMSG data: ${remoteMSG.data}")
-//        logE("remoteMSG notification: ${remoteMSG.notification}")
         if (Integer.valueOf(remoteMSG.data[AppConstants.FIREBASE_CHAT_ID].toString()) != Global.currentChatID) {
             showNotification(remoteMSG)
         }
     }
 
-    private fun logE(message: String) {
-        Debugger.e(TAG, message)
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        logE("onNewToken $token")
+        (this.application as MyApplication).component.doInjection(this)
+        sharedPrefsHelper.saveFCMToken(token)
+        sharedPrefsHelper.saveIsNewFcmToken(true)
     }
 
     private fun showNotification(remoteMessage: RemoteMessage) {
@@ -130,6 +138,10 @@ class FCMService : FirebaseMessagingService() {
         adminChannel.lightColor = Color.RED
         adminChannel.enableVibration(true)
         notification.createNotificationChannel(adminChannel)
+    }
+
+    private fun logE(message: String) {
+        Debugger.e(TAG, message)
     }
 }
 

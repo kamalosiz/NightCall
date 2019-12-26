@@ -8,9 +8,9 @@
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/_150sdp"
         android:background="@color/theme_color"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -39,7 +39,6 @@
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_5sdp"
             android:fontFamily="@font/roboto_medium"
             android:text="Dummy Name"
@@ -49,7 +48,6 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_10sdp">
 
@@ -73,14 +71,13 @@
         </RelativeLayout>
     </LinearLayout>
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <ImageView
         android:id="@+id/ivUser"
-        android:layout_width="@dimen/_200sdp"
-        android:layout_height="@dimen/_200sdp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/header"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/_20sdp"
-        android:background="@drawable/dummy_placeholder" />
+        android:background="@color/grey"
+        android:scaleType="fitXY" />
 
     <RelativeLayout
         android:id="@+id/rlBottomCalls"
@@ -94,7 +91,7 @@
             android:id="@+id/ibAnswer"
             android:layout_width="@dimen/_45sdp"
             android:layout_height="@dimen/_45sdp"
-            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginStart="@dimen/_10sdp"
             android:background="@drawable/call_receive" />
 
         <ImageButton
@@ -102,7 +99,7 @@
             android:layout_width="@dimen/_45sdp"
             android:layout_height="@dimen/_45sdp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
             android:background="@drawable/call_cancel" />
 
     </RelativeLayout>

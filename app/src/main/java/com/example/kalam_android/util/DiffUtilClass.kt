@@ -2,6 +2,7 @@ import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
 import com.example.kalam_android.localdb.entities.ChatListData
 
+/*
 class DiffUtilClass(
     private val mOldEmployeeList: List<ChatListData>,
     private val mNewEmployeeList: List<ChatListData>
@@ -30,4 +31,4 @@ class DiffUtilClass(
         // Implement method if you're going to use ItemAnimator
         return super.getChangePayload(oldItemPosition, newItemPosition)
     }
-}
+}*/

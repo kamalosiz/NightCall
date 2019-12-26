@@ -55,4 +55,8 @@ abstract class ViewModelsModule {
     @ViewModelKey(LogoutViewModel::class)
     abstract fun bindLogoutViewModel(viewModel: LogoutViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel::class)
+    abstract fun bindMainViewModel(viewModel: MainViewModel): ViewModel
 }

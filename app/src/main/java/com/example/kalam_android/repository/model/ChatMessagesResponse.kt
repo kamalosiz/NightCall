@@ -50,7 +50,7 @@ data class DataResponse(
     val identifier: String,
     val thumbnail: String?,
     val file_id: Long,
-    val groupId: String,
+    val groupId: Long,
     val isGroup: Int
 )
 

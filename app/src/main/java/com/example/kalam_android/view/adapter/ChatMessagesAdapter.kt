@@ -134,20 +134,24 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.tvMessage.typeface = Global.changeText(context, 1)
                 }
                 itemHolder.binding.itemChat.llOriginal.setOnClickListener {
-                    showAlertDialoge(
-                        context,
-                        "Original Message",
-                        item.original_message.toString()
-                    )
+                    if (itemHolder.binding.itemChat.tvOriginal.text == "View Original") {
+                        itemHolder.binding.itemChat.tvOriginal.text = "View Translated"
+                        itemHolder.binding.itemChat.tvMessage.text = item.original_message
+                    } else {
+                        itemHolder.binding.itemChat.tvOriginal.text = "View Original"
+                        itemHolder.binding.itemChat.tvMessage.text = item.message
+                    }
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
+                    itemHolder.binding.itemChat.llOriginal.visibility = View.GONE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.white)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
+                    itemHolder.binding.itemChat.llOriginal.gravity = View.VISIBLE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
@@ -186,27 +190,25 @@ class ChatMessagesAdapter(
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
+                    itemHolder.binding.audioPlayer.llOriginal.gravity = View.GONE
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
+                    itemHolder.binding.audioPlayer.llOriginal.gravity = View.VISIBLE
                 }
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.audioPlayer.ivDeliver, item.is_read
                 )
-                var isTrans = true
                 var audioUrl = ""
                 itemHolder.binding.audioPlayer.llOriginal.setOnClickListener {
-                    if (isTrans) {
-                        isTrans = false
-                        audioUrl = item.audio_url.toString()
+                    if (itemHolder.binding.audioPlayer.tvOriginal.text == "Play Original") {
                         itemHolder.binding.audioPlayer.tvOriginal.text = "Play Translated"
+                        audioUrl = item.audio_url.toString()
                         item.audio_url = item.original_audio_url
                     } else {
-                        isTrans = true
                         itemHolder.binding.audioPlayer.tvOriginal.text = "Play Original"
                         item.audio_url = audioUrl
                     }
-
                 }
             }
             AppConstants.IMAGE_MESSAGE -> {
@@ -284,6 +286,7 @@ class ChatMessagesAdapter(
             }
 
         }
+
     }
 
     inner class MyHolder(val binding: ItemChatRightBinding) : RecyclerView.ViewHolder(binding.root)

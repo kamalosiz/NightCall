@@ -11,7 +11,6 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import org.json.JSONException
 import org.json.JSONObject
-import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
 
 
@@ -74,6 +73,10 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         logE("onClosing " + reason!!)
     }
 
+    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        logE("onClosed $reason")
+    }
+
     override fun onFailure(webSocket: WebSocket?, t: Throwable, response: Response?) {
         println("Error : " + t.message)
         logE("onFailure " + t.message)
@@ -89,7 +92,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
                     sharedPrefsHelper.getUser()?.lastname.toString()
                 )
             )
-            json.put("userId", sharedPrefsHelper.getUser()?.id)
+            json.put("userId", sharedPrefsHelper.getUser()?.id.toString())
             json.put("phone", "")
             json.put("photoUrl", sharedPrefsHelper.getUser()?.profile_image.toString())
             webSocket?.send(json.toString())
@@ -100,43 +103,43 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
     }
 
 
-    fun onIceCandidateReceived(iceCandidate: IceCandidate, callerID: Long) {
+    fun onIceCandidateReceived(iceCandidate: JSONObject, callerID: String) {
         logE("onIceCandidateReceived normal :$iceCandidate")
         val obj = JSONObject()
         try {
             obj.put("type", AppConstants.CANDIDATE)
-            obj.put("label", iceCandidate.sdpMLineIndex)
-            obj.put("id", iceCandidate.sdpMid)
-            obj.put("candidate", iceCandidate.sdp)
+            obj.put("candidate", iceCandidate)
             obj.put("connectedUserId", callerID)
+            logE("ICE Candidates $obj")
             webSocket?.send(obj.toString())
         } catch (e: JSONException) {
+            logE("onIceCandidateReceived JSONException ${e.message}")
             e.printStackTrace()
         }
     }
 
-    fun createOffer(sessionDescription: SessionDescription, callerID: Long, isVideo: Boolean) {
+    fun createOffer(sessionDescription: SessionDescription, callerID: String, isVideo: Boolean) {
         try {
             logE("Emit Description [ $sessionDescription]")
             val obj = JSONObject()
             obj.put("type", sessionDescription.type.canonicalForm())
-            obj.put("sdp", sessionDescription.description)
-            obj.put("candidate", "")
+            obj.put("offer", JSONObject().put("sdp", sessionDescription.description))
             obj.put("connectedUserId", callerID)
             obj.put("isVideo", isVideo)
+            logE("createOffer $obj")
             webSocket?.send(obj.toString())
 
         } catch (e: JSONException) {
+            logE("createOffer JSONException ${e.message}")
             e.printStackTrace()
         }
     }
 
-    fun doAnswer(sessionDescription: SessionDescription, callerID: Long) {
+    fun doAnswer(sessionDescription: SessionDescription, callerID: String) {
         try {
             val obj = JSONObject()
             obj.put("type", sessionDescription.type.canonicalForm())
-            obj.put("sdp", sessionDescription.description)
-            obj.put("candidate", "")
+            obj.put("offer", JSONObject().put("sdp", sessionDescription.description))
             obj.put("connectedUserId", callerID)
             webSocket?.send(obj.toString())
         } catch (e: JSONException) {
@@ -145,7 +148,7 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
         }
     }
 
-    fun onHangout(id: Long) {
+    fun onHangout(id: String) {
         try {
             val obj = JSONObject()
             obj.put("type", "reject")

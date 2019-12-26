@@ -96,7 +96,7 @@ object SocketIO {
     fun emitNewMessage(
         id: String, chatID: String, message: String, type: String, senderName: String,
         fileID: String, duration: Long, thumbnail: String, identifier: String, language: String
-    ,groupId:String,isGroup:Int) {
+    ,groupId:Long,isGroup:Int) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
         jsonObject.addProperty("chat_id", chatID)

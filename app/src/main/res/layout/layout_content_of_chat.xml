@@ -16,66 +16,71 @@
             android:layout_alignParentTop="true"
             android:background="@color/grey" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ivEmoji"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:background="@drawable/ic_smile" />
+            android:layout_marginStart="@dimen/_5sdp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_smile" />
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/editTextMessage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginStart="@dimen/_5sdp"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_toStartOf="@+id/ivCamera"
             android:layout_toEndOf="@id/ivEmoji"
             android:background="@null"
-            android:scrollbars="vertical"
-            android:inputType="textMultiLine"
-            android:textSize="@dimen/_12ssp"
             android:hint="Type your message"
             android:imeOptions="actionSend"
+            android:inputType="textMultiLine"
+            android:scrollbars="vertical"
+            android:textSize="@dimen/_12ssp"
             android:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ivSend"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_5sdp"
-            android:background="@drawable/ic_send" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_send" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ivMic"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_toStartOf="@id/ivSend"
-            android:background="@drawable/ic_mic" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_mic" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ivAttach"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_toStartOf="@id/ivMic"
-            android:background="@drawable/ic_attachment" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_attachment" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ivCamera"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_5sdp"
             android:layout_toStartOf="@id/ivAttach"
-            android:background="@drawable/ic_camera" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_camera" />
 
 
     </RelativeLayout>

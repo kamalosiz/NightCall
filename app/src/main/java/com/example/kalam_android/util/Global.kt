@@ -2,6 +2,7 @@ package com.example.kalam_android.util
 
 import android.content.Context
 import android.graphics.Typeface
+import android.media.AudioManager
 import androidx.core.content.ContextCompat
 import java.lang.reflect.Type
 
@@ -23,5 +24,27 @@ object Global {
             typeface = Typeface.createFromAsset(context.assets, "fonts/roboto_regular.ttf")
         }
         return typeface
+    }
+
+    fun turnOFFSpeakers(audioManager: AudioManager) {
+        try {
+            if (audioManager.isSpeakerphoneOn) {
+                audioManager.isSpeakerphoneOn = false
+            }
+            audioManager.mode = AudioManager.STREAM_MUSIC
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun turnOnSpeakers(audioManager: AudioManager) {
+        try {
+            if (!audioManager.isSpeakerphoneOn) {
+                audioManager.isSpeakerphoneOn = true
+            }
+            audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 }

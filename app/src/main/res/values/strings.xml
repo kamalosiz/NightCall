@@ -76,4 +76,5 @@
     <string name="speech_prompt">Speak now</string>
     <string name="speech_not_supported">Your device does not support speech</string>
     <string name="labelDone">Done</string>
+    <string name="crash_report">Find a crash</string>
 </resources>

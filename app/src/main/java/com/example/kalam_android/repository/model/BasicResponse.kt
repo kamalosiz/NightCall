@@ -1,6 +1,6 @@
 package com.example.kalam_android.repository.model
 
-data class VerifyCodeResponse(
+data class BasicResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
