@@ -65,6 +65,7 @@ object AppConstants {
     const val LOGIN = "login"
     const val TYPE = "type"
     const val REJECT = "reject"
+    const val AVAILABLE = "available"
     const val JSON = "webrtc_json"
 
     //Listeners

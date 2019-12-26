@@ -80,7 +80,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         hitAllChatApi()
 
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
-        SocketIO.setSocketCallbackListener(this)
+//        SocketIO.setSocketCallbackListener(this)
+        SocketIO.getInstance().setSocketCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {
             isRefresh = true
             hitAllChatApi()
@@ -267,7 +268,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
                     }*/
                     logE("onActivityResult of chats Fragment is called")
-                    SocketIO.setSocketCallbackListener(this)
+                    SocketIO.getInstance().setSocketCallbackListener(this)
                     hitAllChatApi()
                 }
 
@@ -326,17 +327,14 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
             isRefresh = true
             hitAllChatApi()
-            SocketIO.setSocketCallbackListener(this)
+            SocketIO.getInstance().setSocketCallbackListener(this)
             logE("OnResume of Chat Fragment")
         }
-        myVoiceToTextHelper = MyVoiceToTextHelper(activity!!, this)
-        myVoiceToTextHelper?.checkPermissionForVoiceToText()
     }
 
     override fun onPause() {
         super.onPause()
         myVoiceToTextHelper?.destroy()
-        Log.i("Voice To Text", "destroy")
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {

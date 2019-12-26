@@ -134,7 +134,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 builder1.setMessage("Do you really want to update changes?")
                 builder1.setCancelable(true)
                 builder1.setPositiveButton("Yes") { dialog, id ->
-                    SocketIO.updateSettings(
+                    SocketIO.getInstance().updateSettings(
                         AppConstants.UPDATE_SETTINGS, autoTranslate.toString()
                         , item, sharedPrefsHelper.getUser()?.id.toString()
                     )

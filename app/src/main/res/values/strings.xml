@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Kalam</string>
+    <string name="app_name">KalamTime</string>
     <string name="hello_dagger">Hello Dagger</string>
-    <string name="welcome_to_kalam">Welcome to Kalam</string>
+    <string name="welcome_to_kalam">Welcome to KalamTime</string>
     <string name="select_country_code">Please select your country code and \n enter your phone number</string>
     <string name="enter_phone">Enter your phone number</string>
     <string name="next">Next</string>
@@ -16,12 +16,12 @@
     <string name="email_address">Email address</string>
     <string name="enter_password">Enter Password</string>
     <string name="confirm_password">Confirm Password</string>
-    <string name="welcome">Welcome Ali \n Have a start your Kalam</string>
+    <string name="welcome">Welcome Ali \n Have a start your KalamTime</string>
     <string name="phone_username">Phone number</string>
     <string name="password">Password</string>
     <string name="forget_pass">Forgot Password?</string>
-    <string name="tap_login">Tap \"Login\" to accept the Kalam Terms of \n Services and Privacy Policy.</string>
-    <string name="kalam_terms">Kalam Terms of \n Services and Privacy Policy.</string>
+    <string name="tap_login">Tap \"Login\" to accept the KalamTime Terms of \n Services and Privacy Policy.</string>
+    <string name="kalam_terms">KalamTime Terms of \n Services and Privacy Policy.</string>
     <string name="login">Login</string>
     <string name="signup">Don\'t have an account SignUp</string>
     <string name="signup_sub">SignUp</string>
@@ -35,7 +35,7 @@
     <string name="hintEmailAddress">Email Address</string>
     <string name="labelSubmit">Submit</string>
     <string name="no_chat">There is currently no chat, Start chatting by clicking compose button </string>
-    <string name="invite_text">Check out Kalam, I use it to message and call the people I care about. Get it for free</string>
+    <string name="invite_text">Check out KalamTime, I use it to message and call the people I care about. Get it for free</string>
     <string name="slide_to_cancel">Slide to cancel</string>
     <string name="labelChangeLng">Select Language</string>
     <string name="settings">Settings</string>

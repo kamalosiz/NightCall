@@ -1,6 +1,7 @@
 package com.example.kalam_android.wrapper
 
-import com.example.kalam_android.callbacks.*
+import com.example.kalam_android.callbacks.MessageTypingListener
+import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
@@ -10,15 +11,27 @@ import com.github.nkzawa.socketio.client.Socket
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
-
-object SocketIO {
+class SocketIO {
     private val TAG = this.javaClass.simpleName
     var socket: Socket? = null
     private var socketCallback: SocketCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null
 
+    companion object {
+        private var instance: SocketIO? = null
+        @Synchronized
+        fun getInstance(): SocketIO {
+            if (instance == null) {
+                instance = SocketIO()
+                Debugger.e("disconnectSocket", "Socket instance created")
+            }
+            return instance as SocketIO
+        }
+    }
+
     fun connectSocket(token: String?) {
         val opts = IO.Options()
+        opts.forceNew = true
         opts.query = "token=$token"
         Debugger.e("testingSocket", "token : ${opts.query}")
         Debugger.e("testingSocket", "token : $token")
@@ -61,13 +74,15 @@ object SocketIO {
     }
 
     fun disconnectSocket() {
+        socket?.disconnect()
         socket?.off(AppConstants.NEW_MESSAGE)
         socket?.off(AppConstants.MESSAGE_TYPING)
         socket?.off(AppConstants.MESSAGE_STOPS_TYPING)
         socket?.off(AppConstants.ALL_MESSAGES_READ)
         socket?.off(AppConstants.MESSAGE_DELIVERED)
         socket?.off(AppConstants.SEEN_MESSAGE)
-        socket?.disconnect()
+        socket?.close()
+        instance = null
     }
 
     fun typingEvent(action: String, userId: String, chatId: String) {

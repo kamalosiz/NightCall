@@ -2,6 +2,7 @@ package com.example.kalam_android.webrtc
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -37,7 +38,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private lateinit var sdpConstraints: MediaConstraints
     private var audioSource: AudioSource? = null
     private var localAudioTrack: AudioTrack? = null
-    internal var localPeer: PeerConnection? = null
+    private var localPeer: PeerConnection? = null
     private lateinit var rootEglBase: EglBase
     private var peerIceServers: MutableList<PeerConnection.IceServer> = ArrayList()
     private val TAG = this.javaClass.simpleName
@@ -65,7 +66,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             Manifest.permission.RECORD_AUDIO
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                if (report!!.areAllPermissionsGranted()) {
+                if (report?.areAllPermissionsGranted() == true) {
                     startWebrtc()
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
@@ -127,10 +128,11 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
-            createPeerConnection()
-            doCall()
             ibAnswer.visibility = View.GONE
             tvCallStatus.text = "Outgoing"
+            webSocketListener?.onAvailable(callerID.toString())
+            /* createPeerConnection()
+             doCall()*/
         } else {
             val json = intent.getStringExtra(AppConstants.JSON)
             mediaPlayer?.start()
@@ -195,11 +197,21 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                             PeerConnection.IceConnectionState.FAILED -> {
                                 logE("Peer Connection FAILED")
                             }
+                            PeerConnection.IceConnectionState.CLOSED -> {
+                                logE("Peer Connection CLOSED")
+                            }
+                            PeerConnection.IceConnectionState.COMPLETED -> {
+                                logE("Peer Connection COMPLETED")
+                            }
+                            PeerConnection.IceConnectionState.NEW -> {
+                                logE("Peer Connection NEW")
+                            }
                             PeerConnection.IceConnectionState.CHECKING -> {
                                 logE("Peer Connection CHECKING")
                                 tvCallStatus.text = "Connecting"
                             }
-                            else -> {}
+                            else -> {
+                            }
                         }
                     }
                 }
@@ -347,25 +359,49 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         }
     }
 
-    private fun logE(msg: String) {
-        Debugger.e(TAG, msg)
-    }
-
     override fun webSocketCallback(jsonObject: JSONObject) {
         runOnUiThread {
             when (jsonObject.getString(AppConstants.TYPE)) {
                 AppConstants.CANDIDATE -> {
-                    logE("webSocketCallback candidate")
+                    logE("did candidates received")
                     saveIceCandidates(jsonObject)
                 }
                 AppConstants.ANSWER -> {
-                    logE("webSocketCallback answer")
+                    logE("did answer received")
                     onAnswerReceived(jsonObject)
                 }
                 AppConstants.REJECT -> {
                     hangup()
                 }
+                AppConstants.AVAILABLE -> {
+                    logE("did available received $jsonObject")
+                    if (jsonObject.getBoolean("isAvailable")) {
+                        createPeerConnection()
+                        doCall()
+                    } else {
+                        tvCallStatus.text = jsonObject.getString("reason")
+                    }
+                }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        val builder1 = AlertDialog.Builder(this)
+        builder1.setTitle("End Call")
+        builder1.setMessage("Do you really want to end this call?")
+        builder1.setCancelable(true)
+        builder1.setPositiveButton("Yes") { dialog, id ->
+            hangup()
+            webSocketListener?.onHangout(callerID.toString())
+        }
+        builder1.setNegativeButton("No") { dialog, id ->
+            dialog.cancel()
+        }
+        builder1.create().show()
+    }
+
+    private fun logE(msg: String) {
+        Debugger.e(TAG, msg)
     }
 }

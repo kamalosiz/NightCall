@@ -40,7 +40,6 @@
                 android:layout_width="@dimen/_30sdp"
                 android:layout_height="@dimen/_30sdp"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:background="@drawable/dummy_placeholder"
                 android:transitionName="@string/profile_trans" />
 
             <androidx.appcompat.widget.LinearLayoutCompat

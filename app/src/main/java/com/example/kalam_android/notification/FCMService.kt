@@ -25,11 +25,18 @@ import javax.inject.Inject
 
 
 class FCMService : FirebaseMessagingService() {
-    val TAG = "FirebaseMessaging"
+    val TAG = this.javaClass.simpleName
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
 
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
+
+        /*val intent = Intent(this@FCMService, ChatDetailActivity::class.java)
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.action = Intent.ACTION_MAIN
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)*/
+        logE("onMessageReceived $remoteMSG")
         if (Integer.valueOf(remoteMSG.data[AppConstants.FIREBASE_CHAT_ID].toString()) != Global.currentChatID) {
             showNotification(remoteMSG)
         }
