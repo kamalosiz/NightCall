@@ -20,13 +20,13 @@ class SignUpViewModel @Inject constructor(val repository: Repository) : ViewMode
 
     fun hitSignUpApi(parameters: Map<String, String>) {
         disposables.add(repository.executeSignup(parameters)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
-            .subscribe(
-                { responseLiveData.setValue(ApiResponse.success(it)) },
-                { responseLiveData.setValue(ApiResponse.error(it)) }
-            ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
+                .subscribe(
+                        { responseLiveData.setValue(ApiResponse.success(it)) },
+                        { responseLiveData.setValue(ApiResponse.error(it)) }
+                ))
     }
 
     override fun onCleared() {

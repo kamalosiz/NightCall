@@ -12,7 +12,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:fontFamily="@font/helvetica_medium"
-            android:text="Kalam"
+            android:text="KalamTime"
             android:textColor="@color/white"
             android:textSize="@dimen/_18sdp" />
 

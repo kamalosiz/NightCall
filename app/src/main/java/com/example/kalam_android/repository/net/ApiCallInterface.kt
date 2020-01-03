@@ -33,7 +33,7 @@ interface ApiCallInterface {
 
 
     @POST(Urls.VERIFY_CONTACTS)
-    fun getContacts(@Body parameters: Map<String, String>): Observable<Contacts>
+    fun getContacts(@Header("Authorization") authorization: String?,@Body parameters: Map<String, String>): Observable<Contacts>
 
     @POST(Urls.ALL_CHATS_LIST)
     fun getAllChats(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
@@ -67,4 +67,7 @@ interface ApiCallInterface {
 
     @POST(Urls.UPDATE_FCM_TOKEN)
     fun updateFcm(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>
+
+    @POST(Urls.GET_PROFILE)
+    fun getProfileData(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<UserProfile>
 }

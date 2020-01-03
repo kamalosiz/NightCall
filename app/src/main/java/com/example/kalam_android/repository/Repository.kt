@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.Part
 import retrofit2.http.PartMap
 
@@ -35,8 +36,8 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.logout(authorization)
     }
 
-    fun getContacts(parameters: Map<String, String>): Observable<Contacts> {
-        return apiCallInterface.getContacts(parameters)
+    fun getContacts(authorization: String?,parameters: Map<String, String>): Observable<Contacts> {
+        return apiCallInterface.getContacts(authorization,parameters)
     }
 
     fun getAllChat(
@@ -88,5 +89,11 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         parameters: Map<String, String>
     ): Observable<BasicResponse> {
         return apiCallInterface.updateFcm(authorization, parameters)
+    }
+    fun getProfileData(
+            authorization: String?,
+            parameters: Map<String, String>
+    ): Observable<UserProfile> {
+        return apiCallInterface.getProfileData(authorization, parameters)
     }
 }

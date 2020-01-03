@@ -48,6 +48,8 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         MyApplication.getAppComponent(this).doInjection(this)
+        connectWebSocket()
+        SocketIO.getInstance().connectSocket(sharedPrefsHelper.getUser()?.token)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
         val homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         binding.viewPager.adapter = homePagerAdapter
@@ -57,8 +59,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         binding.llStories.setOnClickListener { binding.viewPager.setCurrentItem(2, true) }
         binding.llProfile.setOnClickListener { binding.viewPager.setCurrentItem(3, true) }
         binding.ivSettings.setOnClickListener { binding.viewPager.setCurrentItem(4, true) }
-        SocketIO.connectSocket(sharedPrefsHelper.getUser()?.token)
-        connectWebSocket()
         binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
             startActivity(Intent(this, ContactListActivity::class.java))
@@ -186,7 +186,7 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
 
     override fun onDestroy() {
         super.onDestroy()
-        SocketIO.disconnectSocket()
+        SocketIO.getInstance().disconnectSocket()
     }
 
     override fun offerCallback(jsonObject: JSONObject) {

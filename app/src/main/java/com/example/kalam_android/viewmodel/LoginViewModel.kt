@@ -22,13 +22,13 @@ class LoginViewModel @Inject constructor(private val repository: Repository) : V
 
     fun hitLogin(parameters: Map<String, String>) {
         disposables.add(repository.login(parameters)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
-            .subscribe(
-                { responseLiveData.setValue(ApiResponse.success(it)) },
-                { responseLiveData.setValue(ApiResponse.error(it)) }
-            ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
+                .subscribe(
+                        { responseLiveData.setValue(ApiResponse.success(it)) },
+                        { responseLiveData.setValue(ApiResponse.error(it)) }
+                ))
     }
 
     override fun onCleared() {

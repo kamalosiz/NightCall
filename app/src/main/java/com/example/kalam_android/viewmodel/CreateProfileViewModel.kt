@@ -26,27 +26,27 @@ class CreateProfileViewModel @Inject constructor(private val repository: Reposit
 
     fun hitCreateProfileApi(@Body parameters: Map<String, String>) {
         disposable.add(repository.createProfile(parameters)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }
-            .subscribe({
-                responsiveLiveData.value = ApiResponse.success(it)
-            }, {
-                responsiveLiveData.value = ApiResponse.error(it)
-            })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }
+                .subscribe({
+                    responsiveLiveData.value = ApiResponse.success(it)
+                }, {
+                    responsiveLiveData.value = ApiResponse.error(it)
+                })
         )
     }
 
     fun hitCreateProfileApi(@PartMap params: Map<String, @JvmSuppressWildcards RequestBody>, @Part profilePic: MultipartBody.Part) {
         disposable.add(repository.createProfile(params, profilePic)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }
-            .subscribe({
-                responsiveLiveData.value = ApiResponse.success(it)
-            }, {
-                responsiveLiveData.value = ApiResponse.error(it)
-            })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }
+                .subscribe({
+                    responsiveLiveData.value = ApiResponse.success(it)
+                }, {
+                    responsiveLiveData.value = ApiResponse.error(it)
+                })
         )
     }
 

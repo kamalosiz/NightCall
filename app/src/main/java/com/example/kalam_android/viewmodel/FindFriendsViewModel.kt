@@ -21,13 +21,13 @@ class FindFriendsViewModel @Inject constructor(private val repository: Repositor
 
     fun hitSearchFriends(auth:String,parameters: Map<String, String>) {
         disposables.add(repository.findFriends(auth,parameters)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
-            .subscribe(
-                { responseLiveData.setValue(ApiResponse.success(it)) },
-                { responseLiveData.setValue(ApiResponse.error(it)) }
-            ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }
+                .subscribe(
+                        { responseLiveData.setValue(ApiResponse.success(it)) },
+                        { responseLiveData.setValue(ApiResponse.error(it)) }
+                ))
     }
 
     override fun onCleared() {

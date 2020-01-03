@@ -102,8 +102,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         handleIntent(intent)
         initListeners()
         checkSomeoneTyping()
-        SocketIO.setSocketCallbackListener(this)
-        SocketIO.setTypingListeners(this)
+        SocketIO.getInstance().setSocketCallbackListener(this)
+        SocketIO.getInstance().setTypingListeners(this)
         myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         applyPagination()
@@ -127,7 +127,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (isChatIdAvailable) {
             Global.currentChatID = chatId
             hitConversationApi(0)
-            SocketIO.emitReadAllMessages(
+            SocketIO.getInstance().emitReadAllMessages(
                 chatId.toString(),
                 sharedPrefsHelper.getUser()?.id.toString()
             )
@@ -137,7 +137,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             val jsonObject = JsonObject()
             jsonObject.addProperty("user_id", sharedPrefsHelper.getUser()?.id.toString())
             jsonObject.addProperty("receiver_id", receiverId)
-            SocketIO.socket?.emit(AppConstants.START_CAHT, jsonObject, Ack {
+            SocketIO.getInstance().socket?.emit(AppConstants.START_CAHT, jsonObject, Ack {
                 val chatId = it[0] as Int
                 this.chatId = chatId
                 Global.currentChatID = chatId
@@ -147,12 +147,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             })
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
-        myVoiceToTextHelper?.checkPermissionForVoiceToText()
     }
 
     private fun initListeners() {
@@ -396,7 +390,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private val inputFinishChecker = Runnable {
         if (System.currentTimeMillis() > lastTextEdit + delay - 500) {
             logE("User Stops Typing")
-            SocketIO.typingEvent(
+            SocketIO.getInstance().typingEvent(
                 AppConstants.STOP_TYPING,
                 sharedPrefsHelper.getUser()?.id.toString(),
                 chatId.toString()
@@ -420,7 +414,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.isNotEmpty() == true) {
                     logE("User is typing")
-                    SocketIO.typingEvent(
+                    SocketIO.getInstance().typingEvent(
                         AppConstants.START_TYPING,
                         sharedPrefsHelper.getUser()?.id.toString(),
                         chatId.toString()
@@ -441,7 +435,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         message: String, type: String, fileID: String,
         duration: Long, thumbnail: String?, identifier: String, groupId: Long, isGroup: Int
     ) {
-        SocketIO.emitNewMessage(
+        SocketIO.getInstance().emitNewMessage(
             sharedPrefsHelper.getUser()?.id.toString(),
             chatId.toString(), message, type,
             sharedPrefsHelper.getUser()?.firstname.toString()
@@ -523,6 +517,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             R.id.llProfile -> {
                 val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
                 intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+                intent.putExtra(AppConstants.CALLER_USER_ID, callerID.toString())
                 intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
                 val transitionName = getString(R.string.profile_trans)
                 val options =
@@ -567,18 +562,17 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
     }
 
-
     private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
         myChatMediaHelper?.hideAttachments()
         if (list?.size!! > 3) {
 
             val groupId = System.currentTimeMillis()
-            uploadMediaList(list,groupId,1)
+            uploadMediaList(list, groupId, 1)
 
         } else {
 
             val groupId = System.currentTimeMillis()
-            uploadMediaList(list,groupId,0)
+            uploadMediaList(list, groupId, 0)
         }
         logE("List size : $list")
     }
@@ -683,7 +677,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
                     if (data.chat_id == chatId) {
                         addMessage(data)
-                        SocketIO.emitMessageSeen(
+                        SocketIO.getInstance().emitMessageSeen(
                             data.chat_id.toString(),
                             data.id.toString(),
                             sharedPrefsHelper.getUser()?.id.toString()
@@ -758,10 +752,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                myVoiceToTextHelper!!.startVoiceToText()
+                myVoiceToTextHelper?.startVoiceToText()
             }
             MotionEvent.ACTION_UP -> {
-                myVoiceToTextHelper!!.stopVoiceToText()
+                myVoiceToTextHelper?.stopVoiceToText()
             }
         }
         return v?.onTouchEvent(event) ?: true
@@ -769,12 +763,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onResultVoiceToText(list: ArrayList<String>) {
         if (list[0] == "type") {
-            showKeyBoard()
+            Global.showKeyBoard(this, binding.lvBottomChat.editTextMessage)
         } else {
             if (list[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
             ) {
                 sendMessage()
-
             } else {
                 binding.lvBottomChat.editTextMessage.setText(list[0])
                 binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
@@ -782,19 +775,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-
-    private fun showKeyBoard() {
-        val imm =
-            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-        setFocusCursor()
-    }
-
-    private fun setFocusCursor() {
-        binding.lvBottomChat.editTextMessage.isFocusable = true
-        binding.lvBottomChat.editTextMessage.isFocusableInTouchMode = true
-        binding.lvBottomChat.editTextMessage.requestFocus()
-    }
 
     private fun uploadMediaList(list: ArrayList<MediaList>, groupId: Long, isGroup: Int) {
         list.let {

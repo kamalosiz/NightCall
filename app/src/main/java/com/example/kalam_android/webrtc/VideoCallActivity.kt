@@ -2,6 +2,7 @@ package com.example.kalam_android.webrtc
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -159,11 +160,12 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
-            createPeerConnection()
-            doCall()
             ibAnswer.visibility = View.GONE
-            turnOnSpeakers()
             tvCallStatus.text = "Outgoing"
+            webSocketListener?.onAvailable(callerID.toString())
+            /* createPeerConnection()
+             doCall()
+             turnOnSpeakers()*/
         } else {
             val json = intent.getStringExtra(AppConstants.JSON)
             mediaPlayer?.start()
@@ -470,6 +472,21 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         return null
     }
 
+    override fun onBackPressed() {
+        val builder1 = AlertDialog.Builder(this)
+        builder1.setTitle("End Call")
+        builder1.setMessage("Do you really want to end this call?")
+        builder1.setCancelable(true)
+        builder1.setPositiveButton("Yes") { dialog, id ->
+            hangup()
+            webSocketListener?.onHangout(callerID.toString())
+        }
+        builder1.setNegativeButton("No") { dialog, id ->
+            dialog.cancel()
+        }
+        builder1.create().show()
+    }
+
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)
     }
@@ -485,6 +502,16 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 }
                 AppConstants.REJECT -> {
                     hangup()
+                }
+                AppConstants.AVAILABLE -> {
+                    logE("webSocketCallback AVAILABLE $jsonObject")
+                    if (jsonObject.getBoolean("isAvailable")) {
+                        createPeerConnection()
+                        doCall()
+                        turnOnSpeakers()
+                    } else {
+                        tvCallStatus.text = jsonObject.getString("reason")
+                    }
                 }
             }
         }

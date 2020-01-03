@@ -258,7 +258,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                     binding.rvForContacts.visibility = View.GONE
                     val params = HashMap<String, String>()
                     params["contacts"] = createContactsJson(getAllContact()).toString()
-                    viewModel.getContacts(params)
+                    viewModel.getContacts(sharedPrefsHelper.getUser()?.token,params)
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }

@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 abstract class PaginationScrollListener(
-    private var layoutManager: LinearLayoutManager
+        private var layoutManager: LinearLayoutManager
 ) : RecyclerView.OnScrollListener() {
 
     abstract val isLastPage: Boolean

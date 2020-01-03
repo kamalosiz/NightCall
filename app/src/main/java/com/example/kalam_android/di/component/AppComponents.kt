@@ -34,4 +34,5 @@ interface AppComponents {
     fun doInjection(fcm: FCMService)
     fun doInjection(activityVideo: VideoCallActivity)
     fun doInjection(activityAudio: AudioCallActivity)
+    fun doInjection(activityProfile: UserProfileActivity)
 }

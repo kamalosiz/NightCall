@@ -26,7 +26,7 @@ class WelcomeActivity : BaseActivity() {
         )
         binding.tvWelcomeUser.text =
             StringBuilder("Welcome ").append(intent.getStringExtra(AppConstants.USER_NAME))
-                .append("\n").append("Have a start your Kalam")
+                .append("\n").append("Have a start your KalamTime")
         binding.btnFinish.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
             finish()

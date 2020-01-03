@@ -14,6 +14,7 @@ data class UserData(
     var email: String,
     var country: String,
     var country_code: String,
+    var phone: String,
     var profile_image: String,
     val token: String,
     val id: Int,

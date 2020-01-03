@@ -10,6 +10,7 @@ object AppConstants {
     const val INITIATOR = "caller_initiator"
     const val IS_FROM_OUTSIDE = "is_outside_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
+    const val CHAT_USER_ID = "chat_user_id"
     const val CHAT_USER_PICTURE = "chat_user_picture"
     const val CHAT_ID = "kalam_chat_id"
     const val DUMMY_DATA = -1
@@ -32,7 +33,7 @@ object AppConstants {
     const val KEY_IS_LOGIN = "is_logged_in_kalam"
     const val PHONE = "key_phoneno"
     const val CONNECTED_USER_ID = "connectedUserId"
-
+    const val IMAGE_DIRECTORY = "/demonuts"
     const val FIREBASE_CHAT_ID = "chat_id"
     const val SENDER_NAME = "sender_name"
 
@@ -46,6 +47,8 @@ object AppConstants {
     const val SELECTED_IMAGES = 12
     const val SELECT_IMAGES_VIDEOS = 14
     const val SELECT_AUDIO = 15
+    const val CAMERA = 150
+    const val GALLERY = 160
 
 
 
@@ -71,6 +74,7 @@ object AppConstants {
     const val LOGIN = "login"
     const val TYPE = "type"
     const val REJECT = "reject"
+    const val AVAILABLE = "available"
     const val JSON = "webrtc_json"
 
     //Listeners

@@ -95,6 +95,8 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
             json.put("userId", sharedPrefsHelper.getUser()?.id.toString())
             json.put("phone", "")
             json.put("photoUrl", sharedPrefsHelper.getUser()?.profile_image.toString())
+            json.put("deviceType", "android")
+            json.put("token", sharedPrefsHelper.getFCMToken().toString())
             webSocket?.send(json.toString())
             logE("login successfully")
         } catch (e: JSONException) {
@@ -154,6 +156,19 @@ class CustomWebSocketListener(val sharedPrefsHelper: SharedPrefsHelper) : WebSoc
             obj.put("type", "reject")
             obj.put("connectedUserId", id)
             webSocket?.send(obj.toString())
+        } catch (e: JSONException) {
+            logE("onSetFailure" + e.message)
+            e.printStackTrace()
+        }
+    }
+
+    fun onAvailable(id: String) {
+        try {
+            val obj = JSONObject()
+            obj.put("type", "available")
+            obj.put("connectedUserId", id)
+            webSocket?.send(obj.toString())
+            logE("onAvailable sent $obj")
         } catch (e: JSONException) {
             logE("onSetFailure" + e.message)
             e.printStackTrace()
