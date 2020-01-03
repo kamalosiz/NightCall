@@ -1,6 +1,7 @@
 package com.example.kalam_android.repository.net
 
 import com.example.kalam_android.repository.model.*
+import com.example.kalam_android.services.WorkManagerMedia
 import io.reactivex.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -33,7 +34,7 @@ interface ApiCallInterface {
 
 
     @POST(Urls.VERIFY_CONTACTS)
-    fun getContacts(@Header("Authorization") authorization: String?,@Body parameters: Map<String, String>): Observable<Contacts>
+    fun getContacts(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<Contacts>
 
     @POST(Urls.ALL_CHATS_LIST)
     fun getAllChats(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<AllChatListResponse>
@@ -51,23 +52,24 @@ interface ApiCallInterface {
 
     @Multipart
     @POST(Urls.UPLOAD_AUDIO)
-    fun uploadAudio(
+    fun uploadMedia(
         @Header("Authorization") authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-        @Part audio: MultipartBody.Part
+        @Part media: MultipartBody.Part
     ): Observable<MediaResponse>
 
-    @Multipart
+    /*@Multipart
     @POST(Urls.UPLOAD_AUDIO)
-    fun uploadAudio(
+    fun uploadMedia(
         @Header("Authorization") authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
         @Part list: ArrayList<MultipartBody.Part>
-    ): Observable<MediaResponse>
+    ): Observable<MediaResponse>*/
 
     @POST(Urls.UPDATE_FCM_TOKEN)
     fun updateFcm(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>
 
     @POST(Urls.GET_PROFILE)
     fun getProfileData(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<UserProfile>
+
 }

@@ -112,7 +112,7 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             } else {
-                showAlertDialoge(this, "Error", res.message.toString())
+                showAlertDialog(this, "Error", res.message.toString())
             }
         }
     }

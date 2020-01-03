@@ -1,4 +1,4 @@
-package com.example.kalam_android.notification
+package com.example.kalam_android.services
 
 import android.app.ActivityManager
 import android.app.NotificationChannel
@@ -132,9 +132,7 @@ class FCMService : FirebaseMessagingService() {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun setupNotificationChannels(notification: NotificationManager, type: String) {
-        val adminChannelName = getString(R.string.notifications_admin_channel_name)
         val adminChannelDescription = getString(R.string.notifications_admin_channel_description)
-
         val adminChannel = NotificationChannel(
             type,
             type,

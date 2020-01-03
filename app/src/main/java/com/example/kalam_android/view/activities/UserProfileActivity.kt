@@ -1,18 +1,10 @@
 package com.example.kalam_android.view.activities
 
-import android.Manifest
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.graphics.Paint
-import android.icu.text.CompactDecimalFormat
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,7 +13,6 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityUserProfileBinding
-import com.example.kalam_android.repository.model.FindFriends
 import com.example.kalam_android.repository.model.ProfileData
 import com.example.kalam_android.repository.model.UserProfile
 import com.example.kalam_android.repository.net.ApiResponse
@@ -31,15 +22,9 @@ import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.adapter.AdapterForProfilePhotos
 import com.example.kalam_android.view.adapter.AdapterForProfileVideos
-import com.example.kalam_android.viewmodel.FindFriendsViewModel
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.*
 import kotlinx.android.synthetic.main.layout_profile_header.view.*
 import javax.inject.Inject

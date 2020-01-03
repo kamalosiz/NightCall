@@ -36,8 +36,8 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.logout(authorization)
     }
 
-    fun getContacts(authorization: String?,parameters: Map<String, String>): Observable<Contacts> {
-        return apiCallInterface.getContacts(authorization,parameters)
+    fun getContacts(authorization: String?, parameters: Map<String, String>): Observable<Contacts> {
+        return apiCallInterface.getContacts(authorization, parameters)
     }
 
     fun getAllChat(
@@ -68,21 +68,21 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.findFriends(authorization, parameters)
     }
 
-    fun uploadAudio(
+    fun uploadMedia(
         authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-        @Part audio: MultipartBody.Part
+        @Part media: MultipartBody.Part
     ): Observable<MediaResponse> {
-        return apiCallInterface.uploadAudio(authorization, params, audio)
+        return apiCallInterface.uploadMedia(authorization, params, media)
     }
 
-    fun uploadAudio(
+   /* fun uploadMedia(
         authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
         @Part list: ArrayList<MultipartBody.Part>
     ): Observable<MediaResponse> {
         return apiCallInterface.uploadAudio(authorization, params, list)
-    }
+    }*/
 
     fun updateFcm(
         authorization: String?,

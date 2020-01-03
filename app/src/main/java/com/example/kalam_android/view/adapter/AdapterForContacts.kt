@@ -152,10 +152,15 @@ class AdapterForContacts(val context: Context) :
                     val feedIndex: Int = Integer.parseInt(v.tag.toString())
                     val item = contactList?.get(feedIndex)
                     if (item?.id != 0) {
+                        val name: String = if (item?.name.isNullOrEmpty()) {
+                            item?.kalam_name.toString()
+                        } else {
+                            item?.name.toString()
+                        }
                         val intent = Intent(context, ChatDetailActivity::class.java)
-                        intent.putExtra(AppConstants.RECEIVER_ID, item?.id.toString())
+                        intent.putExtra(AppConstants.CALLER_USER_ID, item?.id?.toLong())
                         intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, false)
-                        intent.putExtra(AppConstants.CHAT_USER_NAME, item?.kalam_name.toString())
+                        intent.putExtra(AppConstants.CHAT_USER_NAME, name)
                         intent.putExtra(
                             AppConstants.CHAT_USER_PICTURE,
                             item?.profile_image.toString()

@@ -15,5 +15,7 @@ data class ChatListData(
     @ColumnInfo(name = "profile_image") var profile_image: String,
     @ColumnInfo(name = "message") var message: String?,
     @ColumnInfo(name = "un_read_count") var un_read_count: Int,
-    @ColumnInfo(name = "user_id") var user_id: Long
+    @ColumnInfo(name = "user_id") var user_id: Long,
+    @ColumnInfo(name = "nickname") var nickname: String?,
+    @ColumnInfo(name = "last_message_id") var last_message_id: Long
 )

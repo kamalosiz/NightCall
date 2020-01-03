@@ -70,7 +70,7 @@ class VerifyCodeActivity : BaseActivity(), View.OnClickListener {
                 startActivity(Intent(this, CreateProfileActivity::class.java))
                 finish()
             } else {
-                showAlertDialoge(this, "Error", it.message)
+                showAlertDialog(this, "Error", it.message)
             }
 
         }

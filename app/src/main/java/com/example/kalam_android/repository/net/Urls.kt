@@ -6,7 +6,7 @@ class Urls {
 //        const val WEB_SOCKET_URL = "https://voip.worldnoordev.com:9090"
 //        const val WEB_SOCKET_URL = "https://192.168.0.168:9090"
         const val WEB_SOCKET_URL = "ws://192.168.0.168:9090"
-                const val BASE_URL = "http://192.168.0.71:5000/"
+        const val BASE_URL = "http://192.168.0.71:5000/"
         //        const val BASE_URL = "http://184.169.185.200:5000/"
 //        const val BASE_URL = "http://54.183.109.117:5000/"
         const val VERIFY_PHONE = "api/user/verify_phone"

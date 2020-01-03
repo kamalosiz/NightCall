@@ -20,15 +20,15 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
 
     private val disposable = CompositeDisposable()
     private val responsiveLiveData = MutableLiveData<ApiResponse<ChatMessagesResponse>>()
-    private val audioLiveData = MutableLiveData<ApiResponse<MediaResponse>>()
+//    private val audioLiveData = MutableLiveData<ApiResponse<MediaResponse>>()
 
     fun allChatResponse(): MutableLiveData<ApiResponse<ChatMessagesResponse>> {
         return responsiveLiveData
     }
 
-    fun mediaResponse(): MutableLiveData<ApiResponse<MediaResponse>> {
-        return audioLiveData
-    }
+    /*  fun mediaResponse(): MutableLiveData<ApiResponse<MediaResponse>> {
+          return audioLiveData
+      }*/
 
     fun hitAllChatApi(authorization: String?, @Body parameters: Map<String, String>) {
         disposable.add(repository.getAllMessages(authorization, parameters)
@@ -43,7 +43,7 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
         )
     }
 
-    fun hitUploadAudioApi(
+/*    fun hitUploadAudioApi(
         authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>, @Part audio: MultipartBody.Part
     ) {
@@ -74,5 +74,10 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
                 audioLiveData.value = ApiResponse.error(it)
             })
         )
+    }*/
+
+    override fun onCleared() {
+        super.onCleared()
+        disposable.clear()
     }
 }

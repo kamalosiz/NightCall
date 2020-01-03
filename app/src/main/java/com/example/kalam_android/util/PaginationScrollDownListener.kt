@@ -3,12 +3,11 @@ package com.example.kalam_android.util
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-
-abstract class PaginationScrollListener(
+abstract class PaginationScrollDownListener(
         private var layoutManager: LinearLayoutManager
 ) : RecyclerView.OnScrollListener() {
 
-    abstract val isLastPage: Boolean
+    abstract val isFirstPage: Boolean
 
     abstract val isLoading: Boolean
 
@@ -18,8 +17,8 @@ abstract class PaginationScrollListener(
         val visibleItemCount = layoutManager.childCount
         val totalItemCount = layoutManager.itemCount
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-        if (!isLoading && !isLastPage) {
-            if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
+        if (!isLoading && !isFirstPage) {
+            if (firstVisibleItemPosition == 0 && totalItemCount >= visibleItemCount) {
                 loadMoreItems()
             }
         }

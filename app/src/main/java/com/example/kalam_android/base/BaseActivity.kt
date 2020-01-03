@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
+import com.example.kalam_android.util.Debugger
 
 
 open class BaseActivity : AppCompatActivity() {

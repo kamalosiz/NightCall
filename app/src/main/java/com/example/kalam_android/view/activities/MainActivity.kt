@@ -49,7 +49,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         MyApplication.getAppComponent(this).doInjection(this)
         connectWebSocket()
+//        SocketIO.socketConnection(sharedPrefsHelper.getUser()?.token).connectListeners()
         SocketIO.getInstance().connectSocket(sharedPrefsHelper.getUser()?.token)
+        SocketIO.getInstance().connectListeners()
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
         val homePagerAdapter = HomePagerAdapter(supportFragmentManager)
         binding.viewPager.adapter = homePagerAdapter

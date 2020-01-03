@@ -1,8 +1,6 @@
 package com.example.kalam_android.view.fragments
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,17 +29,9 @@ import com.example.kalam_android.view.adapter.AdapterForProfileVideos
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.content_profile.view.*
 import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.*
 import kotlinx.android.synthetic.main.layout_profile_header.view.*
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.content_profile.view.tvEmail as tvEmail1
-import kotlinx.android.synthetic.main.layout_profile_header.view.tvName as tvName1
 
 class ProfileFragment : Fragment(), View.OnClickListener {
 

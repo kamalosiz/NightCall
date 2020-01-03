@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -51,7 +50,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     var position = -1
     private var isRefresh = false
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
-
+    var fromSearch = 0
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -97,14 +96,16 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.length == 0) {
+                    fromSearch = 0
                     binding.pbCenter.visibility = View.VISIBLE
                     hitAllChatApi()
                 } else {
+                    fromSearch = 1
                     hitSearchMessage(s.toString())
                 }
             }
         })
-        myVoiceToTextHelper = MyVoiceToTextHelper(activity!!, this)
+        myVoiceToTextHelper = MyVoiceToTextHelper(activity as Activity, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         return binding.root
     }
@@ -267,9 +268,10 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
                     }*/
+                    binding.etSearch.setText("")
                     logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
-                    hitAllChatApi()
+//                    hitAllChatApi()
                 }
 
             }
@@ -294,31 +296,33 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     override fun myOnClick(view: View, position: Int) {
         when (view.id) {
             R.id.rlItem -> {
-                val item = chatList[position]
-                if (item.chat_id != 0) {
-                    this.position = position
-                    val intent = Intent(activity, ChatDetailActivity::class.java)
-                    intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
-                    intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
-                    intent.putExtra(AppConstants.CALLER_USER_ID, item.user_id)
-                    intent.putExtra(
-                        AppConstants.CHAT_USER_NAME,
-                        StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
-                    )
-                    intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
-                    startActivityForResult(
-                        intent,
-                        AppConstants.CHAT_FRAGMENT_CODE
-                    )
-                } else {
-                    showAlertDialoge(
-                        activity as Context,
-                        StringBuilder(item.firstname).append(" ").append(item.lastname).toString(),
-                        item.message.toString()
-                    )
-                }
+                startActivity(position)
             }
         }
+    }
+
+    fun startActivity(position: Int) {
+        val item = chatList[position]
+        this.position = position
+        val name = if (item.nickname.isNullOrEmpty()) {
+            StringBuilder(item.firstname).append(" ").append(item.lastname).toString()
+        } else {
+            item.nickname.toString()
+        }
+        val intent = Intent(activity, ChatDetailActivity::class.java)
+        intent.putExtra(AppConstants.CHAT_ID, item.chat_id)
+        intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
+        intent.putExtra(AppConstants.CALLER_USER_ID, item.user_id)
+        intent.putExtra(AppConstants.CHAT_USER_NAME, name)
+        intent.putExtra(AppConstants.CHAT_USER_PICTURE, item.profile_image)
+        if (fromSearch == 1) {
+            intent.putExtra(AppConstants.MSG_ID, item.last_message_id)
+            intent.putExtra(AppConstants.FROM_SEARCH, fromSearch)
+        }
+        startActivityForResult(
+            intent,
+            AppConstants.CHAT_FRAGMENT_CODE
+        )
     }
 
     override fun onResume() {
@@ -374,25 +378,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                             activity,
                             "chat with ${chatList[i].firstname + " " + chatList[i].lastname}"
                         )
-                        val intent = Intent(activity, ChatDetailActivity::class.java)
-                        intent.putExtra(AppConstants.CHAT_ID, chatList[i].chat_id)
-                        intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
-                        intent.putExtra(
-                            AppConstants.CHAT_USER_NAME,
-                            StringBuilder(chatList[i].firstname).append(" ").append(
-                                chatList[i].lastname
-                            ).toString()
-                        )
-                        intent.putExtra(
-                            AppConstants.CHAT_USER_PICTURE,
-                            chatList[i].profile_image
-                        )
-                        startActivityForResult(
-                            intent,
-                            AppConstants.CHAT_FRAGMENT_CODE
-                        )
+                        startActivity(i)
                         return
-
                     }
                 }
             }
