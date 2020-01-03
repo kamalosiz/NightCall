@@ -13,17 +13,17 @@ import org.json.JSONObject
 
 class SocketIO {
     private val TAG = this.javaClass.simpleName
-    var socket: Socket? = null
     private var socketCallback: SocketCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null
+    var socket: Socket? = null
 
     companion object {
         private var instance: SocketIO? = null
+
         @Synchronized
         fun getInstance(): SocketIO {
             if (instance == null) {
                 instance = SocketIO()
-                Debugger.e("disconnectSocket", "Socket instance created")
             }
             return instance as SocketIO
         }
@@ -33,10 +33,11 @@ class SocketIO {
         val opts = IO.Options()
         opts.forceNew = true
         opts.query = "token=$token"
-        Debugger.e("testingSocket", "token : ${opts.query}")
-        Debugger.e("testingSocket", "token : $token")
         socket = IO.socket(Urls.BASE_URL, opts)
         socket?.connect()
+    }
+
+    fun connectListeners() {
         socket?.on(Socket.EVENT_CONNECT) {
             Debugger.e(TAG, "==============CONNECTED==============")
         }?.on(Socket.EVENT_DISCONNECT) {
@@ -83,6 +84,7 @@ class SocketIO {
         socket?.off(AppConstants.SEEN_MESSAGE)
         socket?.close()
         instance = null
+        Debugger.e("SocketIO", "Socket disconnectSocket")
     }
 
     fun typingEvent(action: String, userId: String, chatId: String) {
@@ -109,8 +111,17 @@ class SocketIO {
     }
 
     fun emitNewMessage(
-        id: String, chatID: String, message: String, type: String, senderName: String,
-        fileID: String, duration: Long, thumbnail: String, identifier: String, language: String
+        id: String,
+        chatID: String,
+        message: String,
+        type: String,
+        senderName: String,
+        fileID: String,
+        duration: Long,
+        thumbnail: String,
+        identifier: String,
+        language: String,
+        groupID: String
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
@@ -123,6 +134,7 @@ class SocketIO {
         jsonObject.addProperty("thumbnail", thumbnail)
         jsonObject.addProperty("identifier", identifier)
         jsonObject.addProperty("language", language)
+        jsonObject.addProperty("group_id", groupID)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)

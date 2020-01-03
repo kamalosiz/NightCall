@@ -51,7 +51,6 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     lateinit var viewModel: ContactsViewModel
     lateinit var contactList: ArrayList<ContactsData>
-    private val jsonArray = JsonArray()
     private var searchView: SearchView? = null
 
 
@@ -146,6 +145,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
     private fun renderResponse(response: Contacts?) {
         logE("socketResponse: $response")
         response?.let {
+            contactList.clear()
             contactList = it.data.contacts_list
             (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
             val entityList = ArrayList<ContactsEntityClass>()
@@ -235,6 +235,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun createContactsJson(list: MutableList<ContactInfo>): JsonArray {
+        val jsonArray = JsonArray()
         for (x in list.indices) {
             val jsonObject = JsonObject()
             jsonObject.addProperty("name", list[x].name)
@@ -258,7 +259,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                     binding.rvForContacts.visibility = View.GONE
                     val params = HashMap<String, String>()
                     params["contacts"] = createContactsJson(getAllContact()).toString()
-                    viewModel.getContacts(params)
+                    viewModel.getContacts(sharedPrefsHelper.getUser()?.token.toString(), params)
                 } else {
                     Debugger.e("Capturing Image", "onPermissionDenied")
                 }

@@ -6,8 +6,15 @@ data class ChatMessagesResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
-    val data: ArrayList<ChatData>?,
+    val data: DataObject,
     val message: String
+)
+
+data class DataObject(
+    val chats: ArrayList<ChatData>?,
+    val is_first_page: Int,
+    val is_last_page: Int,
+    val swipe_up: Int
 )
 
 data class ChatData(
@@ -47,7 +54,8 @@ data class DataResponse(
     val type: String?,
     val identifier: String,
     val thumbnail: String?,
-    val file_id: Long
+    val file_id: Long,
+    val group_id: String?
 )
 
 data class MediaList(val file: String, val type: Int) : Serializable

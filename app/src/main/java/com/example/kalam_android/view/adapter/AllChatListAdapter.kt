@@ -66,8 +66,12 @@ class AllChatListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val holderItem = holder as MyHolder
         val item = chatList[position]
-        holderItem.binding.tvName.text =
-            StringBuilder(item.firstname).append(" ").append(item.lastname)
+        if (item.nickname.isNullOrEmpty()) {
+            holderItem.binding.tvName.text =
+                StringBuilder(item.firstname).append(" ").append(item.lastname)
+        } else {
+            holderItem.binding.tvName.text = item.nickname.toString()
+        }
         holderItem.binding.tvLastMessage.text = item.message.toString()
         if (item.un_read_count == 0) {
             holderItem.binding.llUnread.visibility = View.GONE

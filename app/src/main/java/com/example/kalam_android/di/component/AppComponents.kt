@@ -3,7 +3,8 @@ package com.example.kalam_android.di.component
 import com.example.kalam_android.di.modules.AppModule
 import com.example.kalam_android.di.modules.UtilsModule
 import com.example.kalam_android.di.modules.ViewModelsModule
-import com.example.kalam_android.notification.FCMService
+import com.example.kalam_android.services.FCMService
+import com.example.kalam_android.services.WorkManagerMedia
 import com.example.kalam_android.view.activities.*
 import com.example.kalam_android.view.fragments.ChatsFragment
 import com.example.kalam_android.view.fragments.MoreFragment
@@ -34,4 +35,5 @@ interface AppComponents {
     fun doInjection(fcm: FCMService)
     fun doInjection(activityVideo: VideoCallActivity)
     fun doInjection(activityAudio: AudioCallActivity)
+    fun doInjection(thread: WorkManagerMedia)
 }

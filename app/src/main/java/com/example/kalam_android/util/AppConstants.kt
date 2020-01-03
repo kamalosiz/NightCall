@@ -33,6 +33,8 @@ object AppConstants {
     const val CONNECTED_USER_ID = "connectedUserId"
 
     const val FIREBASE_CHAT_ID = "chat_id"
+    const val MSG_ID = "msgidto_send"
+    const val FROM_SEARCH = "is_from_search"
     const val SENDER_NAME = "sender_name"
 
     //Request Code

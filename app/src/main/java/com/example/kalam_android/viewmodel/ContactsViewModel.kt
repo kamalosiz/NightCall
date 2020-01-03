@@ -30,8 +30,8 @@ class ContactsViewModel @Inject constructor(
         return responsiveRoomData
     }
 
-    fun getContacts(parameters: Map<String, String>) {
-        disposables.add(repository.getContacts(parameters)
+    fun getContacts(authorization: String?, parameters: Map<String, String>) {
+        disposables.add(repository.getContacts(authorization, parameters)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { responseLiveData.setValue(ApiResponse.loading()) }

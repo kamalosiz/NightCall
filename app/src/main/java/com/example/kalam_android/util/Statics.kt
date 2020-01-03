@@ -34,11 +34,11 @@ fun toast(context: Context?, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
 
-fun getFileBody(path: String, fileName: String): MultipartBody.Part {
+/*fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     val file = File(path)
     val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
     return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
-}
+}*/
 
 /*fun calculateLocalDate(unixTime: Long): String {
     val date = Date(unixTime * 1000L)
@@ -108,7 +108,7 @@ fun getTimeStamp(unixTime: Long): String {
     return sdf.format(date)
 }
 
-fun showAlertDialoge(context: Context, title: String, message: String) {
+fun showAlertDialog(context: Context, title: String, message: String) {
     val builder1 = AlertDialog.Builder(context)
     builder1.setTitle(title)
     builder1.setMessage(message)
@@ -128,10 +128,10 @@ fun showAlertDialoge(context: Context, title: String, message: String) {
     ) + " " + units[digitGroups]
 }*/
 
-fun getFileSizeInBytes(selectedPath: String): Int {
+/*fun getFileSizeInBytes(selectedPath: String): Int {
     val file = File(selectedPath)
     return (file.length() / 1024).toString().toInt()
-}
+}*/
 
 @SuppressLint("Recycle")
 fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {

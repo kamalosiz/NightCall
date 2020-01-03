@@ -110,7 +110,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                 startActivity(intent)
                 finish()
             } else {
-                showAlertDialoge(this, "Error", it.message)
+                showAlertDialog(this, "Error", it.message)
             }
         }
 

@@ -92,7 +92,7 @@ class SignUpActivity : BaseActivity() {
                 startActivity(intent)
                 finish()
             } else {
-                showAlertDialoge(this, "Error", it.message)
+                showAlertDialog(this, "Error", it.message)
             }
         }
     }
