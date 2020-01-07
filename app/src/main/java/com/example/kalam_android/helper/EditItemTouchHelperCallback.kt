@@ -28,7 +28,6 @@ class EditItemTouchHelperCallback(private val adapterSelectedMedia: AdapterSelec
     }
 
     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 

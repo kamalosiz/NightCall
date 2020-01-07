@@ -92,6 +92,7 @@ dependencies {
     implementation 'com.github.mahimrocky:ShowMoreText:1.0.2'
 
     //WorkManager
-    implementation 'androidx.work:work-runtime-ktx:2.2.0'
+//    implementation 'androidx.work:work-runtime-ktx:2.2.0'
+    implementation 'androidx.work:work-rxjava2:2.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -303,7 +303,7 @@ fun getAudioFileSize(file: File): String? {
     val format = DecimalFormat("##.##")
     val MiB = 1024 * 1024
     val KiB = 1024
-    if (!file.isFile()) {
+    if (!file.isFile) {
         throw  IllegalArgumentException("Expected a file")
     }
     val length = file.length();

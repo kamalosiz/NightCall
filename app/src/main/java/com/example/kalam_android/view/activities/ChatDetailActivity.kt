@@ -31,7 +31,7 @@ import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
-import com.example.kalam_android.services.WorkManagerMedia
+import com.example.kalam_android.services.RxMediaWorker
 import com.example.kalam_android.util.*
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
@@ -47,7 +47,6 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
-import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
@@ -306,7 +305,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-        val oneTimeWorkRequest = OneTimeWorkRequest.Builder(WorkManagerMedia::class.java)
+        val oneTimeWorkRequest = OneTimeWorkRequest.Builder(RxMediaWorker::class.java)
             .setInputData(
                 createInputData(
                     identifier,
@@ -317,7 +316,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     groupID
                 )
             )
-            .setInitialDelay(10, TimeUnit.SECONDS)
+            .setInitialDelay(5, TimeUnit.SECONDS)
             .setConstraints(constraints).build()
         WorkManager.getInstance(this).enqueue(oneTimeWorkRequest)
     }
@@ -534,10 +533,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         list?.let {
             it.forEach { media ->
                 val groupID = System.currentTimeMillis().toString()
-                if (media.type == 0) {
-                    sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0, groupID)
-                } else {
-                    sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0, groupID)
+                when (media.type) {
+                    0 -> sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0, groupID)
+                    1 -> sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0, groupID)
+                    2 -> sendMediaMessage(media.file, AppConstants.AUDIO_MESSAGE, 0, groupID)
                 }
             }
         }
@@ -575,32 +574,32 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     }
                 }
                 AppConstants.SELECTED_IMAGES -> {
-                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+//                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
+                    /* if (data != null) {
+                         val list =
+                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                         Debugger.e("List", "${list}")
+                         sendVideoOrImage(list)
+                     }*/
                     if (data != null) {
                         val list =
                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
-                        Debugger.e("List", "${list}")
-                        sendVideoOrImage(list)
-                    }
-                    /*if (data != null) {
-                        val list =
-                                data?.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
-                        sendVideoOrImage(list)
-                        val intent = Intent(this@ChatDetailActivity, AttachmentActivity::class.java)
+//                        sendVideoOrImage(list)
+                        val intent =
+                            Intent(this@ChatDetailActivity, AttachmentActivity::class.java)
                         intent.putExtra(AppConstants.SELECTED_IMAGES_VIDEOS, list)
                         startActivityForResult(intent, AppConstants.SELECT_IMAGES_VIDEOS)
 
-                    }*/
+                    }
                 }
                 AppConstants.SELECT_IMAGES_VIDEOS -> {
                     if (data != null) {
                         val list =
                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
-                        Debugger.e("List", "${list}")
+                        Debugger.e("List", "$list")
                         sendVideoOrImage(list)
                     }
                 }
-
             }
         }
     }

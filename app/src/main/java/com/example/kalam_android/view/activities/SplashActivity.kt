@@ -29,18 +29,10 @@ class SplashActivity : BaseActivity() {
         if (sharedPrefsHelper.isLoggedIn()) {
             intent = Intent(this, MainActivity::class.java)
             if (chatId?.isNotEmpty() == true) {
-//                intent = Intent(this, ChatDetailActivity::class.java)
-                Debugger.e(
-                    "SplashActivity",
-                    "Chat ID: ${intent.getIntExtra(AppConstants.CHAT_ID, 0)}"
-                )
                 intent.putExtra(AppConstants.CHAT_ID, chatId.toInt())
                 intent.putExtra(AppConstants.IS_FROM_OUTSIDE, true)
-//                intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
                 intent.putExtra(AppConstants.CHAT_USER_NAME, name)
-            } /*else {
-                intent = Intent(this, MainActivity::class.java)
-            }*/
+            }
         }
         Handler().postDelayed({
             startActivity(intent)

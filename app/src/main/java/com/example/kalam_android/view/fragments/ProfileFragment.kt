@@ -37,8 +37,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     private lateinit var binding: ProfileFragmentBinding
 
-    private var userName: String = ""
-    private var userImage: String = ""
     @Inject
     lateinit var factory: ViewModelFactory
     lateinit var viewModel: UserProfileViewModel
@@ -46,12 +44,12 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     lateinit var sharedPrefsHelper: SharedPrefsHelper
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.profile_fragment, container, false
+            inflater, R.layout.profile_fragment, container, false
         )
         MyApplication.getAppComponent(activity!!).doInjection(this)
         viewModel = ViewModelProviders.of(this, factory).get(UserProfileViewModel::class.java)
@@ -74,7 +72,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun consumeApiResponse(response: ApiResponse<UserProfile>) {
-        Debugger.e("Response : ", "${response}")
+        Debugger.e("Response : ", "$response")
         when (response.status) {
 
             Status.LOADING -> {
@@ -101,18 +99,18 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
         binding.profileHeaderView.tvName.text = userList[0].nickname
         GlideDownloader.load(
-                activity?.applicationContext,
-                binding.profileHeaderView.ivProfile,
-                userList[0].profile_image,
-                R.drawable.dummy_placeholder,
-                R.drawable.dummy_placeholder
+            activity?.applicationContext,
+            binding.profileHeaderView.ivProfile,
+            userList[0].profile_image,
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
         )
         GlideDownloader.load(
-                activity?.applicationContext,
-                binding.profileHeaderView.ivUserProfile,
-                userList[0].profile_image,
-                R.drawable.dummy_placeholder,
-                R.drawable.dummy_placeholder
+            activity?.applicationContext,
+            binding.profileHeaderView.ivUserProfile,
+            userList[0].profile_image,
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
         )
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
@@ -143,33 +141,33 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     private fun initShowMore() {
         binding.overviewView.tvDescription.text =
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
         binding.overviewView.tvDescription.setShowingLine(3)
         binding.overviewView.tvDescription.addShowMoreText("Show more")
         binding.overviewView.tvDescription.addShowLessText("Show less")
         binding.overviewView.tvDescription.setShowLessTextColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
+            ContextCompat.getColor(
+                activity!!.applicationContext,
+                R.color.theme_color
+            )
         )
         binding.overviewView.tvDescription.setShowMoreColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
+            ContextCompat.getColor(
+                activity!!.applicationContext,
+                R.color.theme_color
+            )
         )
         binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelOverview)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelOverview)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelPhotos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelPhotos)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelVideos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelVideos)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
 
     }
@@ -177,10 +175,10 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     private fun onclickListener() {
 
         binding.profileHeaderView.tvOverview.setTextColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
+            ContextCompat.getColor(
+                activity!!.applicationContext,
+                R.color.theme_color
+            )
         )
         binding.profileHeaderView.tvOverview.setOnClickListener(this)
         binding.profileHeaderView.tvPhotos.setOnClickListener(this)
@@ -193,22 +191,22 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         when (v?.id) {
             R.id.tvOverview -> {
                 binding.profileHeaderView.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.theme_color
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.theme_color
+                    )
                 )
                 binding.profileHeaderView.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.profileHeaderView.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.overviewView.visibility = View.VISIBLE
                 binding.rvUserProfilePhotos.visibility = View.GONE
@@ -220,22 +218,22 @@ class ProfileFragment : Fragment(), View.OnClickListener {
             }
             R.id.tvPhotos -> {
                 binding.profileHeaderView.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.profileHeaderView.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.theme_color
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.theme_color
+                    )
                 )
                 binding.profileHeaderView.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.overviewView.visibility = View.GONE
                 binding.rvUserProfilePhotos.visibility = View.VISIBLE
@@ -244,22 +242,22 @@ class ProfileFragment : Fragment(), View.OnClickListener {
             }
             R.id.tvVideos -> {
                 binding.profileHeaderView.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.profileHeaderView.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.profileHeaderView.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.theme_color
-                        )
+                    ContextCompat.getColor(
+                        activity!!.applicationContext,
+                        R.color.theme_color
+                    )
                 )
                 binding.overviewView.visibility = View.GONE
                 binding.rvUserProfilePhotos.visibility = View.GONE

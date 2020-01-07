@@ -71,12 +71,13 @@ class FindsFriendsActivity : BaseActivity(), TextWatcher {
                 binding.pbCenter.visibility = View.VISIBLE
             }
             Status.SUCCESS -> {
-                logE("data: ${response.data}")
+                logE("SUCCESS: ${response.data}")
                 binding.pbCenter.visibility = View.GONE
                 renderLocalResponse(response.data)
 
             }
             Status.ERROR -> {
+                logE("ERROR: ${response.error?.message}")
                 binding.pbCenter.visibility = View.GONE
             }
             else -> {

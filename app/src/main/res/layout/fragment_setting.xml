@@ -11,6 +11,7 @@
             android:id="@+id/tvChangeLanguage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
             android:fontFamily="@font/roboto_light"
             android:gravity="center_vertical"
             android:padding="@dimen/_15sdp"
@@ -27,12 +28,13 @@
             android:id="@+id/tvFindFriends"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
             android:fontFamily="@font/roboto_light"
             android:gravity="center_vertical"
             android:padding="@dimen/_15sdp"
             android:text="@string/labelFindFriends"
             android:textColor="@color/black"
-            android:textSize="@dimen/_12ssp"/>
+            android:textSize="@dimen/_12ssp" />
 
         <View
             android:layout_width="match_parent"
@@ -40,9 +42,9 @@
             android:background="@color/light_grey" />
 
         <TextView
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
             android:fontFamily="@font/roboto_light"
             android:gravity="center_vertical"
             android:padding="@dimen/_15sdp"
@@ -59,6 +61,7 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
             android:fontFamily="@font/roboto_light"
             android:gravity="center_vertical"
             android:padding="@dimen/_15sdp"
@@ -75,6 +78,7 @@
             android:id="@+id/tvAbout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
             android:fontFamily="@font/roboto_light"
             android:gravity="center_vertical"
             android:padding="@dimen/_15sdp"
