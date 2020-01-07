@@ -2,7 +2,7 @@ package com.example.kalam_android.repository.net
 
 class Urls {
     companion object {
-        //        const val WEB_SOCKET_URL = "http://192.168.0.39:9090"
+        //        const val WEB_SOCKET_URL = "http://192.168.0.39:9090"x
 //        const val WEB_SOCKET_URL = "https://voip.worldnoordev.com:9090"
 //        const val WEB_SOCKET_URL = "https://192.168.0.168:9090"
         const val WEB_SOCKET_URL = "ws://192.168.0.168:9090"
@@ -21,5 +21,6 @@ class Urls {
         const val FIND_FRIENDS = "/api/user/search"
         const val UPDATE_FCM_TOKEN = "/api/user/update_fcm_token"
         const val UPLOAD_AUDIO = "/api/chat/upload_file"
+        const val GET_PROFILE = "/api/user/profile"
     }
 }

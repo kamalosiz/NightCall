@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/lvBack"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:background="@color/theme_color">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivBack"
+                android:layout_width="@dimen/_16sdp"
+                android:layout_height="@dimen/_16sdp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_8sdp"
+                app:srcCompat="@drawable/icon_back" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:layout_toEndOf="@id/ivBack"
+                android:fontFamily="@font/helvetica_medium"
+                android:singleLine="true"
+                android:text="Waqar Mustafa"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12ssp"
+                android:transitionName="@string/profile_trans" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvTotalImages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvName"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_toEndOf="@id/ivBack"
+                android:fontFamily="@font/halvatic_light"
+                android:singleLine="true"
+                android:text="25 photo"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_9ssp"
+                android:transitionName="@string/profile_trans" />
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvGroupImages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/_10sdp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>

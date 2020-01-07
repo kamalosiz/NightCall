@@ -47,6 +47,7 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
@@ -578,9 +579,28 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (data != null) {
                         val list =
                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                        Debugger.e("List", "${list}")
+                        sendVideoOrImage(list)
+                    }
+                    /*if (data != null) {
+                        val list =
+                                data?.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                        sendVideoOrImage(list)
+                        val intent = Intent(this@ChatDetailActivity, AttachmentActivity::class.java)
+                        intent.putExtra(AppConstants.SELECTED_IMAGES_VIDEOS, list)
+                        startActivityForResult(intent, AppConstants.SELECT_IMAGES_VIDEOS)
+
+                    }*/
+                }
+                AppConstants.SELECT_IMAGES_VIDEOS -> {
+                    if (data != null) {
+                        val list =
+                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                        Debugger.e("List", "${list}")
                         sendVideoOrImage(list)
                     }
                 }
+
             }
         }
     }

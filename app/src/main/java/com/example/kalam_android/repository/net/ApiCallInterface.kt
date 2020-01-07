@@ -69,4 +69,7 @@ interface ApiCallInterface {
     @POST(Urls.UPDATE_FCM_TOKEN)
     fun updateFcm(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>
 
+    @POST(Urls.GET_PROFILE)
+    fun getProfileData(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<UserProfile>
+
 }

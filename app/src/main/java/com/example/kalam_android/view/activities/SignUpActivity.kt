@@ -12,7 +12,7 @@ import com.example.kalam_android.databinding.ActivitySignUpBinding
 import com.example.kalam_android.repository.model.PhoneModel
 import com.example.kalam_android.repository.model.SignUpResponse
 import com.example.kalam_android.repository.net.ApiResponse
-import com.example.kalam_android.repository.net.Status.*
+import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
 import com.example.kalam_android.viewmodel.SignUpViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
@@ -61,15 +61,15 @@ class SignUpActivity : BaseActivity() {
     private fun consumeResponse(apiResponse: ApiResponse<SignUpResponse>?) {
         when (apiResponse?.status) {
 
-            LOADING -> {
+            Status.LOADING -> {
                 showProgressDialog(this@SignUpActivity)
             }
-            SUCCESS -> {
+            Status.SUCCESS -> {
                 hideProgressDialog()
                 renderResponse(apiResponse.data as SignUpResponse)
                 logE("consumeResponse SUCCESS : ${apiResponse.data}")
             }
-            ERROR -> {
+            Status.ERROR -> {
                 hideProgressDialog()
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
             }

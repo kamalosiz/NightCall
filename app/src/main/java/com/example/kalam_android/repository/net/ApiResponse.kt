@@ -1,6 +1,5 @@
 package com.example.kalam_android.repository.net
 
-import com.example.kalam_android.repository.net.Status.*
 import io.reactivex.annotations.NonNull
 import io.reactivex.annotations.Nullable
 
@@ -12,15 +11,15 @@ class ApiResponse<T> private constructor(
     companion object {
 
         fun <T> loading(): ApiResponse<T> {
-            return ApiResponse(LOADING, null, null)
+            return ApiResponse(Status.LOADING, null, null)
         }
 
         fun <T> success(@NonNull data: T?): ApiResponse<T> {
-            return ApiResponse(SUCCESS, data, null)
+            return ApiResponse(Status.SUCCESS, data, null)
         }
 
         fun <T> error(@NonNull error: Throwable): ApiResponse<T> {
-            return ApiResponse(ERROR, null, error)
+            return ApiResponse(Status.ERROR, null, error)
         }
 
     }

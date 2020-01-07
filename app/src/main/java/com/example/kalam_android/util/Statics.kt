@@ -3,16 +3,15 @@ package com.example.kalam_android.util
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.loader.content.CursorLoader
+import com.example.kalam_android.repository.model.AudioModel
 import com.example.kalam_android.repository.model.MediaList
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.*
-import java.lang.Math.log10
-import java.nio.file.Files
+import java.io.File
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -229,6 +228,93 @@ fun getGalleryImagesVideos(context: Context): ArrayList<MediaList> {
     }
     cursor.close()
     return listOfAllImages
+}
+
+fun getAllAudioFromDevice(context: Context): ArrayList<AudioModel>? {
+    val tempAudioList: ArrayList<AudioModel> = ArrayList()
+    val uri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    val projection = arrayOf(
+        MediaStore.Audio.AudioColumns.DATA,
+        MediaStore.Audio.AudioColumns.ALBUM,
+        MediaStore.Audio.ArtistColumns.ARTIST
+    )
+
+    val c = context.contentResolver.query(
+        uri,
+        projection,
+        null,
+        null,
+        null
+    )
+    if (c != null) {
+        while (c.moveToNext()) {
+            val path: String = c.getString(0)
+            val album: String = c.getString(1)
+            val artist: String = c.getString(2)
+            val name = path.substring(path.lastIndexOf("/") + 1)
+            val file = File(path)
+            val duration = getAudioDuration(file)
+            val length = getAudioFileSize(file)
+
+            Log.e("Name :$name", " Album :$album")
+            Log.e("Path :$path", " Artist :$artist")
+            tempAudioList.add(AudioModel(path, name, album, artist, duration!!, length!!))
+        }
+        c.close()
+    }
+    return tempAudioList
+}
+
+fun getAudioDuration(file: File): String? {
+    val mediaMetadataRetriever = MediaMetadataRetriever()
+    mediaMetadataRetriever.setDataSource(file.absolutePath)
+    val durationStr: String =
+        mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+    return formatMilliSecond(durationStr.toLong())
+}
+
+fun formatMilliSecond(milliseconds: Long): String? {
+    var finalTimerString = ""
+    var secondsString = ""
+    // Convert total duration into time
+    val hours = (milliseconds / (1000 * 60 * 60)).toInt()
+    val minutes = (milliseconds % (1000 * 60 * 60)).toInt() / (1000 * 60)
+    val seconds = (milliseconds % (1000 * 60 * 60) % (1000 * 60) / 1000).toInt()
+    // Add hours if there
+    if (hours > 0) {
+        finalTimerString = "$hours:"
+    }
+    // Prepending 0 to seconds if it is one digit
+    secondsString = if (seconds < 10) {
+        "0$seconds"
+    } else {
+        "" + seconds
+    }
+    finalTimerString = "$finalTimerString$minutes:$secondsString"
+    //      return  String.format("%02d Min, %02d Sec",
+//                TimeUnit.MILLISECONDS.toMinutes(milliseconds),
+//                TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+//                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
+// return timer string
+    return finalTimerString
+}
+
+fun getAudioFileSize(file: File): String? {
+    val format = DecimalFormat("##.##")
+    val MiB = 1024 * 1024
+    val KiB = 1024
+    if (!file.isFile()) {
+        throw  IllegalArgumentException("Expected a file")
+    }
+    val length = file.length();
+
+    if (length > MiB) {
+        return format.format(length / MiB) + " MB"
+    }
+    if (length > KiB) {
+        return format.format(length / KiB) + " KB"
+    }
+    return format.format(length) + " B"
 }
 
 /*@SuppressLint("SetTextI18n")

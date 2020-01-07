@@ -28,7 +28,7 @@ object UtilsModule {
             val interceptor = HttpLoggingInterceptor()
 
             interceptor.level =
-                if (Debugger.IS_DEVELOPMENT_MODE) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
+                    if (Debugger.IS_DEVELOPMENT_MODE) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
             return interceptor
         }
 
@@ -50,12 +50,12 @@ object UtilsModule {
         httpClient.addInterceptor { chain ->
             val original = chain.request()
             val request = original.newBuilder()
-                .build()
+                    .build()
             chain.proceed(request)
         }
-            .connectTimeout(100, TimeUnit.SECONDS)
-            .writeTimeout(100, TimeUnit.SECONDS)
-            .readTimeout(300, TimeUnit.SECONDS)
+                .connectTimeout(100, TimeUnit.SECONDS)
+                .writeTimeout(100, TimeUnit.SECONDS)
+                .readTimeout(300, TimeUnit.SECONDS)
 
         httpClient.addInterceptor(interceptor)
         return httpClient.build()
@@ -66,11 +66,11 @@ object UtilsModule {
     @Singleton
     internal fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Urls.BASE_URL)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
+                .baseUrl(Urls.BASE_URL)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build()
     }
 
     @JvmStatic

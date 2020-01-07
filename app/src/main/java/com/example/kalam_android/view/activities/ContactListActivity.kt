@@ -1,7 +1,6 @@
 package com.example.kalam_android.view.activities
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.database.Cursor
@@ -37,7 +36,6 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import javax.inject.Inject
 
 

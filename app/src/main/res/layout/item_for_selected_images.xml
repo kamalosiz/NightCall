@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="@dimen/_65sdp"
+        android:layout_height="@dimen/_65sdp"
+        android:id="@+id/llSelectedImage"
+        android:layout_marginTop="@dimen/_3sdp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivSelectedImages"
+            android:layout_width="@dimen/_55sdp"
+            android:layout_height="@dimen/_55sdp"
+            android:layout_margin="@dimen/_3sdp"
+            android:scaleType="centerCrop" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivCancel"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_cancel" />
+    </RelativeLayout>
+
+</layout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:id="@+id/rlVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_3sdp"
+        tools:ignore="UselessParent">
+
+        <ImageView
+            android:id="@+id/ivImage"
+            android:layout_width="@dimen/_70sdp"
+            android:layout_height="@dimen/_70sdp"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="@dimen/_3sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/dummy_placeholder_1"
+            android:transitionName="@string/trans_key"
+            android:contentDescription="TODO" />
+
+        <ImageView
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/video_icon"
+            android:contentDescription="TODO" />
+
+    </RelativeLayout>
+
+</layout>

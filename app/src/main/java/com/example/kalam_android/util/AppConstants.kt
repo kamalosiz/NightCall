@@ -10,6 +10,7 @@ object AppConstants {
     const val INITIATOR = "caller_initiator"
     const val IS_FROM_OUTSIDE = "is_outside_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
+    const val CHAT_USER_ID = "chat_user_id"
     const val CHAT_USER_PICTURE = "chat_user_picture"
     const val CHAT_ID = "kalam_chat_id"
     const val DUMMY_DATA = -1
@@ -17,6 +18,7 @@ object AppConstants {
     const val TEXT_MESSAGE = "text"
     const val AUDIO_MESSAGE = "audio"
     const val IMAGE_MESSAGE = "image"
+    const val GROUP = "group"
     const val VIDEO_MESSAGE = "video"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
@@ -31,7 +33,7 @@ object AppConstants {
     const val KEY_IS_LOGIN = "is_logged_in_kalam"
     const val PHONE = "key_phoneno"
     const val CONNECTED_USER_ID = "connectedUserId"
-
+    const val IMAGE_DIRECTORY = "/demonuts"
     const val FIREBASE_CHAT_ID = "chat_id"
     const val MSG_ID = "msgidto_send"
     const val FROM_SEARCH = "is_from_search"
@@ -40,10 +42,17 @@ object AppConstants {
     //Request Code
     const val IMAGE_GALLERY = 0
     const val POST_VIDEO = 1
+    const val AUDIO_GALLERY = 2
     const val PROFILE_IMAGE_CODE = 111
     const val CHAT_FRAGMENT_CODE = 1000
     const val LOGOUT_CODE = 1001
     const val SELECTED_IMAGES = 12
+    const val SELECT_IMAGES_VIDEOS = 14
+    const val SELECT_AUDIO = 15
+    const val CAMERA = 150
+    const val GALLERY = 160
+
+
 
     //Local DB=
     const val DB_NAME = "kalam_local_db"

@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 abstract class PaginationScrollDownListener(
-    private var layoutManager: LinearLayoutManager
+        private var layoutManager: LinearLayoutManager
 ) : RecyclerView.OnScrollListener() {
 
     abstract val isFirstPage: Boolean

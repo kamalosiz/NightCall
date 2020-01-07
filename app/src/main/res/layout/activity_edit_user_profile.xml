@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/_10sdp">
+
+        <RelativeLayout
+            android:id="@+id/lvBack"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:background="@color/theme_color">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivBack"
+                android:layout_width="@dimen/_16sdp"
+                android:layout_height="@dimen/_16sdp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_8sdp"
+                app:srcCompat="@drawable/icon_back" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvHeaderName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:layout_toEndOf="@id/ivBack"
+                android:fontFamily="@font/roboto_medium"
+                android:singleLine="true"
+                android:text="Profile"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14ssp"
+                android:transitionName="@string/profile_trans" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:fontFamily="@font/roboto_medium"
+                android:padding="@dimen/_5sdp"
+                android:singleLine="true"
+                android:text="@string/labelSave"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14ssp"
+                android:transitionName="@string/profile_trans" />
+
+        </RelativeLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_220sdp">
+
+                    <ImageView
+                        android:id="@+id/ivProfileWall"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_175sdp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/dummy_placeholder_1" />
+
+                    <RelativeLayout
+                        android:layout_width="@dimen/_100sdp"
+                        android:layout_height="@dimen/_100sdp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerInParent="true">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/ivProfile"
+                            android:layout_width="@dimen/_100sdp"
+                            android:layout_height="@dimen/_100sdp"
+                            android:src="@drawable/dummy_placeholder_1"
+                            app:civ_border_color="@color/light_grey"
+                            app:civ_border_width="@dimen/_1sdp" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/ivProfileCamera"
+                            android:layout_width="@dimen/_100sdp"
+                            android:layout_height="@dimen/_30sdp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerInParent="true"
+                            android:background="@drawable/bg_camera_profile"
+                            android:transitionName="@string/profile_trans" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/_25sdp"
+                            android:layout_height="@dimen/_25sdp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerInParent="true"
+                            android:padding="@dimen/_5sdp"
+                            android:src="@drawable/camera_icon"
+                            android:transitionName="@string/profile_trans" />
+
+                    </RelativeLayout>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/ivCameraWall"
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        app:cardBackgroundColor="@color/transparentBlack"
+                        app:cardElevation="0dp"
+                        app:cardCornerRadius="@dimen/_5sdp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/_25sdp"
+                            android:layout_height="@dimen/_25sdp"
+                            android:layout_gravity="center"
+                            android:padding="@dimen/_5sdp"
+                            android:src="@drawable/camera_icon" />
+                    </androidx.cardview.widget.CardView>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/tvName"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_35sdp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/white_box_outine"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="Ali Raza"
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_18ssp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:weightSum="4">
+
+                    <TextView
+                        android:id="@+id/tvOverview"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_regular"
+                        android:padding="@dimen/_5sdp"
+                        android:text="@string/labelOverview"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+
+                    <TextView
+                        android:id="@+id/tvPhotos"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_regular"
+                        android:padding="@dimen/_5sdp"
+                        android:text="@string/labelPhotos"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+
+                    <TextView
+                        android:id="@+id/tvVideos"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_regular"
+                        android:padding="@dimen/_5sdp"
+                        android:text="@string/labelVideos"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_13ssp" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <include
+                        android:id="@+id/overviewView"
+                        layout="@layout/layout_for_user_edit_profile_overview" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvUserProfilePhotos"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvUserProfileVideos"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+                </RelativeLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>

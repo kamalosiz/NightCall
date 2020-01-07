@@ -15,9 +15,9 @@ object CropHelper {
     private var index: Int? = null
 
     fun startCropActivity(
-        sharedPrefsHelper: SharedPrefsHelper,
-        context: Context,
-        uri: Uri
+            sharedPrefsHelper: SharedPrefsHelper,
+            context: Context,
+            uri: Uri
     ) {
         index = sharedPrefsHelper.getImageIndex()?.plus(1)
         val destinationFileName = "$SAMPLE_CROPPED_IMAGE_NAME$index.jpg"

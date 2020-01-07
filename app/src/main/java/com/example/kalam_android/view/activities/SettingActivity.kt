@@ -1,5 +1,6 @@
 package com.example.kalam_android.view.activities
 
+import com.example.kalam_android.databinding.ActivitySelectLanguageBinding
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -13,11 +14,11 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
-import com.example.kalam_android.databinding.ActivitySelectLanguageBinding
 import com.example.kalam_android.repository.model.BasicResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.AppConstants
+import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.util.toast
 import com.example.kalam_android.viewmodel.LogoutViewModel
@@ -30,12 +31,14 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
     var item = ""
     var position = -1
     private var autoTranslate: Int? = null
+    private var userId = ""
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     lateinit var binding: ActivitySelectLanguageBinding
     @Inject
     lateinit var factory: ViewModelFactory
     lateinit var viewModel: LogoutViewModel
+    private val TAG = this.javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +62,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
         )*/
         autoTranslate = sharedPrefsHelper.getTransState()
         binding.checkBox.isChecked = sharedPrefsHelper.getTransState() != 0
+        userId = sharedPrefsHelper.getUser()?.id.toString()
         applySpinner()
         checkBoxListener()
     }
@@ -161,5 +165,9 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 builder1.create().show()
             }
         }
+    }
+
+    private fun logE(message: String) {
+        Debugger.e(TAG, message)
     }
 }

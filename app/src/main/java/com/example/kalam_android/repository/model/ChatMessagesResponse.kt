@@ -17,7 +17,6 @@ data class DataObject(
     val is_last_page: Int,
     val swipe_up: Int
 )
-
 /*data class ChatData(
     val original_audio_text: String?,
     var audio_url: String?,
@@ -60,3 +59,12 @@ data class DataResponse(
 )
 
 data class MediaList(val file: String, val type: Int) : Serializable
+
+data class AudioModel(
+    val aPath: String,
+    val aName: String,
+    val aAlbum: String,
+    val aArtist: String,
+    val duration: String,
+    val audioLength: String
+)

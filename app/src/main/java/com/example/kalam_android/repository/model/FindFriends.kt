@@ -6,18 +6,18 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 data class FindFriends(
-    val action: String,
-    val code: Int,
-    val status: Boolean,
-    val data: ArrayList<FindFriendList>?,
-    val message: String
+        val action: String,
+        val code: Int,
+        val status: Boolean,
+        val data: ArrayList<FindFriendList>?,
+        val message: String
 )
 
 
 data class FindFriendList(
-    val id: Int,
-    val firstname: String,
-    val lastname: String,
-    val profile_image: String,
-    val country: String
+        val id: Int,
+        val firstname: String,
+        val lastname: String,
+        val profile_image: String,
+        val country: String
 )
