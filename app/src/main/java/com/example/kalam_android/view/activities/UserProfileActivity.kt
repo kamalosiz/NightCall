@@ -7,8 +7,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityUserProfileBinding
 import com.example.kalam_android.util.AppConstants
-import com.example.kalam_android.wrapper.GlideDownloder
-import kotlinx.android.synthetic.main.layout_content_of_user_profile.view.*
+import com.example.kalam_android.wrapper.GlideDownloader
 
 
 class UserProfileActivity : BaseActivity() {
@@ -32,7 +31,7 @@ class UserProfileActivity : BaseActivity() {
             userImage = bundle?.getString(AppConstants.CHAT_USER_PICTURE).toString()
             binding.collapsingToolbar.title = userName
 //            binding.contentUser.tvMobileNumber.text =
-            GlideDownloder.load(
+            GlideDownloader.load(
                 this,
                 binding.ivUserImage,
                 userImage,

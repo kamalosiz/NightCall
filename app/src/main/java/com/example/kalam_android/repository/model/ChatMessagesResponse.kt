@@ -1,5 +1,6 @@
 package com.example.kalam_android.repository.model
 
+import com.example.kalam_android.localdb.entities.ChatData
 import java.io.Serializable
 
 data class ChatMessagesResponse(
@@ -17,7 +18,7 @@ data class DataObject(
     val swipe_up: Int
 )
 
-data class ChatData(
+/*data class ChatData(
     val original_audio_text: String?,
     var audio_url: String?,
     val original_audio_url: String?,
@@ -37,7 +38,7 @@ data class ChatData(
     var identifier: String?,
     val unix_time: Double,
     val language: String?
-)
+)*/
 
 data class MediaResponse(
     val action: String,
@@ -59,10 +60,3 @@ data class DataResponse(
 )
 
 data class MediaList(val file: String, val type: Int) : Serializable
-
-data class NotificationResponse(
-    val type: String,
-    val sender_name: String,
-    val message: String?,
-    val original_message: String?
-)

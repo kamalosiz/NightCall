@@ -10,10 +10,14 @@ import com.example.kalam_android.repository.model.MediaList
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.File
+import java.io.*
+import java.lang.Math.log10
+import java.nio.file.Files
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.pow
 
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -33,6 +37,44 @@ fun Context.toast(message: CharSequence) =
 fun toast(context: Context?, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
+
+/*@Throws(IOException::class)
+fun splitFile(f: File): List<File>? {
+    var partCounter = 1
+    val result: MutableList<File> = ArrayList()
+    val sizeOfFiles = 1024 * 1024 // 1MB
+    val buffer =
+        ByteArray(sizeOfFiles) // create a buffer of bytes sized as the one chunk size
+    val bis = BufferedInputStream(FileInputStream(f))
+    val name: String = f.name
+    var tmp: Int
+    while (bis.read(buffer).also { tmp = it } > 0) {
+        val newFile = File(
+            f.parent,
+            name + "." + String.format("%03d", partCounter++)
+        ) // naming files as <inputFileName>.001, <inputFileName>.002, ...
+        val out = FileOutputStream(newFile)
+        out.write(
+            buffer,
+            0,
+            tmp
+        ) //tmp is chunk size. Need it for the last chunk, which could be less then 1 mb.
+        result.add(newFile)
+    }
+    return result
+}*/
+
+/*@SuppressLint("NewApi")
+@Throws(IOException::class)
+fun mergeFiles(files: List<File>, into: File) {
+    val mergingStream = BufferedOutputStream(FileOutputStream(into))
+    for (f in files) {
+//        val stream: InputStream = FileInputStream(f)
+        Files.copy(f.toPath(), mergingStream)
+//        stream.close()
+    }
+    mergingStream.close()
+}*/
 
 /*fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     val file = File(path)
@@ -117,16 +159,16 @@ fun showAlertDialog(context: Context, title: String, message: String) {
     builder1.create().show()
 }
 
-/*fun getReadableFileSize(size: Long): String {
+fun getReadableFileSize(size: Long): String {
     if (size <= 0) {
         return "0"
     }
     val units = arrayOf("B", "KB", "MB", "GB", "TB")
-    val digitGroups = (log10(size.toDouble()) / log10(1024.0)).toInt()
+    val digitGroups = (kotlin.math.log10(size.toDouble()) / kotlin.math.log10(1024.0)).toInt()
     return DecimalFormat("#,##0.#").format(
         size / 1024.0.pow(digitGroups.toDouble())
     ) + " " + units[digitGroups]
-}*/
+}
 
 /*fun getFileSizeInBytes(selectedPath: String): Int {
     val file = File(selectedPath)

@@ -1,8 +1,6 @@
 package com.example.kalam_android.webrtc
 
-import android.util.Log
 import com.example.kalam_android.util.Debugger
-
 import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 

@@ -16,13 +16,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
-import com.example.kalam_android.repository.model.ChatData
+import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.getTimeStamp
 import com.example.kalam_android.view.activities.OpenMediaActivity
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 
 
 class ChatMessagesAdapter(
@@ -41,12 +41,8 @@ class ChatMessagesAdapter(
     fun updateList(list: ArrayList<ChatData>, isDown: Boolean) {
         if (isDown) {
             logE("isDown is true")
-            logE("list size ${list.size}")
-            logE("list size $list")
-
             var i = list.size - 1
             while (i > -1) {
-                logE("first element ${list[i]}")
                 chatList?.add(0, list[i])
                 notifyItemInserted(0)
                 i--
@@ -228,7 +224,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.VISIBLE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
-                GlideDownloder.load(
+                GlideDownloader.load(
                     context,
                     itemHolder.binding.imageHolder.ivImage,
                     item.audio_url.toString(),
@@ -268,7 +264,7 @@ class ChatMessagesAdapter(
                 } else {
                     itemHolder.binding.videoHolder.rlVideoItem.gravity = Gravity.START
                 }
-                GlideDownloder.load(
+                GlideDownloader.load(
                     context,
                     itemHolder.binding.videoHolder.ivImage,
                     item.audio_url.toString(),

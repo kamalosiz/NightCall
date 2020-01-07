@@ -7,12 +7,9 @@ import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Handler
 import android.os.SystemClock
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
-import android.view.animation.AnimationUtils
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
@@ -20,13 +17,12 @@ import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.activity_audio_call.*
 import kotlinx.android.synthetic.main.call_activity.*
 import kotlinx.android.synthetic.main.call_activity.chronometer
 import kotlinx.android.synthetic.main.call_activity.header
@@ -182,7 +178,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = data.getString("name")
             tvCallStatus.text = "Incoming"
         }
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             ivUser,
             profileImage,

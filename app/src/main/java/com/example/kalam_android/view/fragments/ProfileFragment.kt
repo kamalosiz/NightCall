@@ -12,7 +12,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ProfileFragmentBinding
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import kotlinx.android.synthetic.main.content_profile.view.*
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ class ProfileFragment : Fragment() {
             sharedPrefsHelper.getUser()?.firstname + " " + sharedPrefsHelper.getUser()?.lastname
         userImage = sharedPrefsHelper.getUser()?.profile_image.toString()
         binding.content.tvName.text = userName
-        GlideDownloder.load(
+        GlideDownloader.load(
             activity,
             binding.ivUserImage,
             userImage,

@@ -26,7 +26,7 @@ import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.helper.MyVoiceToTextHelper
-import com.example.kalam_android.repository.model.ChatData
+import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.repository.net.ApiResponse
@@ -38,7 +38,7 @@ import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.webrtc.AudioCallActivity
 import com.example.kalam_android.webrtc.VideoCallActivity
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
 import com.google.gson.Gson
@@ -227,7 +227,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
         callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
         binding.header.tvName.text = userRealName
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             binding.header.ivProfileImage,
             profileImage,
@@ -552,6 +552,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         val media = data.getSerializableExtra(SandriosCamera.MEDIA) as Media
                         if (media.type == SandriosCamera.MediaType.PHOTO) {
                             logE("onActivity Received")
+                            /*       //Testing
+                                   logE("original file size ${getReadableFileSize(File(media.path).length())}")
+                                   val list = splitFile(File(media.path))
+                                   for (x in list?.indices!!) {
+                                       logE("chunks $x : ${list[x]}")
+                                       logE("chunks $x : ${getReadableFileSize(list[x].length())}")
+                                   }
+
+                                   //Testing*/
                             sendMediaMessage(
                                 media.path,
                                 AppConstants.IMAGE_MESSAGE, 0, groupID

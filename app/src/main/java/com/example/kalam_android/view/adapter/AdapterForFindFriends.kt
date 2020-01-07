@@ -3,17 +3,13 @@ package com.example.kalam_android.view.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.GlideContext
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemForFindFriendsBinding
 import com.example.kalam_android.repository.model.FindFriendList
-import com.example.kalam_android.repository.model.FindFriends
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 
 class AdapterForFindFriends(val context: Context, var friendList: MutableList<FindFriendList>) :
     RecyclerView.Adapter<AdapterForFindFriends.FindFriendsVH>() {
@@ -47,7 +43,7 @@ class AdapterForFindFriends(val context: Context, var friendList: MutableList<Fi
         val item = friendList.get(position)
         holder.binding.tvName.text = item.firstname + " " + item.lastname
         holder.binding.tvLocation.text = item.country
-        GlideDownloder.load(
+        GlideDownloader.load(
             context,
             holder.binding.ivImage,
             item.profile_image,

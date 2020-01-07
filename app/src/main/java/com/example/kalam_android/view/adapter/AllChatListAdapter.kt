@@ -13,7 +13,7 @@ import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.getTimeStamp
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 
 
 class AllChatListAdapter(
@@ -87,7 +87,7 @@ class AllChatListAdapter(
         }
 
         holderItem.binding.tvAgo.text = item.unix_time?.let { getTimeStamp(it.toLong()) }
-        GlideDownloder.load(
+        GlideDownloader.load(
             context,
             holderItem.binding.ivImage,
             item.profile_image,

@@ -17,7 +17,7 @@ import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -69,7 +69,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 if (report?.areAllPermissionsGranted() == true) {
                     startWebrtc()
                 } else {
-                    Debugger.e("Capturing Image", "onPermissionDenied")
+                    Debugger.e("initPermissions", "onPermissionDenied")
                 }
             }
 
@@ -129,7 +129,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             ibAnswer.visibility = View.GONE
-            tvCallStatus.text = "Outgoing"
+            tvCallStatus.text = "Calling"
             webSocketListener?.onAvailable(callerID.toString())
             /* createPeerConnection()
              doCall()*/
@@ -149,7 +149,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = data.getString("name")
             tvCallStatus.text = "Incoming"
         }
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             ivUser,
             profileImage,
@@ -327,8 +327,8 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     override fun onClick(v: View) {
         when (v.id) {
             R.id.ibHangUp -> {
-                hangup()
                 webSocketListener?.onHangout(callerID.toString())
+                hangup()
             }
             R.id.ibAnswer -> {
                 answerCall()
@@ -376,6 +376,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 AppConstants.AVAILABLE -> {
                     logE("did available received $jsonObject")
                     if (jsonObject.getBoolean("isAvailable")) {
+                        tvCallStatus.text = "Ringing"
                         createPeerConnection()
                         doCall()
                     } else {
@@ -392,8 +393,8 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         builder1.setMessage("Do you really want to end this call?")
         builder1.setCancelable(true)
         builder1.setPositiveButton("Yes") { dialog, id ->
-            hangup()
             webSocketListener?.onHangout(callerID.toString())
+            hangup()
         }
         builder1.setNegativeButton("No") { dialog, id ->
             dialog.cancel()
