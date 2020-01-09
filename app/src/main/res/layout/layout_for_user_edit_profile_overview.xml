@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/tvDescription"
+        android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
@@ -45,7 +45,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelAddress"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etAddress"
@@ -73,7 +73,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelCountry"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -105,7 +105,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelCity"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -137,7 +137,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelPhone"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etPhone"
@@ -166,7 +166,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelFax"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etFax"
@@ -194,7 +194,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelEmail"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etEmail"
@@ -206,7 +206,6 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:text="raza.7891@gmail.com"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
@@ -225,7 +224,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelWebsite"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etWebsite"
@@ -237,7 +236,6 @@
                     android:inputType="textWebEditText"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:text="Softech.com.pk"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
@@ -255,7 +253,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelInterest"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -267,7 +265,8 @@
                     <Spinner
                         android:id="@+id/spInterest"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        android:entries="@array/listInterest"/>
                 </LinearLayout>
             </LinearLayout>
 
@@ -284,7 +283,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelMarried"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -296,7 +295,8 @@
                     <Spinner
                         android:id="@+id/spStatus"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        android:entries="@array/listStatus" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -313,7 +313,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelWork"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etWork"
@@ -324,7 +324,6 @@
                     android:fontFamily="@font/roboto_regular"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:text="Android Developer at softech"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
@@ -332,7 +331,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:weightSum="2">
 
                 <TextView
@@ -342,7 +341,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="@string/labelEducation"
                     android:textColor="@color/theme_color"
-                    android:textSize="@dimen/_14ssp" />
+                    android:textSize="@dimen/_13ssp" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/etEducation"
@@ -353,7 +352,6 @@
                     android:fontFamily="@font/roboto_regular"
                     android:maxLines="2"
                     android:padding="@dimen/_5sdp"
-                    android:text="BS(CS)"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>

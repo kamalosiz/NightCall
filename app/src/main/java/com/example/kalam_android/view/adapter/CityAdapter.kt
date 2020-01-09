@@ -9,7 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 
-class CityAdapter (val pContext: Context, val list: ArrayList<String>, val listener: CityItemClickListener)
+class CityAdapter (val pContext: Context, var list: ArrayList<String>, val listener: CityItemClickListener)
     : RecyclerView.Adapter<CityAdapter.ViewHolder>(){
 
 
@@ -29,6 +29,10 @@ class CityAdapter (val pContext: Context, val list: ArrayList<String>, val liste
 
     override fun getItemViewType(position: Int): Int {
         return position
+    }
+    fun updateList(list :ArrayList<String>){
+        this.list = list
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

@@ -63,4 +63,8 @@ abstract class ViewModelsModule {
     @IntoMap
     @ViewModelKey(UserProfileViewModel::class)
     abstract fun bindUserProfileViewModel(viewModel: UserProfileViewModel): ViewModel
+    @Binds
+    @IntoMap
+    @ViewModelKey(EditUserProfileViewModel::class)
+    abstract fun bindEditUserProfileViewModel(viewModel: EditUserProfileViewModel): ViewModel
 }

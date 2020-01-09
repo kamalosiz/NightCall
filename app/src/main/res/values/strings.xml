@@ -94,4 +94,15 @@
     <string name="labelCity">City</string>
     <string name="labelSelectCountry">Select Country</string>
     <string name="labelSelectCity">Select City</string>
+    <string-array name="listStatus">
+        <item>Select Status</item>
+        <item>Single</item>
+        <item>Married</item>
+    </string-array>
+    <string-array name="listInterest">
+        <item>Select Interest</item>
+        <item>Food,Music,Movie</item>
+        <item>Movie,Tv Shows</item>
+        <item>Traveling</item>
+    </string-array>
 </resources>

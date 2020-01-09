@@ -37,4 +37,5 @@ interface AppComponents {
     fun doInjection(activityAudio: AudioCallActivity)
     fun doInjection(activityProfile: UserProfileActivity)
     fun doInjection(thread: WorkManagerMedia)
+    fun doInjection(activityProfile: EditUserProfileActivity)
 }

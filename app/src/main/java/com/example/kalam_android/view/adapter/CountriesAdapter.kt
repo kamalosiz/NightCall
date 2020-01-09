@@ -9,7 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 
-class CountriesAdapter (val pContext: Context, val list: ArrayList<String>, val listener: LocationItemClickListener)
+class CountriesAdapter (val pContext: Context, var list: ArrayList<String>, val listener: LocationItemClickListener)
     :RecyclerView.Adapter<CountriesAdapter.ViewHolder>(){
 
 
@@ -29,6 +29,10 @@ class CountriesAdapter (val pContext: Context, val list: ArrayList<String>, val 
 
     override fun getItemViewType(position: Int): Int {
         return position
+    }
+    fun updateList(list: ArrayList<String>){
+        this.list = list
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

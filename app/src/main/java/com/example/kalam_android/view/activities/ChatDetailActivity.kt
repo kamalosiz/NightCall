@@ -487,6 +487,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
                 intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
                 intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+                intent.putExtra(AppConstants.CALLER_USER_ID,callerID.toString())
                 val transitionName = getString(R.string.profile_trans)
                 val options =
                         ActivityOptionsCompat.makeSceneTransitionAnimation(

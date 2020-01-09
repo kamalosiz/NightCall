@@ -25,8 +25,13 @@ import com.example.kalam_android.view.adapter.AdapterForProfileVideos
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
+import kotlinx.android.synthetic.main.content_profile.view.*
+import kotlinx.android.synthetic.main.item_for_add_my_status.view.*
+import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.view.*
 import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.*
+import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.tvEmail
 import kotlinx.android.synthetic.main.layout_profile_header.view.*
+import kotlinx.android.synthetic.main.layout_profile_header.view.tvName
 import javax.inject.Inject
 
 
@@ -79,8 +84,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun initShowMore() {
-        binding.overviewView.tvDescription.text =
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+
         binding.overviewView.tvDescription.setShowingLine(3)
         binding.overviewView.tvDescription.addShowMoreText("Show more")
         binding.overviewView.tvDescription.addShowLessText("Show less")
@@ -256,7 +260,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         GlideDownloder.load(
                 this,
                 binding.profileHeaderView.ivUserProfile,
-                userList[0].profile_image,
+                userList[0].wall_image,
                 R.drawable.dummy_placeholder,
                 R.drawable.dummy_placeholder
         )
@@ -264,6 +268,15 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
         binding.overviewView.tvAddress.text = userList[0].country
         binding.profileHeaderView.tvLocation.text = userList[0].country
+        binding.profileHeaderView.tvCity.text = userList[0].city
+        binding.profileHeaderView.tvAddress.text = userList[0].address
+        binding.profileHeaderView.tvEmail.text = userList[0].email
+        binding.profileHeaderView.tvWebsite.text = userList[0].website
+        binding.profileHeaderView.tvFax.text = userList[0].fax
+        binding.profileHeaderView.tvStatus.text = userList[0].martial_status
+        binding.profileHeaderView.tvInterested.text = userList[0].intrests
+        binding.profileHeaderView.tvEducation.text = userList[0].education
+        binding.profileHeaderView.tvDescription.text = userList[0].bio
 
     }
 

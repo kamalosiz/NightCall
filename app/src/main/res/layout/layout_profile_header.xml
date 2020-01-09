@@ -13,8 +13,8 @@
             android:id="@+id/ivUserProfile"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_175sdp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/dummy_placeholder_1" />
+            android:src="@drawable/dummy_placeholder"
+            android:scaleType="centerCrop" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivProfile"
@@ -22,8 +22,8 @@
             android:layout_height="@dimen/_100sdp"
             android:layout_alignParentBottom="true"
             android:layout_centerInParent="true"
-            android:src="@drawable/dummy_placeholder_1"
             android:transitionName="@string/profile_trans"
+            android:src="@drawable/dummy_placeholder"
             app:civ_border_color="@color/white"
             app:civ_border_width="@dimen/_1sdp" />
     </RelativeLayout>
@@ -41,7 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:fontFamily="@font/roboto_regular"
-            android:text="Ali Raza"
             android:textColor="@color/theme_color"
             android:textSize="@dimen/_18ssp" />
 
@@ -52,7 +51,6 @@
             android:layout_below="@+id/tvName"
             android:layout_centerInParent="true"
             android:fontFamily="@font/roboto_regular"
-            android:text="Lahore, Pakistan"
             android:textColor="@color/black"
             android:textSize="@dimen/_13ssp" />
     </LinearLayout>

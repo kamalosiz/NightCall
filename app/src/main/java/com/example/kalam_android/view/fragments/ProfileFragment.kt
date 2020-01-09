@@ -1,6 +1,9 @@
 package com.example.kalam_android.view.fragments
 
 import android.annotation.SuppressLint
+import android.app.Activity.RECEIVER_VISIBLE_TO_INSTANT_APPS
+import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,6 +24,7 @@ import com.example.kalam_android.repository.model.ProfileData
 import com.example.kalam_android.repository.model.UserProfile
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.activities.EditUserProfileActivity
@@ -29,8 +33,10 @@ import com.example.kalam_android.view.adapter.AdapterForProfileVideos
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloder
+import kotlinx.android.synthetic.main.item_for_add_my_status.view.*
 import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.*
 import kotlinx.android.synthetic.main.layout_profile_header.view.*
+import kotlinx.android.synthetic.main.layout_profile_header.view.tvName
 import javax.inject.Inject
 
 class ProfileFragment : Fragment(), View.OnClickListener {
@@ -44,7 +50,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     lateinit var viewModel: UserProfileViewModel
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
-
+    private var list: ArrayList<ProfileData>? = null
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -98,8 +104,8 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     @SuppressLint("SetTextI18n")
     private fun renderResponse(userList: ArrayList<ProfileData>) {
-
-        binding.profileHeaderView.tvName.text = userList[0].nickname
+        list = userList
+        binding.profileHeaderView.tvName.text = userList[0].firstname + " "+userList[0].lastname
         GlideDownloder.load(
                 activity?.applicationContext,
                 binding.profileHeaderView.ivProfile,
@@ -110,14 +116,21 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         GlideDownloder.load(
                 activity?.applicationContext,
                 binding.profileHeaderView.ivUserProfile,
-                userList[0].profile_image,
+                userList[0].wall_image,
                 R.drawable.dummy_placeholder,
                 R.drawable.dummy_placeholder
         )
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
-        binding.overviewView.tvAddress.text = userList[0].country
-        binding.profileHeaderView.tvLocation.text = userList[0].country
+        binding.overviewView.tvAddress.text = userList[0].address
+        binding.profileHeaderView.tvLocation.text = userList[0].city+","+userList[0].country
+        binding.overviewView.tvEducation.text = userList[0].education
+        binding.overviewView.tvFax.text = userList[0].fax
+        binding.overviewView.tvDescription.text = userList[0].bio
+        binding.overviewView.tvWork.text = userList[0].work
+        binding.overviewView.tvWebsite.text = userList[0].website
+        binding.overviewView.tvMartialStatus.text = userList[0].martial_status
+        binding.overviewView.tvInterested.text = userList[0].intrests
 
     }
 
@@ -142,8 +155,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun initShowMore() {
-        binding.overviewView.tvDescription.text =
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+
         binding.overviewView.tvDescription.setShowingLine(3)
         binding.overviewView.tvDescription.addShowMoreText("Show more")
         binding.overviewView.tvDescription.addShowLessText("Show less")
@@ -213,9 +225,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 binding.overviewView.visibility = View.VISIBLE
                 binding.rvUserProfilePhotos.visibility = View.GONE
                 binding.rvUserProfileVideos.visibility = View.GONE
-                binding.nestedScroll.scrollTo(0, 0)
-                binding.rvUserProfilePhotos.isNestedScrollingEnabled = false
-                binding.rvUserProfileVideos.isNestedScrollingEnabled = false
+                
 
             }
             R.id.tvPhotos -> {
@@ -267,10 +277,23 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
             }
             R.id.btnProfileEdit -> {
-
-                startActivity(Intent(activity, EditUserProfileActivity::class.java))
+                val intent = Intent(activity, EditUserProfileActivity::class.java)
+                intent.putExtra(AppConstants.USER_DATA, list)
+                startActivityForResult(intent, AppConstants.UPDATE_PROFILE)
             }
 
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            if (requestCode == AppConstants.UPDATE_PROFILE) {
+
+                val params = HashMap<String, String>()
+                params["user_id"] = sharedPrefsHelper.getUser()?.id.toString()
+                viewModel.hitUserProfile(sharedPrefsHelper.getUser()?.token!!, params)
+            }
         }
     }
 }

@@ -22,5 +22,6 @@ class Urls {
         const val UPDATE_FCM_TOKEN = "/api/user/update_fcm_token"
         const val UPLOAD_AUDIO = "/api/chat/upload_file"
         const val GET_PROFILE = "/api/user/profile"
+        const val UPDATE_PROFILE = "/api/user/update_profile"
     }
 }

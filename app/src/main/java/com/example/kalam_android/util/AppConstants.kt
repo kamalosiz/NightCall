@@ -38,6 +38,7 @@ object AppConstants {
     const val MSG_ID = "msgidto_send"
     const val FROM_SEARCH = "is_from_search"
     const val SENDER_NAME = "sender_name"
+    const val USER_DATA = "user_data"
 
     //Request Code
     const val IMAGE_GALLERY = 0
@@ -49,6 +50,7 @@ object AppConstants {
     const val SELECTED_IMAGES = 12
     const val SELECT_IMAGES_VIDEOS = 14
     const val SELECT_AUDIO = 15
+    const val UPDATE_PROFILE = 11
     const val CAMERA = 150
     const val GALLERY = 160
 

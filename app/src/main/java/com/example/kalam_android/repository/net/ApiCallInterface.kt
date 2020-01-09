@@ -21,8 +21,8 @@ interface ApiCallInterface {
     @Multipart
     @POST(Urls.CREATE_PROFILE)
     fun createProfile(
-        @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>,
-        @Part profilePic: MultipartBody.Part
+            @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>,
+            @Part profilePic: MultipartBody.Part
     ): Observable<CreateProfileResponse>
 
     @POST(Urls.SIGN_IN)
@@ -53,9 +53,9 @@ interface ApiCallInterface {
     @Multipart
     @POST(Urls.UPLOAD_AUDIO)
     fun uploadMedia(
-        @Header("Authorization") authorization: String?,
-        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-        @Part media: MultipartBody.Part
+            @Header("Authorization") authorization: String?,
+            @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+            @Part media: MultipartBody.Part
     ): Observable<MediaResponse>
 
     /*@Multipart
@@ -71,5 +71,16 @@ interface ApiCallInterface {
 
     @POST(Urls.GET_PROFILE)
     fun getProfileData(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<UserProfile>
+
+    @POST(Urls.UPDATE_PROFILE)
+    fun updateProfile(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<UpdateUserProfile>
+
+    @Multipart
+    @POST(Urls.UPDATE_PROFILE)
+    fun updateProfile(@Header("Authorization") authorization: String, @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part image: MultipartBody.Part): Observable<UpdateUserProfile>
+
+    @Multipart
+    @POST(Urls.UPDATE_PROFILE)
+    fun updateProfile(@Header("Authorization") authorization: String, @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part profile: MultipartBody.Part, @Part wallImage: MultipartBody.Part): Observable<UpdateUserProfile>
 
 }
