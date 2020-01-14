@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
+import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityEditUserProfileBinding
 import com.example.kalam_android.helper.JSONParser
 import com.example.kalam_android.util.AppConstants
@@ -59,9 +60,8 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_user_profile)
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_user_profile)
+        MyApplication.getAppComponent(this).doInjection(this)
         initShowMore()
         onclickListener()
         initProfileVideosRecyclerView()

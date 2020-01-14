@@ -47,6 +47,7 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
@@ -93,15 +94,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
-
         myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
         handleIntent(intent)
         initListeners()
         checkSomeoneTyping()
         SocketIO.getInstance().setSocketCallbackListener(this)
         SocketIO.getInstance().setTypingListeners(this)
-        myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
-        myVoiceToTextHelper?.checkPermissionForVoiceToText()
         downwardPagination(fromSearch != 0)
         upwardPagination()
         binding.fabSpeech.setOnTouchListener(this)
@@ -117,7 +115,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         isChatIdAvailable = intent.getBooleanExtra(AppConstants.IS_CHATID_AVAILABLE, false)
         chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
         lastMsgID = intent.getLongExtra(AppConstants.MSG_ID, 0)
-        logE("lastMessage ID : $lastMsgID")
+//        logE("lastMessage ID : $lastMsgID")
         fromSearch = intent.getIntExtra(AppConstants.FROM_SEARCH, 0)
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
         setUserData()
@@ -125,7 +123,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (isChatIdAvailable) {
             Global.currentChatID = chatId
             hitConversationApi(lastMsgID, 0, fromSearch)
-//            logE("hitting from search : lastMsgID $lastMsgID : fromSearch: $fromSearch")
             SocketIO.getInstance().emitReadAllMessages(
                 chatId.toString(),
                 sharedPrefsHelper.getUser()?.id.toString()
@@ -187,7 +184,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 binding.pbHeader.visibility = View.VISIBLE
                 loading = true
                 lastMsgID = upChatList[upChatList.size - 1].id
-                logE("last message id: ${upChatList[upChatList.size - 1].id}")
                 hitConversationApi(lastMsgID, 0, fromSearch)
             }
         })
@@ -206,7 +202,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     binding.pbFooter.visibility = View.VISIBLE
                     loading = true
                     lastMsgID = downChatList[0].id
-                    logE("first message id ${downChatList[0].id}")
                     hitConversationApi(lastMsgID, 1, fromSearch)
                 }
             })
@@ -291,6 +286,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         it, true
                     )
                 }
+
             }
         }
     }
@@ -359,7 +355,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
                 val convertedFile = Compressor(this).compressToFile(File(file))
                 uploadMedia(identifier, convertedFile.absolutePath, duration, type, groupID)
-//                uploadMedia(identifier, file, duration, type, groupID)
             }
             AppConstants.VIDEO_MESSAGE -> {
                 lastMessage = "Video"
@@ -393,9 +388,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 }
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.isNotEmpty() == true) {
@@ -552,15 +545,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         val media = data.getSerializableExtra(SandriosCamera.MEDIA) as Media
                         if (media.type == SandriosCamera.MediaType.PHOTO) {
                             logE("onActivity Received")
-                            /*       //Testing
-                                   logE("original file size ${getReadableFileSize(File(media.path).length())}")
-                                   val list = splitFile(File(media.path))
-                                   for (x in list?.indices!!) {
-                                       logE("chunks $x : ${list[x]}")
-                                       logE("chunks $x : ${getReadableFileSize(list[x].length())}")
-                                   }
-
-                                   //Testing*/
                             sendMediaMessage(
                                 media.path,
                                 AppConstants.IMAGE_MESSAGE, 0, groupID
@@ -574,17 +558,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     }
                 }
                 AppConstants.SELECTED_IMAGES -> {
-//                    binding.lvBottomChat.lvForAttachment.visibility = View.GONE
-                    /* if (data != null) {
-                         val list =
-                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
-                         Debugger.e("List", "${list}")
-                         sendVideoOrImage(list)
-                     }*/
                     if (data != null) {
                         val list =
                             data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
-//                        sendVideoOrImage(list)
                         val intent =
                             Intent(this@ChatDetailActivity, AttachmentActivity::class.java)
                         intent.putExtra(AppConstants.SELECTED_IMAGES_VIDEOS, list)
@@ -604,6 +580,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
+
     override fun onPause() {
         super.onPause()
         try {
@@ -622,6 +599,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         Global.currentChatID = -1
         myChatMediaHelper?.myPlayer = MediaPlayer()
         myVoiceToTextHelper?.destroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
+        myVoiceToTextHelper?.checkPermissionForVoiceToText()
     }
 
     override fun onBackPressed() {

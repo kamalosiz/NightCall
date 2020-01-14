@@ -94,7 +94,6 @@ class MyVoiceToTextHelper(val context: Activity, private val resultVoiceToText: 
     }
 
     fun startVoiceToText() {
-
         speech?.startListening(recognizerIntent)
     }
 

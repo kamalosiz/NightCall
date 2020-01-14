@@ -26,13 +26,24 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
-        <activity android:name=".view.activities.EditUserProfileActivity" />
-        <activity android:name=".view.activities.AudioFileActivity" />
-        <activity android:name=".view.activities.AttachmentActivity" />
-        <activity android:name=".view.activities.MultipleMediasGroupActivity" /> <!-- <activity android:name=".webrtc.AudioCallActivity" /> -->
+
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+
+        <activity
+            android:name=".view.activities.EditUserProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.AudioFileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.AttachmentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.activities.MultipleMediasGroupActivity"
+            android:screenOrientation="portrait" />
+
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -46,10 +57,13 @@
 
         <activity
             android:name=".webrtc.AudioCallActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
+            android:showOnLockScreen="true" />
         <activity
             android:name=".webrtc.VideoCallActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:showOnLockScreen="true" />
         <activity
             android:name=".view.activities.StatusDetailActivity"
             android:screenOrientation="portrait" />
@@ -86,11 +100,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.activities.ContactListActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

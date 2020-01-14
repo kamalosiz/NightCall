@@ -51,15 +51,6 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
         binding.btnUpdateChanges.setOnClickListener(this)
         binding.logout.setOnClickListener(this)
         binding.header.btnRight.visibility = View.GONE
-        /*Debugger.e(
-            "SettingActivity",
-            "Language from login: ${sharedPrefsHelper.getUser()?.language} " +
-                    ", state from login: ${sharedPrefsHelper.getUser()?.auto_translate}"
-        )
-        Debugger.e(
-            "SettingActivity",
-            "Language: ${sharedPrefsHelper.getLanguage()} , isCheck: ${sharedPrefsHelper.getTransState()}"
-        )*/
         autoTranslate = sharedPrefsHelper.getTransState()
         binding.checkBox.isChecked = sharedPrefsHelper.getTransState() != 0
         userId = sharedPrefsHelper.getUser()?.id.toString()

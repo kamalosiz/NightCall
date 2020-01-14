@@ -63,7 +63,6 @@ class ChatMessagesAdapter(
                     } else {
                         chatList?.get(x)?.is_read = 0
                     }
-//                    notifyDataSetChanged()
                     notifyItemChanged(x)
                 }
             }

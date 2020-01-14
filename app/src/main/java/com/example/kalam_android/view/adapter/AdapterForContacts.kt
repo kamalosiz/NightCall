@@ -179,7 +179,6 @@ class AdapterForContacts(val context: Context) :
         return object : Filter() {
             override fun performFiltering(charSequence: CharSequence): FilterResults {
                 val charString = charSequence.toString()
-                logE("charString : $charString")
                 if (charString.isEmpty()) {
                     contactsFilteredList = contactList2
                 } else {

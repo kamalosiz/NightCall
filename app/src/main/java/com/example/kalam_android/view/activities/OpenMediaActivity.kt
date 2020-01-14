@@ -24,7 +24,6 @@ import com.google.android.exoplayer2.trackselection.*
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
 
-
 class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventListener {
 
     lateinit var binding: ActivityOpenMediaBinding
@@ -81,14 +80,13 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
             )
         } else if (type == AppConstants.VIDEO_MESSAGE) {
             logE("Video Received")
-            logE("Video Received :$file")
             binding.image.visibility = View.GONE
             binding.rlVideo.visibility = View.VISIBLE
-            setUp(file)
+            setUpPlayer(file)
         }
     }
 
-    private fun setUp(videoUri: String?) {
+    private fun setUpPlayer(videoUri: String?) {
         initializePlayer()
         if (videoUri == null) {
             return

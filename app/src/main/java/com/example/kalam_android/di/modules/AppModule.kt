@@ -11,6 +11,8 @@ import com.example.kalam_android.localdb.dao.AllChatListDao
 import com.example.kalam_android.localdb.dao.ContactsDao
 import com.example.kalam_android.localdb.RoomDB
 import com.example.kalam_android.localdb.LocalRepo
+import com.example.kalam_android.localdb.dao.ChatDataDao
+import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.util.AppConstants
 
 
@@ -47,7 +49,7 @@ class AppModule(private val context: Context) {
 
     @Singleton
     @Provides
-    fun provideShowDao(roomDb: RoomDB): ContactsDao {
+    fun provideContactsDao(roomDb: RoomDB): ContactsDao {
         return roomDb.contactsDao()
     }
 
@@ -57,10 +59,20 @@ class AppModule(private val context: Context) {
         return roomDb.allChatListDao()
     }
 
+    @Singleton
+    @Provides
+    fun provideChatDataDao(roomDb: RoomDB): ChatDataDao {
+        return roomDb.chatData()
+    }
+
     @Provides
     @Singleton
-    fun getLocalRepo(contactsDao: ContactsDao, allChatListDao: AllChatListDao): LocalRepo {
-        return LocalRepo(contactsDao, allChatListDao)
+    fun getLocalRepo(
+        contactsDao: ContactsDao,
+        allChatListDao: AllChatListDao,
+        chatDataDao: ChatDataDao
+    ): LocalRepo {
+        return LocalRepo(contactsDao, allChatListDao, chatDataDao)
     }
 
 }

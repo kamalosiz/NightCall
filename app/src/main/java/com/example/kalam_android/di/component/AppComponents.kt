@@ -10,6 +10,7 @@ import com.example.kalam_android.view.fragments.ChatsFragment
 import com.example.kalam_android.view.fragments.MoreFragment
 import com.example.kalam_android.view.fragments.ProfileFragment
 import com.example.kalam_android.webrtc.AudioCallActivity
+import com.example.kalam_android.webrtc.CustomWebSocketListener
 import com.example.kalam_android.webrtc.VideoCallActivity
 import dagger.Component
 import javax.inject.Singleton
@@ -37,4 +38,5 @@ interface AppComponents {
     fun doInjection(activityAudio: AudioCallActivity)
     fun doInjection(activityProfile: UserProfileActivity)
     fun doInjection(thread: RxMediaWorker)
+    fun doInjection(activity: EditUserProfileActivity)
 }

@@ -3,20 +3,27 @@ package com.example.kalam_android.util
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.loader.content.CursorLoader
 import com.example.kalam_android.repository.model.AudioModel
 import com.example.kalam_android.repository.model.MediaList
 import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.pow
+
 
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -37,6 +44,60 @@ fun toast(context: Context?, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
 
+/*fun onDisplayPopupPermission(context: Context) {
+    if (!isMIUI()) {
+        return
+    }
+    try { // MIUI 8
+        val localIntent = Intent("miui.intent.action.APP_PERM_EDITOR")
+        localIntent.setClassName(
+            "com.miui.securitycenter",
+            "com.miui.permcenter.permissions.PermissionsEditorActivity"
+        )
+        localIntent.putExtra("extra_pkgname", context.packageName)
+        context.startActivity(localIntent)
+        return
+    } catch (ignore: Exception) {
+    }
+    try { // MIUI 5/6/7
+        val localIntent = Intent("miui.intent.action.APP_PERM_EDITOR")
+        localIntent.setClassName(
+            "com.miui.securitycenter",
+            "com.miui.permcenter.permissions.AppPermissionsEditorActivity"
+        )
+        localIntent.putExtra("extra_pkgname", context.packageName)
+        context.startActivity(localIntent)
+        return
+    } catch (ignore: Exception) {
+    }
+    // Otherwise jump to application details
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri =
+        Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    context.startActivity(intent)
+}
+
+
+fun isMIUI(): Boolean {
+    val device = Build.MANUFACTURER
+    if (device == "Xiaomi") {
+        try {
+            val prop = Properties()
+            prop.load(FileInputStream(File(Environment.getRootDirectory(), "build.prop")))
+            return prop.getProperty(
+                "ro.miui.ui.version.code",
+                null
+            ) != null || prop.getProperty(
+                "ro.miui.ui.version.name",
+                null
+            ) != null || prop.getProperty("ro.miui.internal.storage", null) != null
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    return false
+}*/
 /*@Throws(IOException::class)
 fun splitFile(f: File): List<File>? {
     var partCounter = 1

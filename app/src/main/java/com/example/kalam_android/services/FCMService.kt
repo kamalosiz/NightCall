@@ -13,16 +13,20 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.kalam_android.R
 import com.example.kalam_android.base.MyApplication
+import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.activities.ChatDetailActivity
+import com.example.kalam_android.view.activities.MainActivity
 import com.example.kalam_android.view.activities.SplashActivity
+import com.example.kalam_android.webrtc.CustomWebSocketListener
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import javax.inject.Inject
-
 
 class FCMService : FirebaseMessagingService() {
     val TAG = this.javaClass.simpleName
@@ -31,14 +35,35 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMSG: RemoteMessage) {
 
-        /*val intent = Intent(this@FCMService, ChatDetailActivity::class.java)
-        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        intent.action = Intent.ACTION_MAIN
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        startActivity(intent)*/
-        logE("onMessageReceived $remoteMSG")
-        if (Integer.valueOf(remoteMSG.data[AppConstants.FIREBASE_CHAT_ID].toString()) != Global.currentChatID) {
-            showNotification(remoteMSG)
+        logE("onMessageReceived ${remoteMSG.data}")
+        if (remoteMSG.data["nType"] == "call") {
+            showNotification("Call Notification", "Call is received")
+
+
+            /*val intent = Intent(this.application, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.putExtra(
+                AppConstants.CONNECTED_USER_ID,
+                remoteMSG.data["connectedUserId"].toString()
+            )
+            intent.putExtra(AppConstants.IS_FROM_CALL, true)
+            startActivity(intent)*/
+
+            (this.application as MyApplication).component.doInjection(this)
+            val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
+            val customWebSocketListener =
+                CustomWebSocketListener.getInstance(sharedPrefsHelper, this)
+            val okHttpClientBuilder = OkHttpClient.Builder()
+            val webSocket1 = okHttpClientBuilder.build()
+            val webSocket = webSocket1.newWebSocket(request, customWebSocketListener)
+            customWebSocketListener.setWebSocket(webSocket)
+            customWebSocketListener.setPushData(remoteMSG.data["connectedUserId"].toString(), true)
+            webSocket1.dispatcher().executorService().shutdown()
+
+        } else {
+            if (Integer.valueOf(remoteMSG.data[AppConstants.FIREBASE_CHAT_ID].toString()) != Global.currentChatID) {
+                showNotification(remoteMSG)
+            }
         }
     }
 
@@ -51,21 +76,10 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun showNotification(remoteMessage: RemoteMessage) {
-        var body: String? = ""
-        var title: String? = ""
-        var chatID = -1
-        try {
-            body = remoteMessage.notification?.body
-            title = remoteMessage.notification?.title
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        try {
-            chatID =
-                Integer.valueOf(remoteMessage.data[AppConstants.FIREBASE_CHAT_ID].toString())
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val body: String? = remoteMessage.notification?.body
+        val title: String? = remoteMessage.notification?.title
+        val chatID: Int =
+            Integer.valueOf(remoteMessage.data[AppConstants.FIREBASE_CHAT_ID].toString())
         logE("chatId: $chatID")
         var intent = Intent(this, SplashActivity::class.java)
         if (isAppRunning(this, packageName)) {
@@ -105,9 +119,9 @@ class FCMService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setSound(defaultSoundUri)
-            .setGroup(title)
-            .setGroupSummary(true)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+//            .setGroup(title)
+//            .setGroupSummary(true)
+//            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
 
         mNotificationManager.notify(chatID, mBuilder.build())
     }
@@ -145,15 +159,33 @@ class FCMService : FirebaseMessagingService() {
         notification.createNotificationChannel(adminChannel)
     }
 
+    private fun showNotification(title: String, task: String) {
+        logE("Showing Notification")
+        val notificationManager: NotificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                "Call Notification",
+                "Call Notification",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+        val mBuilder: NotificationCompat.Builder =
+            NotificationCompat.Builder(this, "Call Notification")
+                .setContentTitle(title)
+                .setSmallIcon(getNotificationIcon())
+                .setContentText(task)
+                .setColor(Color.parseColor("#179a63"))
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        notificationManager.notify(1, mBuilder.build())
+        logE("Showing Notification done")
+    }
+
     private fun logE(message: String) {
         Debugger.e(TAG, message)
     }
+
 }
-
-
-/* .setStyle(
-     NotificationCompat.BigPictureStyle()
-//                    .bigPicture(bigBitmap)
-         .setSummaryText(body)
-         .setBigContentTitle(title)
- )*/
