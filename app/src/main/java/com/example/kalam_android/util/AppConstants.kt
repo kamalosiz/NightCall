@@ -39,6 +39,7 @@ object AppConstants {
     const val FROM_SEARCH = "is_from_search"
     const val SENDER_NAME = "sender_name"
     const val USER_DATA = "user_data"
+    const val KALAM_CONTACT_LIST = "kalam_contact_list"
 
     //Request Code
     const val IMAGE_GALLERY = 0

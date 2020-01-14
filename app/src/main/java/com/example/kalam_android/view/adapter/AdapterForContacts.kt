@@ -20,6 +20,7 @@ import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.activities.ChatDetailActivity
+import com.example.kalam_android.view.activities.NewGroupActivity
 import com.example.kalam_android.wrapper.GlideDownloder
 
 class AdapterForContacts(val context: Context) :
@@ -30,8 +31,8 @@ class AdapterForContacts(val context: Context) :
     private var contactsFilteredList: ArrayList<ContactsData>? = null
     private val TAG = this.javaClass.simpleName
     private val VIEW_HEADER = 0
-
     private val VIEW_ITEM = 1
+    private var tempContactList : ArrayList<ContactsData> = ArrayList()
     private val onClickListener: View.OnClickListener
 
     init {
@@ -79,7 +80,12 @@ class AdapterForContacts(val context: Context) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-
+        for (i in  contactList!!.indices){
+            if (contactList!![i].id != 0){
+                tempContactList.clear()
+                tempContactList.add(contactList!![i])
+            }
+        }
         when (getItemViewType(position)) {
             VIEW_HEADER -> {
             }
@@ -130,7 +136,9 @@ class AdapterForContacts(val context: Context) :
         override fun onClick(v: View) {
             when (v.id) {
                 R.id.lvNewGroup -> {
-                    Toast.makeText(context, "New Group", Toast.LENGTH_LONG).show()
+                    val intent = Intent(context,NewGroupActivity::class.java)
+                    intent.putExtra(AppConstants.KALAM_CONTACT_LIST,tempContactList)
+                    context.startActivity(intent)
                 }
                 R.id.lvNewContact -> {
                     val intent = Intent(Intent.ACTION_INSERT)

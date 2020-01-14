@@ -21,45 +21,20 @@
                 android:layout_marginStart="@dimen/_15sdp"
                 android:src="@drawable/ic_group_placeholder" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/tvNewGroup"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
+                android:backgroundTint="@color/theme_color"
+                android:hint="Add Group Name"
+                android:textColorHint="@color/theme_color"
                 android:fontFamily="@font/roboto_regular"
-                android:text="@string/labelNewGroup"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14ssp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/lvNewContact"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_5sdp"
-            android:gravity="center">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/ivNewContactImage"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
-                android:layout_marginStart="@dimen/_15sdp"
-                android:src="@color/theme_color" />
-
-            <TextView
-                android:id="@+id/tvNewContact"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_15sdp"
-                android:layout_marginEnd="@dimen/_15sdp"
-                android:layout_weight="1"
-                android:fontFamily="@font/roboto_regular"
-                android:text="@string/labelNewContact"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_14ssp" />
         </LinearLayout>
 
     </LinearLayout>

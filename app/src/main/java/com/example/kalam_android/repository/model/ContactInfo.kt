@@ -1,5 +1,7 @@
 package com.example.kalam_android.repository.model
 
+import java.io.Serializable
+
 data class ContactInfo(val name: String, val number: String)
 
 data class Contacts(
@@ -20,4 +22,4 @@ data class ContactsData(
     val profile_image: String?,
     val kalam_number: String?,
     val kalam_name: String?
-)
+):Serializable

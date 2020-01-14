@@ -43,8 +43,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     private lateinit var binding: ProfileFragmentBinding
 
-    private var userName: String = ""
-    private var userImage: String = ""
     @Inject
     lateinit var factory: ViewModelFactory
     lateinit var viewModel: UserProfileViewModel
@@ -65,10 +63,21 @@ class ProfileFragment : Fragment(), View.OnClickListener {
             consumeApiResponse(it)
         })
 
-        initShowMore()
         onclickListener()
         initProfileVideosRecyclerView()
         initProfileImagesRecyclerView()
+        binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
+                "<u>${getString(R.string.labelOverview)}</u>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+        binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
+                "<u>${getString(R.string.labelPhotos)}</u>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+        binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
+                "<u>${getString(R.string.labelVideos)}</u>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
         binding.rvUserProfileVideos.isFocusable = false
         binding.rvUserProfilePhotos.isFocusable = false
         binding.nestedScroll.isFocusable = false
@@ -123,10 +132,11 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
         binding.overviewView.tvAddress.text = userList[0].address
-        binding.profileHeaderView.tvLocation.text = userList[0].city+","+userList[0].country
+        binding.profileHeaderView.tvLocation.text = userList[0].city+", "+userList[0].country
         binding.overviewView.tvEducation.text = userList[0].education
         binding.overviewView.tvFax.text = userList[0].fax
         binding.overviewView.tvDescription.text = userList[0].bio
+        initShowMore()
         binding.overviewView.tvWork.text = userList[0].work
         binding.overviewView.tvWebsite.text = userList[0].website
         binding.overviewView.tvMartialStatus.text = userList[0].martial_status
@@ -171,18 +181,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                         R.color.theme_color
                 )
         )
-        binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelOverview)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelPhotos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelVideos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
 
     }
 
@@ -225,7 +223,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 binding.overviewView.visibility = View.VISIBLE
                 binding.rvUserProfilePhotos.visibility = View.GONE
                 binding.rvUserProfileVideos.visibility = View.GONE
-                
+
 
             }
             R.id.tvPhotos -> {

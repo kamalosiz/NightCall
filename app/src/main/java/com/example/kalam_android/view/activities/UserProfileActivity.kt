@@ -57,10 +57,21 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
             consumeApiResponse(it)
         })
         setUserData()
-        initShowMore()
         onclickListener()
         initProfileVideosRecyclerView()
         initProfileImagesRecyclerView()
+        binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
+                "<u>${getString(R.string.labelOverview)}</u>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+        binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
+                "<u>${getString(R.string.labelPhotos)}</u>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+        binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
+                "<u>${getString(R.string.labelVideos)}</u>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
         binding.rvUserProfileVideos.isFocusable = false
         binding.rvUserProfilePhotos.isFocusable = false
         binding.nestedScroll.isFocusable = false
@@ -100,18 +111,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                         R.color.theme_color
                 )
         )
-        binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelOverview)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelPhotos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelVideos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
+
 
     }
 
@@ -277,7 +277,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         binding.profileHeaderView.tvInterested.text = userList[0].intrests
         binding.profileHeaderView.tvEducation.text = userList[0].education
         binding.profileHeaderView.tvDescription.text = userList[0].bio
-
+        initShowMore()
     }
 
 }

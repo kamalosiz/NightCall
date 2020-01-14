@@ -24,9 +24,10 @@
         android:roundIcon="@drawable/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".view.activities.EditUserProfileActivity"></activity>
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup">
+        <activity android:name=".view.activities.NewGroupActivity"></activity>
+        <activity android:name=".view.activities.EditUserProfileActivity" />
         <activity android:name=".view.activities.AudioFileActivity" />
         <activity android:name=".view.activities.AttachmentActivity" />
         <activity android:name=".view.activities.MultipleMediasGroupActivity" /> <!-- <activity android:name=".webrtc.AudioCallActivity" /> -->

@@ -94,6 +94,7 @@
     <string name="labelCity">City</string>
     <string name="labelSelectCountry">Select Country</string>
     <string name="labelSelectCity">Select City</string>
+    <string name="labelAddPeople">Add People</string>
     <string-array name="listStatus">
         <item>Select Status</item>
         <item>Single</item>
