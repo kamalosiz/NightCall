@@ -26,7 +26,6 @@ import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloader
 import kotlinx.android.synthetic.main.content_profile.view.*
-import kotlinx.android.synthetic.main.item_for_add_my_status.view.*
 import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.view.*
 import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.*
 import kotlinx.android.synthetic.main.layout_for_user_profile_overview.view.tvEmail
@@ -249,7 +248,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     private fun renderResponse(userList: ArrayList<ProfileData>) {
 
-        binding.profileHeaderView.tvName.text = userList[0].nickname
+        binding.profileHeaderView.tvName.text = userList[0].firstname+" "+userList[0].lastname
         GlideDownloader.load(
                 this,
                 binding.profileHeaderView.ivProfile,
@@ -266,17 +265,15 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         )
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
-        binding.overviewView.tvAddress.text = userList[0].country
-        binding.profileHeaderView.tvLocation.text = userList[0].country
-        binding.profileHeaderView.tvCity.text = userList[0].city
-        binding.profileHeaderView.tvAddress.text = userList[0].address
-        binding.profileHeaderView.tvEmail.text = userList[0].email
-        binding.profileHeaderView.tvWebsite.text = userList[0].website
-        binding.profileHeaderView.tvFax.text = userList[0].fax
-        binding.profileHeaderView.tvStatus.text = userList[0].martial_status
-        binding.profileHeaderView.tvInterested.text = userList[0].intrests
-        binding.profileHeaderView.tvEducation.text = userList[0].education
-        binding.profileHeaderView.tvDescription.text = userList[0].bio
+        binding.overviewView.tvAddress.text = userList[0].address
+        binding.profileHeaderView.tvLocation.text = userList[0].city + ", " + userList[0].country
+        binding.overviewView.tvWebsite.text = userList[0].website
+        binding.overviewView.tvFax.text = userList[0].fax
+        binding.overviewView.tvMartialStatus.text = userList[0].martial_status
+        binding.overviewView.tvWork.text = userList[0].work
+        binding.overviewView.tvInterested.text = userList[0].intrests
+        binding.overviewView.tvEducation.text = userList[0].education
+        binding.overviewView.tvDescription.text = userList[0].bio
         initShowMore()
     }
 
