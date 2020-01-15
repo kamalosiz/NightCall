@@ -216,7 +216,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                 binding.rvUserProfileVideos.visibility = View.VISIBLE
 
             }
-            R.id.ivBack -> {
+            R.id.llBack -> {
                 onBackPressed()
             }
 

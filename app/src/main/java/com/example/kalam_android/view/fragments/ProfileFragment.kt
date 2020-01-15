@@ -67,16 +67,16 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         initProfileVideosRecyclerView()
         initProfileImagesRecyclerView()
         binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelOverview)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelOverview)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelPhotos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelPhotos)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelVideos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelVideos)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.rvUserProfileVideos.isFocusable = false
         binding.rvUserProfilePhotos.isFocusable = false
@@ -114,25 +114,25 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     private fun renderResponse(userList: ArrayList<ProfileData>) {
         list = userList
-        binding.profileHeaderView.tvName.text = userList[0].firstname + " "+userList[0].lastname
+        binding.profileHeaderView.tvName.text = userList[0].firstname + " " + userList[0].lastname
         GlideDownloader.load(
-                activity?.applicationContext,
-                binding.profileHeaderView.ivProfile,
-                userList[0].profile_image,
-                R.drawable.dummy_placeholder,
-                R.drawable.dummy_placeholder
+            activity?.applicationContext,
+            binding.profileHeaderView.ivProfile,
+            userList[0].profile_image,
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
         )
         GlideDownloader.load(
-                activity?.applicationContext,
-                binding.profileHeaderView.ivUserProfile,
-                userList[0].wall_image,
-                R.drawable.dummy_placeholder,
-                R.drawable.dummy_placeholder
+            activity?.applicationContext,
+            binding.profileHeaderView.ivUserProfile,
+            userList[0].wall_image,
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
         )
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
         binding.overviewView.tvAddress.text = userList[0].address
-        binding.profileHeaderView.tvLocation.text = userList[0].city+", "+userList[0].country
+        binding.profileHeaderView.tvLocation.text = userList[0].city + ", " + userList[0].country
         binding.overviewView.tvEducation.text = userList[0].education
         binding.overviewView.tvFax.text = userList[0].fax
         binding.overviewView.tvDescription.text = userList[0].bio
@@ -142,14 +142,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         binding.overviewView.tvMartialStatus.text = userList[0].martial_status
         binding.overviewView.tvInterested.text = userList[0].intrests
 
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home ->
-                activity?.onBackPressed()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun initProfileVideosRecyclerView() {

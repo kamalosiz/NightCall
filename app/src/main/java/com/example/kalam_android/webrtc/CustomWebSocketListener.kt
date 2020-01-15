@@ -122,6 +122,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
 
     override fun onFailure(wSocket: WebSocket?, t: Throwable, response: Response?) {
         logE("onFailure " + t.message)
+        logE("response $response")
         val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
         val okHttpClientBuilder = OkHttpClient.Builder()
         val webSocket1 = okHttpClientBuilder.build()
