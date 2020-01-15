@@ -3,7 +3,6 @@ package com.example.kalam_android.view.adapter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Environment
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -17,25 +16,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
-import com.example.kalam_android.repository.model.ChatData
+import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.Global
 import com.example.kalam_android.util.getTimeStamp
 import com.example.kalam_android.view.activities.OpenMediaActivity
-import com.example.kalam_android.wrapper.GlideDownloder
-import java.io.File
+import com.example.kalam_android.wrapper.GlideDownloader
 
-
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class ChatMessagesAdapter(
-    val context: Context,
-    private val userId: String,
-    val name: String,
-    private val profile: String,
-    private val translateState: Int?,
-    private val language: String?,
-    private val myChatMediaHelper: MyChatMediaHelper?
+        val context: Context,
+        private val userId: String,
+        val name: String,
+        private val profile: String,
+        private val translateState: Int?,
+        private val language: String?,
+        private val myChatMediaHelper: MyChatMediaHelper?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val TAG = this.javaClass.simpleName
@@ -44,12 +40,8 @@ class ChatMessagesAdapter(
     fun updateList(list: ArrayList<ChatData>, isDown: Boolean) {
         if (isDown) {
             logE("isDown is true")
-            logE("list size ${list.size}")
-            logE("list size $list")
-
             var i = list.size - 1
             while (i > -1) {
-                logE("first element ${list[i]}")
                 chatList?.add(0, list[i])
                 notifyItemInserted(0)
                 i--
@@ -71,7 +63,6 @@ class ChatMessagesAdapter(
                     } else {
                         chatList?.get(x)?.is_read = 0
                     }
-//                    notifyDataSetChanged()
                     notifyItemChanged(x)
                 }
             }
@@ -114,12 +105,12 @@ class ChatMessagesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MyHolder(
-            DataBindingUtil.inflate(
-                LayoutInflater.from(parent.context),
-                R.layout.item_chat_right,
-                parent,
-                false
-            )
+                DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.item_chat_right,
+                        parent,
+                        false
+                )
         )
     }
 
@@ -133,8 +124,8 @@ class ChatMessagesAdapter(
         when (item?.type) {
             AppConstants.TEXT_MESSAGE -> {
                 hideShowViewOriginal(
-                    itemHolder.binding.itemChat.llOriginal,
-                    item.language.toString()
+                        itemHolder.binding.itemChat.llOriginal,
+                        item.language.toString()
                 )
                 itemHolder.binding.itemChat.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
@@ -162,30 +153,30 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
                     itemHolder.binding.itemChat.llOriginal.visibility = View.GONE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
-                        Global.setColor(context, R.color.white)
+                            Global.setColor(context, R.color.white)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
                     itemHolder.binding.itemChat.llOriginal.gravity = View.VISIBLE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
-                        Global.setColor(context, R.color.black)
+                            Global.setColor(context, R.color.black)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                 }
                 applyReadStatus(
-                    userId.toInt(), item.sender_id,
-                    itemHolder.binding.itemChat.ivDeliver, item.is_read
+                        userId.toInt(), item.sender_id,
+                        itemHolder.binding.itemChat.ivDeliver, item.is_read
                 )
             }
             AppConstants.AUDIO_MESSAGE -> {
                 hideShowViewOriginal(
-                    itemHolder.binding.audioPlayer.llOriginal,
-                    item.language.toString()
+                        itemHolder.binding.audioPlayer.llOriginal,
+                        item.language.toString()
                 )
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.audioPlayer.tvTime.text =
-                        getTimeStamp(item.unix_time.toLong())
+                            getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.audioPlayer.tvTime.text = "Uploading Audio..."
                 }
@@ -196,12 +187,12 @@ class ChatMessagesAdapter(
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.ivPlayPause.setOnClickListener {
                     myChatMediaHelper?.playVoiceMsg(
-                        itemHolder.binding,
-                        item.audio_url.toString(),
-                        item.id,
-                        context,
-                        item.unix_time,
-                        item.language!!
+                            itemHolder.binding,
+                            item.audio_url.toString(),
+                            item.id,
+                            context,
+                            item.unix_time,
+                            item.language!!
                     )
                 }
                 if (item.sender_id == userId.toInt()) {
@@ -212,8 +203,8 @@ class ChatMessagesAdapter(
                     itemHolder.binding.audioPlayer.llOriginal.gravity = View.VISIBLE
                 }
                 applyReadStatus(
-                    userId.toInt(), item.sender_id,
-                    itemHolder.binding.audioPlayer.ivDeliver, item.is_read
+                        userId.toInt(), item.sender_id,
+                        itemHolder.binding.audioPlayer.ivDeliver, item.is_read
                 )
                 var audioUrl = ""
                 itemHolder.binding.audioPlayer.llOriginal.setOnClickListener {
@@ -230,7 +221,7 @@ class ChatMessagesAdapter(
             AppConstants.IMAGE_MESSAGE -> {
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.imageHolder.tvTime.text =
-                        getTimeStamp(item.unix_time.toLong())
+                            getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.imageHolder.tvTime.text = "Uploading Image..."
                 }
@@ -239,12 +230,12 @@ class ChatMessagesAdapter(
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.VISIBLE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
-                GlideDownloder.load(
-                    context,
-                    itemHolder.binding.imageHolder.ivImage,
-                    item.audio_url.toString(),
-                    R.color.grey,
-                    R.color.grey
+                GlideDownloader.load(
+                        context,
+                        itemHolder.binding.imageHolder.ivImage,
+                        item.audio_url.toString(),
+                        R.color.grey,
+                        R.color.grey
                 )
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.END
@@ -253,14 +244,14 @@ class ChatMessagesAdapter(
                 }
                 itemHolder.binding.imageHolder.rlImage.setOnClickListener {
                     startOpenMediaActivity(
-                        item.audio_url.toString(),
-                        AppConstants.IMAGE_MESSAGE,
-                        itemHolder.binding.imageHolder.ivImage
+                            item.audio_url.toString(),
+                            AppConstants.IMAGE_MESSAGE,
+                            itemHolder.binding.imageHolder.ivImage
                     )
                 }
                 applyReadStatus(
-                    userId.toInt(), item.sender_id,
-                    itemHolder.binding.imageHolder.ivDeliver, item.is_read
+                        userId.toInt(), item.sender_id,
+                        itemHolder.binding.imageHolder.ivDeliver, item.is_read
                 )
             }
             AppConstants.VIDEO_MESSAGE -> {
@@ -272,7 +263,7 @@ class ChatMessagesAdapter(
 
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.videoHolder.tvTime.text =
-                        getTimeStamp(item.unix_time.toLong())
+                            getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.videoHolder.tvTime.text = "Uploading Video..."
                 }
@@ -281,23 +272,23 @@ class ChatMessagesAdapter(
                 } else {
                     itemHolder.binding.videoHolder.rlVideoItem.gravity = Gravity.START
                 }
-                GlideDownloder.load(
-                    context,
-                    itemHolder.binding.videoHolder.ivImage,
-                    item.audio_url.toString(),
-                    R.color.grey,
-                    R.color.grey
+                GlideDownloader.load(
+                        context,
+                        itemHolder.binding.videoHolder.ivImage,
+                        item.audio_url.toString(),
+                        R.color.grey,
+                        R.color.grey
                 )
                 itemHolder.binding.videoHolder.rlVideoItem.setOnClickListener {
                     startOpenMediaActivity(
-                        item.audio_url.toString(),
-                        AppConstants.VIDEO_MESSAGE,
-                        itemHolder.binding.videoHolder.ivImage
+                            item.audio_url.toString(),
+                            AppConstants.VIDEO_MESSAGE,
+                            itemHolder.binding.videoHolder.ivImage
                     )
                 }
                 applyReadStatus(
-                    userId.toInt(), item.sender_id,
-                    itemHolder.binding.videoHolder.ivDeliver, item.is_read
+                        userId.toInt(), item.sender_id,
+                        itemHolder.binding.videoHolder.ivDeliver, item.is_read
                 )
             }
 
@@ -316,11 +307,11 @@ class ChatMessagesAdapter(
 
         val transitionName = context.getString(R.string.trans_key)
         val options =
-            ActivityOptionsCompat.makeSceneTransitionAnimation(
-                context as Activity,
-                view,
-                transitionName
-            )
+                ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        context as Activity,
+                        view,
+                        transitionName
+                )
         ActivityCompat.startActivity(context, intent, options.toBundle())
     }
 

@@ -4,13 +4,12 @@ object AppConstants {
     const val VERIFICATION_CODE = "key_phone_verfiy"
     const val PROFILE_IMAGE_KEY = "profileImage_kalam"
     const val USER_NAME = "user_name_kalam"
-    const val RECEIVER_ID = "user_receiver_id"
     const val IS_CHATID_AVAILABLE = "is_chat_boolean"
     const val CALLER_USER_ID = "caller_user_id"
     const val INITIATOR = "caller_initiator"
     const val IS_FROM_OUTSIDE = "is_outside_boolean"
+    const val IS_FROM_PUSH = "is_call_boolean"
     const val CHAT_USER_NAME = "chat_user_name"
-    const val CHAT_USER_ID = "chat_user_id"
     const val CHAT_USER_PICTURE = "chat_user_picture"
     const val CHAT_ID = "kalam_chat_id"
     const val DUMMY_DATA = -1
@@ -18,7 +17,6 @@ object AppConstants {
     const val TEXT_MESSAGE = "text"
     const val AUDIO_MESSAGE = "audio"
     const val IMAGE_MESSAGE = "image"
-    const val GROUP = "group"
     const val VIDEO_MESSAGE = "video"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
@@ -33,13 +31,13 @@ object AppConstants {
     const val KEY_IS_LOGIN = "is_logged_in_kalam"
     const val PHONE = "key_phoneno"
     const val CONNECTED_USER_ID = "connectedUserId"
-    const val IMAGE_DIRECTORY = "/demonuts"
     const val FIREBASE_CHAT_ID = "chat_id"
     const val MSG_ID = "msgidto_send"
     const val FROM_SEARCH = "is_from_search"
     const val SENDER_NAME = "sender_name"
     const val USER_DATA = "user_data"
     const val KALAM_CONTACT_LIST = "kalam_contact_list"
+
 
     //Request Code
     const val IMAGE_GALLERY = 0
@@ -52,15 +50,13 @@ object AppConstants {
     const val SELECT_IMAGES_VIDEOS = 14
     const val SELECT_AUDIO = 15
     const val UPDATE_PROFILE = 11
-    const val CAMERA = 150
-    const val GALLERY = 160
-
-
+    const val CODE_FROM_PUSH = 1010
 
     //Local DB=
     const val DB_NAME = "kalam_local_db"
     const val CONTACTS_TABLE = "contacts"
     const val ALL_CHAT_ENTITY = "allchat"
+    const val CHAT_MESSAGES = "chat_messages"
 
     //SocketIO Actions
     const val START_CAHT = "startChat"
@@ -79,7 +75,13 @@ object AppConstants {
     const val LOGIN = "login"
     const val TYPE = "type"
     const val REJECT = "reject"
+
+
     const val AVAILABLE = "available"
+    const val READY_FOR_CALL = "readyforcall"
+    const val NEW_CALL = "newcall"
+
+
     const val JSON = "webrtc_json"
 
     //Listeners

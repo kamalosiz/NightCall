@@ -76,12 +76,10 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
     }
 
     private fun getIntentData() {
-
         if (intent != null) {
             list =
                 intent.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>?
             Debugger.w("Gallery list ", list.toString())
-
         }
     }
 

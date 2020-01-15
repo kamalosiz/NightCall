@@ -1,5 +1,8 @@
 package com.example.kalam_android.view.activities
 
+import android.app.Activity
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -27,10 +30,13 @@ import com.example.kalam_android.webrtc.AudioCallActivity
 import com.example.kalam_android.webrtc.CustomWebSocketListener
 import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.wrapper.SocketIO
+import com.sandrios.sandriosCamera.internal.SandriosCamera
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import javax.inject.Inject
+import kotlin.system.exitProcess
+
 
 class MainActivity : BaseActivity(), WebSocketOfferCallback {
 
@@ -42,14 +48,13 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-    private var customWebSocketListener: CustomWebSocketListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         MyApplication.getAppComponent(this).doInjection(this)
-        connectWebSocket()
-//        SocketIO.socketConnection(sharedPrefsHelper.getUser()?.token).connectListeners()
+//        connectWebSocket()
+        didPushReceived()
         SocketIO.getInstance().connectSocket(sharedPrefsHelper.getUser()?.token)
         SocketIO.getInstance().connectListeners()
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
@@ -169,13 +174,32 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
 
     private fun connectWebSocket() {
         val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
-        customWebSocketListener = CustomWebSocketListener.getInstance(sharedPrefsHelper)
         val okHttpClientBuilder = OkHttpClient.Builder()
         val webSocket1 = okHttpClientBuilder.build()
-        val webSocket = webSocket1.newWebSocket(request, customWebSocketListener)
-        customWebSocketListener?.setWebSocket(webSocket)
-        customWebSocketListener?.setOfferListener(this)
+        val webSocket =
+            webSocket1.newWebSocket(request, CustomWebSocketListener.getInstance(sharedPrefsHelper))
+        CustomWebSocketListener.getInstance(sharedPrefsHelper).setWebSocket(webSocket)
+        CustomWebSocketListener.getInstance(sharedPrefsHelper).setOfferListener(this)
         webSocket1.dispatcher().executorService().shutdown()
+    }
+
+    private fun didPushReceived() {
+        val isFromCall = intent.getBooleanExtra(AppConstants.IS_FROM_PUSH, false)
+        if (isFromCall) {
+            val jsonString = intent.getStringExtra(AppConstants.JSON)
+            val jsonObject = JSONObject(jsonString)
+//            val connectedUserId = intent.getStringExtra(AppConstants.CONNECTED_USER_ID)
+//            customWebSocketListener?.setPushData(connectedUserId, isFromCall)
+
+            if (jsonObject.getBoolean("isVideo")) {
+                startNewActivity(VideoCallActivity::class.java, jsonObject, true)
+            } else {
+                startNewActivity(AudioCallActivity::class.java, jsonObject, true)
+            }
+            CustomWebSocketListener.getInstance(sharedPrefsHelper).setOfferListener(this)
+        } else {
+            connectWebSocket()
+        }
     }
 
     override fun onBackPressed() {
@@ -194,19 +218,42 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     override fun offerCallback(jsonObject: JSONObject) {
         when (jsonObject.getString(AppConstants.TYPE)) {
             AppConstants.OFFER -> {
+                Debugger.e("offerCallback", "json : $jsonObject")
                 if (jsonObject.getBoolean("isVideo")) {
-                    startNewActivity(VideoCallActivity::class.java, jsonObject)
+                    startNewActivity(VideoCallActivity::class.java, jsonObject, false)
                 } else {
-                    startNewActivity(AudioCallActivity::class.java, jsonObject)
+                    startNewActivity(AudioCallActivity::class.java, jsonObject, false)
                 }
             }
         }
     }
 
-    private fun startNewActivity(mClass: Class<*>, jsonObject: JSONObject) {
+    override fun onResume() {
+        super.onResume()
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
+    }
+
+    private fun startNewActivity(mClass: Class<*>, jsonObject: JSONObject, isFromPush: Boolean) {
         val intent = Intent(this, mClass)
         intent.putExtra(AppConstants.JSON, jsonObject.toString())
-        startActivity(intent)
+        if (isFromPush) {
+            startActivityForResult(intent, AppConstants.CODE_FROM_PUSH)
+        } else {
+            startActivity(intent)
+        }
         overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                AppConstants.CODE_FROM_PUSH -> {
+                    finishAndRemoveTask()
+                }
+            }
+        }
     }
 }

@@ -4,12 +4,13 @@ import com.example.kalam_android.di.modules.AppModule
 import com.example.kalam_android.di.modules.UtilsModule
 import com.example.kalam_android.di.modules.ViewModelsModule
 import com.example.kalam_android.services.FCMService
-import com.example.kalam_android.services.WorkManagerMedia
+import com.example.kalam_android.services.RxMediaWorker
 import com.example.kalam_android.view.activities.*
 import com.example.kalam_android.view.fragments.ChatsFragment
 import com.example.kalam_android.view.fragments.MoreFragment
 import com.example.kalam_android.view.fragments.ProfileFragment
 import com.example.kalam_android.webrtc.AudioCallActivity
+import com.example.kalam_android.webrtc.CustomWebSocketListener
 import com.example.kalam_android.webrtc.VideoCallActivity
 import dagger.Component
 import javax.inject.Singleton
@@ -36,6 +37,6 @@ interface AppComponents {
     fun doInjection(activityVideo: VideoCallActivity)
     fun doInjection(activityAudio: AudioCallActivity)
     fun doInjection(activityProfile: UserProfileActivity)
-    fun doInjection(thread: WorkManagerMedia)
-    fun doInjection(activityProfile: EditUserProfileActivity)
+    fun doInjection(thread: RxMediaWorker)
+    fun doInjection(activity: EditUserProfileActivity)
 }

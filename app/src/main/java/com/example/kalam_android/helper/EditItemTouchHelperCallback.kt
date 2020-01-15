@@ -1,14 +1,12 @@
 package com.example.kalam_android.helper
 
 
-import androidx.annotation.NonNull
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.*
-import com.example.kalam_android.view.adapter.AdapterForMediaView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.kalam_android.view.adapter.AdapterSelectedMedia
 
- class EditItemTouchHelperCallback(val adapterSelectedMedia: AdapterSelectedMedia) :
+class EditItemTouchHelperCallback(private val adapterSelectedMedia: AdapterSelectedMedia) :
     ItemTouchHelper.Callback() {
 
 
@@ -29,9 +27,8 @@ import com.example.kalam_android.view.adapter.AdapterSelectedMedia
         return true
     }
 
-     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
-         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-     }
+    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
+    }
 
 
- }
+}

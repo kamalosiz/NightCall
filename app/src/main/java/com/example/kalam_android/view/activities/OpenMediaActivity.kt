@@ -15,7 +15,7 @@ import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityOpenMediaBinding
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
@@ -23,7 +23,6 @@ import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.*
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
-
 
 class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventListener {
 
@@ -57,7 +56,7 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
         binding.header.ivAudio.visibility = View.GONE
         binding.header.ivMore.visibility = View.GONE
         binding.header.ivVideo.visibility = View.GONE
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             binding.header.ivProfileImage,
             profile,
@@ -72,7 +71,7 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
             logE("Image Received")
             binding.image.visibility = View.VISIBLE
             binding.rlVideo.visibility = View.GONE
-            GlideDownloder.load(
+            GlideDownloader.load(
                 this,
                 binding.image,
                 file,
@@ -81,14 +80,13 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
             )
         } else if (type == AppConstants.VIDEO_MESSAGE) {
             logE("Video Received")
-            logE("Video Received :$file")
             binding.image.visibility = View.GONE
             binding.rlVideo.visibility = View.VISIBLE
-            setUp(file)
+            setUpPlayer(file)
         }
     }
 
-    private fun setUp(videoUri: String?) {
+    private fun setUpPlayer(videoUri: String?) {
         initializePlayer()
         if (videoUri == null) {
             return

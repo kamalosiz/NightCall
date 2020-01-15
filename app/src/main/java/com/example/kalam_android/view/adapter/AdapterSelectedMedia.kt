@@ -95,7 +95,7 @@ class AdapterSelectedMedia(val context: Context, val list: ArrayList<MediaList>)
                 }
 
             }
-            AppConstants.AUDIO_GALLERY->{
+            AppConstants.AUDIO_GALLERY -> {
                 holder.binding.selectedVideoHolder.rlVideo.visibility = View.GONE
                 holder.binding.selectedAudioHolder.rlAudio.visibility = View.VISIBLE
                 holder.binding.selectedImagesHolder.llSelectedImage.visibility = View.GONE

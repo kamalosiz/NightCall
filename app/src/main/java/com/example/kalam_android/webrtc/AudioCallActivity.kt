@@ -2,6 +2,7 @@ package com.example.kalam_android.webrtc
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.media.AudioManager
@@ -10,6 +11,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
@@ -17,7 +19,7 @@ import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -31,6 +33,7 @@ import org.json.JSONObject
 import org.webrtc.*
 import java.util.*
 import javax.inject.Inject
+
 
 class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
     private var peerConnectionFactory: PeerConnectionFactory? = null
@@ -50,9 +53,16 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     lateinit var audioManager: AudioManager
     private var calleeName: String? = null
     private var profileImage: String? = null
+    private var isAlreadyConnected = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+        )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_call)
         MyApplication.getAppComponent(this).doInjection(this)
@@ -69,7 +79,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 if (report?.areAllPermissionsGranted() == true) {
                     startWebrtc()
                 } else {
-                    Debugger.e("Capturing Image", "onPermissionDenied")
+                    Debugger.e("initPermissions", "onPermissionDenied")
                 }
             }
 
@@ -104,7 +114,6 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             .createIceServer()
         peerIceServers.add(turnIceServer)
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
-            .setEnableVideoHwAcceleration(true)
             .createInitializationOptions()
         PeerConnectionFactory.initialize(initializationOptions)
 
@@ -115,8 +124,14 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             true
         )
         val defaultVideoDecoderFactory = DefaultVideoDecoderFactory(rootEglBase.eglBaseContext)
-        peerConnectionFactory =
-            PeerConnectionFactory(options, defaultVideoEncoderFactory, defaultVideoDecoderFactory)
+        peerConnectionFactory = PeerConnectionFactory.builder()
+            .setOptions(options)
+            .setVideoEncoderFactory(defaultVideoEncoderFactory)
+            .setVideoDecoderFactory(defaultVideoDecoderFactory)
+            .createPeerConnectionFactory()
+
+//        peerConnectionFactory =
+//            PeerConnectionFactory(options, defaultVideoEncoderFactory, defaultVideoDecoderFactory)
 
         audioConstraints = MediaConstraints()
 
@@ -129,10 +144,9 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             ibAnswer.visibility = View.GONE
-            tvCallStatus.text = "Outgoing"
-            webSocketListener?.onAvailable(callerID.toString())
-            /* createPeerConnection()
-             doCall()*/
+            tvCallStatus.text = "Calling"
+            webSocketListener?.onNewCall(callerID.toString())
+
         } else {
             val json = intent.getStringExtra(AppConstants.JSON)
             mediaPlayer?.start()
@@ -149,7 +163,7 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = data.getString("name")
             tvCallStatus.text = "Incoming"
         }
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             ivUser,
             profileImage,
@@ -327,8 +341,8 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     override fun onClick(v: View) {
         when (v.id) {
             R.id.ibHangUp -> {
-                hangup()
                 webSocketListener?.onHangout(callerID.toString())
+                hangup()
             }
             R.id.ibAnswer -> {
                 answerCall()
@@ -352,8 +366,10 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             if (audioSource != null) {
                 audioSource?.dispose()
             }
+            setResult(Activity.RESULT_OK)
             finish()
             overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
+            Debugger.e("MainActivity","Finishing activity")
         } catch (e: Exception) {
             logE("Exception Occurred ${e.message}")
         }
@@ -373,14 +389,11 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 AppConstants.REJECT -> {
                     hangup()
                 }
-                AppConstants.AVAILABLE -> {
-                    logE("did available received $jsonObject")
-                    if (jsonObject.getBoolean("isAvailable")) {
-                        createPeerConnection()
-                        doCall()
-                    } else {
-                        tvCallStatus.text = jsonObject.getString("reason")
-                    }
+                AppConstants.READY_FOR_CALL -> {
+                    logE("did readyForCall received $jsonObject")
+                    tvCallStatus.text = "Ringing"
+                    createPeerConnection()
+                    doCall()
                 }
             }
         }
@@ -392,8 +405,8 @@ class AudioCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         builder1.setMessage("Do you really want to end this call?")
         builder1.setCancelable(true)
         builder1.setPositiveButton("Yes") { dialog, id ->
-            hangup()
             webSocketListener?.onHangout(callerID.toString())
+            hangup()
         }
         builder1.setNegativeButton("No") { dialog, id ->
             dialog.cancel()

@@ -13,13 +13,14 @@ class CityAdapter (val pContext: Context, var list: ArrayList<String>, val liste
     : RecyclerView.Adapter<CityAdapter.ViewHolder>(){
 
 
-    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvItem: AppCompatTextView = itemView.findViewById(R.id.tvItem)
         val loc: ConstraintLayout = itemView.findViewById(R.id.loc)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =  LayoutInflater.from(parent.context).inflate(R.layout.item_for_countries, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_for_countries, parent, false)
         return ViewHolder(view)
     }
 
@@ -37,7 +38,7 @@ class CityAdapter (val pContext: Context, var list: ArrayList<String>, val liste
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tvItem.text = list[position]
-        holder.loc.setOnClickListener{
+        holder.loc.setOnClickListener {
             listener.onCityItemClick(list[position], position)
         }
     }

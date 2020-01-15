@@ -2,12 +2,19 @@ package com.example.kalam_android.repository.net
 
 class Urls {
     companion object {
-        //        const val WEB_SOCKET_URL = "http://192.168.0.39:9090"x
-//        const val WEB_SOCKET_URL = "https://voip.worldnoordev.com:9090"
-//        const val WEB_SOCKET_URL = "https://192.168.0.168:9090"
-        const val WEB_SOCKET_URL = "ws://192.168.0.168:9090"
+        //        const val WEB_SOCKET_URL = "http://192.168.0.39:9090"
+        const val WEB_SOCKET_URL = "https://voip.worldnoordev.com:9090"
+        //        const val WEB_SOCKET_URL = "ws://192.168.0.168:9090"
+
+        //Local IP
         const val BASE_URL = "http://192.168.0.71:5000/"
-        //        const val BASE_URL = "http://184.169.185.200:5000/"
+//        const val BASE_URL = "http://192.168.0.73:5000/"
+
+        //Stage IP
+//        const val BASE_URL = "http://184.169.185.200:5000/"
+//        const val BASE_URL = "http://184.169.185.200:6000/"
+
+        //Live Ip
 //        const val BASE_URL = "http://54.183.109.117:5000/"
         const val VERIFY_PHONE = "api/user/verify_phone"
         const val VERIFY_PHONE_CODE = "api/user/verify_phone_code"

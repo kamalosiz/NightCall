@@ -11,12 +11,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.PagerAdapter
-import com.bumptech.glide.Glide
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemForMediaViewerBinding
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.view.activities.OpenMediaActivity
+import com.example.kalam_android.wrapper.GlideDownloader
 import java.util.*
 
 class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) : PagerAdapter() {
@@ -30,17 +30,19 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
             null,
             false
         )
-        val type = list[position].type
-        when (type) {
+        when (list[position].type) {
             AppConstants.IMAGE_GALLERY -> {
                 binding.viewVideoHolder.rlVideo.visibility = View.GONE
                 binding.ivImageViewer.visibility = View.VISIBLE
                 binding.viewAudiHolder.rlAudio.visibility = View.GONE
                 binding.ivImageViewer.let {
-                    Glide.with(context)
-                        .load(list[position].file)
-                        .placeholder(R.drawable.dummy_placeholder_1)
-                        .into(it)
+                    GlideDownloader.load(
+                        context,
+                        it,
+                        list[position].file,
+                        R.drawable.dummy_placeholder_1,
+                        R.drawable.dummy_placeholder_1
+                    )
                 }
             }
             AppConstants.POST_VIDEO -> {
@@ -49,13 +51,16 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
                 binding.ivImageViewer.visibility = View.GONE
                 binding.viewAudiHolder.rlAudio.visibility = View.GONE
                 binding.viewVideoHolder.ivImage.let {
-                    Glide.with(context)
-                        .load(list[position].file)
-                        .placeholder(R.drawable.dummy_placeholder_1)
-                        .into(it)
+                    GlideDownloader.load(
+                        context,
+                        it,
+                        list[position].file,
+                        R.drawable.dummy_placeholder_1,
+                        R.drawable.dummy_placeholder_1
+                    )
                 }
                 binding.viewVideoHolder.rlVideo.setOnClickListener {
-                    startOpenMediaActivity(list[position].file,list[position].type.toString(),it)
+                    startOpenMediaActivity(list[position].file, list[position].type.toString(), it)
                 }
 
             }
@@ -65,7 +70,7 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
                 binding.ivImageViewer.visibility = View.GONE
                 binding.viewAudiHolder.rlAudio.visibility = View.VISIBLE
                 binding.viewAudiHolder.rlAudio.setOnClickListener {
-                    startOpenMediaActivity(list[position].file,list[position].type.toString(),it)
+                    startOpenMediaActivity(list[position].file, list[position].type.toString(), it)
                 }
 
             }
@@ -93,7 +98,7 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
     }
 
     override fun getItemPosition(`object`: Any): Int {
-        return PagerAdapter.POSITION_NONE
+        return POSITION_NONE
     }
 
     override fun restoreState(state: Parcelable?, loader: ClassLoader?) {}
@@ -101,6 +106,7 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
     override fun saveState(): Parcelable? {
         return null
     }
+
     private fun startOpenMediaActivity(file: String, type: String, view: View) {
         val intent = Intent(context, OpenMediaActivity::class.java)
         intent.putExtra(AppConstants.CHAT_FILE, file)

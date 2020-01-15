@@ -4,6 +4,5 @@ import android.view.View
 import com.example.kalam_android.repository.model.AudioModel
 
 interface SelectAudioCallBack {
-
-    fun selectAudio(view: View,audioModel: AudioModel,position:Int)
+    fun selectAudio(view: View, audioModel: AudioModel, position: Int)
 }

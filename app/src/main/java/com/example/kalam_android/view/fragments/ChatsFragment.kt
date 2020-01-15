@@ -79,13 +79,11 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         hitAllChatApi()
 
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
-//        SocketIO.setSocketCallbackListener(this)
         SocketIO.getInstance().setSocketCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {
             isRefresh = true
             hitAllChatApi()
         }
-        binding.fabSpeech.isClickable = false
         binding.fabSpeech.setOnTouchListener(this)
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -105,8 +103,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 }
             }
         })
-        myVoiceToTextHelper = MyVoiceToTextHelper(activity as Activity, this)
-        myVoiceToTextHelper?.checkPermissionForVoiceToText()
         return binding.root
     }
 
@@ -327,6 +323,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
 
     override fun onResume() {
         super.onResume()
+        myVoiceToTextHelper = MyVoiceToTextHelper(activity as Activity, this)
+        myVoiceToTextHelper?.checkPermissionForVoiceToText()
         if (sharedPrefsHelper[AppConstants.IS_FROM_CONTACTS, 0] == 1) {
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
             isRefresh = true
@@ -341,6 +339,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         myVoiceToTextHelper?.destroy()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {

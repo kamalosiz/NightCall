@@ -40,7 +40,7 @@ import com.example.kalam_android.view.adapter.CountriesAdapter
 import com.example.kalam_android.viewmodel.EditUserProfileViewModel
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.karumi.dexter.Dexter
@@ -79,8 +79,6 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
     var citiesJson = ""
     var wallImage = ""
     var profileImage = ""
-    var wallImageMultipart: MultipartBody.Part? = null
-    var profileImageMultipart: MultipartBody.Part? = null
     @Inject
     lateinit var factory: ViewModelFactory
     lateinit var viewModel: EditUserProfileViewModel
@@ -156,14 +154,14 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             binding.overviewView.tvCountry.text = list[0].country
             binding.overviewView.spInterest.setSelection(getIndex(binding.overviewView.spInterest, list[0].intrests))
             binding.overviewView.spStatus.setSelection(getIndex(binding.overviewView.spStatus, list[0].martial_status))
-            GlideDownloder.load(
+            GlideDownloader.load(
                     this,
                     binding.ivProfile,
                     list[0].profile_image,
                     R.drawable.dummy_placeholder,
                     R.drawable.dummy_placeholder
             )
-            GlideDownloder.load(
+            GlideDownloader.load(
                     this,
                     binding.ivProfileWall,
                     list[0].wall_image,
@@ -360,7 +358,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
         profileImagePath = resultUri.path.toString()
 
         if (!isWallImage) {
-            GlideDownloder.load(
+            GlideDownloader.load(
                     this,
                     binding.ivProfile,
                     resultUri.path,
@@ -369,7 +367,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             )
             profileImage = profileImagePath as String
         } else {
-            GlideDownloder.load(
+            GlideDownloader.load(
                     this,
                     binding.ivProfileWall,
                     resultUri.path,

@@ -11,7 +11,7 @@ import com.github.nkzawa.socketio.client.Socket
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
-class SocketIO {
+class SocketIO private constructor() {
     private val TAG = this.javaClass.simpleName
     private var socketCallback: SocketCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null

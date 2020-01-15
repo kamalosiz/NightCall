@@ -22,7 +22,7 @@ import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
 import com.example.kalam_android.viewmodel.CreateProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.fxn.pix.Options
 import com.fxn.pix.Pix
 import com.google.firebase.iid.FirebaseInstanceId
@@ -146,7 +146,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         }
         logE("result: ${resultUri.path}")
         profileImagePath = resultUri.path.toString()
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             binding.ivUploadImage,
             resultUri.path,

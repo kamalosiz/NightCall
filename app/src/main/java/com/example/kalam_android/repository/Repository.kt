@@ -3,6 +3,7 @@ package com.example.kalam_android.repository
 import com.example.kalam_android.repository.model.*
 import com.example.kalam_android.repository.net.ApiCallInterface
 import io.reactivex.Observable
+import io.reactivex.Single
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -69,20 +70,12 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     }
 
     fun uploadMedia(
-            authorization: String?,
-            @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-            @Part media: MultipartBody.Part
-    ): Observable<MediaResponse> {
+        authorization: String?,
+        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
+        @Part media: MultipartBody.Part
+    ): Single<MediaResponse> {
         return apiCallInterface.uploadMedia(authorization, params, media)
     }
-
-    /* fun uploadMedia(
-         authorization: String?,
-         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-         @Part list: ArrayList<MultipartBody.Part>
-     ): Observable<MediaResponse> {
-         return apiCallInterface.uploadAudio(authorization, params, list)
-     }*/
 
     fun updateFcm(
             authorization: String?,

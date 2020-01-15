@@ -1,8 +1,8 @@
 package com.example.kalam_android.repository.net
 
 import com.example.kalam_android.repository.model.*
-import com.example.kalam_android.services.WorkManagerMedia
 import io.reactivex.Observable
+import io.reactivex.Single
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -53,18 +53,10 @@ interface ApiCallInterface {
     @Multipart
     @POST(Urls.UPLOAD_AUDIO)
     fun uploadMedia(
-            @Header("Authorization") authorization: String?,
-            @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-            @Part media: MultipartBody.Part
-    ): Observable<MediaResponse>
-
-    /*@Multipart
-    @POST(Urls.UPLOAD_AUDIO)
-    fun uploadMedia(
         @Header("Authorization") authorization: String?,
         @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-        @Part list: ArrayList<MultipartBody.Part>
-    ): Observable<MediaResponse>*/
+        @Part media: MultipartBody.Part
+    ): Single<MediaResponse>
 
     @POST(Urls.UPDATE_FCM_TOKEN)
     fun updateFcm(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>

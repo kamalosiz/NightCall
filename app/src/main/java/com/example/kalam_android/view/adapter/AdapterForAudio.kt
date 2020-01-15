@@ -13,7 +13,8 @@ import com.example.kalam_android.repository.model.AudioModel
 
 class AdapterForAudio(val context: Context, val list: ArrayList<AudioModel>) :
     RecyclerView.Adapter<AdapterForAudio.AudioViewHolder>() {
-    private var selectAudioCallBack:SelectAudioCallBack?=null
+
+    private var selectAudioCallBack: SelectAudioCallBack? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioViewHolder {
         return AudioViewHolder(
             DataBindingUtil.inflate(
@@ -24,7 +25,8 @@ class AdapterForAudio(val context: Context, val list: ArrayList<AudioModel>) :
             )
         )
     }
-    fun setSelectAudioCallBack(selectAudioCallBack:SelectAudioCallBack){
+
+    fun setSelectAudioCallBack(selectAudioCallBack: SelectAudioCallBack) {
         this.selectAudioCallBack = selectAudioCallBack
     }
 
@@ -39,7 +41,7 @@ class AdapterForAudio(val context: Context, val list: ArrayList<AudioModel>) :
             list[position].duration + " . " + list[position].audioLength
         holder.binding.rlAudio.setOnClickListener {
 
-            selectAudioCallBack?.selectAudio(holder.itemView,list[position],position)
+            selectAudioCallBack?.selectAudio(holder.itemView, list[position], position)
         }
     }
 

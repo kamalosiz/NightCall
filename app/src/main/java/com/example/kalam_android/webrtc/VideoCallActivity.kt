@@ -2,17 +2,16 @@ package com.example.kalam_android.webrtc
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.Handler
 import android.os.SystemClock
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
-import android.view.animation.AnimationUtils
+import android.view.WindowManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
@@ -20,7 +19,7 @@ import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -68,6 +67,12 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+        )
         super.onCreate(savedInstanceState)
         setContentView(R.layout.call_activity)
         MyApplication.getAppComponent(this).doInjection(this)
@@ -126,7 +131,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             .createIceServer()
         peerIceServers.add(turnIceServer)
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
-            .setEnableVideoHwAcceleration(true)
+//            .setEnableVideoHwAcceleration(true)
             .createInitializationOptions()
         PeerConnectionFactory.initialize(initializationOptions)
 
@@ -137,15 +142,36 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             true
         )
         val defaultVideoDecoderFactory = DefaultVideoDecoderFactory(rootEglBase.eglBaseContext)
-        peerConnectionFactory =
-            PeerConnectionFactory(options, defaultVideoEncoderFactory, defaultVideoDecoderFactory)
+//        peerConnectionFactory =
+//            PeerConnectionFactory(options, defaultVideoEncoderFactory, defaultVideoDecoderFactory)
+        peerConnectionFactory = PeerConnectionFactory.builder()
+            .setOptions(options)
+            .setVideoEncoderFactory(defaultVideoEncoderFactory)
+            .setVideoDecoderFactory(defaultVideoDecoderFactory)
+            .createPeerConnectionFactory()
 
         val videoCapturerAndroid: VideoCapturer? = createCameraCapturer(Camera1Enumerator(false))
         audioConstraints = MediaConstraints()
         videoConstraints = MediaConstraints()
-        if (videoCapturerAndroid != null) {
+
+
+        /*if (videoCapturerAndroid != null) {
             videoSource = peerConnectionFactory?.createVideoSource(videoCapturerAndroid)
+        }*/
+        //Create a VideoSource instance
+        if (videoCapturerAndroid != null) {
+            val surfaceTextureHelper =
+                SurfaceTextureHelper.create("CaptureThread", rootEglBase.eglBaseContext)
+            videoSource =
+                peerConnectionFactory?.createVideoSource(videoCapturerAndroid.isScreencast)
+            videoCapturerAndroid.initialize(
+                surfaceTextureHelper,
+                applicationContext,
+                videoSource?.capturerObserver
+            )
         }
+
+
         localVideoTrack = peerConnectionFactory?.createVideoTrack("100", videoSource)
         audioSource = peerConnectionFactory?.createAudioSource(audioConstraints)
         localAudioTrack = peerConnectionFactory?.createAudioTrack("101", audioSource)
@@ -161,11 +187,9 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             ibAnswer.visibility = View.GONE
-            tvCallStatus.text = "Outgoing"
-            webSocketListener?.onAvailable(callerID.toString())
-            /* createPeerConnection()
-             doCall()
-             turnOnSpeakers()*/
+            tvCallStatus.text = "Calling"
+            webSocketListener?.onNewCall(callerID.toString())
+
         } else {
             val json = intent.getStringExtra(AppConstants.JSON)
             mediaPlayer?.start()
@@ -182,7 +206,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             calleeName = data.getString("name")
             tvCallStatus.text = "Incoming"
         }
-        GlideDownloder.load(
+        GlideDownloader.load(
             this,
             ivUser,
             profileImage,
@@ -434,6 +458,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 peerConnectionFactory?.dispose()
                 peerConnectionFactory = null
             }*/
+            setResult(Activity.RESULT_OK)
             finish()
             overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
         } catch (e: Exception) {
@@ -503,15 +528,12 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 AppConstants.REJECT -> {
                     hangup()
                 }
-                AppConstants.AVAILABLE -> {
-                    logE("webSocketCallback AVAILABLE $jsonObject")
-                    if (jsonObject.getBoolean("isAvailable")) {
-                        createPeerConnection()
-                        doCall()
-                        turnOnSpeakers()
-                    } else {
-                        tvCallStatus.text = jsonObject.getString("reason")
-                    }
+                AppConstants.READY_FOR_CALL -> {
+                    logE("did readyForCall received $jsonObject")
+                    tvCallStatus.text = "Ringing"
+                    createPeerConnection()
+                    doCall()
+                    turnOnSpeakers()
                 }
             }
         }

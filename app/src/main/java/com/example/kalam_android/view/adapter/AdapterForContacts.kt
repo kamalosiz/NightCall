@@ -21,7 +21,7 @@ import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.activities.NewGroupActivity
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 
 class AdapterForContacts(val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
@@ -94,7 +94,7 @@ class AdapterForContacts(val context: Context) :
                 val itemHolder = holder as ContactViewHolder
                 itemHolder.binding.tvContactName.text = item?.name
                 itemHolder.binding.tvContactPhone.text = item?.number
-                GlideDownloder.load(
+                GlideDownloader.load(
                     context,
                     itemHolder.binding.ivContactImage,
                     item?.profile_image,
@@ -187,7 +187,6 @@ class AdapterForContacts(val context: Context) :
         return object : Filter() {
             override fun performFiltering(charSequence: CharSequence): FilterResults {
                 val charString = charSequence.toString()
-                logE("charString : $charString")
                 if (charString.isEmpty()) {
                     contactsFilteredList = contactList2
                 } else {

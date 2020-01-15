@@ -6,9 +6,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemUserProfileImageBinding
-import com.example.kalam_android.databinding.ItemUserProfileVideoBinding
 
-class AdapterForProfilePhotos: RecyclerView.Adapter<ProfilePhotosHolder>() {
+class AdapterForProfilePhotos : RecyclerView.Adapter<ProfilePhotosHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfilePhotosHolder {
         return ProfilePhotosHolder(
             DataBindingUtil.inflate(
@@ -21,7 +20,6 @@ class AdapterForProfilePhotos: RecyclerView.Adapter<ProfilePhotosHolder>() {
     }
 
     override fun getItemCount(): Int {
-
         return 40
     }
 
@@ -30,6 +28,4 @@ class AdapterForProfilePhotos: RecyclerView.Adapter<ProfilePhotosHolder>() {
 }
 
 class ProfilePhotosHolder(val binding: ItemUserProfileImageBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
-}
+    RecyclerView.ViewHolder(binding.root)

@@ -9,17 +9,18 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 
-class CountriesAdapter (val pContext: Context, var list: ArrayList<String>, val listener: LocationItemClickListener)
-    :RecyclerView.Adapter<CountriesAdapter.ViewHolder>(){
+class CountriesAdapter(val pContext: Context, var list: ArrayList<String>, val listener: LocationItemClickListener)
+    : RecyclerView.Adapter<CountriesAdapter.ViewHolder>() {
 
 
-    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvItem: AppCompatTextView = itemView.findViewById(R.id.tvItem)
         val loc: ConstraintLayout = itemView.findViewById(R.id.loc)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =  LayoutInflater.from(parent.context).inflate(R.layout.item_for_countries, parent, false)
+        val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_for_countries, parent, false)
         return ViewHolder(view)
     }
 
@@ -30,14 +31,15 @@ class CountriesAdapter (val pContext: Context, var list: ArrayList<String>, val 
     override fun getItemViewType(position: Int): Int {
         return position
     }
-    fun updateList(list: ArrayList<String>){
+
+    fun updateList(list: ArrayList<String>) {
         this.list = list
         notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tvItem.text = list[position]
-        holder.loc.setOnClickListener{
+        holder.loc.setOnClickListener {
             listener.onItemClick(list[position], position)
         }
     }

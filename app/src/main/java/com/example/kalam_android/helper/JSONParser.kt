@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 
 object JSONParser {
 
-    fun loadJSONFromAsset(pContext: Context, filename: String): String{
+    fun loadJSONFromAsset(pContext: Context, filename: String): String {
         var json = ""
         try {
             val inputStream = pContext.assets.open(filename)
@@ -20,14 +20,14 @@ object JSONParser {
             inputStream.close()
             val charset: Charset = Charsets.UTF_8
             json = String(buffer, charset)
-        } catch (e: IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
         }
         return json
     }
 
 
-    fun getCountriesFromJSON(json: String, pContext: Context): ArrayList<String>{
+    fun getCountriesFromJSON(json: String, pContext: Context): ArrayList<String> {
         val jsonArray = JSONArray(json)
         val countriesList = ArrayList<String>()
         for (i in 0 until jsonArray.length()) {
@@ -38,13 +38,13 @@ object JSONParser {
         return countriesList
     }
 
-    fun getCitiesFromJSON(json: String, pContext: Context, query: String): ArrayList<String>{
+    fun getCitiesFromJSON(json: String, pContext: Context, query: String): ArrayList<String> {
         val jsonArray = JSONArray(json)
         val citiesList = ArrayList<String>()
         for (i in 0 until jsonArray.length()) {
             val jObj: JSONObject = jsonArray.getJSONObject(i)
             Debugger.d("JSON_FILE_DATA", "JSON: $jObj")
-            if(jObj.getString("country") == query) {
+            if (jObj.getString("country") == query) {
                 citiesList.add(jObj.getString("name"))
             }
         }

@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.work.RxWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.kalam_android.R
@@ -12,6 +13,7 @@ import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.wrapper.SocketIO
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -21,19 +23,18 @@ import okhttp3.RequestBody
 import java.io.File
 import javax.inject.Inject
 
-class WorkManagerMedia(
+class RxMediaWorker(
     private val ctx: Context,
     params: WorkerParameters
 
-) : Worker(ctx, params) {
+) : RxWorker(ctx, params) {
 
     @Inject
     lateinit var repository: Repository
 
-    private val disposable = CompositeDisposable()
-    override fun doWork(): Result {
-
+    override fun createWork(): Single<Result> {
         MyApplication.getAppComponent(ctx).doInjection(this)
+
         val identifier = inputData.getString("identifier")
         val file = inputData.getString("file")
         val duration = inputData.getString("duration")
@@ -67,43 +68,32 @@ class WorkManagerMedia(
         val requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), fileToUpload)
         imageFileBody =
             MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
-
-        disposable.add(repository.uploadMedia(token, params, imageFileBody)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { }
-            .subscribe({ response ->
-                showNotification("Kalam", "Image Uploaded Successfully")
-                if (SocketIO.getInstance().socket == null) {
-                    Debugger.e("WorkManagerMedia", "Socket is not connected")
-                    SocketIO.getInstance().connectSocket(token)
-                } else {
-                    Debugger.e("WorkManagerMedia", "Socket is connected")
-                }
-                response?.let {
-                    it.data?.let { list ->
-                        SocketIO.getInstance().emitNewMessage(
-                            id.toString(),
-                            chatId.toString(),
-                            "",
-                            list[0].type.toString(),
-                            name.toString(),
-                            list[0].file_id.toString(),
-                            list[0].duration.toLong(),
-                            list[0].thumbnail.toString(),
-                            list[0].identifier,
-                            language.toString(),
-                            list[0].group_id.toString()
-                        )
-                    }
-                }
-            }, {
-                Debugger.e("WorkManagerMedia", "failed ${it.message}")
-                Result.retry()
-            })
-        )
-
-        return Result.success()
+        return repository.uploadMedia(token, params, imageFileBody).doOnSuccess {
+            showNotification("Kalam", "Image Uploaded Successfully")
+            if (SocketIO.getInstance().socket == null) {
+                Debugger.e("WorkManagerMedia", "Socket is not connected")
+                SocketIO.getInstance().connectSocket(token)
+            } else {
+                Debugger.e("WorkManagerMedia", "Socket is connected")
+            }
+            it.data?.let { list ->
+                SocketIO.getInstance().emitNewMessage(
+                    id.toString(),
+                    chatId.toString(),
+                    "",
+                    list[0].type.toString(),
+                    name.toString(),
+                    list[0].file_id.toString(),
+                    list[0].duration.toLong(),
+                    list[0].thumbnail.toString(),
+                    list[0].identifier,
+                    language.toString(),
+                    list[0].group_id.toString()
+                )
+            }
+        }
+            .map { Result.success() }
+            .onErrorReturn { Result.retry() }
     }
 
     private fun showNotification(title: String, task: String) {
@@ -123,10 +113,5 @@ class WorkManagerMedia(
                 .setContentText(task)
                 .setSmallIcon(R.mipmap.ic_launcher)
         notificationManager.notify(1, notification.build())
-    }
-
-    override fun onStopped() {
-        super.onStopped()
-        disposable.clear()
     }
 }

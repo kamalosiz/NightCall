@@ -7,13 +7,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 
 
-object GlideDownloder {
+object GlideDownloader {
 
-    fun load(context: Context, view: ImageView, resource: Int) {
+    /*fun load(context: Context, view: ImageView, resource: Int) {
         Glide.with(context)
-                .load(resource)
-                .into(view)
-    }
+            .load(resource)
+            .into(view)
+    }*/
 
     fun load(context: Context?, view: ImageView?, resource: String?, error: Int, placeholder: Int) {
         context?.let {
@@ -28,7 +28,7 @@ object GlideDownloder {
         }
     }
 
-    fun load(context: Context?, view: ImageView, resource: String, options: RequestOptions) {
+    /*fun load(context: Context?, view: ImageView, resource: String, options: RequestOptions) {
         if (context != null) {
             Glide.with(context)
                     .load(resource)
@@ -36,5 +36,5 @@ object GlideDownloder {
                     .apply(options)
                     .into(view)
         }
-    }
+    }*/
 }

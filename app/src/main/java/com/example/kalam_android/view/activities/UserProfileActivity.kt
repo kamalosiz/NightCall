@@ -24,7 +24,7 @@ import com.example.kalam_android.view.adapter.AdapterForProfilePhotos
 import com.example.kalam_android.view.adapter.AdapterForProfileVideos
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.wrapper.GlideDownloder
+import com.example.kalam_android.wrapper.GlideDownloader
 import kotlinx.android.synthetic.main.content_profile.view.*
 import kotlinx.android.synthetic.main.item_for_add_my_status.view.*
 import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.view.*
@@ -126,7 +126,7 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
         binding.profileHeaderView.tvOverview.setOnClickListener(this)
         binding.profileHeaderView.tvPhotos.setOnClickListener(this)
         binding.profileHeaderView.tvVideos.setOnClickListener(this)
-        binding.ivBack.setOnClickListener(this)
+        binding.llBack.setOnClickListener(this)
     }
 
     private fun setUserData() {
@@ -250,14 +250,14 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
     private fun renderResponse(userList: ArrayList<ProfileData>) {
 
         binding.profileHeaderView.tvName.text = userList[0].nickname
-        GlideDownloder.load(
+        GlideDownloader.load(
                 this,
                 binding.profileHeaderView.ivProfile,
                 userList[0].profile_image,
                 R.drawable.dummy_placeholder,
                 R.drawable.dummy_placeholder
         )
-        GlideDownloder.load(
+        GlideDownloader.load(
                 this,
                 binding.profileHeaderView.ivUserProfile,
                 userList[0].wall_image,

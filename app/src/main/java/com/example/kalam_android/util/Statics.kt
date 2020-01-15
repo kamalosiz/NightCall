@@ -3,24 +3,27 @@ package com.example.kalam_android.util
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.loader.content.CursorLoader
 import com.example.kalam_android.repository.model.AudioModel
 import com.example.kalam_android.repository.model.MediaList
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.pow
+
 
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -40,6 +43,98 @@ fun Context.toast(message: CharSequence) =
 fun toast(context: Context?, msg: String) {
     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }
+
+/*fun onDisplayPopupPermission(context: Context) {
+    if (!isMIUI()) {
+        return
+    }
+    try { // MIUI 8
+        val localIntent = Intent("miui.intent.action.APP_PERM_EDITOR")
+        localIntent.setClassName(
+            "com.miui.securitycenter",
+            "com.miui.permcenter.permissions.PermissionsEditorActivity"
+        )
+        localIntent.putExtra("extra_pkgname", context.packageName)
+        context.startActivity(localIntent)
+        return
+    } catch (ignore: Exception) {
+    }
+    try { // MIUI 5/6/7
+        val localIntent = Intent("miui.intent.action.APP_PERM_EDITOR")
+        localIntent.setClassName(
+            "com.miui.securitycenter",
+            "com.miui.permcenter.permissions.AppPermissionsEditorActivity"
+        )
+        localIntent.putExtra("extra_pkgname", context.packageName)
+        context.startActivity(localIntent)
+        return
+    } catch (ignore: Exception) {
+    }
+    // Otherwise jump to application details
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri =
+        Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    context.startActivity(intent)
+}
+
+
+fun isMIUI(): Boolean {
+    val device = Build.MANUFACTURER
+    if (device == "Xiaomi") {
+        try {
+            val prop = Properties()
+            prop.load(FileInputStream(File(Environment.getRootDirectory(), "build.prop")))
+            return prop.getProperty(
+                "ro.miui.ui.version.code",
+                null
+            ) != null || prop.getProperty(
+                "ro.miui.ui.version.name",
+                null
+            ) != null || prop.getProperty("ro.miui.internal.storage", null) != null
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+    return false
+}*/
+/*@Throws(IOException::class)
+fun splitFile(f: File): List<File>? {
+    var partCounter = 1
+    val result: MutableList<File> = ArrayList()
+    val sizeOfFiles = 1024 * 1024 // 1MB
+    val buffer =
+        ByteArray(sizeOfFiles) // create a buffer of bytes sized as the one chunk size
+    val bis = BufferedInputStream(FileInputStream(f))
+    val name: String = f.name
+    var tmp: Int
+    while (bis.read(buffer).also { tmp = it } > 0) {
+        val newFile = File(
+            f.parent,
+            name + "." + String.format("%03d", partCounter++)
+        ) // naming files as <inputFileName>.001, <inputFileName>.002, ...
+        val out = FileOutputStream(newFile)
+        out.write(
+            buffer,
+            0,
+            tmp
+        ) //tmp is chunk size. Need it for the last chunk, which could be less then 1 mb.
+        result.add(newFile)
+    }
+    return result
+}*/
+
+/*@SuppressLint("NewApi")
+@Throws(IOException::class)
+fun mergeFiles(files: List<File>, into: File) {
+    val mergingStream = BufferedOutputStream(FileOutputStream(into))
+    for (f in files) {
+//        val stream: InputStream = FileInputStream(f)
+        Files.copy(f.toPath(), mergingStream)
+//        stream.close()
+    }
+    mergingStream.close()
+}*/
 
 /*fun getFileBody(path: String, fileName: String): MultipartBody.Part {
     val file = File(path)
@@ -124,16 +219,16 @@ fun showAlertDialog(context: Context, title: String, message: String) {
     builder1.create().show()
 }
 
-/*fun getReadableFileSize(size: Long): String {
+fun getReadableFileSize(size: Long): String {
     if (size <= 0) {
         return "0"
     }
     val units = arrayOf("B", "KB", "MB", "GB", "TB")
-    val digitGroups = (log10(size.toDouble()) / log10(1024.0)).toInt()
+    val digitGroups = (kotlin.math.log10(size.toDouble()) / kotlin.math.log10(1024.0)).toInt()
     return DecimalFormat("#,##0.#").format(
         size / 1024.0.pow(digitGroups.toDouble())
     ) + " " + units[digitGroups]
-}*/
+}
 
 /*fun getFileSizeInBytes(selectedPath: String): Int {
     val file = File(selectedPath)
@@ -224,7 +319,7 @@ fun getAllAudioFromDevice(context: Context): ArrayList<AudioModel>? {
 
             Log.e("Name :$name", " Album :$album")
             Log.e("Path :$path", " Artist :$artist")
-            tempAudioList.add(AudioModel(path, name, album, artist, duration!!,length!!))
+            tempAudioList.add(AudioModel(path, name, album, artist, duration!!, length!!))
         }
         c.close()
     }
@@ -266,10 +361,10 @@ fun formatMilliSecond(milliseconds: Long): String? {
 }
 
 fun getAudioFileSize(file: File): String? {
-    val  format =  DecimalFormat("##.##")
+    val format = DecimalFormat("##.##")
     val MiB = 1024 * 1024
     val KiB = 1024
-    if (!file.isFile()) {
+    if (!file.isFile) {
         throw  IllegalArgumentException("Expected a file")
     }
     val length = file.length();

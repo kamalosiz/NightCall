@@ -2,33 +2,31 @@ package com.example.kalam_android.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.kalam_android.localdb.LocalRepo
+import com.example.kalam_android.localdb.entities.ChatData
+import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.Repository
-import com.example.kalam_android.repository.model.MediaResponse
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
+import com.example.kalam_android.util.Debugger
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.http.Body
-import retrofit2.http.Part
-import retrofit2.http.PartMap
 import javax.inject.Inject
 
-class ChatMessagesViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class ChatMessagesViewModel @Inject constructor(
+    private val repository: Repository,
+    private val localRepo: LocalRepo
+) : ViewModel() {
 
     private val disposable = CompositeDisposable()
     private val responsiveLiveData = MutableLiveData<ApiResponse<ChatMessagesResponse>>()
-//    private val audioLiveData = MutableLiveData<ApiResponse<MediaResponse>>()
 
     fun allChatResponse(): MutableLiveData<ApiResponse<ChatMessagesResponse>> {
         return responsiveLiveData
     }
-
-    /*  fun mediaResponse(): MutableLiveData<ApiResponse<MediaResponse>> {
-          return audioLiveData
-      }*/
 
     fun hitAllChatApi(authorization: String?, @Body parameters: Map<String, String>) {
         disposable.add(repository.getAllMessages(authorization, parameters)
@@ -43,38 +41,31 @@ class ChatMessagesViewModel @Inject constructor(private val repository: Reposito
         )
     }
 
-/*    fun hitUploadAudioApi(
-        authorization: String?,
-        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>, @Part audio: MultipartBody.Part
-    ) {
-        disposable.add(repository.uploadAudio(authorization, params, audio)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { audioLiveData.value = ApiResponse.loading() }
-            .subscribe({
-                audioLiveData.value = ApiResponse.success(it)
-            }, {
-                audioLiveData.value = ApiResponse.error(it)
-            })
+    fun addMessageToDB(list: ArrayList<ChatData>) {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.inserChatsIntoDB(list)
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Chat messages inserted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
         )
     }
 
-    fun hitUploadAudioApi(
-        authorization: String?,
-        @PartMap params: HashMap<String, @JvmSuppressWildcards RequestBody>,
-        @Part list: ArrayList<MultipartBody.Part>
-    ) {
-        disposable.add(repository.uploadAudio(authorization, params, list)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { audioLiveData.value = ApiResponse.loading() }
-            .subscribe({
-                audioLiveData.value = ApiResponse.success(it)
-            }, {
-                audioLiveData.value = ApiResponse.error(it)
-            })
+    fun addMessageToDB(msg: ChatData) {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.inserChatsIntoDB(msg)
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Chat messages inserted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
         )
-    }*/
+    }
 
     override fun onCleared() {
         super.onCleared()

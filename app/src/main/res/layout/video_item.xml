@@ -1,4 +1,5 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
@@ -27,14 +28,20 @@
             android:background="@drawable/media_background"
             tools:ignore="UselessParent">
 
-            <ImageView
-                android:id="@+id/ivImage"
-                android:layout_width="@dimen/_200sdp"
-                android:layout_height="@dimen/_200sdp"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:scaleType="centerCrop"
-                android:transitionName="@string/trans_key" />
+            <androidx.cardview.widget.CardView
+                android:layout_width="@dimen/_210sdp"
+                android:layout_height="@dimen/_210sdp"
+                android:layout_centerInParent="true"
+                app:cardCornerRadius="@dimen/_10sdp"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:transitionName="@string/trans_key" />
+            </androidx.cardview.widget.CardView>
 
             <ImageView
                 android:layout_width="@dimen/_40sdp"
