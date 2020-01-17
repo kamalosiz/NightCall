@@ -15,24 +15,23 @@
             android:layout_height="@dimen/_40sdp"
             android:background="@color/theme_color">
 
-            <androidx.appcompat.widget.AppCompatImageView
+           <!-- <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivBack"
                 android:layout_width="@dimen/_16sdp"
                 android:layout_height="@dimen/_16sdp"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/_8sdp"
-                app:srcCompat="@drawable/icon_back" />
+                app:srcCompat="@drawable/icon_back" />-->
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tvHeaderName"
+                android:id="@+id/tvCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:layout_toEndOf="@id/ivBack"
                 android:fontFamily="@font/roboto_medium"
                 android:singleLine="true"
-                android:text="Profile"
+                android:text="Cancel"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14ssp"
                 android:transitionName="@string/profile_trans" />
@@ -83,7 +82,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_175sdp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/dummy_placeholder" />
+                        android:src="@color/grey" />
 
                     <RelativeLayout
                         android:layout_width="@dimen/_100sdp"
@@ -95,7 +94,7 @@
                             android:id="@+id/ivProfile"
                             android:layout_width="@dimen/_100sdp"
                             android:layout_height="@dimen/_100sdp"
-                            android:src="@drawable/dummy_placeholder"
+                            android:src="@color/grey"
                             app:civ_border_color="@color/light_grey"
                             app:civ_border_width="@dimen/_1sdp" />
 

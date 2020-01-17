@@ -47,6 +47,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.yalantis.ucrop.UCrop
+import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.activity_sign_up.view.tvCountry
 import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.view.*
 import okhttp3.MediaType
@@ -185,7 +186,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
         binding.tvOverview.setOnClickListener(this)
         binding.tvPhotos.setOnClickListener(this)
         binding.tvVideos.setOnClickListener(this)
-        binding.ivBack.setOnClickListener(this)
+        binding.tvCancel.setOnClickListener(this)
         binding.ivCameraWall.setOnClickListener(this)
         binding.ivProfileCamera.setOnClickListener(this)
         binding.overviewView.tvCountry.setOnClickListener(this)
@@ -271,7 +272,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                 binding.rvUserProfileVideos.visibility = View.VISIBLE
 
             }
-            R.id.ivBack -> {
+            R.id.tvCancel -> {
                 onBackPressed()
             }
             R.id.ivProfileCamera -> {
@@ -522,220 +523,96 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
             params["education"] = binding.overviewView.etEducation.text.toString()
             params["city"] = binding.overviewView.tvCity.text.toString()
             params["country"] = binding.overviewView.tvCountry.text.toString()
-            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token!!, params)
+            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token.toString(), params)
 
         } else if (profileImage != "" && wallImage != "") {
-            val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
-
-            params["user_id"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                sharedPrefsHelper.getUser()?.id.toString()
-            )
-            params["bio"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etDescription.text.toString()
-            )
-            params["address"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etAddress.text.toString()
-            )
-            params["first_name"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.etFirstName.text.toString()
-            )
-            params["last_name"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.etLastName.text.toString()
-            )
-            params["website"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etWebsite.text.toString()
-            )
-            params["fax"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etFax.text.toString()
-            )
-            if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["intrests"] = RequestBody.create(
-                    MediaType.parse("text/plain"),
-                    binding.overviewView.spInterest.selectedItem.toString()
-                )
-            }
-            if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["martial_status"] = RequestBody.create(
-                    MediaType.parse("text/plain"),
-                    binding.overviewView.spStatus.selectedItem.toString()
-                )
-            }
-            params["work"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etWork.text.toString()
-            )
-            params["education"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etEducation.text.toString()
-            )
-            params["city"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.tvCity.text.toString()
-            )
-            params["country"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.tvCountry.text.toString()
-            )
-
             viewModel.hitUpdateUserProfile(
-                sharedPrefsHelper.getUser()?.token!!,
-                params,
+                sharedPrefsHelper.getUser()?.token.toString(),
+                multiPartParams(),
                 convertImageMultipart(profileImage, "profile_image"),
                 convertImageMultipart(wallImage, "wall_image")
             )
 
         } else if (profileImage != "" && wallImage == "") {
-
-            val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
-
-            params["user_id"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                sharedPrefsHelper.getUser()?.id.toString()
-            )
-            params["bio"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etDescription.text.toString()
-            )
-            params["address"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etAddress.text.toString()
-            )
-            params["first_name"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.etFirstName.text.toString()
-            )
-            params["last_name"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.etLastName.text.toString()
-            )
-            params["website"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etWebsite.text.toString()
-            )
-            params["fax"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etFax.text.toString()
-            )
-            if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["intrests"] = RequestBody.create(
-                    MediaType.parse("text/plain"),
-                    binding.overviewView.spInterest.selectedItem.toString()
-                )
-            }
-            if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["martial_status"] = RequestBody.create(
-                    MediaType.parse("text/plain"),
-                    binding.overviewView.spStatus.selectedItem.toString()
-                )
-            }
-            params["work"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etWork.text.toString()
-            )
-            params["education"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etEducation.text.toString()
-            )
-            params["city"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.tvCity.text.toString()
-            )
-            params["country"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.tvCountry.text.toString()
-            )
-
             viewModel.hitUpdateUserProfile(
-                sharedPrefsHelper.getUser()?.token!!,
-                params,
+                sharedPrefsHelper.getUser()?.token.toString(),
+                multiPartParams(),
                 convertImageMultipart(profileImage, "profile_image")
             )
 
         } else {
-            val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
-
-            params["user_id"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                sharedPrefsHelper.getUser()?.id.toString()
-            )
-            params["bio"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etDescription.text.toString()
-            )
-            params["address"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etAddress.text.toString()
-            )
-            params["first_name"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.etFirstName.text.toString()
-            )
-            params["last_name"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.etLastName.text.toString()
-            )
-            params["website"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etWebsite.text.toString()
-            )
-            params["fax"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etFax.text.toString()
-            )
-            if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["intrests"] = RequestBody.create(
-                    MediaType.parse("text/plain"),
-                    binding.overviewView.spInterest.selectedItem.toString()
-                )
-            }
-            if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["martial_status"] = RequestBody.create(
-                    MediaType.parse("text/plain"),
-                    binding.overviewView.spStatus.selectedItem.toString()
-                )
-            }
-            params["work"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etWork.text.toString()
-            )
-            params["education"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.etEducation.text.toString()
-            )
-            params["city"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.tvCity.text.toString()
-            )
-            params["country"] = RequestBody.create(
-                MediaType.parse("text/plain"),
-                binding.overviewView.tvCountry.text.toString()
-            )
-
             viewModel.hitUpdateUserProfile(
-                sharedPrefsHelper.getUser()?.token!!,
-                params,
+                sharedPrefsHelper.getUser()?.token.toString(),
+                multiPartParams(),
                 convertImageMultipart(wallImage, "wall_image")
             )
         }
+    }
+
+    fun multiPartParams(): HashMap<String, @JvmSuppressWildcards RequestBody> {
+        val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
+
+        params["user_id"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            sharedPrefsHelper.getUser()?.id.toString()
+        )
+        params["bio"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etDescription.text.toString()
+        )
+        params["address"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etAddress.text.toString()
+        )
+        params["first_name"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.etFirstName.text.toString()
+        )
+        params["last_name"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.etLastName.text.toString()
+        )
+        params["website"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etWebsite.text.toString()
+        )
+        params["fax"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etFax.text.toString()
+        )
+        if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
+            params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
+        } else {
+            params["intrests"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.overviewView.spInterest.selectedItem.toString()
+            )
+        }
+        if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
+            params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
+        } else {
+            params["martial_status"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.overviewView.spStatus.selectedItem.toString()
+            )
+        }
+        params["work"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etWork.text.toString()
+        )
+        params["education"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etEducation.text.toString()
+        )
+        params["city"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.tvCity.text.toString()
+        )
+        params["country"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.tvCountry.text.toString()
+        )
+        return params
     }
 
     private fun consumeApiResponse(response: ApiResponse<UpdateUserProfile>) {
@@ -762,9 +639,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
             else -> {
 
             }
-
         }
-
     }
 
     private fun getIndex(spinner: Spinner, myString: String): Int {
@@ -773,17 +648,17 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                 return i
             }
         }
-
         return 0
     }
 
     private fun convertImageMultipart(path: String, imageType: String): MultipartBody.Part {
         val imageFileBody: MultipartBody.Part?
-        val fileToUpload = File(path)
+//        val fileToUpload = File(path)
+        val fileToUpload = Compressor(this).compressToFile(File(path))
         val requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), fileToUpload)
         imageFileBody =
             MultipartBody.Part.createFormData(imageType, fileToUpload.name, requestBody)
-        return imageFileBody!!
+        return imageFileBody
     }
 
 }

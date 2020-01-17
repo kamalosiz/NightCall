@@ -4,59 +4,57 @@ import android.content.Context
 import android.content.Intent
 import com.example.kalam_android.callbacks.WebSocketCallback
 import com.example.kalam_android.callbacks.WebSocketOfferCallback
-import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.activities.MainActivity
-import okhttp3.*
-import okio.ByteString
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.SessionDescription
+import tech.gusavila92.websocketclient.WebSocketClient
+import java.net.URI
+
+class CustomWebSocketClient private constructor(
+    val sharedPrefsHelper: SharedPrefsHelper,
+    uri: URI
+) :
+    WebSocketClient(uri) {
 
 
-class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedPrefsHelper) :
-    WebSocketListener() {
-    private var webSocket: WebSocket? = null
+    private val TAG = this.javaClass.simpleName
     private var webSocketCallback: WebSocketCallback? = null
     private var webSocketOfferCallback: WebSocketOfferCallback? = null
     private var dummyWebSocketOfferCallback: WebSocketOfferCallback? = null
     private var isFromPush = false
     private var connectedUserId = ""
-    private val TAG = this.javaClass.simpleName
 
     companion object {
-        private var instance: CustomWebSocketListener? = null
+        private var instance: CustomWebSocketClient? = null
         var context: Context? = null
         @Synchronized
-        fun getInstance(sharedPrefsHelper: SharedPrefsHelper): CustomWebSocketListener {
+        fun getInstance(sharedPrefsHelper: SharedPrefsHelper, uri: URI): CustomWebSocketClient {
             if (instance == null) {
-                instance = CustomWebSocketListener(sharedPrefsHelper)
+                instance = CustomWebSocketClient(sharedPrefsHelper, uri)
             }
-            return instance as CustomWebSocketListener
+            return instance as CustomWebSocketClient
         }
 
         @Synchronized
         fun getInstance(
             sharedPrefsHelper: SharedPrefsHelper,
-            context: Context
-        ): CustomWebSocketListener {
+            context: Context, uri: URI
+        ): CustomWebSocketClient {
             if (instance == null) {
                 this.context = context
-                instance = CustomWebSocketListener(sharedPrefsHelper)
+                instance = CustomWebSocketClient(sharedPrefsHelper, uri)
             }
-            return instance as CustomWebSocketListener
+            return instance as CustomWebSocketClient
         }
     }
 
     fun setSocketCallback(webSocketCallback: WebSocketCallback?) {
         this.webSocketCallback = webSocketCallback
     }
-
-    /* fun setOfferListener(webSocketOfferCallback: WebSocketOfferCallback) {
-         this.webSocketOfferCallback = webSocketOfferCallback
-     }*/
 
     fun setOfferListener(
         webSocketOfferCallback: WebSocketOfferCallback,
@@ -74,9 +72,6 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
         this.webSocketOfferCallback = dummyWebSocketOfferCallback
     }
 
-    fun setWebSocket(webSocket: WebSocket) {
-        this.webSocket = webSocket
-    }
 
     fun setPushData(connectedUserId: String, isFromPush: Boolean) {
         this.connectedUserId = connectedUserId
@@ -84,15 +79,15 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
     }
 
 
-    override fun onOpen(webSocket: WebSocket?, response: Response?) {
-        logE("onOpen $response")
+    override fun onOpen() {
+        logE("Yahoo websocket is open now")
         login()
         if (isFromPush) {
             onReadyForCall(connectedUserId)
         }
     }
 
-    override fun onMessage(webSocket: WebSocket?, text: String?) {
+    override fun onTextReceived(text: String?) {
         logE("onMessage string" + text!!)
         val json = JSONObject(text)
         when {
@@ -118,28 +113,26 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
         }
     }
 
-    override fun onMessage(webSocket: WebSocket?, bytes: ByteString?) {
-        logE("onMessage bytes " + bytes!!)
+    override fun onPongReceived(data: ByteArray?) {
+        logE("onPongReceived $data")
     }
 
-    override fun onClosing(webSocket: WebSocket?, code: Int, reason: String?) {
-        logE("onClosing " + reason!!)
+    override fun onException(e: Exception?) {
+        logE("onException ${e?.message}")
     }
 
-    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-        logE("onClosed $reason")
+    override fun onCloseReceived() {
+        logE("onCloseReceived")
     }
 
-    override fun onFailure(wSocket: WebSocket?, t: Throwable, response: Response?) {
-        logE("onFailure " + t.message)
-        logE("response $response")
-        val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
-        val okHttpClientBuilder = OkHttpClient.Builder()
-        val webSocket1 = okHttpClientBuilder.build()
-        webSocket = webSocket1.newWebSocket(request, this)
-        this.setWebSocket(webSocket!!)
-        webSocket1.dispatcher().executorService().shutdown()
+    override fun onBinaryReceived(data: ByteArray?) {
+        logE("onBinaryReceived $data")
     }
+
+    override fun onPingReceived(data: ByteArray?) {
+        logE("onPingReceived $data")
+    }
+
 
     fun login() {
         val json = JSONObject()
@@ -157,7 +150,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             json.put("deviceType", "android")
             json.put("token", sharedPrefsHelper.getFCMToken().toString())
             json.put("platform", "kalamtime")
-            webSocket?.send(json.toString())
+            send(json.toString())
             logE("login successfully")
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -170,7 +163,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             obj.put("type", AppConstants.READY_FOR_CALL)
             obj.put("connectedUserId", connectedUserId)
             logE("readyForCall sent $obj")
-            webSocket?.send(obj.toString())
+            send(obj.toString())
         } catch (e: JSONException) {
             logE("onReadyForCall JSONException ${e.message}")
             e.printStackTrace()
@@ -185,7 +178,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             obj.put("candidate", iceCandidate)
             obj.put("connectedUserId", callerID)
             logE("ICE Candidates $obj")
-            webSocket?.send(obj.toString())
+            send(obj.toString())
         } catch (e: JSONException) {
             logE("onIceCandidateReceived JSONException ${e.message}")
             e.printStackTrace()
@@ -200,7 +193,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             obj.put("connectedUserId", callerID)
             obj.put("isVideo", isVideo)
             logE("createOffer $obj")
-            webSocket?.send(obj.toString())
+            send(obj.toString())
 
         } catch (e: JSONException) {
             logE("createOffer JSONException ${e.message}")
@@ -214,7 +207,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             obj.put("type", sessionDescription.type.canonicalForm())
             obj.put("offer", JSONObject().put("sdp", sessionDescription.description))
             obj.put("connectedUserId", callerID)
-            webSocket?.send(obj.toString())
+            send(obj.toString())
         } catch (e: JSONException) {
             logE("onSetFailure" + e.message)
             e.printStackTrace()
@@ -226,7 +219,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             val obj = JSONObject()
             obj.put("type", AppConstants.REJECT)
             obj.put("connectedUserId", id)
-            webSocket?.send(obj.toString())
+            send(obj.toString())
         } catch (e: JSONException) {
             logE("onSetFailure" + e.message)
             e.printStackTrace()
@@ -238,7 +231,7 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
             val obj = JSONObject()
             obj.put("type", AppConstants.NEW_CALL)
             obj.put("connectedUserId", id)
-            webSocket?.send(obj.toString())
+            send(obj.toString())
             logE("onNewCall sent $obj")
         } catch (e: JSONException) {
             logE("onSetFailure" + e.message)
@@ -246,7 +239,14 @@ class CustomWebSocketListener private constructor(val sharedPrefsHelper: SharedP
         }
     }
 
+    fun disconnectSocket() {
+        close()
+        instance = null
+    }
+
+
     private fun logE(msg: String) {
         Debugger.e(TAG, msg)
     }
+
 }

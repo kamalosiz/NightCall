@@ -4,18 +4,24 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.os.Bundle
-import android.os.SystemClock
+import android.media.Ringtone
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.*
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.WebSocketCallback
+import com.example.kalam_android.callbacks.WebSocketOfferCallback
+import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
@@ -35,14 +41,17 @@ import kotlinx.android.synthetic.main.call_activity.ivUser
 import kotlinx.android.synthetic.main.call_activity.rlBottomCalls
 import kotlinx.android.synthetic.main.call_activity.tvCallStatus
 import kotlinx.android.synthetic.main.call_activity.tvName
+import kotlinx.android.synthetic.main.secondcall_notify.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
+import java.net.URI
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback {
+class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
+    WebSocketOfferCallback {
     private var peerConnectionFactory: PeerConnectionFactory? = null
     private var audioConstraints: MediaConstraints? = null
     private var videoConstraints: MediaConstraints? = null
@@ -55,15 +64,21 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private lateinit var rootEglBase: EglBase
     private var peerIceServers: MutableList<PeerConnection.IceServer> = ArrayList()
     private val TAG = this.javaClass.simpleName
-    private var webSocketListener: CustomWebSocketListener? = null
+    private var webSocketClient: CustomWebSocketClient? = null
     var callerID: Long = -1
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
-    private var mediaPlayer: MediaPlayer? = null
+    //    private var mediaPlayer: MediaPlayer? = null
     private lateinit var audioManager: AudioManager
     private var videoCapture: CameraVideoCapturer? = null
     private var calleeName: String? = null
     private var profileImage: String? = null
+
+    private var uri: Uri? = null
+    private var ringtune: Ringtone? = null
+    private var vibrator: Vibrator? = null
+    private var handler = Handler()
+    lateinit var callTimeRunnable: Runnable
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,10 +127,12 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         remoteVideoView.init(rootEglBase.eglBaseContext, null)
         localVideoView.setZOrderMediaOverlay(true)
         remoteVideoView.setZOrderMediaOverlay(true)
-        webSocketListener = CustomWebSocketListener.getInstance(sharedPrefsHelper)
-        webSocketListener?.setSocketCallback(this)
+        webSocketClient =
+            CustomWebSocketClient.getInstance(sharedPrefsHelper, URI(Urls.WEB_SOCKET_URL))
+        webSocketClient?.setSocketCallback(this)
+        webSocketClient?.setOfferListener(this, false)
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        mediaPlayer = MediaPlayer.create(this, R.raw.incoming)
+//        mediaPlayer = MediaPlayer.create(this, R.raw.incoming)
     }
 
     fun startWebrtc() {
@@ -181,6 +198,15 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         localVideoTrack?.addSink(localVideoView)
         localVideoView.setMirror(true)
         remoteVideoView.setMirror(true)
+
+        uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+        ringtune = RingtoneManager.getRingtone(this, uri)
+        callTimeRunnable = Runnable {
+            logE("callTimeRunnable called")
+            hangup()
+        }
+        handler.postDelayed(callTimeRunnable, 60 * 1000)
+
         val initiator = intent.getBooleanExtra(AppConstants.INITIATOR, false)
         if (initiator) {
             callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
@@ -188,24 +214,33 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             ibAnswer.visibility = View.GONE
             tvCallStatus.text = "Calling"
-            webSocketListener?.onNewCall(callerID.toString())
+            webSocketClient?.onNewCall(callerID.toString())
 
         } else {
             val json = intent.getStringExtra(AppConstants.JSON)
-            mediaPlayer?.start()
-            mediaPlayer?.isLooping = true
+//            mediaPlayer?.start()
+//            mediaPlayer?.isLooping = true
+            ringtune?.play()
             val data = JSONObject(json)
-            val offer = JSONObject(data.getString("offer"))
-            callerID = data.getString(AppConstants.CONNECTED_USER_ID).toLong()
-            createPeerConnection()
-            localPeer?.setRemoteDescription(
-                CustomSdpObserver("localSetRemote"),
-                SessionDescription(SessionDescription.Type.OFFER, offer.getString("sdp"))
-            )
-            profileImage = data.getString("photoUrl")
-            calleeName = data.getString("name")
+            newCallReceived(data)
             tvCallStatus.text = "Incoming"
         }
+        setCallerProfile()
+    }
+
+    private fun newCallReceived(data: JSONObject) {
+        val offer = JSONObject(data.getString("offer"))
+        callerID = data.getString(AppConstants.CONNECTED_USER_ID).toLong()
+        createPeerConnection()
+        localPeer?.setRemoteDescription(
+            CustomSdpObserver("localSetRemote"),
+            SessionDescription(SessionDescription.Type.OFFER, offer.getString("sdp"))
+        )
+        profileImage = data.getString("photoUrl")
+        calleeName = data.getString("name")
+    }
+
+    private fun setCallerProfile() {
         GlideDownloader.load(
             this,
             ivUser,
@@ -240,7 +275,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     json.put("sdp", iceCandidate.sdp)
                     json.put("sdpMLineIndex", iceCandidate.sdpMLineIndex)
                     json.put("sdpMid", iceCandidate.sdpMid)
-                    webSocketListener?.onIceCandidateReceived(json, callerID.toString())
+                    webSocketClient?.onIceCandidateReceived(json, callerID.toString())
                 }
 
                 override fun onAddStream(mediaStream: MediaStream) {
@@ -254,6 +289,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                             PeerConnection.IceConnectionState.CONNECTED -> {
                                 logE("Peer Connection CONNECTED")
                                 startChronometer()
+                                handler.removeCallbacks(callTimeRunnable)
                             }
                             PeerConnection.IceConnectionState.DISCONNECTED -> {
                                 logE("Peer Connection DISCONNECTED")
@@ -264,6 +300,8 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                             PeerConnection.IceConnectionState.CHECKING -> {
                                 logE("Peer Connection CHECKING")
                                 tvCallStatus.text = "Connecting"
+                            }
+                            else -> {
                             }
                         }
                     }
@@ -329,7 +367,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     CustomSdpObserver("localSetLocalDesc"),
                     sessionDescription
                 )
-                webSocketListener?.createOffer(sessionDescription, callerID.toString(), true)
+                webSocketClient?.createOffer(sessionDescription, callerID.toString(), true)
 
             }
         }, sdpConstraints)
@@ -338,7 +376,8 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private fun answerCall() {
         logE("onOfferReceived")
         try {
-            mediaPlayer?.pause()
+//            mediaPlayer?.pause()
+            ringtune?.stop()
             ibAnswer.visibility = View.GONE
             doAnswer()
             updateVideoViews()
@@ -357,7 +396,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     CustomSdpObserver("localSetLocal"),
                     sessionDescription
                 )
-                webSocketListener?.doAnswer(sessionDescription, callerID.toString())
+                webSocketClient?.doAnswer(sessionDescription, callerID.toString())
             }
         }, MediaConstraints())
     }
@@ -411,7 +450,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         when (v.id) {
             R.id.ibHangUp -> {
                 hangup()
-                webSocketListener?.onHangout(callerID.toString())
+                webSocketClient?.onHangout(callerID.toString())
             }
             R.id.ibAnswer -> {
                 answerCall()
@@ -429,41 +468,45 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     }
 
     private fun hangup() {
-        try {
-            if (mediaPlayer != null && mediaPlayer?.isPlaying == true) {
-                mediaPlayer?.pause()
-            }
-            turnOFFSpeakers()
-            if (peerConnectionFactory != null) {
-                peerConnectionFactory?.stopAecDump()
-            }
-            if (localPeer != null) {
-                localPeer?.close()
-                localPeer = null
-            }
-            if (videoCapture != null) {
-                videoCapture?.stopCapture()
-                videoCapture?.dispose()
-                videoCapture = null
-            }
-            if (localVideoView != null || remoteVideoView != null) {
-                localVideoView.release()
-                remoteVideoView.release()
-            }
-            if (audioSource != null && videoSource != null) {
-                audioSource?.dispose()
-                videoSource?.dispose()
-            }
-            /*if (peerConnectionFactory != null) {
-                peerConnectionFactory?.dispose()
-                peerConnectionFactory = null
-            }*/
-            setResult(Activity.RESULT_OK)
-            finish()
-            overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
-        } catch (e: Exception) {
-            logE("Exception Occurred ${e.message}")
+//        try {
+        /*if (mediaPlayer != null && mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+        }*/
+        if (ringtune?.isPlaying == true) {
+            ringtune?.stop()
         }
+        turnOFFSpeakers()
+        if (peerConnectionFactory != null) {
+            peerConnectionFactory?.stopAecDump()
+        }
+        if (localPeer != null) {
+            localPeer?.close()
+            localPeer = null
+        }
+        if (videoCapture != null) {
+            videoCapture?.stopCapture()
+            videoCapture?.dispose()
+            videoCapture = null
+        }
+        if (localVideoView != null || remoteVideoView != null) {
+            localVideoView.release()
+            remoteVideoView.release()
+        }
+        /*if (audioSource != null && videoSource != null) {
+            audioSource?.dispose()
+            videoSource?.dispose()
+        }*/
+        /*if (peerConnectionFactory != null) {
+            peerConnectionFactory?.dispose()
+            peerConnectionFactory = null
+        }*/
+        webSocketClient?.reAssignOfferListenerToMain()
+        setResult(Activity.RESULT_OK)
+        finish()
+        overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
+        /*} catch (e: Exception) {
+            logE("Exception Occurred ${e.message}")
+        }*/
 
     }
 
@@ -504,7 +547,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         builder1.setCancelable(true)
         builder1.setPositiveButton("Yes") { dialog, id ->
             hangup()
-            webSocketListener?.onHangout(callerID.toString())
+            webSocketClient?.onHangout(callerID.toString())
         }
         builder1.setNegativeButton("No") { dialog, id ->
             dialog.cancel()
@@ -536,6 +579,59 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                     turnOnSpeakers()
                 }
             }
+        }
+    }
+
+    private fun secondCallDialogue(jsonObject: JSONObject) {
+        val dialog = Dialog(this, android.R.style.Theme_Translucent_NoTitleBar)
+        dialog.setCancelable(false)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.secondcall_notify)
+        dialog.btnCancelCall.setOnClickListener {
+            dialog.dismiss()
+            vibrator?.cancel()
+            webSocketClient?.onHangout(jsonObject.getString(AppConstants.CONNECTED_USER_ID))
+        }
+        dialog.btnAcceptReject.setOnClickListener {
+            dialog.dismiss()
+            vibrator?.cancel()
+            webSocketClient?.onHangout(callerID.toString())
+            newCallReceived(jsonObject)
+            setCallerProfile()
+            doAnswer()
+        }
+        GlideDownloader.load(
+            this,
+            dialog.cvImageCaller,
+            jsonObject.getString("photoUrl").toString(),
+            R.drawable.dummy_placeholder,
+            R.drawable.dummy_placeholder
+        )
+        dialog.tvTitleCall.text =
+            StringBuilder(jsonObject.getString("name").toString()).append(" ")
+                .append("is calling....").toString()
+        dialog.show()
+    }
+
+    private fun vibratePhone() {
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator?.vibrate(
+                VibrationEffect.createOneShot(
+                    1000,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        } else {
+            vibrator?.vibrate(1000)
+        }
+    }
+
+    override fun offerCallback(jsonObject: JSONObject) {
+        runOnUiThread {
+            logE("offer received $jsonObject")
+            vibratePhone()
+            secondCallDialogue(jsonObject)
         }
     }
 }

@@ -119,15 +119,15 @@ class ProfileFragment : Fragment(), View.OnClickListener {
             activity?.applicationContext,
             binding.profileHeaderView.ivProfile,
             userList[0].profile_image,
-            R.drawable.dummy_placeholder,
-            R.drawable.dummy_placeholder
+            R.color.grey,
+            R.color.grey
         )
         GlideDownloader.load(
             activity?.applicationContext,
             binding.profileHeaderView.ivUserProfile,
             userList[0].wall_image,
-            R.drawable.dummy_placeholder,
-            R.drawable.dummy_placeholder
+            R.color.grey,
+            R.color.grey
         )
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
