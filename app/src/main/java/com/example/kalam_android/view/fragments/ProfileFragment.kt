@@ -89,13 +89,12 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     }
 
     private fun consumeApiResponse(response: ApiResponse<UserProfile>) {
-        Debugger.e("Response : ", "$response")
         when (response.status) {
 
             Status.LOADING -> {
             }
             Status.SUCCESS -> {
-                Debugger.e("data : ", "${response.data}")
+                Debugger.e("consumeApiResponse : ", "${response.data}")
                 renderResponse(response.data?.data!!)
 
             }

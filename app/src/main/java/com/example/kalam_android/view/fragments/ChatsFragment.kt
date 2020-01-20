@@ -50,7 +50,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     private var chatList: ArrayList<ChatListData> = ArrayList()
     private var chatIDs: ArrayList<Int> = ArrayList()
     var position = -1
-    private var isRefresh = false
+    //    private var isRefresh = false
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
     var fromSearch = 0
 
@@ -75,13 +75,15 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             consumeResponse(it)
         })
         //latest
-        if (sharedPrefsHelper.isAllChatsItemsSynced()) {
+        viewModel.getAllchatItemFromDB()
+        hitAllChatApi()
+        /*if (sharedPrefsHelper.isAllChatsItemsSynced()) {
             viewModel.getAllchatItemFromDB()
             logE("loaded from local db")
         } else {
             hitAllChatApi()
             logE("loaded from live server")
-        }
+        }*/
         //latest
 
         //Old
@@ -90,7 +92,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
         SocketIO.getInstance().setSocketCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {
-            isRefresh = true
+            //            isRefresh = true
             hitAllChatApi()
         }
         binding.fabSpeech.setOnTouchListener(this)
@@ -104,8 +106,9 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.length == 0) {
                     fromSearch = 0
-//                    binding.pbCenter.visibility = View.VISIBLE
+                    viewModel.getAllchatItemFromDB()
                     hitAllChatApi()
+
                 } else {
                     fromSearch = 1
                     hitSearchMessage(s.toString())
@@ -124,8 +127,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
+                logE("consumeResponse : ${apiResponse.data}")
                 renderResponse(apiResponse.data as AllChatListResponse)
-                logE("consumeResponse SUCCESS : ${apiResponse.data}")
             }
             Status.ERROR -> {
                 binding.pbCenter.visibility = View.GONE
@@ -147,7 +150,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 binding.pbCenter.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
                 renderLocalResponse(apiResponse.data)
-                logE("consumeResponse SUCCESS : ${apiResponse.data}")
             }
             Status.ERROR -> {
                 binding.pbCenter.visibility = View.GONE
@@ -173,38 +175,28 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             list.forEach {
                 chatIDs.add(it.chat_id)
             }
+            logE("Chats are added from local")
             (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
         }
     }
 
     private fun renderResponse(response: AllChatListResponse?) {
-        logE("socketResponse: $response")
+        logE("renderResponse: $response")
         response?.let { it ->
             if (it.data?.isNotEmpty() == true) {
                 it.data.reverse()
                 chatList.clear()
                 chatList = it.data
-
-                //latest
                 chatIDs.clear()
                 it.data.forEach {
                     chatIDs.add(it.chat_id)
                 }
-                //latest
-
-                (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-
-                //latest
-                if (isRefresh) {
-                    isRefresh = false
-                    viewModel.deleteAllChats()
-                }
-                //latest
+                viewModel.deleteAllChats()
                 binding.tvNoChat.visibility = View.GONE
-
-
                 viewModel.addAllChatItemsToDB(chatList)
                 sharedPrefsHelper.allChatItemSynced()
+                logE("Chats are added from liver server")
+                (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
             } else {
                 binding.tvNoChat.visibility = View.VISIBLE
             }
@@ -277,7 +269,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 AppConstants.CHAT_FRAGMENT_CODE -> {
                     val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
                     if (isSeen == true) {
-                        logE("If Part")
+                        logE("onActivityResult If Part")
                         if (chatList[position].un_read_count != 0) {
                             chatList[position].un_read_count = 0
                             (binding.chatRecycler.adapter as AllChatListAdapter).updateReadCount(
@@ -286,7 +278,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                             viewModel.updateReadCountDB(chatList[position].chat_id, 0)
                         }
                     } else {
-                        logE("Else Part")
+                        logE("onActivityResult Else Part")
                         val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
@@ -356,7 +348,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         if (sharedPrefsHelper[AppConstants.IS_FROM_CONTACTS, 0] == 1) {
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
-            isRefresh = true
+//            isRefresh = true
             hitAllChatApi()
             SocketIO.getInstance().setSocketCallbackListener(this)
             logE("OnResume of Chat Fragment")
