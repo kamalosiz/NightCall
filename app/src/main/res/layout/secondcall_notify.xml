@@ -26,10 +26,10 @@
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/_10sdp"
             android:fontFamily="@font/roboto_medium"
-            android:text="Waqar is calling..."
+            android:text="Waqar is just created a audio calling..."
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15ssp"
+            android:textSize="@dimen/_12ssp"
             android:textStyle="bold" />
 
         <LinearLayout

@@ -3,6 +3,7 @@ package com.example.kalam_android.services
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.RxWorker
@@ -69,7 +70,7 @@ class RxMediaWorker(
         imageFileBody =
             MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
         return repository.uploadMedia(token, params, imageFileBody).doOnSuccess {
-            showNotification("Kalam", "Image Uploaded Successfully")
+            showNotification("KalamTime", "Media Uploaded Successfully")
             if (SocketIO.getInstance().socket == null) {
                 Debugger.e("WorkManagerMedia", "Socket is not connected")
                 SocketIO.getInstance().connectSocket(token)
@@ -101,16 +102,18 @@ class RxMediaWorker(
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
-                "Kalam",
-                "Kalam",
+                "KalamTime",
+                "KalamTime",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(notificationChannel)
         }
         val notification: NotificationCompat.Builder =
-            NotificationCompat.Builder(applicationContext, "Kalam")
+            NotificationCompat.Builder(applicationContext, "KalamTime")
                 .setContentTitle(title)
                 .setContentText(task)
+                .setColor(Color.parseColor("#179a63"))
+                .setAutoCancel(true)
                 .setSmallIcon(R.mipmap.ic_launcher)
         notificationManager.notify(1, notification.build())
     }

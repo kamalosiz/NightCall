@@ -132,7 +132,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
         binding.overviewView.tvAddress.text = userList[0].address
-        binding.profileHeaderView.tvLocation.text = userList[0].city + ", " + userList[0].country
+        binding.profileHeaderView.tvLocation.text = userList[0].city + " " + userList[0].country
         binding.overviewView.tvEducation.text = userList[0].education
         binding.overviewView.tvFax.text = userList[0].fax
         binding.overviewView.tvDescription.text = userList[0].bio

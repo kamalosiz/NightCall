@@ -36,39 +36,21 @@ class FCMService : FirebaseMessagingService() {
         logE("onMessageReceived ${remoteMSG.data}")
         if (remoteMSG.data["nType"] == "call") {
             showNotification("Call Notification", "Call is received")
-
-
-            /*val intent = Intent(this.application, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.putExtra(
-                AppConstants.CONNECTED_USER_ID,
-                remoteMSG.data["connectedUserId"].toString()
-            )
-            intent.putExtra(AppConstants.IS_FROM_CALL, true)
-            startActivity(intent)*/
-
-            /*(this.application as MyApplication).component.doInjection(this)
-            val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
-            val customWebSocketListener =
-                CustomWebSocketListener.getInstance(sharedPrefsHelper, this)
-            val okHttpClientBuilder = OkHttpClient.Builder()
-            val webSocket1 = okHttpClientBuilder.build()
-            val webSocket = webSocket1.newWebSocket(request, customWebSocketListener)
-            customWebSocketListener.setWebSocket(webSocket)
-            customWebSocketListener.setPushData(remoteMSG.data["connectedUserId"].toString(), true)
-            webSocket1.dispatcher().executorService().shutdown()*/
             (this.application as MyApplication).component.doInjection(this)
             try {
-                val dummyWebSocket =
+                val customWebSocketClient =
                     CustomWebSocketClient.getInstance(
                         sharedPrefsHelper, this,
                         URI(Urls.WEB_SOCKET_URL)
                     )
-                dummyWebSocket.setConnectTimeout(10000)
-                dummyWebSocket.setReadTimeout(60000)
-                dummyWebSocket.enableAutomaticReconnection(5000)
-                dummyWebSocket.connect()
-                dummyWebSocket.setPushData(remoteMSG.data["connectedUserId"].toString(), true)
+                customWebSocketClient.setConnectTimeout(10000)
+                customWebSocketClient.setReadTimeout(60000)
+                customWebSocketClient.enableAutomaticReconnection(5000)
+                customWebSocketClient.connect()
+                customWebSocketClient.setPushData(
+                    remoteMSG.data["connectedUserId"].toString(),
+                    true
+                )
             } catch (e: IllegalStateException) {
                 e.printStackTrace()
             }

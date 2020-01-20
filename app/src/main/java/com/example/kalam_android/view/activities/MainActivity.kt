@@ -153,7 +153,7 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             }
             Status.SUCCESS -> {
                 Debugger.e(TAG, "consumeUpdateFcmResponse SUCCESS")
-                toast(apiResponse.data?.message.toString())
+//                toast(apiResponse.data?.message.toString())
                 apiResponse.data?.let {
                     sharedPrefsHelper.saveIsNewFcmToken(false)
                 }
@@ -201,9 +201,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             val jsonString = intent.getStringExtra(AppConstants.JSON)
             val jsonObject = JSONObject(jsonString)
             if (jsonObject.getBoolean("isVideo")) {
-                startNewActivity(VideoCallActivity::class.java, jsonObject, true)
+                startNewActivity(VideoCallActivity::class.java, jsonObject, true, true)
             } else {
-                startNewActivity(AudioCallActivity::class.java, jsonObject, true)
+                startNewActivity(VideoCallActivity::class.java, jsonObject, true, false)
             }
             CustomWebSocketClient.getInstance(sharedPrefsHelper, URI(Urls.WEB_SOCKET_URL))
                 .setOfferListener(this, true)
@@ -231,9 +231,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             AppConstants.OFFER -> {
                 Debugger.e("offerCallback", "json : $jsonObject")
                 if (jsonObject.getBoolean("isVideo")) {
-                    startNewActivity(VideoCallActivity::class.java, jsonObject, false)
+                    startNewActivity(VideoCallActivity::class.java, jsonObject, false, true)
                 } else {
-                    startNewActivity(AudioCallActivity::class.java, jsonObject, false)
+                    startNewActivity(VideoCallActivity::class.java, jsonObject, false, false)
                 }
             }
         }
@@ -246,9 +246,15 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         notificationManager.cancelAll()
     }
 
-    private fun startNewActivity(mClass: Class<*>, jsonObject: JSONObject, isFromPush: Boolean) {
+    private fun startNewActivity(
+        mClass: Class<*>,
+        jsonObject: JSONObject,
+        isFromPush: Boolean,
+        isVideo: Boolean
+    ) {
         val intent = Intent(this, mClass)
         intent.putExtra(AppConstants.JSON, jsonObject.toString())
+        intent.putExtra("isVideoCall", isVideo)
         if (isFromPush) {
 //            startActivityForResult(intent, AppConstants.CODE_FROM_PUSH)
             startActivity(intent)

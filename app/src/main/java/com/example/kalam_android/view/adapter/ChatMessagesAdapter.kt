@@ -25,13 +25,13 @@ import com.example.kalam_android.view.activities.OpenMediaActivity
 import com.example.kalam_android.wrapper.GlideDownloader
 
 class ChatMessagesAdapter(
-        val context: Context,
-        private val userId: String,
-        val name: String,
-        private val profile: String,
-        private val translateState: Int?,
-        private val language: String?,
-        private val myChatMediaHelper: MyChatMediaHelper?
+    val context: Context,
+    private val userId: String,
+    val name: String,
+    private val profile: String,
+    private val translateState: Int?,
+    private val language: String?,
+    private val myChatMediaHelper: MyChatMediaHelper?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val TAG = this.javaClass.simpleName
@@ -105,12 +105,12 @@ class ChatMessagesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MyHolder(
-                DataBindingUtil.inflate(
-                        LayoutInflater.from(parent.context),
-                        R.layout.item_chat_right,
-                        parent,
-                        false
-                )
+            DataBindingUtil.inflate(
+                LayoutInflater.from(parent.context),
+                R.layout.item_chat_right,
+                parent,
+                false
+            )
         )
     }
 
@@ -124,8 +124,8 @@ class ChatMessagesAdapter(
         when (item?.type) {
             AppConstants.TEXT_MESSAGE -> {
                 hideShowViewOriginal(
-                        itemHolder.binding.itemChat.llOriginal,
-                        item.language.toString()
+                    itemHolder.binding.itemChat.llOriginal,
+                    item.language.toString()
                 )
                 itemHolder.binding.itemChat.tvTime.text = getTimeStamp(item.unix_time.toLong())
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
@@ -153,30 +153,30 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
                     itemHolder.binding.itemChat.llOriginal.visibility = View.GONE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
-                            Global.setColor(context, R.color.white)
+                        Global.setColor(context, R.color.white)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
                     itemHolder.binding.itemChat.llOriginal.gravity = View.VISIBLE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
-                            Global.setColor(context, R.color.black)
+                        Global.setColor(context, R.color.black)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                 }
                 applyReadStatus(
-                        userId.toInt(), item.sender_id,
-                        itemHolder.binding.itemChat.ivDeliver, item.is_read
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.itemChat.ivDeliver, item.is_read
                 )
             }
             AppConstants.AUDIO_MESSAGE -> {
                 hideShowViewOriginal(
-                        itemHolder.binding.audioPlayer.llOriginal,
-                        item.language.toString()
+                    itemHolder.binding.audioPlayer.llOriginal,
+                    item.language.toString()
                 )
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.audioPlayer.tvTime.text =
-                            getTimeStamp(item.unix_time.toLong())
+                        getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.audioPlayer.tvTime.text = "Uploading Audio..."
                 }
@@ -187,12 +187,12 @@ class ChatMessagesAdapter(
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 itemHolder.binding.audioPlayer.ivPlayPause.setOnClickListener {
                     myChatMediaHelper?.playVoiceMsg(
-                            itemHolder.binding,
-                            item.audio_url.toString(),
-                            item.id,
-                            context,
-                            item.unix_time,
-                            item.language!!
+                        itemHolder.binding,
+                        item.audio_url.toString(),
+                        item.id,
+                        context,
+                        item.unix_time,
+                        item.language!!
                     )
                 }
                 if (item.sender_id == userId.toInt()) {
@@ -203,8 +203,8 @@ class ChatMessagesAdapter(
                     itemHolder.binding.audioPlayer.llOriginal.gravity = View.VISIBLE
                 }
                 applyReadStatus(
-                        userId.toInt(), item.sender_id,
-                        itemHolder.binding.audioPlayer.ivDeliver, item.is_read
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.audioPlayer.ivDeliver, item.is_read
                 )
                 var audioUrl = ""
                 itemHolder.binding.audioPlayer.llOriginal.setOnClickListener {
@@ -221,7 +221,7 @@ class ChatMessagesAdapter(
             AppConstants.IMAGE_MESSAGE -> {
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.imageHolder.tvTime.text =
-                            getTimeStamp(item.unix_time.toLong())
+                        getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.imageHolder.tvTime.text = "Uploading Image..."
                 }
@@ -231,11 +231,11 @@ class ChatMessagesAdapter(
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 GlideDownloader.load(
-                        context,
-                        itemHolder.binding.imageHolder.ivImage,
-                        item.audio_url.toString(),
-                        R.color.grey,
-                        R.color.grey
+                    context,
+                    itemHolder.binding.imageHolder.ivImage,
+                    item.audio_url.toString(),
+                    R.color.grey,
+                    R.color.grey
                 )
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.END
@@ -244,14 +244,14 @@ class ChatMessagesAdapter(
                 }
                 itemHolder.binding.imageHolder.rlImage.setOnClickListener {
                     startOpenMediaActivity(
-                            item.audio_url.toString(),
-                            AppConstants.IMAGE_MESSAGE,
-                            itemHolder.binding.imageHolder.ivImage
+                        item.audio_url.toString(),
+                        AppConstants.IMAGE_MESSAGE,
+                        itemHolder.binding.imageHolder.ivImage
                     )
                 }
                 applyReadStatus(
-                        userId.toInt(), item.sender_id,
-                        itemHolder.binding.imageHolder.ivDeliver, item.is_read
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.imageHolder.ivDeliver, item.is_read
                 )
             }
             AppConstants.VIDEO_MESSAGE -> {
@@ -263,7 +263,7 @@ class ChatMessagesAdapter(
 
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.videoHolder.tvTime.text =
-                            getTimeStamp(item.unix_time.toLong())
+                        getTimeStamp(item.unix_time.toLong())
                 } else {
                     itemHolder.binding.videoHolder.tvTime.text = "Uploading Video..."
                 }
@@ -273,22 +273,22 @@ class ChatMessagesAdapter(
                     itemHolder.binding.videoHolder.rlVideoItem.gravity = Gravity.START
                 }
                 GlideDownloader.load(
-                        context,
-                        itemHolder.binding.videoHolder.ivImage,
-                        item.audio_url.toString(),
-                        R.color.grey,
-                        R.color.grey
+                    context,
+                    itemHolder.binding.videoHolder.ivImage,
+                    item.audio_url.toString(),
+                    R.color.grey,
+                    R.color.grey
                 )
                 itemHolder.binding.videoHolder.rlVideoItem.setOnClickListener {
                     startOpenMediaActivity(
-                            item.audio_url.toString(),
-                            AppConstants.VIDEO_MESSAGE,
-                            itemHolder.binding.videoHolder.ivImage
+                        item.audio_url.toString(),
+                        AppConstants.VIDEO_MESSAGE,
+                        itemHolder.binding.videoHolder.ivImage
                     )
                 }
                 applyReadStatus(
-                        userId.toInt(), item.sender_id,
-                        itemHolder.binding.videoHolder.ivDeliver, item.is_read
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.videoHolder.ivDeliver, item.is_read
                 )
             }
 
@@ -307,11 +307,11 @@ class ChatMessagesAdapter(
 
         val transitionName = context.getString(R.string.trans_key)
         val options =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        context as Activity,
-                        view,
-                        transitionName
-                )
+            ActivityOptionsCompat.makeSceneTransitionAnimation(
+                context as Activity,
+                view,
+                transitionName
+            )
         ActivityCompat.startActivity(context, intent, options.toBundle())
     }
 

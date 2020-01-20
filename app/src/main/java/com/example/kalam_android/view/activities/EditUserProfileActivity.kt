@@ -102,7 +102,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
     private fun initProfileVideosRecyclerView() {
 
         binding.rvUserProfileVideos.layoutManager =
-            GridLayoutManager(this, 4) as RecyclerView.LayoutManager?
+            GridLayoutManager(this, 4)
         binding.rvUserProfileVideos.adapter = AdapterForProfileVideos()
     }
 
@@ -470,7 +470,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                         cities.apply {
                             this?.forEach {
                                 if (it.contains(char.toString())) {
-                                    val tempList: ArrayList<String> = ArrayList<String>()
+                                    val tempList: ArrayList<String> = ArrayList()
                                     tempList.add(it)
                                     viewAdapter.updateList(tempList)
                                 }
@@ -549,7 +549,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
         }
     }
 
-    fun multiPartParams(): HashMap<String, @JvmSuppressWildcards RequestBody> {
+    private fun multiPartParams(): HashMap<String, @JvmSuppressWildcards RequestBody> {
         val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
 
         params["user_id"] = RequestBody.create(
