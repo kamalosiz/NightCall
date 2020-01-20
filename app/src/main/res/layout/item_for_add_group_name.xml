@@ -8,21 +8,19 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/lvNewGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/_5sdp"
             android:gravity="center">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivNewGroupImage"
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:layout_marginStart="@dimen/_15sdp"
                 android:src="@drawable/ic_group_placeholder" />
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/tvNewGroup"
+                android:id="@+id/etGroupName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_15sdp"
