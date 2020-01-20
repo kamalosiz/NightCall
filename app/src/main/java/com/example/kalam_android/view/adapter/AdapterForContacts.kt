@@ -45,6 +45,11 @@ class AdapterForContacts(val context: Context) :
         contactList?.size?.plus(1)
         contactsFilteredList = contactList
         contactList2 = contactList
+        for (i in 0 until (contactList?.size!!)){
+            if (contactList!![i].id != 0){
+                tempContactList.add(contactList!![i])
+            }
+        }
         notifyDataSetChanged()
     }
 
@@ -80,12 +85,7 @@ class AdapterForContacts(val context: Context) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        for (i in  contactList!!.indices){
-            if (contactList!![i].id != 0){
-                tempContactList.clear()
-                tempContactList.add(contactList!![i])
-            }
-        }
+
         when (getItemViewType(position)) {
             VIEW_HEADER -> {
             }
