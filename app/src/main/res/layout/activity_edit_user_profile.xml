@@ -81,7 +81,7 @@
                         android:id="@+id/ivProfileWall"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/_175sdp"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitXY"
                         android:src="@color/grey" />
 
                     <RelativeLayout

@@ -127,7 +127,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                         sharedPrefsHelper,
                         this,
                         Uri.fromFile(File(returnValue?.get(0).toString()))
-                    )
+                    ,false)
                 }
                 UCrop.REQUEST_CROP -> {
                     logE("onActivityResult REQUEST_CROP")

@@ -17,13 +17,19 @@ object CropHelper {
     fun startCropActivity(
             sharedPrefsHelper: SharedPrefsHelper,
             context: Context,
-            uri: Uri
+            uri: Uri,
+            isWallImage: Boolean
     ) {
         index = sharedPrefsHelper.getImageIndex()?.plus(1)
         val destinationFileName = "$SAMPLE_CROPPED_IMAGE_NAME$index.jpg"
         index?.let { sharedPrefsHelper.setImageIndex(it) }
         var uCrop = UCrop.of(uri, Uri.fromFile(File(context.cacheDir, destinationFileName)))
-        uCrop.withAspectRatio(1f, 1f)  // for profile: 3:4  a kind of square
+        if (!isWallImage) {
+            uCrop.withAspectRatio(1f, 1f)
+        } else {
+            uCrop.withAspectRatio(3f, 2f)
+
+        }  // for profile: 3:4  a kind of square
         uCrop = advancedConfig(context, uCrop)
         uCrop.start(context as AppCompatActivity)
     }

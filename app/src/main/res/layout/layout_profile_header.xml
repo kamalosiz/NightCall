@@ -13,7 +13,7 @@
             android:id="@+id/ivUserProfile"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_175sdp"
-            android:scaleType="centerCrop" />
+            android:scaleType="fitXY" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivProfile"

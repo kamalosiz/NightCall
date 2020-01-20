@@ -149,7 +149,7 @@
                     android:inputType="phone"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/grey"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
 
@@ -157,6 +157,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
+                android:visibility="gone"
                 android:weightSum="2">
 
                 <TextView
@@ -177,7 +178,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:maxLines="2"
                     android:padding="@dimen/_5sdp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/grey"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
 
@@ -206,7 +207,7 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/grey"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
 
@@ -215,6 +216,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
+                android:visibility="gone"
                 android:weightSum="2">
 
                 <TextView

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
@@ -164,9 +165,13 @@ class ChatMessagesAdapter(
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                 }
-                applyReadStatus(
+                /*applyReadStatus(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.itemChat.ivDeliver, item.is_read
+                )*/
+                applyReadStatus(
+                        userId.toInt(), item.sender_id,
+                        itemHolder.binding.itemChat.tvMessageStatus, item.is_read
                 )
             }
             AppConstants.AUDIO_MESSAGE -> {
@@ -204,7 +209,7 @@ class ChatMessagesAdapter(
                 }
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
-                    itemHolder.binding.audioPlayer.ivDeliver, item.is_read
+                    itemHolder.binding.audioPlayer.tvMessageStatus, item.is_read
                 )
                 var audioUrl = ""
                 itemHolder.binding.audioPlayer.llOriginal.setOnClickListener {
@@ -251,7 +256,7 @@ class ChatMessagesAdapter(
                 }
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
-                    itemHolder.binding.imageHolder.ivDeliver, item.is_read
+                    itemHolder.binding.imageHolder.tvMessageStatus, item.is_read
                 )
             }
             AppConstants.VIDEO_MESSAGE -> {
@@ -288,7 +293,7 @@ class ChatMessagesAdapter(
                 }
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
-                    itemHolder.binding.videoHolder.ivDeliver, item.is_read
+                    itemHolder.binding.videoHolder.tvMessageStatus, item.is_read
                 )
             }
 
@@ -315,16 +320,29 @@ class ChatMessagesAdapter(
         ActivityCompat.startActivity(context, intent, options.toBundle())
     }
 
-    private fun applyReadStatus(userId: Int, senderId: Int?, view: ImageView, isRead: Int) {
+    private fun applyReadStatus(userId: Int, senderId: Int?, view: TextView, isRead: Int) {
         if (userId == senderId) {
             view.visibility = View.VISIBLE
             when (isRead) {
-                0 -> view.setBackgroundResource(R.drawable.icon_sent)
-                1 -> view.setBackgroundResource(R.drawable.icon_message_sent)
-                2 -> view.setBackgroundResource(R.drawable.icon_message_read)
+                0 -> {
+//                    view.setBackgroundResource(R.drawable.icon_sent)
+                    view.text = "Sent"
+                    view.setTextColor(context.resources.getColor(R.color.darkGrey,null))
+                }
+                1 -> {
+//                    view.setBackgroundResource(R.drawable.icon_message_sent)
+                    view.text = "Delivered"
+                    view.setTextColor(context.resources.getColor(R.color.darkGrey,null))
+                }
+                2 -> {
+//                    view.setBackgroundResource(R.drawable.icon_message_read)
+                    view.text = "Seen"
+                    view.setTextColor(context.resources.getColor(R.color.darkGrey,null))
+                }
             }
         } else {
-            view.visibility = View.GONE
+//            view.visibility = View.GONE
+            view.text = ""
         }
     }
 

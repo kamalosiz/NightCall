@@ -48,7 +48,7 @@
                     android:layout_toRightOf="@+id/rlBack"
                     android:gravity="center_vertical"
                     android:paddingStart="@dimen/_10sdp"
-                    android:text="Gallery"
+                    android:text="Select Media"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_14ssp" />
 
