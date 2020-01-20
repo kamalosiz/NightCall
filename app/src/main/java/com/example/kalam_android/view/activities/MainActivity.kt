@@ -27,15 +27,12 @@ import com.example.kalam_android.view.adapter.HomePagerAdapter
 import com.example.kalam_android.viewmodel.MainViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.webrtc.AudioCallActivity
-import com.example.kalam_android.webrtc.CustomWebSocketListener
+import com.example.kalam_android.webrtc.CustomWebSocketClient
 import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.wrapper.SocketIO
-import com.sandrios.sandriosCamera.internal.SandriosCamera
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.json.JSONObject
+import java.net.URI
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 
 class MainActivity : BaseActivity(), WebSocketOfferCallback {
@@ -48,12 +45,12 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+    private var customWebSocketClient: CustomWebSocketClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         MyApplication.getAppComponent(this).doInjection(this)
-//        connectWebSocket()
         didPushReceived()
         SocketIO.getInstance().connectSocket(sharedPrefsHelper.getUser()?.token)
         SocketIO.getInstance().connectListeners()
@@ -156,7 +153,7 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             }
             Status.SUCCESS -> {
                 Debugger.e(TAG, "consumeUpdateFcmResponse SUCCESS")
-                toast(apiResponse.data?.message.toString())
+//                toast(apiResponse.data?.message.toString())
                 apiResponse.data?.let {
                     sharedPrefsHelper.saveIsNewFcmToken(false)
                 }
@@ -173,14 +170,29 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     }
 
     private fun connectWebSocket() {
-        val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
+
+        /*val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
         val okHttpClientBuilder = OkHttpClient.Builder()
         val webSocket1 = okHttpClientBuilder.build()
         val webSocket =
             webSocket1.newWebSocket(request, CustomWebSocketListener.getInstance(sharedPrefsHelper))
         CustomWebSocketListener.getInstance(sharedPrefsHelper).setWebSocket(webSocket)
-        CustomWebSocketListener.getInstance(sharedPrefsHelper).setOfferListener(this)
-        webSocket1.dispatcher().executorService().shutdown()
+        CustomWebSocketListener.getInstance(sharedPrefsHelper).setOfferListener(this, true)
+        webSocket1.dispatcher().executorService().shutdown()*/
+        try {
+            customWebSocketClient =
+                CustomWebSocketClient.getInstance(
+                    sharedPrefsHelper,
+                    URI(Urls.WEB_SOCKET_URL)
+                )
+            customWebSocketClient?.setConnectTimeout(10000)
+            customWebSocketClient?.setReadTimeout(60000)
+            customWebSocketClient?.enableAutomaticReconnection(5000)
+            customWebSocketClient?.connect()
+            customWebSocketClient?.setOfferListener(this, true)
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
+        }
     }
 
     private fun didPushReceived() {
@@ -188,15 +200,13 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         if (isFromCall) {
             val jsonString = intent.getStringExtra(AppConstants.JSON)
             val jsonObject = JSONObject(jsonString)
-//            val connectedUserId = intent.getStringExtra(AppConstants.CONNECTED_USER_ID)
-//            customWebSocketListener?.setPushData(connectedUserId, isFromCall)
-
             if (jsonObject.getBoolean("isVideo")) {
-                startNewActivity(VideoCallActivity::class.java, jsonObject, true)
+                startNewActivity(VideoCallActivity::class.java, jsonObject, true, true)
             } else {
-                startNewActivity(AudioCallActivity::class.java, jsonObject, true)
+                startNewActivity(VideoCallActivity::class.java, jsonObject, true, false)
             }
-            CustomWebSocketListener.getInstance(sharedPrefsHelper).setOfferListener(this)
+            CustomWebSocketClient.getInstance(sharedPrefsHelper, URI(Urls.WEB_SOCKET_URL))
+                .setOfferListener(this, true)
         } else {
             connectWebSocket()
         }
@@ -213,6 +223,7 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     override fun onDestroy() {
         super.onDestroy()
         SocketIO.getInstance().disconnectSocket()
+        customWebSocketClient?.disconnectSocket()
     }
 
     override fun offerCallback(jsonObject: JSONObject) {
@@ -220,9 +231,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             AppConstants.OFFER -> {
                 Debugger.e("offerCallback", "json : $jsonObject")
                 if (jsonObject.getBoolean("isVideo")) {
-                    startNewActivity(VideoCallActivity::class.java, jsonObject, false)
+                    startNewActivity(VideoCallActivity::class.java, jsonObject, false, true)
                 } else {
-                    startNewActivity(AudioCallActivity::class.java, jsonObject, false)
+                    startNewActivity(VideoCallActivity::class.java, jsonObject, false, false)
                 }
             }
         }
@@ -235,11 +246,18 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         notificationManager.cancelAll()
     }
 
-    private fun startNewActivity(mClass: Class<*>, jsonObject: JSONObject, isFromPush: Boolean) {
+    private fun startNewActivity(
+        mClass: Class<*>,
+        jsonObject: JSONObject,
+        isFromPush: Boolean,
+        isVideo: Boolean
+    ) {
         val intent = Intent(this, mClass)
         intent.putExtra(AppConstants.JSON, jsonObject.toString())
+        intent.putExtra("isVideoCall", isVideo)
         if (isFromPush) {
-            startActivityForResult(intent, AppConstants.CODE_FROM_PUSH)
+//            startActivityForResult(intent, AppConstants.CODE_FROM_PUSH)
+            startActivity(intent)
         } else {
             startActivity(intent)
         }
@@ -251,9 +269,15 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CODE_FROM_PUSH -> {
+//                    finish()
                     finishAndRemoveTask()
+                    moveTaskToBack(true)
                 }
             }
         }
+    }
+
+    private fun logE(msg: String) {
+        Debugger.e(TAG, msg)
     }
 }

@@ -21,7 +21,7 @@ class AdapterForProfileVideos : RecyclerView.Adapter<ProfileVideosHolder>() {
 
     override fun getItemCount(): Int {
 
-        return 40
+        return 0
     }
 
     override fun onBindViewHolder(holder: ProfileVideosHolder, position: Int) {

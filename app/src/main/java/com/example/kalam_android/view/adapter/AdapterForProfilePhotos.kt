@@ -20,7 +20,7 @@ class AdapterForProfilePhotos : RecyclerView.Adapter<ProfilePhotosHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return 40
+        return 0
     }
 
     override fun onBindViewHolder(holder: ProfilePhotosHolder, position: Int) {

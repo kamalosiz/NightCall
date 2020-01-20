@@ -47,7 +47,6 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
-import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
@@ -479,7 +478,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 val intent = Intent(this@ChatDetailActivity, UserProfileActivity::class.java)
                 intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
                 intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
-                intent.putExtra(AppConstants.CALLER_USER_ID,callerID.toString())
+                intent.putExtra(AppConstants.CALLER_USER_ID, callerID.toString())
                 val transitionName = getString(R.string.profile_trans)
                 val options =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -504,20 +503,21 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 myChatMediaHelper?.openAttachments()
             }
             R.id.ivAudio -> {
-                startNewActivity(AudioCallActivity::class.java)
+                startNewActivity(VideoCallActivity::class.java, false)
             }
             R.id.ivVideo -> {
-                startNewActivity(VideoCallActivity::class.java)
+                startNewActivity(VideoCallActivity::class.java, true)
             }
         }
     }
 
-    private fun startNewActivity(mClass: Class<*>) {
+    private fun startNewActivity(mClass: Class<*>, isVideo: Boolean) {
         val intent = Intent(this, mClass)
         intent.putExtra(AppConstants.INITIATOR, true)
         intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
         intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
         intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
+        intent.putExtra("isVideoCall", isVideo)
         startActivity(intent)
         overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
     }
@@ -722,13 +722,15 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     override fun onResultVoiceToText(list: ArrayList<String>) {
         if (list[0] == "type") {
             Global.showKeyBoard(this, binding.lvBottomChat.editTextMessage)
+        } else if (list[0] == "type a message") {
+            Global.showKeyBoard(this, binding.lvBottomChat.editTextMessage)
         } else {
             if (list[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
             ) {
                 sendMessage()
             } else {
-                binding.lvBottomChat.editTextMessage.setText(list[0])
-                binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
+//                binding.lvBottomChat.editTextMessage.setText(list[0])
+//                binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
             }
         }
     }

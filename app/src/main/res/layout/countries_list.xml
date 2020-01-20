@@ -19,6 +19,7 @@
             android:drawableEnd="@drawable/ic_search"
             android:fontFamily="@font/roboto_regular"
             android:hint="Search"
+            android:inputType="textCapWords"
             android:paddingStart="@dimen/_10sdp"
             android:paddingEnd="@dimen/_10sdp"
             android:textColor="@color/black"

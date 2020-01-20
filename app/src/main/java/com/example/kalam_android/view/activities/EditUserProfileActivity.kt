@@ -29,7 +29,6 @@ import com.example.kalam_android.databinding.ActivityEditUserProfileBinding
 import com.example.kalam_android.helper.JSONParser
 import com.example.kalam_android.repository.model.ProfileData
 import com.example.kalam_android.repository.model.UpdateUserProfile
-import com.example.kalam_android.repository.model.UserProfile
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
@@ -38,7 +37,6 @@ import com.example.kalam_android.view.adapter.AdapterForProfileVideos
 import com.example.kalam_android.view.adapter.CityAdapter
 import com.example.kalam_android.view.adapter.CountriesAdapter
 import com.example.kalam_android.viewmodel.EditUserProfileViewModel
-import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloader
 import com.fxn.pix.Options
@@ -49,23 +47,17 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.yalantis.ucrop.UCrop
-import kotlinx.android.synthetic.main.activity_edit_user_profile.view.*
+import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.activity_sign_up.view.tvCountry
-import kotlinx.android.synthetic.main.item_chat.*
-import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.*
 import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.view.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.json.JSONException
-import org.json.JSONObject
-import retrofit2.http.Multipart
 import java.io.File
-import java.io.IOException
-import java.nio.charset.Charset
 import javax.inject.Inject
 
-class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, CountriesAdapter.LocationItemClickListener, CityAdapter.CityItemClickListener {
+class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
+    CountriesAdapter.LocationItemClickListener, CityAdapter.CityItemClickListener {
     private lateinit var binding: ActivityEditUserProfileBinding
     private var isWallImage: Boolean = false
     private var profileImagePath: String? = null
@@ -109,7 +101,8 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
 
     private fun initProfileVideosRecyclerView() {
 
-        binding.rvUserProfileVideos.layoutManager = GridLayoutManager(this, 4) as RecyclerView.LayoutManager?
+        binding.rvUserProfileVideos.layoutManager =
+            GridLayoutManager(this, 4)
         binding.rvUserProfileVideos.adapter = AdapterForProfileVideos()
     }
 
@@ -122,16 +115,16 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
     private fun initShowMore() {
 
         binding.tvOverview.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelOverview)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelOverview)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.tvPhotos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelPhotos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelPhotos)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
         binding.tvVideos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelVideos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+            "<u>${getString(R.string.labelVideos)}</u>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
         )
 
     }
@@ -152,21 +145,31 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             binding.overviewView.etWork.setText(list[0].work)
             binding.overviewView.tvCity.text = list[0].city
             binding.overviewView.tvCountry.text = list[0].country
-            binding.overviewView.spInterest.setSelection(getIndex(binding.overviewView.spInterest, list[0].intrests))
-            binding.overviewView.spStatus.setSelection(getIndex(binding.overviewView.spStatus, list[0].martial_status))
-            GlideDownloader.load(
-                    this,
-                    binding.ivProfile,
-                    list[0].profile_image,
-                    R.drawable.dummy_placeholder,
-                    R.drawable.dummy_placeholder
+            binding.overviewView.spInterest.setSelection(
+                getIndex(
+                    binding.overviewView.spInterest,
+                    list[0].intrests
+                )
+            )
+            binding.overviewView.spStatus.setSelection(
+                getIndex(
+                    binding.overviewView.spStatus,
+                    list[0].martial_status
+                )
             )
             GlideDownloader.load(
-                    this,
-                    binding.ivProfileWall,
-                    list[0].wall_image,
-                    R.drawable.dummy_placeholder,
-                    R.drawable.dummy_placeholder
+                this,
+                binding.ivProfile,
+                list[0].profile_image,
+                R.drawable.dummy_placeholder,
+                R.drawable.dummy_placeholder
+            )
+            GlideDownloader.load(
+                this,
+                binding.ivProfileWall,
+                list[0].wall_image,
+                R.drawable.dummy_placeholder,
+                R.drawable.dummy_placeholder
             )
         }
     }
@@ -174,16 +177,16 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
     private fun onclickListener() {
 
         binding.tvOverview.setTextColor(
-                ContextCompat.getColor(
-                        applicationContext,
-                        R.color.theme_color
-                )
+            ContextCompat.getColor(
+                applicationContext,
+                R.color.theme_color
+            )
         )
 
         binding.tvOverview.setOnClickListener(this)
         binding.tvPhotos.setOnClickListener(this)
         binding.tvVideos.setOnClickListener(this)
-        binding.ivBack.setOnClickListener(this)
+        binding.tvCancel.setOnClickListener(this)
         binding.ivCameraWall.setOnClickListener(this)
         binding.ivProfileCamera.setOnClickListener(this)
         binding.overviewView.tvCountry.setOnClickListener(this)
@@ -196,22 +199,22 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
         when (v?.id) {
             R.id.tvOverview -> {
                 binding.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.theme_color
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.theme_color
+                    )
                 )
                 binding.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.overviewView.visibility = View.VISIBLE
                 binding.rvUserProfilePhotos.visibility = View.GONE
@@ -223,22 +226,22 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             }
             R.id.tvPhotos -> {
                 binding.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.theme_color
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.theme_color
+                    )
                 )
                 binding.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.overviewView.visibility = View.GONE
                 binding.rvUserProfilePhotos.visibility = View.VISIBLE
@@ -247,29 +250,29 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             }
             R.id.tvVideos -> {
                 binding.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.black
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.black
+                    )
                 )
                 binding.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                applicationContext,
-                                R.color.theme_color
-                        )
+                    ContextCompat.getColor(
+                        applicationContext,
+                        R.color.theme_color
+                    )
                 )
                 binding.overviewView.visibility = View.GONE
                 binding.rvUserProfilePhotos.visibility = View.GONE
                 binding.rvUserProfileVideos.visibility = View.VISIBLE
 
             }
-            R.id.ivBack -> {
+            R.id.tvCancel -> {
                 onBackPressed()
             }
             R.id.ivProfileCamera -> {
@@ -298,14 +301,14 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
 
     private fun checkPermissions() {
         Dexter.withActivity(this).withPermissions(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report?.areAllPermissionsGranted() == true) {
                     Pix.start(
-                            this@EditUserProfileActivity,
-                            Options.init().setRequestCode(AppConstants.PROFILE_IMAGE_CODE)
+                        this@EditUserProfileActivity,
+                        Options.init().setRequestCode(AppConstants.PROFILE_IMAGE_CODE)
                     )
 
 
@@ -315,8 +318,8 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             }
 
             override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>?,
-                    token: PermissionToken?
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
             ) {
                 token?.continuePermissionRequest()
             }
@@ -334,9 +337,9 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
                     val returnValue = data?.getStringArrayListExtra(Pix.IMAGE_RESULTS)
 //                    logE("onActivityResult returnValue: $returnValue")
                     CropHelper.startCropActivity(
-                            sharedPrefsHelper,
-                            this,
-                            Uri.fromFile(File(returnValue?.get(0).toString()))
+                        sharedPrefsHelper,
+                        this,
+                        Uri.fromFile(File(returnValue?.get(0).toString()))
                     )
                 }
                 UCrop.REQUEST_CROP -> {
@@ -359,20 +362,20 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
 
         if (!isWallImage) {
             GlideDownloader.load(
-                    this,
-                    binding.ivProfile,
-                    resultUri.path,
-                    R.drawable.dummy_placeholder,
-                    R.drawable.dummy_placeholder
+                this,
+                binding.ivProfile,
+                resultUri.path,
+                R.drawable.dummy_placeholder,
+                R.drawable.dummy_placeholder
             )
             profileImage = profileImagePath as String
         } else {
             GlideDownloader.load(
-                    this,
-                    binding.ivProfileWall,
-                    resultUri.path,
-                    R.drawable.dummy_placeholder,
-                    R.drawable.dummy_placeholder
+                this,
+                binding.ivProfileWall,
+                resultUri.path,
+                R.drawable.dummy_placeholder,
+                R.drawable.dummy_placeholder
             )
             wallImage = profileImagePath as String
 
@@ -385,36 +388,46 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
         dialogCountry.setContentView(R.layout.countries_list)
         countries = JSONParser.getCountriesFromJSON(countriesJson, this)
         val viewManager = LinearLayoutManager(this)
-        val viewAdapter = CountriesAdapter(this@EditUserProfileActivity, countries!!, this@EditUserProfileActivity)
+        val viewAdapter = CountriesAdapter(
+            this@EditUserProfileActivity,
+            countries!!,
+            this@EditUserProfileActivity
+        )
         dialogCountry.findViewById<RecyclerView>(R.id.rvList).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
         }
-        dialogCountry.findViewById<EditText>(R.id.etSearch).addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
+        dialogCountry.findViewById<EditText>(R.id.etSearch)
+            .addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
 
-            }
+                }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.toString() != "") {
-                    countries.apply {
-                        this?.forEach {
-                            if (it.contains(s.toString())) {
-                                val tempList: ArrayList<String> = ArrayList<String>()
-                                tempList.add(it)
-                                viewAdapter.updateList(tempList)
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (s.toString() != "") {
+                        countries.apply {
+                            this?.forEach {
+                                if (it.contains(s.toString())) {
+                                    val tempList: ArrayList<String> = ArrayList<String>()
+                                    tempList.add(it)
+                                    viewAdapter.updateList(tempList)
+                                }
                             }
                         }
+                    } else {
+                        viewAdapter.updateList(countries!!)
                     }
-                } else {
-                    viewAdapter.updateList(countries!!)
                 }
-            }
-        })
+            })
 
         dialogCountry.show()
     }
@@ -426,37 +439,49 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
         dialogCity.setContentView(R.layout.countries_list)
         val viewManager = LinearLayoutManager(this)
         cities = JSONParser.getCitiesFromJSON(citiesJson, this, countryName)
-        val viewAdapter = CityAdapter(this@EditUserProfileActivity, cities!!, this@EditUserProfileActivity)
+        val viewAdapter =
+            CityAdapter(this@EditUserProfileActivity, cities!!, this@EditUserProfileActivity)
         dialogCity.findViewById<RecyclerView>(R.id.rvList).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
             adapter = viewAdapter
         }
-        dialogCity.findViewById<EditText>(R.id.etSearch).addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
+        dialogCity.findViewById<EditText>(R.id.etSearch)
+            .addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
 
-            }
+                }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
 
-            override fun onTextChanged(char: CharSequence?, start: Int, before: Int, count: Int) {
-                if (char.toString() != "") {
-                    cities.apply {
-                        this?.forEach {
-                            if (it.contains(char.toString())) {
-                                val tempList: ArrayList<String> = ArrayList<String>()
-                                tempList.add(it)
-                                viewAdapter.updateList(tempList)
+                override fun onTextChanged(
+                    char: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int
+                ) {
+                    if (char.toString() != "") {
+                        cities.apply {
+                            this?.forEach {
+                                if (it.contains(char.toString())) {
+                                    val tempList: ArrayList<String> = ArrayList()
+                                    tempList.add(it)
+                                    viewAdapter.updateList(tempList)
+                                }
                             }
                         }
+                    } else {
+                        viewAdapter.updateList(cities!!)
                     }
-                } else {
-                    viewAdapter.updateList(cities!!)
                 }
-            }
 
-        })
+            })
         dialogCity.show()
     }
 
@@ -477,7 +502,6 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
 
         if (profileImage == "" && wallImage == "") {
             val params = HashMap<String, String>()
-
             params["user_id"] = sharedPrefsHelper.getUser()?.id.toString()
             params["bio"] = binding.overviewView.etDescription.text.toString()
             params["address"] = binding.overviewView.etAddress.text.toString()
@@ -499,92 +523,96 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             params["education"] = binding.overviewView.etEducation.text.toString()
             params["city"] = binding.overviewView.tvCity.text.toString()
             params["country"] = binding.overviewView.tvCountry.text.toString()
-            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token!!, params)
+            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token.toString(), params)
 
         } else if (profileImage != "" && wallImage != "") {
-            val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
+            viewModel.hitUpdateUserProfile(
+                sharedPrefsHelper.getUser()?.token.toString(),
+                multiPartParams(),
+                convertImageMultipart(profileImage, "profile_image"),
+                convertImageMultipart(wallImage, "wall_image")
+            )
 
-            params["user_id"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getUser()?.id.toString())
-            params["bio"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etDescription.text.toString())
-            params["address"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etAddress.text.toString())
-            params["first_name"] = RequestBody.create(MediaType.parse("text/plain"), binding.etFirstName.text.toString())
-            params["last_name"] = RequestBody.create(MediaType.parse("text/plain"), binding.etLastName.text.toString())
-            params["website"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etWebsite.text.toString())
-            params["fax"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etFax.text.toString())
-            if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.spInterest.selectedItem.toString())
-            }
-            if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.spStatus.selectedItem.toString())
-            }
-            params["work"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etWork.text.toString())
-            params["education"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etEducation.text.toString())
-            params["city"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.tvCity.text.toString())
-            params["country"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.tvCountry.text.toString())
-
-            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token!!, params, convertImageMultipart(profileImage, "profile_image"), convertImageMultipart(wallImage, "wall_image"))
-
-        } else if (profileImage != "") {
-
-            val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
-
-            params["user_id"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getUser()?.id.toString())
-            params["bio"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etDescription.text.toString())
-            params["address"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etAddress.text.toString())
-            params["first_name"] = RequestBody.create(MediaType.parse("text/plain"), binding.etFirstName.text.toString())
-            params["last_name"] = RequestBody.create(MediaType.parse("text/plain"), binding.etLastName.text.toString())
-            params["website"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etWebsite.text.toString())
-            params["fax"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etFax.text.toString())
-            if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.spInterest.selectedItem.toString())
-            }
-            if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.spStatus.selectedItem.toString())
-            }
-            params["work"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etWork.text.toString())
-            params["education"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etEducation.text.toString())
-            params["city"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.tvCity.text.toString())
-            params["country"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.tvCountry.text.toString())
-
-            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token!!, params, convertImageMultipart(profileImage, "profile_image"))
+        } else if (profileImage != "" && wallImage == "") {
+            viewModel.hitUpdateUserProfile(
+                sharedPrefsHelper.getUser()?.token.toString(),
+                multiPartParams(),
+                convertImageMultipart(profileImage, "profile_image")
+            )
 
         } else {
-            val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
-
-            params["user_id"] = RequestBody.create(MediaType.parse("text/plain"), sharedPrefsHelper.getUser()?.id.toString())
-            params["bio"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etDescription.text.toString())
-            params["address"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etAddress.text.toString())
-            params["first_name"] = RequestBody.create(MediaType.parse("text/plain"), binding.etFirstName.text.toString())
-            params["last_name"] = RequestBody.create(MediaType.parse("text/plain"), binding.etLastName.text.toString())
-            params["website"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etWebsite.text.toString())
-            params["fax"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etFax.text.toString())
-            if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.spInterest.selectedItem.toString())
-            }
-            if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
-            } else {
-                params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.spStatus.selectedItem.toString())
-            }
-            params["work"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etWork.text.toString())
-            params["education"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.etEducation.text.toString())
-            params["city"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.tvCity.text.toString())
-            params["country"] = RequestBody.create(MediaType.parse("text/plain"), binding.overviewView.tvCountry.text.toString())
-
-            viewModel.hitUpdateUserProfile(sharedPrefsHelper.getUser()?.token!!, params, convertImageMultipart(wallImage, "wall_image"))
+            viewModel.hitUpdateUserProfile(
+                sharedPrefsHelper.getUser()?.token.toString(),
+                multiPartParams(),
+                convertImageMultipart(wallImage, "wall_image")
+            )
         }
+    }
 
+    private fun multiPartParams(): HashMap<String, @JvmSuppressWildcards RequestBody> {
+        val params = HashMap<String, @JvmSuppressWildcards RequestBody>()
 
+        params["user_id"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            sharedPrefsHelper.getUser()?.id.toString()
+        )
+        params["bio"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etDescription.text.toString()
+        )
+        params["address"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etAddress.text.toString()
+        )
+        params["first_name"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.etFirstName.text.toString()
+        )
+        params["last_name"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.etLastName.text.toString()
+        )
+        params["website"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etWebsite.text.toString()
+        )
+        params["fax"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etFax.text.toString()
+        )
+        if (binding.overviewView.spInterest.selectedItem.toString() == "Select Interest") {
+            params["intrests"] = RequestBody.create(MediaType.parse("text/plain"), "")
+        } else {
+            params["intrests"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.overviewView.spInterest.selectedItem.toString()
+            )
+        }
+        if (binding.overviewView.spStatus.selectedItem.toString() == "Select Status") {
+            params["martial_status"] = RequestBody.create(MediaType.parse("text/plain"), "")
+        } else {
+            params["martial_status"] = RequestBody.create(
+                MediaType.parse("text/plain"),
+                binding.overviewView.spStatus.selectedItem.toString()
+            )
+        }
+        params["work"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etWork.text.toString()
+        )
+        params["education"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.etEducation.text.toString()
+        )
+        params["city"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.tvCity.text.toString()
+        )
+        params["country"] = RequestBody.create(
+            MediaType.parse("text/plain"),
+            binding.overviewView.tvCountry.text.toString()
+        )
+        return params
     }
 
     private fun consumeApiResponse(response: ApiResponse<UpdateUserProfile>) {
@@ -611,9 +639,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
             else -> {
 
             }
-
         }
-
     }
 
     private fun getIndex(spinner: Spinner, myString: String): Int {
@@ -622,17 +648,17 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener, Count
                 return i
             }
         }
-
         return 0
     }
 
     private fun convertImageMultipart(path: String, imageType: String): MultipartBody.Part {
         val imageFileBody: MultipartBody.Part?
-        val fileToUpload = File(path)
-        val requestBody = RequestBody.create(MediaType.parse("image/*"), fileToUpload)
+//        val fileToUpload = File(path)
+        val fileToUpload = Compressor(this).compressToFile(File(path))
+        val requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), fileToUpload)
         imageFileBody =
-                MultipartBody.Part.createFormData(imageType, fileToUpload.name, requestBody)
-        return imageFileBody!!
+            MultipartBody.Part.createFormData(imageType, fileToUpload.name, requestBody)
+        return imageFileBody
     }
 
 }

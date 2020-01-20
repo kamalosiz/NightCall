@@ -95,7 +95,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.length == 0) {
                     fromSearch = 0
-                    binding.pbCenter.visibility = View.VISIBLE
+//                    binding.pbCenter.visibility = View.VISIBLE
                     hitAllChatApi()
                 } else {
                     fromSearch = 1
@@ -110,7 +110,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         when (apiResponse?.status) {
 
             Status.LOADING -> {
-                binding.pbCenter.visibility = View.VISIBLE
+//                binding.pbCenter.visibility = View.VISIBLE
             }
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
@@ -363,7 +363,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
 
                 for (i in chatList.indices) {
                     if (speechName.equals(
-                            "chat with" + " " + chatList[i].firstname + " " + chatList[i].lastname,
+                            "chat with" + " " + chatList[i].nickname,
                             true
                         ) || speechName.equals(
                             "chat with" + " " + chatList[i].firstname,
@@ -375,7 +375,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     ) {
                         toast(
                             activity,
-                            "chat with ${chatList[i].firstname + " " + chatList[i].lastname}"
+                            "chat with ${chatList[i].nickname}"
                         )
                         startActivity(i)
                         return
