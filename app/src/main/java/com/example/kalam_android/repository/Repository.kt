@@ -102,4 +102,12 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     fun updateProfile(authorization: String?, parameters: Map<String, @JvmSuppressWildcards RequestBody>, profileImage: MultipartBody.Part, wallImage: MultipartBody.Part): Observable<UpdateUserProfile> {
         return apiCallInterface.updateProfile(authorization!!, parameters, profileImage, wallImage)
     }
+
+    fun updateUserName(authorization: String?, parameters: Map<String, String>): Observable<RequestBody> {
+        return apiCallInterface.updateUserName(authorization!!, parameters)
+    }
+
+    fun forgetPassword(parameters: Map<String, String>): Observable<RequestBody> {
+        return apiCallInterface.forgetPassword(parameters)
+    }
 }

@@ -88,13 +88,24 @@
                 android:background="@color/black" />
         </LinearLayout>
 
-        <ImageView
+        <TextView
+            android:id="@+id/tvMessageStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cvPlayer"
+            android:layout_alignEnd="@id/cvPlayer"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:textSize="@dimen/_8ssp"/>
+
+        <!--<ImageView
             android:id="@+id/ivDeliver"
             android:layout_width="@dimen/_10sdp"
             android:layout_height="@dimen/_10sdp"
             android:layout_below="@id/cvPlayer"
             android:layout_alignEnd="@id/cvPlayer"
             android:layout_marginTop="@dimen/_3sdp"
-            android:layout_marginEnd="@dimen/_10sdp"/>
+            android:visibility="gone"
+            android:layout_marginEnd="@dimen/_10sdp"/>-->
     </RelativeLayout>
 </layout>

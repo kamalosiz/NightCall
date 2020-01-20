@@ -11,6 +11,7 @@
             android:id="@+id/lvBack"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
+
             android:background="@color/theme_color">
 
             <!--<androidx.appcompat.widget.AppCompatImageView
@@ -47,6 +48,22 @@
                 android:singleLine="true"
                 android:text="Profile"
                 android:textColor="@color/white"
+                android:textSize="@dimen/_14ssp"
+                android:transitionName="@string/profile_trans" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_15sdp"
+                android:fontFamily="@font/roboto_medium"
+                android:singleLine="true"
+                android:padding="@dimen/_5sdp"
+                android:layout_alignParentEnd="true"
+                android:text="@string/labelSave"
+                android:textColor="@color/white"
+                android:layout_marginEnd="@dimen/_10sdp"
                 android:textSize="@dimen/_14ssp"
                 android:transitionName="@string/profile_trans" />
 

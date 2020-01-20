@@ -139,9 +139,9 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
             binding.overviewView.etEmail.setText(list[0].email)
             binding.overviewView.etDescription.setText(list[0].bio)
             binding.overviewView.etAddress.setText(list[0].address)
-            binding.overviewView.etWebsite.setText(list[0].website)
+//            binding.overviewView.etWebsite.setText(list[0].website)
             binding.overviewView.etEducation.setText(list[0].education)
-            binding.overviewView.etFax.setText(list[0].fax)
+//            binding.overviewView.etFax.setText(list[0].fax)
             binding.overviewView.etWork.setText(list[0].work)
             binding.overviewView.tvCity.text = list[0].city
             binding.overviewView.tvCountry.text = list[0].country
@@ -339,7 +339,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                     CropHelper.startCropActivity(
                         sharedPrefsHelper,
                         this,
-                        Uri.fromFile(File(returnValue?.get(0).toString()))
+                        Uri.fromFile(File(returnValue?.get(0).toString())),isWallImage
                     )
                 }
                 UCrop.REQUEST_CROP -> {

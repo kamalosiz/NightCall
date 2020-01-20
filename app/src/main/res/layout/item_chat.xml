@@ -82,6 +82,18 @@
                 android:background="@color/black" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tvMessageStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rlLayout"
+            android:layout_alignEnd="@id/rlLayout"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:layout_marginEnd="@dimen/_9sdp"
+            android:textColor="@color/theme_color"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="@dimen/_8ssp" />
+
         <ImageView
             android:id="@+id/ivDeliver"
             android:layout_width="@dimen/_10sdp"
@@ -89,6 +101,7 @@
             android:layout_below="@id/rlLayout"
             android:layout_alignEnd="@id/rlLayout"
             android:layout_marginTop="@dimen/_3sdp"
-            android:layout_marginEnd="@dimen/_10sdp" />
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:visibility="gone" />
     </RelativeLayout>
 </layout>

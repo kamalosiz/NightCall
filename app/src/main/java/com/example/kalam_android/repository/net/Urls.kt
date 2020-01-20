@@ -31,5 +31,7 @@ class Urls {
         const val UPLOAD_AUDIO = "/api/chat/upload_file"
         const val GET_PROFILE = "/api/user/profile"
         const val UPDATE_PROFILE = "/api/user/update_profile"
+        const val USER_NAME_UPDATE = "/api/user/update_contact_info"
+        const val FORGET_PASSWORD = "/api/site/forgot_password"
     }
 }
