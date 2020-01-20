@@ -22,6 +22,7 @@ import com.example.kalam_android.callbacks.ResultVoiceToText
 import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.databinding.ChatsFragmentBinding
 import com.example.kalam_android.helper.MyVoiceToTextHelper
+import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.model.AllChatListResponse
 import com.example.kalam_android.repository.net.ApiResponse
@@ -32,6 +33,7 @@ import com.example.kalam_android.view.adapter.AllChatListAdapter
 import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
+import com.google.gson.Gson
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -63,20 +65,27 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         )
         MyApplication.getAppComponent(activity as Context).doInjection(this)
         viewModel = ViewModelProviders.of(this, factory).get(AllChatListViewModel::class.java)
-        /* viewModel.allChatLocalResponse().observe(this, Observer {
-             consumeLocalResponse(it)
-         })*/
+
+        //latest
+        viewModel.allChatLocalResponse().observe(this, Observer {
+            consumeLocalResponse(it)
+        })
+        //latest
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        /*if (sharedPrefsHelper.isAllChatsItemsSynced()) {
+        //latest
+        if (sharedPrefsHelper.isAllChatsItemsSynced()) {
             viewModel.getAllchatItemFromDB()
             logE("loaded from local db")
         } else {
             hitAllChatApi()
             logE("loaded from live server")
-        }*/
-        hitAllChatApi()
+        }
+        //latest
+
+        //Old
+//        hitAllChatApi()
 
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
         SocketIO.getInstance().setSocketCallbackListener(this)
@@ -128,44 +137,45 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             }
         }
     }
-    /* private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
-         when (apiResponse?.status) {
 
-             Status.LOADING -> {
-             }
-             Status.SUCCESS -> {
-                 binding.pbCenter.visibility = View.GONE
-                 binding.swipeRefreshLayout.isRefreshing = false
-                 renderLocalResponse(apiResponse.data)
-                 logE("consumeResponse SUCCESS : ${apiResponse.data}")
-             }
-             Status.ERROR -> {
-                 binding.pbCenter.visibility = View.GONE
-                 binding.swipeRefreshLayout.isRefreshing = false
-                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
-                 toast(activity, "Something went wrong please try again")
-             }
-             else -> {
-             }
-         }
-     }*/
+    private fun consumeLocalResponse(apiResponse: ApiResponse<List<ChatListData>>?) {
+        when (apiResponse?.status) {
 
-    /* private fun renderLocalResponse(list: List<ChatListData>?) {
-         logE("renderLocalResponse: $list")
-         list?.let {
-             chatList.clear()
-             chatIDs.clear()
+            Status.LOADING -> {
+            }
+            Status.SUCCESS -> {
+                binding.pbCenter.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
+                renderLocalResponse(apiResponse.data)
+                logE("consumeResponse SUCCESS : ${apiResponse.data}")
+            }
+            Status.ERROR -> {
+                binding.pbCenter.visibility = View.GONE
+                binding.swipeRefreshLayout.isRefreshing = false
+                logE("consumeResponse ERROR: " + apiResponse.error.toString())
+                toast(activity, "Something went wrong please try again")
+            }
+            else -> {
+            }
+        }
+    }
 
-             if (list.isNotEmpty()) {
-                 binding.fabSpeech.isClickable = true
-             }
-             chatList.addAll(list)
-             list.forEach {
-                 chatIDs.add(it.chat_id)
-             }
-             (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-         }
-     }*/
+    private fun renderLocalResponse(list: List<ChatListData>?) {
+        logE("renderLocalResponse: $list")
+        list?.let {
+            chatList.clear()
+            chatIDs.clear()
+
+            if (list.isNotEmpty()) {
+                binding.fabSpeech.isClickable = true
+            }
+            chatList.addAll(list)
+            list.forEach {
+                chatIDs.add(it.chat_id)
+            }
+            (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
+        }
+    }
 
     private fun renderResponse(response: AllChatListResponse?) {
         logE("socketResponse: $response")
@@ -174,18 +184,27 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 it.data.reverse()
                 chatList.clear()
                 chatList = it.data
-                /*chatIDs.clear()
+
+                //latest
+                chatIDs.clear()
                 it.data.forEach {
                     chatIDs.add(it.chat_id)
-                }*/
+                }
+                //latest
+
                 (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-                /*if (isRefresh) {
+
+                //latest
+                if (isRefresh) {
                     isRefresh = false
                     viewModel.deleteAllChats()
-                }*/
+                }
+                //latest
                 binding.tvNoChat.visibility = View.GONE
-//                viewModel.addAllChatItemsToDB(chatList)
-//                sharedPrefsHelper.allChatItemSynced()
+
+
+                viewModel.addAllChatItemsToDB(chatList)
+                sharedPrefsHelper.allChatItemSynced()
             } else {
                 binding.tvNoChat.visibility = View.VISIBLE
             }
@@ -210,35 +229,43 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
 
     override fun socketResponse(jsonObject: JSONObject, type: String) {
         if (type == AppConstants.NEW_MESSAGE) {
-//            val gson = Gson()
-//            logE("New Message : $jsonObject")
-//            val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-//            val unixTime = System.currentTimeMillis() / 1000L
+            val gson = Gson()
+            logE("New Message : $jsonObject")
+            val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+            val unixTime = System.currentTimeMillis() / 1000L
             activity?.runOnUiThread {
-                /* val name = newChat.sender_name.split(" ")
-                 val item = ChatListData(
-                     newChat.chat_id, "", unixTime, name[0], name[1],
-                     "", newChat.message, 1
-                 )
-                 if (chatIDs.contains(newChat.chat_id)) {
-                     logE("Chat ID matched")
-                     for (x in chatList.indices) {
-                         if (chatList[x].chat_id == newChat.chat_id) {
-                             chatList[x].un_read_count += 1
-                             modifyItem(x, item.message.toString(), unixTime, chatList[x].un_read_count)
-                         }
-                     }
-                 } else {
-                     logE("This chat is not present")
-                     if (chatList.size == 0) {
-                         binding.tvNoChat.visibility = View.GONE
-                     }
-                     chatList.add(0, item)
-                     chatIDs.add(newChat.chat_id)
-                     (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(chatList)
-                     viewModel.insertChat(item)
-                 }*/
-                hitAllChatApi()
+                val name = newChat.sender_name.split(" ")
+                val item = ChatListData(
+                    newChat.chat_id, "", unixTime.toDouble(), name[0], name[1],
+                    "", newChat.message, 1, newChat.sender_id?.toLong()!!,
+                    newChat.sender_name, newChat.id
+                )
+                if (chatIDs.contains(newChat.chat_id)) {
+                    logE("Chat ID matched")
+                    for (x in chatList.indices) {
+                        if (chatList[x].chat_id == newChat.chat_id) {
+                            chatList[x].un_read_count += 1
+                            modifyItem(
+                                x,
+                                item.message.toString(),
+                                unixTime,
+                                chatList[x].un_read_count
+                            )
+                        }
+                    }
+                } else {
+                    logE("This chat is not present")
+                    if (chatList.size == 0) {
+                        binding.tvNoChat.visibility = View.GONE
+                    }
+                    chatList.add(0, item)
+                    chatIDs.add(newChat.chat_id)
+                    (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(chatList)
+                    viewModel.insertChat(item)
+                }
+
+                //old
+//                hitAllChatApi()
             }
         }
     }
@@ -248,7 +275,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
-                    /*val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
+                    val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
                     if (isSeen == true) {
                         logE("If Part")
                         if (chatList[position].un_read_count != 0) {
@@ -263,10 +290,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
                         modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
-                    }*/
-                    binding.etSearch.setText("")
+                    }
                     logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
+
+                    //Old
+//                    binding.etSearch.setText("")
 //                    hitAllChatApi()
                 }
 
@@ -274,20 +303,20 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         }
     }
 
-    /* private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
-         chatList[position].message = lastMessage
-         chatList[position].unix_time = unixTime
-         chatList[position].un_read_count = unReadCount
-         val item = chatList[position]
-         chatList.remove(chatList[position])
-         chatList.add(0, item)
-         (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
-         binding.chatRecycler.scrollToPosition(0)
-         viewModel.updateItemToDB(
-             unixTime.toString(), lastMessage,
-             item.chat_id, unReadCount
-         )
-     }*/
+    private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
+        chatList[position].message = lastMessage
+        chatList[position].unix_time = unixTime?.toDouble()
+        chatList[position].un_read_count = unReadCount
+        val item = chatList[position]
+        chatList.remove(chatList[position])
+        chatList.add(0, item)
+        (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
+        binding.chatRecycler.scrollToPosition(0)
+        viewModel.updateItemToDB(
+            unixTime.toString(), lastMessage,
+            item.chat_id, unReadCount
+        )
+    }
 
     override fun myOnClick(view: View, position: Int) {
         when (view.id) {
