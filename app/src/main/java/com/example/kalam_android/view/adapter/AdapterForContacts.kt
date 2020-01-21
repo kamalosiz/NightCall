@@ -32,7 +32,7 @@ class AdapterForContacts(val context: Context) :
     private val TAG = this.javaClass.simpleName
     private val VIEW_HEADER = 0
     private val VIEW_ITEM = 1
-    private var tempContactList : ArrayList<ContactsData> = ArrayList()
+    private var tempContactList: ArrayList<ContactsData> = ArrayList()
     private val onClickListener: View.OnClickListener
 
     init {
@@ -45,8 +45,8 @@ class AdapterForContacts(val context: Context) :
         contactList?.size?.plus(1)
         contactsFilteredList = contactList
         contactList2 = contactList
-        for (i in 0 until (contactList?.size!!)){
-            if (contactList!![i].id != 0){
+        for (i in 0 until (contactList?.size!!)) {
+            if (contactList!![i].id != 0) {
                 tempContactList.add(contactList!![i])
             }
         }
@@ -136,8 +136,8 @@ class AdapterForContacts(val context: Context) :
         override fun onClick(v: View) {
             when (v.id) {
                 R.id.lvNewGroup -> {
-                    val intent = Intent(context,NewGroupActivity::class.java)
-                    intent.putExtra(AppConstants.KALAM_CONTACT_LIST,tempContactList)
+                    val intent = Intent(context, NewGroupActivity::class.java)
+                    intent.putExtra(AppConstants.KALAM_CONTACT_LIST, tempContactList)
                     context.startActivity(intent)
                 }
                 R.id.lvNewContact -> {
@@ -166,7 +166,9 @@ class AdapterForContacts(val context: Context) :
                             item?.name.toString()
                         }
                         val intent = Intent(context, ChatDetailActivity::class.java)
-                        intent.putExtra(AppConstants.CALLER_USER_ID, item?.id?.toLong())
+                        item?.id?.let {
+                            intent.putExtra(AppConstants.CALLER_USER_ID, it)
+                        }
                         intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, false)
                         intent.putExtra(AppConstants.CHAT_USER_NAME, name)
                         intent.putExtra(
