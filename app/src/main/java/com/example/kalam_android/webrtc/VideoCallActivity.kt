@@ -345,7 +345,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 audioManager.isSpeakerphoneOn = true
             }
             audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        } catch (e: java.lang.Exception) {
+        } catch (e:Exception) {
             e.printStackTrace()
         }
     }
@@ -356,7 +356,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 audioManager.isSpeakerphoneOn = false
             }
             audioManager.mode = AudioManager.MODE_NORMAL
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -392,17 +392,14 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
     private fun answerCall() {
         logE("onOfferReceived")
-        try {
-            if (ringtune?.isPlaying == true)
-                ringtune?.stop()
+        if (ringtune?.isPlaying == true) {
+            ringtune?.stop()
             binding.ibAnswer.visibility = View.GONE
-            doAnswer()
-            if (isVideo) {
-                updateVideoViews()
-                turnOnSpeakers()
-            }
-        } catch (e: JSONException) {
-            e.printStackTrace()
+        }
+        doAnswer()
+        if (isVideo) {
+            updateVideoViews()
+            turnOnSpeakers()
         }
     }
 
@@ -613,8 +610,8 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
             if (this.isVideo != isVideo) {
                 this.isVideo = isVideo
                 initViews(isVideo)
-                if (isVideo)
-                    initVideoCapturer(isVideo)
+                if (isVideo) initVideoCapturer(isVideo)
+                else turnOFFSpeakers()
             }
             newCallReceived(jsonObject)
             setCallerProfile(this.isVideo)

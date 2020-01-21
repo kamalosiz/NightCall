@@ -36,7 +36,6 @@ import com.example.kalam_android.util.*
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.webrtc.AudioCallActivity
 import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.wrapper.GlideDownloader
 import com.example.kalam_android.wrapper.SocketIO
@@ -47,11 +46,13 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.seconds
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     SocketCallback, MessageTypingListener, View.OnTouchListener,
@@ -82,6 +83,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
+    private var lastMessageSenderID: Int? = 0
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -338,6 +340,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             )
             .putString("language", sharedPrefsHelper.getLanguage().toString())
             .putString("group_id", groupID)
+            .putString("profile_image", sharedPrefsHelper.getUser()?.profile_image.toString())
             .build()
     }
 
@@ -345,20 +348,17 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         val identifier = System.currentTimeMillis().toString()
         when (type) {
             AppConstants.AUDIO_MESSAGE -> {
-                lastMessage = "Audio"
-                createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
+                createChatObject("Audio", file, type, identifier)
                 uploadMedia(identifier, file, duration, type, groupID)
             }
             AppConstants.IMAGE_MESSAGE -> {
-                lastMessage = "Image"
-                createChatObject(AppConstants.DUMMY_STRING, file, type, identifier)
+                createChatObject("Image", file, type, identifier)
                 val convertedFile = Compressor(this).compressToFile(File(file))
                 uploadMedia(identifier, convertedFile.absolutePath, duration, type, groupID)
             }
             AppConstants.VIDEO_MESSAGE -> {
-                lastMessage = "Video"
                 createChatObject(
-                    AppConstants.DUMMY_STRING,
+                    "Video",
                     file,
                     type,
                     identifier
@@ -403,12 +403,17 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun addMessage(chatData: ChatData) {
+        lastMsgTime = chatData.unix_time.toLong()
+        lastMessage = chatData.message
+        lastMessageSenderID = chatData.sender_id
+        logE("My ID :${sharedPrefsHelper.getUser()?.id}")
+        logE("chatData.sender_id :${chatData.sender_id}")
+        logE("chatData.receiver_id :${chatData.receiver_id}")
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
 
     private fun createChatObject(message: String, file: String, type: String, identifier: String) {
-        lastMsgTime = System.currentTimeMillis() / 1000L
         addMessage(
             ChatData(
                 AppConstants.DUMMY_STRING,
@@ -419,7 +424,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
                 AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
                 type, file, 0, 0, message, identifier,
-                lastMsgTime.toDouble(), sharedPrefsHelper.getLanguage()
+                System.currentTimeMillis() / 1000L.toDouble(), sharedPrefsHelper.getLanguage(),
+                sharedPrefsHelper.getUser()?.profile_image.toString()
             )
         )
     }
@@ -440,13 +446,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             AppConstants.DUMMY_STRING,
             0,
             AppConstants.DUMMY_STRING,
-            identifier
-            ,
+            identifier,
             sharedPrefsHelper.getLanguage().toString(),
-            identifier
+            identifier, sharedPrefsHelper.getUser()?.profile_image.toString()
         )
         logE("Message Emitted to socket")
-        lastMessage = binding.lvBottomChat.editTextMessage.text.toString()
         binding.lvBottomChat.editTextMessage.setText("")
     }
 
@@ -609,23 +613,26 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     override fun onBackPressed() {
-//        val intent = Intent()
-        /*if (isFromOutside) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }*/ /*else {
-               if (lastMessage?.isNotEmpty() == true && lastMsgTime != null) {
-                   intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
-                   intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
-                   intent.putExtra(AppConstants.IsSEEN, false)
-               } else {
-                   intent.putExtra(AppConstants.IsSEEN, true)
-               }
-               setResult(Activity.RESULT_OK, intent)
-               finish()
-        }*/
-        setResult(Activity.RESULT_OK)
+        val intent = Intent()
+        /* if (isFromOutside) {
+             startActivity(Intent(this, MainActivity::class.java))
+             finish()
+
+              && lastMsgTime != null
+         } else {*/
+
+        if (lastMessage?.isNotEmpty() == true) {
+            intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
+            intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
+            intent.putExtra(AppConstants.IsSEEN, false)
+        } else {
+            intent.putExtra(AppConstants.IsSEEN, true)
+        }
+        setResult(Activity.RESULT_OK, intent)
         finish()
+//        }
+//        setResult(Activity.RESULT_OK)
+//        finish()
     }
     //Socket Listeners
 

@@ -170,8 +170,8 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.ivDeliver, item.is_read
                 )*/
                 applyReadStatus(
-                        userId.toInt(), item.sender_id,
-                        itemHolder.binding.itemChat.tvMessageStatus, item.is_read
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.itemChat.tvMessageStatus, item.is_read
                 )
             }
             AppConstants.AUDIO_MESSAGE -> {
@@ -323,25 +323,19 @@ class ChatMessagesAdapter(
     private fun applyReadStatus(userId: Int, senderId: Int?, view: TextView, isRead: Int) {
         if (userId == senderId) {
             view.visibility = View.VISIBLE
+            view.setTextColor(Global.setColor(context, R.color.darkGrey))
             when (isRead) {
                 0 -> {
-//                    view.setBackgroundResource(R.drawable.icon_sent)
                     view.text = "Sent"
-                    view.setTextColor(context.resources.getColor(R.color.darkGrey,null))
                 }
                 1 -> {
-//                    view.setBackgroundResource(R.drawable.icon_message_sent)
                     view.text = "Delivered"
-                    view.setTextColor(context.resources.getColor(R.color.darkGrey,null))
                 }
                 2 -> {
-//                    view.setBackgroundResource(R.drawable.icon_message_read)
                     view.text = "Seen"
-                    view.setTextColor(context.resources.getColor(R.color.darkGrey,null))
                 }
             }
         } else {
-//            view.visibility = View.GONE
             view.text = ""
         }
     }
