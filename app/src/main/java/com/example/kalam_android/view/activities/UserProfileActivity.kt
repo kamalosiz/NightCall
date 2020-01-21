@@ -258,8 +258,8 @@ class UserProfileActivity : BaseActivity(), View.OnClickListener {
                 this,
                 binding.profileHeaderView.ivUserProfile,
                 userList[0].wall_image,
-                R.drawable.dummy_placeholder,
-                R.drawable.dummy_placeholder
+                R.color.darkGrey,
+                R.color.darkGrey
         )
         binding.overviewView.tvEmail.text = userList[0].email
         binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
