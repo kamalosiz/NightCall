@@ -35,25 +35,10 @@ class AllChatListAdapter(
         )
     }
 
-    fun updateReadCount(chatList: ArrayList<ChatListData>, position: Int) {
-        this.chatList = chatList
-        notifyItemChanged(position)
-    }
-
     fun updateList(chatList: ArrayList<ChatListData>) {
         this.chatList = chatList
         notifyDataSetChanged()
     }
-
-    /*fun updateNewList(newList: ArrayList<ChatListData>) {
-//        Debugger.e("ChatsFragment","Old Chats : $chatList")
-//        Debugger.e("ChatsFragment","new Chats : $newList")
-        val diffCallback = DiffUtilClass(this.chatList, newList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        this.chatList.clear()
-        this.chatList.addAll(newList)
-        diffResult.dispatchUpdatesTo(this)
-    }*/
 
     fun newChatInserted(chatList: ArrayList<ChatListData>) {
         this.chatList = chatList
@@ -109,10 +94,7 @@ class AllChatListAdapter(
         }
     }
 
-    private fun applyReadStatus(userId: Int?, senderId: Int?, view: ImageView, isRead: Int) {
-        Debugger.e("AllChatListAdapter", "userId :$userId")
-        Debugger.e("AllChatListAdapter", "senderId :$senderId")
-        Debugger.e("AllChatListAdapter", "isRead :$isRead")
+    private fun applyReadStatus(userId: Int?, senderId: Int?, view: ImageView, isRead: Int?) {
         if (userId != senderId) {
             view.visibility = View.VISIBLE
             when (isRead) {

@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.localdb.entities.ChatData
-import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.repository.model.ChatMessagesResponse
 import com.example.kalam_android.repository.net.ApiResponse
@@ -44,7 +43,7 @@ class ChatMessagesViewModel @Inject constructor(
     fun addMessageToDB(list: ArrayList<ChatData>) {
         disposable.add(
             Completable.fromAction {
-                localRepo.inserChatsIntoDB(list)
+                localRepo.insertChatsIntoDB(list)
             }.subscribeOn(Schedulers.io())
                 .subscribe({
                     Debugger.i("testingLocal", "All Chat messages inserted")
@@ -57,7 +56,7 @@ class ChatMessagesViewModel @Inject constructor(
     fun addMessageToDB(msg: ChatData) {
         disposable.add(
             Completable.fromAction {
-                localRepo.inserChatsIntoDB(msg)
+                localRepo.insertChatsIntoDB(msg)
             }.subscribeOn(Schedulers.io())
                 .subscribe({
                     Debugger.i("testingLocal", "All Chat messages inserted")

@@ -55,7 +55,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private var peerIceServers: MutableList<PeerConnection.IceServer> = ArrayList()
     private val TAG = this.javaClass.simpleName
     private var webSocketClient: CustomWebSocketClient? = null
-    var callerID: Long = -1
+    var callerID: Int = -1
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private lateinit var audioManager: AudioManager
@@ -212,7 +212,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
         val initiator = intent.getBooleanExtra(AppConstants.INITIATOR, false)
         if (initiator) {
-            callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
+            callerID = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             binding.ibAnswer.visibility = View.GONE
@@ -235,7 +235,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
 
     private fun newCallReceived(data: JSONObject) {
         val offer = JSONObject(data.getString("offer"))
-        callerID = data.getString(AppConstants.CONNECTED_USER_ID).toLong()
+        callerID = data.getString(AppConstants.CONNECTED_USER_ID).toInt()
         createPeerConnection()
         localPeer?.setRemoteDescription(
             CustomSdpObserver("localSetRemote"),
