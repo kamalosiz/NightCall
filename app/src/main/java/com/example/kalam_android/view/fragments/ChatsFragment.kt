@@ -52,7 +52,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     var position = -1
     //    private var isRefresh = false
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
-    var fromSearch = 0
+    private var fromSearch = 0
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -66,11 +67,9 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         MyApplication.getAppComponent(activity as Context).doInjection(this)
         viewModel = ViewModelProviders.of(this, factory).get(AllChatListViewModel::class.java)
 
-        //latest
         viewModel.allChatLocalResponse().observe(this, Observer {
             consumeLocalResponse(it)
         })
-        //latest
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
@@ -155,7 +154,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 binding.pbCenter.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
                 logE("consumeResponse ERROR: " + apiResponse.error.toString())
-                toast(activity, "Something went wrong please try again")
+//                toast(activity, "Something went wrong please try again")
             }
             else -> {
             }
@@ -220,44 +219,60 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     }
 
     override fun socketResponse(jsonObject: JSONObject, type: String) {
-        if (type == AppConstants.NEW_MESSAGE) {
-            val gson = Gson()
-            logE("New Message : $jsonObject")
-            val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-            val unixTime = System.currentTimeMillis() / 1000L
-            activity?.runOnUiThread {
-                val name = newChat.sender_name.split(" ")
-                val item = ChatListData(
-                    newChat.chat_id, "", unixTime.toDouble(), name[0], name[1],
-                    "", newChat.message, 1, newChat.sender_id?.toLong()!!,
-                    newChat.sender_name, newChat.id
-                )
-                if (chatIDs.contains(newChat.chat_id)) {
-                    logE("Chat ID matched")
-                    for (x in chatList.indices) {
-                        if (chatList[x].chat_id == newChat.chat_id) {
-                            chatList[x].un_read_count += 1
-                            modifyItem(
-                                x,
-                                item.message.toString(),
-                                unixTime,
-                                chatList[x].un_read_count
-                            )
+        when (type) {
+            AppConstants.NEW_MESSAGE -> {
+                val gson = Gson()
+                logE("New Message : $jsonObject")
+                val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+                val unixTime = System.currentTimeMillis() / 1000L
+                logE(" newChat.receiver_id : ${newChat.receiver_id}")
+                logE("newChat.sender_id : ${newChat.sender_id}")
+                activity?.runOnUiThread {
+                    val name = newChat.sender_name.split(" ")
+                    val item = ChatListData(
+                        newChat.chat_id,
+                        "",
+                        unixTime.toDouble(),
+                        name[0], name[1],
+                        newChat.profile_image.toString(),
+                        newChat.message,
+                        1,
+                        newChat.sender_id,
+                        newChat.sender_name,
+                        newChat.id,
+                        newChat.is_read,
+                        newChat.receiver_id
+                    )
+                    if (chatIDs.contains(newChat.chat_id)) {
+                        logE("Chat ID matched")
+                        for (x in chatList.indices) {
+                            if (chatList[x].chat_id == newChat.chat_id) {
+                                chatList[x].un_read_count += 1
+                                modifyItem(
+                                    x,
+                                    item.message.toString(),
+                                    unixTime,
+                                    chatList[x].un_read_count,
+                                    item.user_id
+                                )
+                            }
                         }
+                    } else {
+                        logE("This chat is not present")
+                        if (chatList.size == 0) {
+                            binding.tvNoChat.visibility = View.GONE
+                        }
+                        chatList.add(0, item)
+                        chatIDs.add(newChat.chat_id)
+                        (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(
+                            chatList
+                        )
+                        viewModel.insertChat(item)
                     }
-                } else {
-                    logE("This chat is not present")
-                    if (chatList.size == 0) {
-                        binding.tvNoChat.visibility = View.GONE
-                    }
-                    chatList.add(0, item)
-                    chatIDs.add(newChat.chat_id)
-                    (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(chatList)
-                    viewModel.insertChat(item)
-                }
 
-                //old
+                    //old
 //                hitAllChatApi()
+                }
             }
         }
     }
@@ -281,7 +296,13 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         logE("onActivityResult Else Part")
                         val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
                         val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
-                        modifyItem(position, lastMessage.toString(), lastMsgTime?.toLong(), 0)
+                        modifyItem(
+                            position,
+                            lastMessage.toString(),
+                            lastMsgTime?.toLong(),
+                            0,
+                            sharedPrefsHelper.getUser()?.id
+                        )
                     }
                     logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
@@ -295,10 +316,17 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         }
     }
 
-    private fun modifyItem(position: Int, lastMessage: String, unixTime: Long?, unReadCount: Int) {
+    private fun modifyItem(
+        position: Int,
+        lastMessage: String,
+        unixTime: Long?,
+        unReadCount: Int,
+        senderId: Int?
+    ) {
         chatList[position].message = lastMessage
         chatList[position].unix_time = unixTime?.toDouble()
         chatList[position].un_read_count = unReadCount
+        chatList[position].sender_id = senderId
         val item = chatList[position]
         chatList.remove(chatList[position])
         chatList.add(0, item)
@@ -306,7 +334,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         binding.chatRecycler.scrollToPosition(0)
         viewModel.updateItemToDB(
             unixTime.toString(), lastMessage,
-            item.chat_id, unReadCount
+            item.chat_id, unReadCount, item.sender_id
         )
     }
 

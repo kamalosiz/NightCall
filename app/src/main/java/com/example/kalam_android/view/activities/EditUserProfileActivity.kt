@@ -132,42 +132,43 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
     @SuppressLint("SetTextI18n")
     private fun getIntentData() {
         if (intent != null) {
-            val list = intent.getSerializableExtra(AppConstants.USER_DATA) as ArrayList<ProfileData>
-            binding.etFirstName.setText(list[0].firstname)
-            binding.etLastName.setText(list[0].lastname)
-            binding.overviewView.etPhone.setText("+" + list[0].country_code + list[0].phone)
-            binding.overviewView.etEmail.setText(list[0].email)
-            binding.overviewView.etDescription.setText(list[0].bio)
-            binding.overviewView.etAddress.setText(list[0].address)
-//            binding.overviewView.etWebsite.setText(list[0].website)
-            binding.overviewView.etEducation.setText(list[0].education)
-//            binding.overviewView.etFax.setText(list[0].fax)
-            binding.overviewView.etWork.setText(list[0].work)
-            binding.overviewView.tvCity.text = list[0].city
-            binding.overviewView.tvCountry.text = list[0].country
+            val list =
+                intent.getSerializableExtra(AppConstants.USER_DATA) as ArrayList<ProfileData>?
+            binding.etFirstName.setText(list?.get(0)?.firstname)
+            binding.etLastName.setText(list?.get(0)?.lastname)
+            binding.overviewView.etPhone.setText("+" + list?.get(0)?.country_code + list?.get(0)?.phone)
+            binding.overviewView.etEmail.setText(list?.get(0)?.email)
+            binding.overviewView.etDescription.setText(list?.get(0)?.bio)
+            binding.overviewView.etAddress.setText(list?.get(0)?.address)
+//            binding.overviewView.etWebsite.setText(list?.get(0)?.website)
+            binding.overviewView.etEducation.setText(list?.get(0)?.education)
+//            binding.overviewView.etFax.setText(list?.get(0)?.fax)
+            binding.overviewView.etWork.setText(list?.get(0)?.work)
+            binding.overviewView.tvCity.text = list?.get(0)?.city
+            binding.overviewView.tvCountry.text = list?.get(0)?.country
             binding.overviewView.spInterest.setSelection(
                 getIndex(
                     binding.overviewView.spInterest,
-                    list[0].intrests
+                    list?.get(0)?.intrests.toString()
                 )
             )
             binding.overviewView.spStatus.setSelection(
                 getIndex(
                     binding.overviewView.spStatus,
-                    list[0].martial_status
+                    list?.get(0)?.martial_status.toString()
                 )
             )
             GlideDownloader.load(
                 this,
                 binding.ivProfile,
-                list[0].profile_image,
+                list?.get(0)?.profile_image,
                 R.drawable.dummy_placeholder,
                 R.drawable.dummy_placeholder
             )
             GlideDownloader.load(
                 this,
                 binding.ivProfileWall,
-                list[0].wall_image,
+                list?.get(0)?.wall_image,
                 R.drawable.dummy_placeholder,
                 R.drawable.dummy_placeholder
             )
@@ -339,7 +340,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                     CropHelper.startCropActivity(
                         sharedPrefsHelper,
                         this,
-                        Uri.fromFile(File(returnValue?.get(0).toString())),isWallImage
+                        Uri.fromFile(File(returnValue?.get(0).toString())), isWallImage
                     )
                 }
                 UCrop.REQUEST_CROP -> {
@@ -632,8 +633,9 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
             }
             Status.ERROR -> {
                 Debugger.e("update profile error : ", "${response.error}")
+                toast("Something went wring please try again later")
                 binding.progressBar.visibility = View.GONE
-                binding.progressBar.visibility = View.VISIBLE
+                binding.tvSave.visibility = View.VISIBLE
 
             }
             else -> {

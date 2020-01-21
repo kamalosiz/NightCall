@@ -121,7 +121,8 @@ class SocketIO private constructor() {
         thumbnail: String,
         identifier: String,
         language: String,
-        groupID: String
+        groupID: String,
+        profileImage: String
     ) {
         val jsonObject = JsonObject()
         jsonObject.addProperty("user_id", id)
@@ -135,6 +136,7 @@ class SocketIO private constructor() {
         jsonObject.addProperty("identifier", identifier)
         jsonObject.addProperty("language", language)
         jsonObject.addProperty("group_id", groupID)
+        jsonObject.addProperty("profile_image", profileImage)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)

@@ -84,10 +84,16 @@ class AllChatListViewModel @Inject constructor(
         )
     }
 
-    fun updateItemToDB(unix_time: String, message: String, uid: Int, unReadcount: Int) {
+    fun updateItemToDB(
+        unix_time: String,
+        message: String,
+        uid: Int,
+        unReadcount: Int,
+        sender_id: Int?
+    ) {
         disposable.add(
             Completable.fromAction {
-                localRepo.updateItemToDB(unix_time, message, uid, unReadcount)
+                localRepo.updateItemToDB(unix_time, message, uid, unReadcount, sender_id)
             }.subscribeOn(Schedulers.io())
                 .subscribe({
                     Debugger.i("testingLocal", "All Chat Items inserted")

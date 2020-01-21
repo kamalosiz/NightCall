@@ -4,6 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
@@ -73,6 +75,7 @@ class AllChatListAdapter(
             holderItem.binding.tvName.text = item.nickname.toString()
         }
         holderItem.binding.tvLastMessage.text = item.message.toString()
+        applyReadStatus(item.user_id, item.sender_id, holderItem.binding.ivStatus, item.is_read)
         if (item.un_read_count == 0) {
             holderItem.binding.llUnread.visibility = View.GONE
             holderItem.binding.tvAgo.setTextColor(
@@ -103,6 +106,28 @@ class AllChatListAdapter(
             binding.rlItem.setOnClickListener {
                 myClickListener.myOnClick(it, adapterPosition)
             }
+        }
+    }
+
+    private fun applyReadStatus(userId: Int?, senderId: Int?, view: ImageView, isRead: Int) {
+        Debugger.e("AllChatListAdapter", "userId :$userId")
+        Debugger.e("AllChatListAdapter", "senderId :$senderId")
+        Debugger.e("AllChatListAdapter", "isRead :$isRead")
+        if (userId != senderId) {
+            view.visibility = View.VISIBLE
+            when (isRead) {
+                0 -> {
+                    view.setBackgroundResource(R.drawable.icon_sent)
+                }
+                1 -> {
+                    view.setBackgroundResource(R.drawable.icon_message_sent)
+                }
+                2 -> {
+                    view.setBackgroundResource(R.drawable.icon_message_read)
+                }
+            }
+        } else {
+            view.visibility = View.GONE
         }
     }
 }

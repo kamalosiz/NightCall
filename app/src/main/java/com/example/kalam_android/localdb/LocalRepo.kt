@@ -7,7 +7,6 @@ import com.example.kalam_android.localdb.dao.ContactsDao
 import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.localdb.entities.ContactsEntityClass
-import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -62,8 +61,14 @@ class LocalRepo @Inject constructor(
         daoChats.insertChat(chatListData)
     }
 
-    fun updateItemToDB(unix_time: String, message: String, uid: Int, unReadcount: Int) {
-        daoChats.updateUnixTime(unix_time, message, uid, unReadcount)
+    fun updateItemToDB(
+        unix_time: String,
+        message: String,
+        uid: Int,
+        unReadcount: Int,
+        sender_id: Int?
+    ) {
+        daoChats.updateItem(unix_time, message, uid, unReadcount, sender_id)
     }
 
     fun updateReadCountDB(uid: Int, unReadcount: Int) {
@@ -80,7 +85,7 @@ class LocalRepo @Inject constructor(
 
     //ChatsData
 
-    fun inserChatsIntoDB(chatData: ArrayList<ChatData>){
+    fun inserChatsIntoDB(chatData: ArrayList<ChatData>) {
         chatData.let {
             Log.i("testingLocal", "insertContactsToIntoDB: $it")
             return chatDataDao.insert(it)

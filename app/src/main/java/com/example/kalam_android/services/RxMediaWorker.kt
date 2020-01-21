@@ -46,6 +46,7 @@ class RxMediaWorker(
         val name = inputData.getString("name")
         val language = inputData.getString("language")
         val groupId = inputData.getString("group_id")
+        val profileImage = inputData.getString("profile_image")
 
         Debugger.e("WorkManagerMedia", "file: $file")
 
@@ -89,7 +90,8 @@ class RxMediaWorker(
                     list[0].thumbnail.toString(),
                     list[0].identifier,
                     language.toString(),
-                    list[0].group_id.toString()
+                    list[0].group_id.toString(),
+                    profileImage.toString()
                 )
             }
         }

@@ -36,7 +36,6 @@ import com.example.kalam_android.util.*
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.webrtc.AudioCallActivity
 import com.example.kalam_android.webrtc.VideoCallActivity
 import com.example.kalam_android.wrapper.GlideDownloader
 import com.example.kalam_android.wrapper.SocketIO
@@ -47,11 +46,13 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.seconds
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     SocketCallback, MessageTypingListener, View.OnTouchListener,
@@ -82,6 +83,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
+    private var lastMessageSenderID: Int? = 0
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -338,6 +340,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             )
             .putString("language", sharedPrefsHelper.getLanguage().toString())
             .putString("group_id", groupID)
+            .putString("profile_image", sharedPrefsHelper.getUser()?.profile_image.toString())
             .build()
     }
 
@@ -402,6 +405,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun addMessage(chatData: ChatData) {
         lastMsgTime = chatData.unix_time.toLong()
         lastMessage = chatData.message
+        lastMessageSenderID = chatData.sender_id
+        logE("My ID :${sharedPrefsHelper.getUser()?.id}")
+        logE("chatData.sender_id :${chatData.sender_id}")
+        logE("chatData.receiver_id :${chatData.receiver_id}")
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
@@ -417,7 +424,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
                 AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
                 type, file, 0, 0, message, identifier,
-                System.currentTimeMillis() / 1000L.toDouble(), sharedPrefsHelper.getLanguage()
+                System.currentTimeMillis() / 1000L.toDouble(), sharedPrefsHelper.getLanguage(),
+                sharedPrefsHelper.getUser()?.profile_image.toString()
             )
         )
     }
@@ -440,7 +448,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             AppConstants.DUMMY_STRING,
             identifier,
             sharedPrefsHelper.getLanguage().toString(),
-            identifier
+            identifier, sharedPrefsHelper.getUser()?.profile_image.toString()
         )
         logE("Message Emitted to socket")
         binding.lvBottomChat.editTextMessage.setText("")
