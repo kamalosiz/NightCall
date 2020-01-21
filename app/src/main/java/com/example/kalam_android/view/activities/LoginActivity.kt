@@ -143,9 +143,10 @@ class LoginActivity : BaseActivity(), View.OnClickListener {
         val i = fullText.indexOf(subText)
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
-                if (SIGN_UP)
+                if (SIGN_UP) {
                     startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
-                else
+                    finish()
+                } else
                     toast("Terms and Policies")
             }
 

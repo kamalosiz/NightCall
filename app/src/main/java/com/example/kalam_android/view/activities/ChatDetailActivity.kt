@@ -78,12 +78,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var profileImage: String? = null
     private var loading = false
     private var isChatIdAvailable = false
-    private var callerID: Long = -1
+    private var callerID: Int = -1
     private var myChatMediaHelper: MyChatMediaHelper? = null
     private var lastMessage: String? = null
     private var lastMsgTime: Long = 0
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
-    private var lastMessageSenderID: Int? = 0
+    private var lastMessageSenderID = 0
+    private var lastMessageStatus = 0
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -221,7 +222,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun setUserData() {
         profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
-        callerID = intent.getLongExtra(AppConstants.CALLER_USER_ID, 0)
+        callerID = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
+        logE("callerId : $callerID")
         binding.header.tvName.text = userRealName
         GlideDownloader.load(
             this,
@@ -287,7 +289,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         it, true
                     )
                 }
-
+                lastMsgTime = it[0].unix_time.toLong()
+                lastMessage = it[0].message
+                it[0].sender_id?.let { id ->
+                    lastMessageSenderID = id
+                }
+                lastMessageStatus = 0
             }
         }
     }
@@ -405,10 +412,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun addMessage(chatData: ChatData) {
         lastMsgTime = chatData.unix_time.toLong()
         lastMessage = chatData.message
-        lastMessageSenderID = chatData.sender_id
-        logE("My ID :${sharedPrefsHelper.getUser()?.id}")
-        logE("chatData.sender_id :${chatData.sender_id}")
-        logE("chatData.receiver_id :${chatData.receiver_id}")
+        chatData.sender_id?.let {
+            lastMessageSenderID = it
+        }
+        lastMessageStatus = 0
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
@@ -614,26 +621,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onBackPressed() {
         val intent = Intent()
-        /* if (isFromOutside) {
-             startActivity(Intent(this, MainActivity::class.java))
-             finish()
-
-              && lastMsgTime != null
-         } else {*/
-
-        if (lastMessage?.isNotEmpty() == true) {
-            intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
-            intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
-            intent.putExtra(AppConstants.IsSEEN, false)
-        } else {
-            intent.putExtra(AppConstants.IsSEEN, true)
-        }
+        intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
+        intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
+        intent.putExtra(AppConstants.LAST_MESSAGE_SENDER_ID, lastMessageSenderID)
+        intent.putExtra(AppConstants.LAST_MESSAGE_STATUS, lastMessageStatus)
         setResult(Activity.RESULT_OK, intent)
         finish()
-//        }
-//        setResult(Activity.RESULT_OK)
-//        finish()
     }
+
     //Socket Listeners
 
     override fun socketResponse(jsonObject: JSONObject, type: String) {
@@ -653,6 +648,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 }
                 AppConstants.ALL_MESSAGES_READ -> {
                     logE("Chat ID received : $jsonObject")
+                    lastMessageStatus = 2
                     val chatId = jsonObject.getString("chat_id").toInt()
                     if (this.chatId == chatId) {
                         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
@@ -661,6 +657,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     }
                 }
                 AppConstants.MESSAGE_DELIVERED -> {
+                    lastMessageStatus = 1
                     logE("MESSAGE_DELIVERED  : $jsonObject")
                     val chatId = jsonObject.getString("chat_id")
 //                    val userId = jsonObject.getString("user_id")
@@ -673,6 +670,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 AppConstants.SEND_MESSAGE -> {
                     logE("AppConstants.SEND_MESSAGE status: $jsonObject")
                     val isDelivered = jsonObject.getBoolean("delivered")
+                    if (isDelivered) lastMessageStatus = 1
                     val identifier = jsonObject.getString("identifier")
                     val msgId = jsonObject.getString("message_id")
                     (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
@@ -681,6 +679,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 }
                 AppConstants.SEEN_MESSAGE -> {
                     logE("Message Seen")
+                    lastMessageStatus = 2
                     val msgId = jsonObject.getString("message_id")
                     val chatId = jsonObject.getString("chat_id")
                     if (chatId.toInt() == this.chatId) {
@@ -698,7 +697,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (chatId1.toInt() == chatId) {
             runOnUiThread {
                 if (isTyping) {
-                    val user = jsonObject.getLong("user_id")
+                    val user = jsonObject.getInt("user_id")
                     if (user == callerID) {
                         binding.header.tvTyping.visibility = View.VISIBLE
                     }

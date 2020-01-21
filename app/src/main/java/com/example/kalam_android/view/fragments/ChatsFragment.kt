@@ -73,25 +73,11 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        //latest
         viewModel.getAllchatItemFromDB()
         hitAllChatApi()
-        /*if (sharedPrefsHelper.isAllChatsItemsSynced()) {
-            viewModel.getAllchatItemFromDB()
-            logE("loaded from local db")
-        } else {
-            hitAllChatApi()
-            logE("loaded from live server")
-        }*/
-        //latest
-
-        //Old
-//        hitAllChatApi()
-
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
         SocketIO.getInstance().setSocketCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {
-            //            isRefresh = true
             hitAllChatApi()
         }
         binding.fabSpeech.setOnTouchListener(this)
@@ -225,8 +211,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 logE("New Message : $jsonObject")
                 val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
                 val unixTime = System.currentTimeMillis() / 1000L
-                logE(" newChat.receiver_id : ${newChat.receiver_id}")
-                logE("newChat.sender_id : ${newChat.sender_id}")
                 activity?.runOnUiThread {
                     val name = newChat.sender_name.split(" ")
                     val item = ChatListData(
@@ -237,7 +221,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         newChat.profile_image.toString(),
                         newChat.message,
                         1,
-                        newChat.sender_id,
+                        newChat.sender_id!!,
                         newChat.sender_name,
                         newChat.id,
                         newChat.is_read,
@@ -253,7 +237,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                                     item.message.toString(),
                                     unixTime,
                                     chatList[x].un_read_count,
-                                    item.user_id
+                                    item.user_id,
+                                    item.is_read
                                 )
                             }
                         }
@@ -282,36 +267,21 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
-                    val isSeen = data?.getBooleanExtra(AppConstants.IsSEEN, false)
-                    if (isSeen == true) {
-                        logE("onActivityResult If Part")
-                        if (chatList[position].un_read_count != 0) {
-                            chatList[position].un_read_count = 0
-                            (binding.chatRecycler.adapter as AllChatListAdapter).updateReadCount(
-                                chatList, position
-                            )
-                            viewModel.updateReadCountDB(chatList[position].chat_id, 0)
-                        }
-                    } else {
-                        logE("onActivityResult Else Part")
-                        val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
-                        val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
-                        modifyItem(
-                            position,
-                            lastMessage.toString(),
-                            lastMsgTime?.toLong(),
-                            0,
-                            sharedPrefsHelper.getUser()?.id
-                        )
-                    }
-                    logE("onActivityResult of chats Fragment is called")
+                    val isRead =
+                        data?.getIntExtra(AppConstants.LAST_MESSAGE_STATUS, 0)
+                    val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
+                    val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
+                    val lastMessageSenderId =
+                        data?.getIntExtra(AppConstants.LAST_MESSAGE_SENDER_ID, 0)
+                    modifyItem(
+                        position,
+                        lastMessage.toString(),
+                        lastMsgTime?.toLong(),
+                        0,
+                        lastMessageSenderId, isRead
+                    )
                     SocketIO.getInstance().setSocketCallbackListener(this)
-
-                    //Old
-//                    binding.etSearch.setText("")
-//                    hitAllChatApi()
                 }
-
             }
         }
     }
@@ -321,12 +291,14 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         lastMessage: String,
         unixTime: Long?,
         unReadCount: Int,
-        senderId: Int?
+        senderId: Int?,
+        isRead: Int?
     ) {
         chatList[position].message = lastMessage
         chatList[position].unix_time = unixTime?.toDouble()
         chatList[position].un_read_count = unReadCount
         chatList[position].sender_id = senderId
+        chatList[position].is_read = isRead
         val item = chatList[position]
         chatList.remove(chatList[position])
         chatList.add(0, item)
@@ -334,7 +306,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         binding.chatRecycler.scrollToPosition(0)
         viewModel.updateItemToDB(
             unixTime.toString(), lastMessage,
-            item.chat_id, unReadCount, item.sender_id
+            item.chat_id, unReadCount, item.sender_id, isRead
         )
     }
 
@@ -348,6 +320,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
 
     fun startActivity(position: Int) {
         val item = chatList[position]
+        logE("startActivity :$item")
         this.position = position
         val name = if (item.nickname.isNullOrEmpty()) {
             StringBuilder(item.firstname).append(" ").append(item.lastname).toString()

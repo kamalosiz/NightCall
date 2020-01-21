@@ -37,6 +37,8 @@ object AppConstants {
     const val SENDER_NAME = "sender_name"
     const val USER_DATA = "user_data"
     const val KALAM_CONTACT_LIST = "kalam_contact_list"
+    const val LAST_MESSAGE_SENDER_ID = "last_message_sender_id"
+    const val LAST_MESSAGE_STATUS = "last_message_status"
 
 
     //Request Code

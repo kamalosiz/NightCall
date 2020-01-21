@@ -51,6 +51,7 @@ class SocketIO private constructor() {
         }?.on(AppConstants.MESSAGE_TYPING) {
 
             val jsonObject = it[0] as JSONObject
+            Debugger.e("SocketIO", "MESSAGE_TYPING :$jsonObject")
             messageTypingResponse?.typingResponse(jsonObject, true)
 
         }?.on(AppConstants.MESSAGE_STOPS_TYPING) {

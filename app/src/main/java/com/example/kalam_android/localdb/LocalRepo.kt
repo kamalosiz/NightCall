@@ -66,13 +66,10 @@ class LocalRepo @Inject constructor(
         message: String,
         uid: Int,
         unReadcount: Int,
-        sender_id: Int?
+        sender_id: Int?,
+        isRead: Int?
     ) {
-        daoChats.updateItem(unix_time, message, uid, unReadcount, sender_id)
-    }
-
-    fun updateReadCountDB(uid: Int, unReadcount: Int) {
-        daoChats.updateReadCountDB(uid, unReadcount)
+        daoChats.updateItem(unix_time, message, uid, unReadcount, sender_id, isRead)
     }
 
     fun getAllChatListFromDB(): Single<List<ChatListData>> {
@@ -83,16 +80,14 @@ class LocalRepo @Inject constructor(
         return daoChats.deleteAll()
     }
 
-    //ChatsData
-
-    fun inserChatsIntoDB(chatData: ArrayList<ChatData>) {
+    fun insertChatsIntoDB(chatData: ArrayList<ChatData>) {
         chatData.let {
             Log.i("testingLocal", "insertContactsToIntoDB: $it")
             return chatDataDao.insert(it)
         }
     }
 
-    fun inserChatsIntoDB(chatData: ChatData) {
+    fun insertChatsIntoDB(chatData: ChatData) {
         chatDataDao.insert(chatData)
     }
 }

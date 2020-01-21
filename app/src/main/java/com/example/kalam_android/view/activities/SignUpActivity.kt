@@ -38,7 +38,10 @@ class SignUpActivity : BaseActivity() {
         MyApplication.getAppComponent(this).doInjection(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SignUpViewModel::class.java)
         binding.tvCountry.setOnClickListener { pickerDialoge() }
-        binding.btnBack.setOnClickListener { finish() }
+        binding.btnBack.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
         binding.btnNext.setOnClickListener { hitSignUp() }
         viewModel.signupResponse().observe(this, Observer<ApiResponse<SignUpResponse>> {
             consumeResponse(it)
