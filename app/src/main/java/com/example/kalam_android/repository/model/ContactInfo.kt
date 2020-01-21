@@ -22,4 +22,4 @@ data class ContactsData(
     val profile_image: String?,
     val kalam_number: String?,
     val kalam_name: String?
-):Serializable
+) : Serializable
