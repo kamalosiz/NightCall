@@ -39,4 +39,5 @@ interface AppComponents {
     fun doInjection(activityProfile: UserProfileActivity)
     fun doInjection(thread: RxMediaWorker)
     fun doInjection(activity: EditUserProfileActivity)
+    fun doInjection(activity: ResetPasswordActivity)
 }

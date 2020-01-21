@@ -103,11 +103,11 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.updateProfile(authorization!!, parameters, profileImage, wallImage)
     }
 
-    fun updateUserName(authorization: String?, parameters: Map<String, String>): Observable<RequestBody> {
+    fun updateUserName(authorization: String?, parameters: Map<String, String>): Observable<BasicResponse> {
         return apiCallInterface.updateUserName(authorization!!, parameters)
     }
 
-    fun forgetPassword(parameters: Map<String, String>): Observable<RequestBody> {
+    fun forgetPassword(parameters: Map<String, String>): Observable<BasicResponse> {
         return apiCallInterface.forgetPassword(parameters)
     }
 }

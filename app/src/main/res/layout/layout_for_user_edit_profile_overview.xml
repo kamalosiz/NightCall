@@ -149,7 +149,7 @@
                     android:inputType="phone"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:textColor="@color/grey"
+                    android:textColor="@color/darkGrey"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
 
@@ -207,7 +207,7 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:padding="@dimen/_5sdp"
-                    android:textColor="@color/grey"
+                    android:textColor="@color/darkGrey"
                     android:textSize="@dimen/_12ssp" />
             </LinearLayout>
 

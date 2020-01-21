@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- <item
-         android:id="@+id/edit"
-         android:title="Edit" />
-     <item
-         android:id="@+id/pin"
-         android:title="Pin" />-->
-    <item
-        android:id="@+id/sync"
-        android:title="Sync Contacts" />
+<?xml version="1.0" encoding="UTF-8"?>
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- <itemandroid:id="@+id/edit"android:title="Edit" /><itemandroid:id="@+id/pin"android:title="Pin" />-->
+
+
+    <item android:title="Sync Contacts" android:id="@+id/sync"/>
+
 </menu>

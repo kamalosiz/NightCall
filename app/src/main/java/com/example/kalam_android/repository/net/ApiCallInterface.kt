@@ -76,8 +76,8 @@ interface ApiCallInterface {
     fun updateProfile(@Header("Authorization") authorization: String, @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part profile: MultipartBody.Part, @Part wallImage: MultipartBody.Part): Observable<UpdateUserProfile>
 
     @POST(Urls.USER_NAME_UPDATE)
-    fun updateUserName(@Header("Authorization") authorization: String, @Body parameters: Map<String, String>): Observable<RequestBody>
+    fun updateUserName(@Header("Authorization") authorization: String, @Body parameters: Map<String, String>): Observable<BasicResponse>
 
     @POST(Urls.FORGET_PASSWORD)
-    fun forgetPassword( @Body parameters: Map<String, String>): Observable<RequestBody>
+    fun forgetPassword(@Body parameters: Map<String, String>): Observable<BasicResponse>
 }

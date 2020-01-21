@@ -7,7 +7,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_220sdp">
+        android:layout_height="@dimen/_225sdp">
 
         <ImageView
             android:id="@+id/ivUserProfile"
@@ -17,8 +17,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivProfile"
-            android:layout_width="@dimen/_100sdp"
-            android:layout_height="@dimen/_100sdp"
+            android:layout_width="@dimen/_110sdp"
+            android:layout_height="@dimen/_110sdp"
             android:layout_alignParentBottom="true"
             android:layout_centerInParent="true"
             android:transitionName="@string/profile_trans"

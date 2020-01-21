@@ -67,4 +67,8 @@ abstract class ViewModelsModule {
     @IntoMap
     @ViewModelKey(EditUserProfileViewModel::class)
     abstract fun bindEditUserProfileViewModel(viewModel: EditUserProfileViewModel): ViewModel
+    @Binds
+    @IntoMap
+    @ViewModelKey(ForgetPasswordViewModel::class)
+    abstract fun bindForgetPasswordViewModel(viewModel: ForgetPasswordViewModel): ViewModel
 }

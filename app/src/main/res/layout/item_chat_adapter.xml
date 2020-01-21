@@ -69,7 +69,7 @@
                     android:layout_marginStart="@dimen/_3sdp"
                     android:fontFamily="@font/roboto_light"
                     android:singleLine="true"
-                    android:textColor="@color/grey"
+                    android:textColor="@color/darkGrey"
                     android:textSize="@dimen/_11sdp" />
             </LinearLayout>
 

@@ -37,8 +37,8 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivProfileImage"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
+                android:layout_width="@dimen/_32sdp"
+                android:layout_height="@dimen/_32sdp"
                 android:layout_marginStart="@dimen/_12sdp"
                 android:transitionName="@string/profile_trans" />
 
@@ -53,12 +53,12 @@
                     android:id="@+id/tvName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/helvetica_medium"
+                    android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
                     android:singleLine="true"
                     android:text="Waqar Mustafa"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_12ssp"
+                    android:textSize="@dimen/_13ssp"
                     android:transitionName="@string/profile_trans" />
 
                 <androidx.appcompat.widget.AppCompatTextView
