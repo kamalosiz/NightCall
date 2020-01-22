@@ -21,10 +21,12 @@
                 android:src="@drawable/dummy_placeholder" />
 
             <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivOnline"
                 android:layout_width="@dimen/_10sdp"
                 android:layout_height="@dimen/_10sdp"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="@dimen/_1sdp"
+                android:visibility="gone"
                 android:background="@drawable/icon_active" />
         </RelativeLayout>
 
@@ -45,33 +47,41 @@
                 android:layout_marginEnd="@dimen/_15sdp"
                 android:layout_weight="1"
                 android:fontFamily="@font/roboto_medium"
-                android:maxLength="15"
                 android:singleLine="true"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_15ssp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_15sdp"
                 android:layout_marginEnd="@dimen/_15sdp"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatImageView
+                <!--<androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/ivStatus"
                     android:layout_width="@dimen/_8sdp"
                     android:layout_height="@dimen/_8sdp"
-                    android:background="@drawable/icon_message_read" />
+                    android:background="@drawable/icon_message_read" />-->
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tvLastMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_3sdp"
                     android:fontFamily="@font/roboto_light"
                     android:singleLine="true"
-                    android:textColor="@color/darkGrey"
-                    android:textSize="@dimen/_11sdp" />
+                    android:textColor="@color/darkestGrey"
+                    android:textSize="@dimen/_12ssp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_light"
+                    android:singleLine="true"
+                    android:textColor="@color/darkestGrey"
+                    android:textSize="@dimen/_9ssp" />
             </LinearLayout>
 
 
@@ -102,7 +112,7 @@
                     android:fontFamily="@font/roboto_regular"
                     android:text="5"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_9sdp" />
+                    android:textSize="@dimen/_10ssp" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -112,7 +122,7 @@
                 android:fontFamily="@font/roboto_light"
                 android:text="10.10 pm"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_10sdp" />
+                android:textSize="@dimen/_11ssp" />
 
         </LinearLayout>
 

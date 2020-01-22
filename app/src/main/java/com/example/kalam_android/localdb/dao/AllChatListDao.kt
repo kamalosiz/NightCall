@@ -31,4 +31,10 @@ interface AllChatListDao {
         sender_id: Int?,
         isRead: Int?
     )
+
+    @Query("UPDATE ${AppConstants.ALL_CHAT_ENTITY} SET un_read_count = :unReadcount,is_read = :isRead  WHERE chat_id = :chatId")
+    fun updateChatItemDB(chatId: Int, unReadcount: Int, isRead: Int?)
+
+    @Query("UPDATE ${AppConstants.ALL_CHAT_ENTITY} SET is_read = :isRead  WHERE chat_id = :chatId")
+    fun updateChatItemDB(chatId: Int, isRead: Int?)
 }

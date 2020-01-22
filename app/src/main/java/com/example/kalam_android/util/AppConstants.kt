@@ -39,6 +39,7 @@ object AppConstants {
     const val KALAM_CONTACT_LIST = "kalam_contact_list"
     const val LAST_MESSAGE_SENDER_ID = "last_message_sender_id"
     const val LAST_MESSAGE_STATUS = "last_message_status"
+    const val IS_NULL = "response_null_kalam"
 
 
     //Request Code
@@ -69,6 +70,7 @@ object AppConstants {
     const val READ_ALL_MESSAGES = "read_all_messages"
     const val MESSAGE_SEEN = "message_seen"
     const val SEEN_MESSAGE = "seen_message"
+    const val USER_STATUS = "user_status"
 
     //WebRtc WebSockets
     const val CANDIDATE = "candidate"

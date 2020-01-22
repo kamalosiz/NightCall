@@ -289,12 +289,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         it, true
                     )
                 }
-                lastMsgTime = it[0].unix_time.toLong()
-                lastMessage = it[0].message
-                it[0].sender_id?.let { id ->
-                    lastMessageSenderID = id
-                }
-                lastMessageStatus = 0
+                lastMessageStatus = it[0].is_read
             }
         }
     }
@@ -621,10 +616,21 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onBackPressed() {
         val intent = Intent()
-        intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
-        intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
-        intent.putExtra(AppConstants.LAST_MESSAGE_SENDER_ID, lastMessageSenderID)
-        intent.putExtra(AppConstants.LAST_MESSAGE_STATUS, lastMessageStatus)
+        if (chatResponse != null) {
+            if (lastMessage?.isNotEmpty() == true) {
+                intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
+                intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
+                intent.putExtra(AppConstants.IsSEEN, false)
+                intent.putExtra(AppConstants.LAST_MESSAGE_SENDER_ID, lastMessageSenderID)
+                intent.putExtra(AppConstants.LAST_MESSAGE_STATUS, lastMessageStatus)
+            } else {
+                intent.putExtra(AppConstants.IsSEEN, true)
+                intent.putExtra(AppConstants.LAST_MESSAGE_STATUS, lastMessageStatus)
+            }
+            intent.putExtra(AppConstants.IS_NULL, false)
+        } else {
+            intent.putExtra(AppConstants.IS_NULL, true)
+        }
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

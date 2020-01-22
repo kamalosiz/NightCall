@@ -1,23 +1,13 @@
 package com.example.kalam_android.services
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.graphics.Color
-import android.os.Build
-import androidx.core.app.NotificationCompat
 import androidx.work.RxWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.example.kalam_android.R
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.wrapper.SocketIO
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -71,7 +61,6 @@ class RxMediaWorker(
         imageFileBody =
             MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
         return repository.uploadMedia(token, params, imageFileBody).doOnSuccess {
-            showNotification("KalamTime", "Media Uploaded Successfully")
             if (SocketIO.getInstance().socket == null) {
                 Debugger.e("WorkManagerMedia", "Socket is not connected")
                 SocketIO.getInstance().connectSocket(token)
@@ -82,7 +71,7 @@ class RxMediaWorker(
                 SocketIO.getInstance().emitNewMessage(
                     id.toString(),
                     chatId.toString(),
-                    "",
+                    list[0].type.toString(),
                     list[0].type.toString(),
                     name.toString(),
                     list[0].file_id.toString(),
@@ -97,26 +86,5 @@ class RxMediaWorker(
         }
             .map { Result.success() }
             .onErrorReturn { Result.retry() }
-    }
-
-    private fun showNotification(title: String, task: String) {
-        val notificationManager: NotificationManager =
-            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                "KalamTime",
-                "KalamTime",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-        val notification: NotificationCompat.Builder =
-            NotificationCompat.Builder(applicationContext, "KalamTime")
-                .setContentTitle(title)
-                .setContentText(task)
-                .setColor(Color.parseColor("#179a63"))
-                .setAutoCancel(true)
-                .setSmallIcon(R.mipmap.ic_launcher)
-        notificationManager.notify(1, notification.build())
     }
 }

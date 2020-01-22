@@ -5,7 +5,7 @@
         android:id="@+id/rlMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_4sdp">
+        android:layout_margin="@dimen/_2sdp">
 
         <TextView
             android:id="@+id/tvTime"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:gravity="center_horizontal"
-                android:minEms="4"
+                android:minEms="5"
                 android:paddingStart="@dimen/_10sdp"
                 android:paddingTop="@dimen/_6sdp"
                 android:paddingEnd="@dimen/_10sdp"
