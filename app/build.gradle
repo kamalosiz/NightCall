@@ -99,5 +99,7 @@ dependencies {
 
 //    implementation "org.java-websocket:Java-WebSocket:1.3.0"
     implementation 'tech.gusavila92:java-android-websocket-client:1.2.2'
+//    swipe to close activity
+    implementation 'com.github.Commit451:ElasticDragDismissLayout:1.0.4'
 }
 apply plugin: 'com.google.gms.google-services'

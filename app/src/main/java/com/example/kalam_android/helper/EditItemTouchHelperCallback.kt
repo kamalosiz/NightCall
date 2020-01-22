@@ -13,7 +13,7 @@ class EditItemTouchHelperCallback(private val adapterSelectedMedia: AdapterSelec
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
         val dragFlags: Int = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         val swipeFlags: Int = ItemTouchHelper.UP or ItemTouchHelper.DOWN
-        return makeMovementFlags(dragFlags, swipeFlags)
+        return makeMovementFlags(dragFlags, 0)
     }
 
     override fun onMove(

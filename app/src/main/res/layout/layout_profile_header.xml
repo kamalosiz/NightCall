@@ -7,29 +7,30 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_225sdp">
+        android:layout_height="@dimen/_170sdp">
 
         <ImageView
             android:id="@+id/ivUserProfile"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_175sdp"
+            android:layout_height="@dimen/_130sdp"
+            android:src="@color/darkGrey"
             android:scaleType="fitXY" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivProfile"
-            android:layout_width="@dimen/_110sdp"
-            android:layout_height="@dimen/_110sdp"
+            android:layout_width="@dimen/_130sdp"
+            android:layout_height="@dimen/_130sdp"
             android:layout_alignParentBottom="true"
             android:layout_centerInParent="true"
             android:transitionName="@string/profile_trans"
             app:civ_border_color="@color/white"
+            android:src="@color/darkGrey"
             app:civ_border_width="@dimen/_1sdp" />
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_10sdp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -38,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:fontFamily="@font/roboto_regular"
+            android:fontFamily="@font/roboto_medium"
             android:textColor="@color/theme_color"
             android:textSize="@dimen/_18ssp" />
 
@@ -49,7 +50,7 @@
             android:layout_below="@+id/tvName"
             android:layout_centerInParent="true"
             android:fontFamily="@font/roboto_regular"
-            android:textColor="@color/black"
+            android:textColor="@color/darkGrey"
             android:textSize="@dimen/_13ssp" />
     </LinearLayout>
 

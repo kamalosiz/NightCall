@@ -9,7 +9,8 @@
         android:id="@+id/tvDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_10sdp"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
         android:fontFamily="@font/roboto_regular"
         android:textColor="@color/darkGrey"
         android:textSize="@dimen/_12ssp" />
