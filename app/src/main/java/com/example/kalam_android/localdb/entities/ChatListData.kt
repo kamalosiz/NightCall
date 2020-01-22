@@ -19,5 +19,6 @@ data class ChatListData(
     @ColumnInfo(name = "nickname") var nickname: String?,
     @ColumnInfo(name = "last_message_id") var last_message_id: Long,
     @ColumnInfo(name = "is_read") var is_read: Int?,
-    @ColumnInfo(name = "sender_id") var sender_id: Int?
+    @ColumnInfo(name = "sender_id") var sender_id: Int?,
+    @ColumnInfo(name = "is_online") var is_Online: Int? = 0
 )

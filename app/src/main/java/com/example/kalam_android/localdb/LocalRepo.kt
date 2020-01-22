@@ -61,6 +61,14 @@ class LocalRepo @Inject constructor(
         daoChats.insertChat(chatListData)
     }
 
+    fun updateChatItemDB(uid: Int, unReadcount: Int, isRead: Int?) {
+        daoChats.updateChatItemDB(uid, unReadcount, isRead)
+    }
+
+    fun updateChatItemDB(uid: Int, isRead: Int?) {
+        daoChats.updateChatItemDB(uid, isRead)
+    }
+
     fun updateItemToDB(
         unix_time: String,
         message: String,

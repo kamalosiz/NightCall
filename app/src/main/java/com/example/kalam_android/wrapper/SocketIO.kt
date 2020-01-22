@@ -72,6 +72,10 @@ class SocketIO private constructor() {
         }?.on(AppConstants.SEEN_MESSAGE) {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEEN_MESSAGE)
+
+        }?.on(AppConstants.USER_STATUS) {
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.USER_STATUS)
         }
     }
 

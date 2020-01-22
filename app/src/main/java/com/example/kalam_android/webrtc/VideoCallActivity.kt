@@ -69,7 +69,6 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
     private var handler = Handler()
     lateinit var callTimeRunnable: Runnable
     private var isVideo = false
-    private var isSameCallFormat = false
     lateinit var binding: CallActivityBinding
 
 
@@ -345,7 +344,7 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
                 audioManager.isSpeakerphoneOn = true
             }
             audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -394,8 +393,8 @@ class VideoCallActivity : BaseActivity(), View.OnClickListener, WebSocketCallbac
         logE("onOfferReceived")
         if (ringtune?.isPlaying == true) {
             ringtune?.stop()
-            binding.ibAnswer.visibility = View.GONE
         }
+        binding.ibAnswer.visibility = View.GONE
         doAnswer()
         if (isVideo) {
             updateVideoViews()

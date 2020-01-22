@@ -7,10 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -50,7 +48,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     private var chatList: ArrayList<ChatListData> = ArrayList()
     private var chatIDs: ArrayList<Int> = ArrayList()
     var position = -1
-    //    private var isRefresh = false
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
     private var fromSearch = 0
 
@@ -81,22 +78,24 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             hitAllChatApi()
         }
         binding.fabSpeech.setOnTouchListener(this)
+        binding.etSearch.setOnEditorActionListener { v, actionId, event ->
+            if (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
+                logE("onTextChanged length is not 0")
+                fromSearch = 1
+                hitSearchMessage(binding.etSearch.text.toString())
+            }
+            false
+        }
+
         binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.length == 0) {
                     fromSearch = 0
+                    logE("onTextChanged length is 0")
                     viewModel.getAllchatItemFromDB()
                     hitAllChatApi()
-
-                } else {
-                    fromSearch = 1
-                    hitSearchMessage(s.toString())
                 }
             }
         })
@@ -150,18 +149,21 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     private fun renderLocalResponse(list: List<ChatListData>?) {
         logE("renderLocalResponse: $list")
         list?.let {
-            chatList.clear()
-            chatIDs.clear()
+            if (fromSearch == 0) {
+                logE("fromSearch == 0 in renderLocalResponse")
+                chatList.clear()
+                chatIDs.clear()
 
-            if (list.isNotEmpty()) {
-                binding.fabSpeech.isClickable = true
+                if (list.isNotEmpty()) {
+                    binding.fabSpeech.isClickable = true
+                }
+                chatList.addAll(list)
+                list.forEach {
+                    chatIDs.add(it.chat_id)
+                }
+                logE("Chats are added from local")
+                (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
             }
-            chatList.addAll(list)
-            list.forEach {
-                chatIDs.add(it.chat_id)
-            }
-            logE("Chats are added from local")
-            (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
         }
     }
 
@@ -172,16 +174,18 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 it.data.reverse()
                 chatList.clear()
                 chatList = it.data
-                chatIDs.clear()
-                it.data.forEach {
-                    chatIDs.add(it.chat_id)
-                }
-                viewModel.deleteAllChats()
                 binding.tvNoChat.visibility = View.GONE
-                viewModel.addAllChatItemsToDB(chatList)
-                sharedPrefsHelper.allChatItemSynced()
-                logE("Chats are added from liver server")
                 (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
+                if (fromSearch == 0) {
+                    logE("fromSearch == 0 in renderResponse")
+                    chatIDs.clear()
+                    it.data.forEach {
+                        chatIDs.add(it.chat_id)
+                    }
+                    viewModel.deleteAllChats()
+                    viewModel.addAllChatItemsToDB(chatList)
+                    sharedPrefsHelper.allChatItemSynced()
+                }
             } else {
                 binding.tvNoChat.visibility = View.VISIBLE
             }
@@ -205,59 +209,105 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     }
 
     override fun socketResponse(jsonObject: JSONObject, type: String) {
-        when (type) {
-            AppConstants.NEW_MESSAGE -> {
-                val gson = Gson()
-                logE("New Message : $jsonObject")
-                val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-                val unixTime = System.currentTimeMillis() / 1000L
-                activity?.runOnUiThread {
-                    val name = newChat.sender_name.split(" ")
-                    val item = ChatListData(
-                        newChat.chat_id,
-                        "",
-                        unixTime.toDouble(),
-                        name[0], name[1],
-                        newChat.profile_image.toString(),
-                        newChat.message,
-                        1,
-                        newChat.sender_id!!,
-                        newChat.sender_name,
-                        newChat.id,
-                        newChat.is_read,
-                        newChat.receiver_id
-                    )
-                    if (chatIDs.contains(newChat.chat_id)) {
-                        logE("Chat ID matched")
-                        for (x in chatList.indices) {
-                            if (chatList[x].chat_id == newChat.chat_id) {
-                                chatList[x].un_read_count += 1
-                                modifyItem(
-                                    x,
-                                    item.message.toString(),
-                                    unixTime,
-                                    chatList[x].un_read_count,
-                                    item.user_id,
-                                    item.is_read
-                                )
-                            }
-                        }
-                    } else {
-                        logE("This chat is not present")
-                        if (chatList.size == 0) {
-                            binding.tvNoChat.visibility = View.GONE
-                        }
-                        chatList.add(0, item)
-                        chatIDs.add(newChat.chat_id)
-                        (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(
-                            chatList
+        activity?.runOnUiThread {
+            when (type) {
+                AppConstants.NEW_MESSAGE -> {
+                    val gson = Gson()
+                    logE("New Message : $jsonObject")
+                    val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+                    val unixTime = System.currentTimeMillis() / 1000L
+                    activity?.runOnUiThread {
+                        val name = newChat.sender_name.split(" ")
+                        val item = ChatListData(
+                            newChat.chat_id,
+                            "",
+                            unixTime.toDouble(),
+                            name[0], name[1],
+                            newChat.profile_image.toString(),
+                            newChat.message,
+                            1,
+                            newChat.sender_id!!,
+                            newChat.sender_name,
+                            newChat.id,
+                            newChat.is_read,
+                            newChat.receiver_id
                         )
-                        viewModel.insertChat(item)
+                        if (chatIDs.contains(newChat.chat_id)) {
+                            logE("Chat ID matched")
+                            for (x in chatList.indices) {
+                                if (chatList[x].chat_id == newChat.chat_id) {
+                                    chatList[x].un_read_count += 1
+                                    modifyItem(
+                                        x,
+                                        item.message.toString(),
+                                        unixTime,
+                                        chatList[x].un_read_count,
+                                        item.user_id,
+                                        item.is_read
+                                    )
+                                }
+                            }
+                        } else {
+                            logE("This chat is not present")
+                            if (chatList.size == 0) {
+                                binding.tvNoChat.visibility = View.GONE
+                            }
+                            chatList.add(0, item)
+                            chatIDs.add(newChat.chat_id)
+                            (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(
+                                chatList
+                            )
+                            viewModel.insertChat(item)
+                        }
                     }
-
-                    //old
-//                hitAllChatApi()
                 }
+                AppConstants.ALL_MESSAGES_READ -> {
+                    logE("ALL_MESSAGES_READ in ChatsFragment: $jsonObject")
+                    val chatId = jsonObject.getString("chat_id").toInt()
+                    updateStatus(chatId, 2)
+                }
+                AppConstants.SEEN_MESSAGE -> {
+                    logE("SEEN_MESSAGE in ChatsFragment: $jsonObject")
+                    val chatId = jsonObject.getString("chat_id").toInt()
+                    updateStatus(chatId, 2)
+                }
+                AppConstants.MESSAGE_DELIVERED -> {
+                    logE("MESSAGE_DELIVERED in ChatsFragment : $jsonObject")
+                    val chatId = jsonObject.getString("chat_id").toInt()
+                    updateStatus(chatId, 1)
+                }
+                AppConstants.SEND_MESSAGE -> {
+                    logE("SEND_MESSAGE in ChatsFragment : $jsonObject")
+                    val isDelivered = jsonObject.getBoolean("delivered")
+                    val chatId = jsonObject.getString("chat_id").toInt()
+                    if (isDelivered) {
+                        updateStatus(chatId, 1)
+                    }
+                }
+                AppConstants.USER_STATUS -> {
+                    logE("USER_STATUS : $jsonObject")
+                    val userId = jsonObject.getInt("user_id")
+                    val status = jsonObject.getInt("status")
+                    for (x in chatList.indices) {
+                        if (chatList[x].user_id == userId) {
+                            (binding.chatRecycler.adapter as AllChatListAdapter).updateOnlineStatus(
+                                x, status
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateStatus(chatId: Int, isRead: Int) {
+        for (x in chatIDs.indices) {
+            if (chatIDs[x] == chatId) {
+                chatList[x].is_read = isRead
+                (binding.chatRecycler.adapter as AllChatListAdapter).updateItem(
+                    chatList, x
+                )
+                viewModel.updateChatItemDB(chatIDs[x], isRead)
             }
         }
     }
@@ -267,19 +317,34 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
-                    val isRead =
-                        data?.getIntExtra(AppConstants.LAST_MESSAGE_STATUS, 0)
-                    val lastMessage = data?.getStringExtra(AppConstants.LAST_MESSAGE)
-                    val lastMsgTime = data?.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
-                    val lastMessageSenderId =
-                        data?.getIntExtra(AppConstants.LAST_MESSAGE_SENDER_ID, 0)
-                    modifyItem(
-                        position,
-                        lastMessage.toString(),
-                        lastMsgTime?.toLong(),
-                        0,
-                        lastMessageSenderId, isRead
-                    )
+                    val isNull = data?.getBooleanExtra(AppConstants.IS_NULL, false)
+                    if (isNull == false) {
+                        val isSeen = data.getBooleanExtra(AppConstants.IsSEEN, false)
+                        val isRead =
+                            data.getIntExtra(AppConstants.LAST_MESSAGE_STATUS, 0)
+                        if (isSeen) {
+                            chatList[position].un_read_count = 0
+                            chatList[position].is_read = isRead
+                            viewModel.updateChatItemDB(chatList[position].chat_id, 0, isRead)
+//                        }
+                            (binding.chatRecycler.adapter as AllChatListAdapter).updateItem(
+                                chatList, position
+                            )
+                        } else {
+                            val lastMessage = data.getStringExtra(AppConstants.LAST_MESSAGE)
+                            val lastMsgTime = data.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
+                            val lastMessageSenderId =
+                                data.getIntExtra(AppConstants.LAST_MESSAGE_SENDER_ID, 0)
+                            modifyItem(
+                                position,
+                                lastMessage,
+                                lastMsgTime?.toLong(),
+                                0,
+                                lastMessageSenderId, isRead
+                            )
+                        }
+                    }
+                    logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
                 }
             }

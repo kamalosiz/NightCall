@@ -1,5 +1,7 @@
 package com.example.kalam_android.view.activities
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -38,6 +40,13 @@ class SplashActivity : BaseActivity() {
             startActivity(intent)
             finish()
         }, 2000)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
     }
 
     private fun logE(message: String) {

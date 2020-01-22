@@ -18,11 +18,9 @@ abstract class PaginationScrollUpListener(
 
         val visibleItemCount = layoutManager.childCount
         val totalItemCount = layoutManager.itemCount
-//        val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
         if (!isLoading && !isLastPage) {
-//            if (lastVisibleItemPosition > 0 && lastVisibleItemPosition + 1 == totalItemCount && totalItemCount >= visibleItemCount) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition > 0) {
                 Debugger.e("testing", "firstVisibleItemPosition : $firstVisibleItemPosition")
                 Debugger.e("testing", "visibleItemCount : $visibleItemCount")

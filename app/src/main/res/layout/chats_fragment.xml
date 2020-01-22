@@ -25,6 +25,8 @@
                 android:hint="Search messages"
                 android:inputType="text"
                 android:maxLines="1"
+                android:imeOptions="actionSearch"
+                android:imeActionLabel="Search"
                 android:minLines="1"
                 android:paddingStart="@dimen/_10sdp"
                 android:textColor="@color/black"
