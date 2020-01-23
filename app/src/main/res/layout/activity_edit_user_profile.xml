@@ -85,22 +85,22 @@
                         android:src="@color/grey" />
 
                     <RelativeLayout
-                        android:layout_width="@dimen/_130sdp"
-                        android:layout_height="@dimen/_130sdp"
+                        android:layout_width="@dimen/_125sdp"
+                        android:layout_height="@dimen/_125sdp"
                         android:layout_alignParentBottom="true"
                         android:layout_centerInParent="true">
 
                         <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/ivProfile"
-                            android:layout_width="@dimen/_130sdp"
-                            android:layout_height="@dimen/_130sdp"
+                            android:layout_width="@dimen/_125sdp"
+                            android:layout_height="@dimen/_125sdp"
                             android:src="@color/grey"
                             app:civ_border_color="@color/light_grey"
                             app:civ_border_width="@dimen/_1sdp" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/ivProfileCamera"
-                            android:layout_width="@dimen/_122sdp"
+                            android:layout_width="@dimen/_120sdp"
                             android:layout_height="@dimen/_30sdp"
                             android:layout_alignParentBottom="true"
                             android:layout_centerInParent="true"

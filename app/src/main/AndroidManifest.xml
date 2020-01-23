@@ -72,6 +72,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view.activities.OpenMediaActivity"
+            android:theme="@style/Theme.Transparent"
             android:configChanges="orientation|screenSize|layoutDirection" />
         <activity
             android:name=".view.activities.GalleryPostActivity"

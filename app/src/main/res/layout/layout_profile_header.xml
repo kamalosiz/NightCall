@@ -18,8 +18,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivProfile"
-            android:layout_width="@dimen/_130sdp"
-            android:layout_height="@dimen/_130sdp"
+            android:layout_width="@dimen/_125sdp"
+            android:layout_height="@dimen/_125sdp"
             android:layout_alignParentBottom="true"
             android:layout_centerInParent="true"
             android:transitionName="@string/profile_trans"

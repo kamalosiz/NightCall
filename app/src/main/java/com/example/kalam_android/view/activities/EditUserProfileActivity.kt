@@ -136,7 +136,9 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                     intent.getSerializableExtra(AppConstants.USER_DATA) as ArrayList<ProfileData>?
             binding.etFirstName.setText(list?.get(0)?.firstname)
             binding.etLastName.setText(list?.get(0)?.lastname)
-            binding.overviewView.etPhone.setText("+" + list?.get(0)?.country_code + list?.get(0)?.phone)
+            if (list?.get(0)?.country_code != null && list.get(0)?.phone != null) {
+                binding.overviewView.etPhone.setText("+" + list?.get(0)?.country_code + list?.get(0)?.phone)
+            }
             binding.overviewView.etEmail.setText(list?.get(0)?.email)
             binding.overviewView.etDescription.setText(list?.get(0)?.bio)
             binding.overviewView.etAddress.setText(list?.get(0)?.address)
