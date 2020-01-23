@@ -64,7 +64,7 @@
             android:screenOrientation="portrait"
             android:showOnLockScreen="true" />
         <activity
-            android:name=".webrtc.VideoCallActivity"
+            android:name=".webrtc.CallActivity"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true" />
         <activity

@@ -36,7 +36,7 @@ import com.example.kalam_android.util.*
 import com.example.kalam_android.view.adapter.ChatMessagesAdapter
 import com.example.kalam_android.viewmodel.ChatMessagesViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.webrtc.VideoCallActivity
+import com.example.kalam_android.webrtc.CallActivity
 import com.example.kalam_android.wrapper.GlideDownloader
 import com.example.kalam_android.wrapper.SocketIO
 import com.github.nkzawa.socketio.client.Ack
@@ -46,13 +46,11 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
-import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.time.seconds
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     SocketCallback, MessageTypingListener, View.OnTouchListener,
@@ -85,6 +83,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
     private var lastMessageSenderID = 0
     private var lastMessageStatus = 0
+    private var myName = ""
+    private var onlineStatus = ""
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -145,6 +145,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             })
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
         }
+        SocketIO.getInstance()
+            .emitGetNickName(sharedPrefsHelper.getUser()?.id.toString(), callerID.toString())
+        SocketIO.getInstance().checkUserStatus(callerID.toString())
     }
 
     private fun initListeners() {
@@ -337,8 +340,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             .putString("id", sharedPrefsHelper.getUser()?.id.toString())
             .putString("chatId", chatId.toString())
             .putString(
-                "name", sharedPrefsHelper.getUser()?.firstname.toString()
-                        + " " + sharedPrefsHelper.getUser()?.lastname.toString()
+                "name", myName
             )
             .putString("language", sharedPrefsHelper.getLanguage().toString())
             .putString("group_id", groupID)
@@ -443,8 +445,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             chatId.toString(),
             binding.lvBottomChat.editTextMessage.text.toString(),
             AppConstants.TEXT_MESSAGE,
-            sharedPrefsHelper.getUser()?.firstname.toString()
-                    + " " + sharedPrefsHelper.getUser()?.lastname.toString(),
+            myName,
             AppConstants.DUMMY_STRING,
             0,
             AppConstants.DUMMY_STRING,
@@ -509,10 +510,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 myChatMediaHelper?.openAttachments()
             }
             R.id.ivAudio -> {
-                startNewActivity(VideoCallActivity::class.java, false)
+                startNewActivity(CallActivity::class.java, false)
             }
             R.id.ivVideo -> {
-                startNewActivity(VideoCallActivity::class.java, true)
+                startNewActivity(CallActivity::class.java, true)
             }
         }
     }
@@ -522,6 +523,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         intent.putExtra(AppConstants.INITIATOR, true)
         intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
         intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
+        intent.putExtra(AppConstants.GET_MY_NICKNAME, myName)
         intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
         intent.putExtra("isVideoCall", isVideo)
         startActivity(intent)
@@ -694,6 +696,32 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         )
                     }
                 }
+                AppConstants.GET_MY_NICKNAME -> {
+                    myName = jsonObject.getString("nickname")
+                }
+                AppConstants.CHECK_USER_STATUS -> {
+                    val userId = jsonObject.getInt("user_id")
+                    val status = jsonObject.getInt("status")
+                    checkUserStatus(userId, status)
+                }
+                AppConstants.USER_STATUS -> {
+                    logE("USER_STATUS : $jsonObject")
+                    val userId = jsonObject.getInt("user_id")
+                    val status = jsonObject.getInt("status")
+                    checkUserStatus(userId, status)
+                }
+            }
+        }
+    }
+
+    private fun checkUserStatus(userId: Int, status: Int) {
+        if (callerID == userId) {
+            if (status == 1) {
+                onlineStatus = "Online"
+                binding.header.tvTyping.text = onlineStatus
+            } else {
+                onlineStatus = "Away"
+                binding.header.tvTyping.text = onlineStatus
             }
         }
     }
@@ -705,10 +733,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 if (isTyping) {
                     val user = jsonObject.getInt("user_id")
                     if (user == callerID) {
-                        binding.header.tvTyping.visibility = View.VISIBLE
+                        binding.header.tvTyping.text = "Typing..."
                     }
                 } else {
-                    binding.header.tvTyping.visibility = View.GONE
+                    binding.header.tvTyping.text = onlineStatus
                 }
             }
         }

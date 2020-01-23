@@ -8,6 +8,7 @@ import com.example.kalam_android.util.Debugger
 import com.github.nkzawa.socketio.client.Ack
 import com.github.nkzawa.socketio.client.IO
 import com.github.nkzawa.socketio.client.Socket
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
@@ -161,5 +162,36 @@ class SocketIO private constructor() {
         jsonObject.addProperty("user_id", userId)
         jsonObject.addProperty("message_id", msgId)
         socket?.emit(AppConstants.MESSAGE_SEEN, jsonObject)
+    }
+
+    fun emitGetNickName(userId: String, contactId: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("user_id", userId)
+        jsonObject.addProperty("contact_id", contactId)
+        socket?.emit(AppConstants.GET_MY_NICKNAME, jsonObject, Ack {
+            val json = it[0] as JSONObject
+            Debugger.e("testingSocket", "json : $json")
+            socketCallback?.socketResponse(json, AppConstants.GET_MY_NICKNAME)
+        })
+    }
+
+    fun checkUserStatus(userId: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("user_id", userId)
+        socket?.emit(AppConstants.CHECK_USER_STATUS, jsonObject, Ack {
+            val json = it[0] as JSONObject
+            Debugger.e("testingSocket", "checkUserStatus : $json")
+            socketCallback?.socketResponse(json, AppConstants.CHECK_USER_STATUS)
+        })
+    }
+
+    fun getUserStatuses(json: JsonArray) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("json_obj", json.toString())
+        socket?.emit(AppConstants.GET_ALL_USER_STATUS, jsonObject, Ack {
+//            val json1 = it[0] as JSONObject
+//            Debugger.e("testingSocket", "checkUserStatus : $json")
+//            socketCallback?.socketResponse(json, AppConstants.GET_ALL_USER_STATUS)
+        })
     }
 }
