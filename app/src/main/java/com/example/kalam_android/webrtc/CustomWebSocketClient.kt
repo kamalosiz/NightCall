@@ -226,11 +226,12 @@ class CustomWebSocketClient private constructor(
         }
     }
 
-    fun onNewCall(id: String) {
+    fun onNewCall(id: String,myName: String?) {
         try {
             val obj = JSONObject()
             obj.put("type", AppConstants.NEW_CALL)
             obj.put("connectedUserId", id)
+            obj.put("nickName", myName)
             send(obj.toString())
             logE("onNewCall sent $obj")
         } catch (e: JSONException) {

@@ -64,10 +64,9 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_medium"
                     android:singleLine="true"
-                    android:text="@string/typing"
+                    android:text="away"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_10ssp"
-                    android:visibility="gone" />
+                    android:textSize="@dimen/_10ssp" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
 

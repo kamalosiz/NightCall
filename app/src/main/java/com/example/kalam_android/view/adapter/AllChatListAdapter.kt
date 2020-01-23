@@ -123,6 +123,9 @@ class AllChatListAdapter(
                 2 -> {
                     view.text = "Seen"
                 }
+                3 -> {
+                    view.visibility = View.GONE
+                }
             }
         } else {
             view.text = ""

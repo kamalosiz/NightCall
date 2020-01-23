@@ -23,6 +23,7 @@ import com.example.kalam_android.helper.MyVoiceToTextHelper
 import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.model.AllChatListResponse
+import com.example.kalam_android.repository.model.ContactInfo
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
@@ -32,6 +33,8 @@ import com.example.kalam_android.viewmodel.AllChatListViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.SocketIO
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -100,6 +103,18 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
             }
         })
         return binding.root
+    }
+
+    private fun createIdsJson(list: MutableList<Int>): JsonArray {
+        val jsonArray = JsonArray()
+        for (x in list.indices) {
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("user_id", list[x])
+            jsonObject.addProperty("status", 0)
+            jsonArray.add(jsonObject)
+        }
+        logE("Json Array : $jsonArray")
+        return jsonArray
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<AllChatListResponse>?) {
@@ -217,12 +232,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     val newChat = gson.fromJson(jsonObject.toString(), ChatData::class.java)
                     val unixTime = System.currentTimeMillis() / 1000L
                     activity?.runOnUiThread {
-                        val name = newChat.sender_name.split(" ")
+                        //                        val name = newChat.sender_name.split(" ")
                         val item = ChatListData(
                             newChat.chat_id,
                             "",
                             unixTime.toDouble(),
-                            name[0], name[1],
+                            newChat.sender_name, "",
                             newChat.profile_image.toString(),
                             newChat.message,
                             1,
@@ -252,8 +267,10 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                             if (chatList.size == 0) {
                                 binding.tvNoChat.visibility = View.GONE
                             }
+                            item.is_read = 3
                             chatList.add(0, item)
                             chatIDs.add(newChat.chat_id)
+
                             (binding.chatRecycler.adapter as AllChatListAdapter).newChatInserted(
                                 chatList
                             )
@@ -346,6 +363,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     }
                     logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
+                    SocketIO.getInstance().getUserStatuses(createIdsJson(chatIDs))
                 }
             }
         }

@@ -35,7 +35,7 @@ class FCMService : FirebaseMessagingService() {
 
         logE("onMessageReceived ${remoteMSG.data}")
         if (remoteMSG.data["nType"] == "call") {
-            showNotification("Call Notification", "Call is received")
+//            showNotification("Call Notification", "Call is received")
             (this.application as MyApplication).component.doInjection(this)
             try {
                 val customWebSocketClient =

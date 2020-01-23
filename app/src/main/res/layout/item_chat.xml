@@ -51,7 +51,7 @@
                 android:singleLine="false"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
-                android:textSize="@dimen/_11ssp"
+                android:textSize="@dimen/_12ssp"
                 tools:ignore="RtlCompat" />
         </RelativeLayout>
 

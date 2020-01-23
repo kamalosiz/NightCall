@@ -71,6 +71,9 @@ object AppConstants {
     const val MESSAGE_SEEN = "message_seen"
     const val SEEN_MESSAGE = "seen_message"
     const val USER_STATUS = "user_status"
+    const val GET_MY_NICKNAME = "get_my_nickname"
+    const val CHECK_USER_STATUS = "check_user_status"
+    const val GET_ALL_USER_STATUS = "get_all_user_status"
 
     //WebRtc WebSockets
     const val CANDIDATE = "candidate"

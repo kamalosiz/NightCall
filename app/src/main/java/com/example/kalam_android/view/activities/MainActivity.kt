@@ -22,13 +22,11 @@ import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
-import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.HomePagerAdapter
 import com.example.kalam_android.viewmodel.MainViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.example.kalam_android.webrtc.AudioCallActivity
 import com.example.kalam_android.webrtc.CustomWebSocketClient
-import com.example.kalam_android.webrtc.VideoCallActivity
+import com.example.kalam_android.webrtc.CallActivity
 import com.example.kalam_android.wrapper.SocketIO
 import org.json.JSONObject
 import java.net.URI
@@ -201,9 +199,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             val jsonString = intent.getStringExtra(AppConstants.JSON)
             val jsonObject = JSONObject(jsonString)
             if (jsonObject.getBoolean("isVideo")) {
-                startNewActivity(VideoCallActivity::class.java, jsonObject, true, true)
+                startNewActivity(CallActivity::class.java, jsonObject, true, true)
             } else {
-                startNewActivity(VideoCallActivity::class.java, jsonObject, true, false)
+                startNewActivity(CallActivity::class.java, jsonObject, true, false)
             }
             CustomWebSocketClient.getInstance(sharedPrefsHelper, URI(Urls.WEB_SOCKET_URL))
                 .setOfferListener(this, true)
@@ -231,9 +229,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
             AppConstants.OFFER -> {
                 Debugger.e("offerCallback", "json : $jsonObject")
                 if (jsonObject.getBoolean("isVideo")) {
-                    startNewActivity(VideoCallActivity::class.java, jsonObject, false, true)
+                    startNewActivity(CallActivity::class.java, jsonObject, false, true)
                 } else {
-                    startNewActivity(VideoCallActivity::class.java, jsonObject, false, false)
+                    startNewActivity(CallActivity::class.java, jsonObject, false, false)
                 }
             }
         }
