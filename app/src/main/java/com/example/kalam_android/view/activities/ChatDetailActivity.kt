@@ -2,6 +2,8 @@ package com.example.kalam_android.view.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -78,13 +80,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var isChatIdAvailable = false
     private var callerID: Int = -1
     private var myChatMediaHelper: MyChatMediaHelper? = null
-    private var lastMessage: String? = null
-    private var lastMsgTime: Long = 0
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
-    private var lastMessageSenderID = 0
-    private var lastMessageStatus = 0
     private var myName = ""
     private var onlineStatus = ""
+    private var lastMessage: String? = null
+    private var lastMsgTime: Long = 0
+    private var lastMessageSenderID = 0
+    private var lastMessageStatus = 0
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -109,10 +111,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        if (chatResponse != null) {
+            if (lastMessage?.isNotEmpty() == true) {
+                viewModel.updateItemToDB(
+                    lastMsgTime.toString(), lastMessage.toString(),
+                    chatId, 0, lastMessageSenderID, lastMessageStatus
+                )
+            } else {
+                viewModel.updateChatItemDB(chatId, 0, lastMessageStatus)
+            }
+        }
         if (intent != null) handleIntent(intent)
     }
 
     private fun handleIntent(intent: Intent) {
+        lastMessage = null
+        lastMsgTime = 0
+        lastMessageSenderID = 0
+        lastMessageStatus = 0
         binding.pbCenter.visibility = View.VISIBLE
         isChatIdAvailable = intent.getBooleanExtra(AppConstants.IS_CHATID_AVAILABLE, false)
         chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
@@ -120,6 +136,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 //        logE("lastMessage ID : $lastMsgID")
         fromSearch = intent.getIntExtra(AppConstants.FROM_SEARCH, 0)
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
+        profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
+        callerID = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
         setUserData()
         initAdapter()
         if (isChatIdAvailable) {
@@ -224,9 +242,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun setUserData() {
-        profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
-        callerID = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
-        logE("callerId : $callerID")
+        logE("Setting User Data")
+        logE("profileImage : $profileImage")
+        logE("callerID : $callerID")
+        logE("lastMsgID : $lastMsgID")
+        logE("userRealName : $userRealName")
         binding.header.tvName.text = userRealName
         GlideDownloader.load(
             this,
@@ -614,20 +634,21 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         super.onResume()
         myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
     }
 
     override fun onBackPressed() {
         val intent = Intent()
         if (chatResponse != null) {
             if (lastMessage?.isNotEmpty() == true) {
-                intent.putExtra(AppConstants.LAST_MESSAGE, lastMessage.toString())
-                intent.putExtra(AppConstants.LAST_MESSAGE_TIME, lastMsgTime.toString())
-                intent.putExtra(AppConstants.IsSEEN, false)
-                intent.putExtra(AppConstants.LAST_MESSAGE_SENDER_ID, lastMessageSenderID)
-                intent.putExtra(AppConstants.LAST_MESSAGE_STATUS, lastMessageStatus)
+                viewModel.updateItemToDB(
+                    lastMsgTime.toString(), lastMessage.toString(),
+                    chatId, 0, lastMessageSenderID, lastMessageStatus
+                )
             } else {
-                intent.putExtra(AppConstants.IsSEEN, true)
-                intent.putExtra(AppConstants.LAST_MESSAGE_STATUS, lastMessageStatus)
+                viewModel.updateChatItemDB(chatId, 0, lastMessageStatus)
             }
             intent.putExtra(AppConstants.IS_NULL, false)
         } else {

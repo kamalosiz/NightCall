@@ -2,6 +2,7 @@ package com.example.kalam_android.wrapper
 
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.SocketCallback
+import com.example.kalam_android.callbacks.StatusCallback
 import com.example.kalam_android.repository.net.Urls
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
@@ -10,11 +11,13 @@ import com.github.nkzawa.socketio.client.IO
 import com.github.nkzawa.socketio.client.Socket
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import org.json.JSONArray
 import org.json.JSONObject
 
 class SocketIO private constructor() {
     private val TAG = this.javaClass.simpleName
     private var socketCallback: SocketCallback? = null
+    private var statusCallback: StatusCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null
     var socket: Socket? = null
 
@@ -112,6 +115,10 @@ class SocketIO private constructor() {
         this.socketCallback = socketCallback
     }
 
+    fun setStatusCallbackListener(statusCallback: StatusCallback) {
+        this.statusCallback = statusCallback
+    }
+
     fun setTypingListeners(messageTypingResponse: MessageTypingListener) {
         this.messageTypingResponse = messageTypingResponse
     }
@@ -189,9 +196,9 @@ class SocketIO private constructor() {
         val jsonObject = JsonObject()
         jsonObject.addProperty("json_obj", json.toString())
         socket?.emit(AppConstants.GET_ALL_USER_STATUS, jsonObject, Ack {
-//            val json1 = it[0] as JSONObject
-//            Debugger.e("testingSocket", "checkUserStatus : $json")
-//            socketCallback?.socketResponse(json, AppConstants.GET_ALL_USER_STATUS)
+            val list = it[0] as JSONArray
+            Debugger.e("testingSocket", "checkUserStatus : $list")
+            statusCallback?.onStatusCallback(list)
         })
     }
 }

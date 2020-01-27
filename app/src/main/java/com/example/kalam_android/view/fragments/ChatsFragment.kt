@@ -18,6 +18,7 @@ import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.callbacks.ResultVoiceToText
 import com.example.kalam_android.callbacks.SocketCallback
+import com.example.kalam_android.callbacks.StatusCallback
 import com.example.kalam_android.databinding.ChatsFragmentBinding
 import com.example.kalam_android.helper.MyVoiceToTextHelper
 import com.example.kalam_android.localdb.entities.ChatData
@@ -35,11 +36,12 @@ import com.example.kalam_android.wrapper.SocketIO
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
 
 class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
-    View.OnTouchListener, ResultVoiceToText {
+    View.OnTouchListener, ResultVoiceToText, StatusCallback {
 
     private val TAG = this.javaClass.simpleName
     private lateinit var binding: ChatsFragmentBinding
@@ -50,6 +52,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private var chatList: ArrayList<ChatListData> = ArrayList()
     private var chatIDs: ArrayList<Int> = ArrayList()
+    private var userIds: ArrayList<Int> = ArrayList()
     var position = -1
     private var myVoiceToTextHelper: MyVoiceToTextHelper? = null
     private var fromSearch = 0
@@ -77,6 +80,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         hitAllChatApi()
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
         SocketIO.getInstance().setSocketCallbackListener(this)
+        SocketIO.getInstance().setStatusCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {
             hitAllChatApi()
         }
@@ -189,6 +193,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 it.data.reverse()
                 chatList.clear()
                 chatList = it.data
+                userIds.clear()
                 binding.tvNoChat.visibility = View.GONE
                 (binding.chatRecycler.adapter as AllChatListAdapter).updateList(chatList)
                 if (fromSearch == 0) {
@@ -196,7 +201,9 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                     chatIDs.clear()
                     it.data.forEach {
                         chatIDs.add(it.chat_id)
+                        userIds.add(it.user_id)
                     }
+                    SocketIO.getInstance().getUserStatuses(createIdsJson(userIds))
                     viewModel.deleteAllChats()
                     viewModel.addAllChatItemsToDB(chatList)
                     sharedPrefsHelper.allChatItemSynced()
@@ -336,7 +343,7 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 AppConstants.CHAT_FRAGMENT_CODE -> {
                     val isNull = data?.getBooleanExtra(AppConstants.IS_NULL, false)
                     if (isNull == false) {
-                        val isSeen = data.getBooleanExtra(AppConstants.IsSEEN, false)
+                        /*val isSeen = data.getBooleanExtra(AppConstants.IsSEEN, false)
                         val isRead =
                             data.getIntExtra(AppConstants.LAST_MESSAGE_STATUS, 0)
                         if (isSeen) {
@@ -359,11 +366,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                                 0,
                                 lastMessageSenderId, isRead
                             )
-                        }
+                        }*/
+                        viewModel.getAllchatItemFromDB()
                     }
                     logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
-                    SocketIO.getInstance().getUserStatuses(createIdsJson(chatIDs))
+                    SocketIO.getInstance().getUserStatuses(createIdsJson(userIds))
                 }
             }
         }
@@ -485,6 +493,22 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         startActivity(i)
                         return
                     }
+                }
+            }
+        }
+    }
+
+    override fun onStatusCallback(array: JSONArray) {
+        activity?.runOnUiThread {
+            logE("get array : $array")
+            for (i in 0 until array.length()) {
+                val jsonObject = array.getJSONObject(i)
+                val userId = jsonObject.getInt("user_id")
+                val status = jsonObject.getInt("status")
+                if (chatList[i].user_id == userId) {
+                    (binding.chatRecycler.adapter as AllChatListAdapter).updateOnlineStatus(
+                        i, status
+                    )
                 }
             }
         }

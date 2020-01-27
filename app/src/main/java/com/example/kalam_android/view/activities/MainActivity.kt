@@ -133,6 +133,11 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         if (isOutside) {
             val chatID = intent.getIntExtra(AppConstants.CHAT_ID, 0)
             val name = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
+            val msgId = intent.getLongExtra(AppConstants.MSG_ID, 0)
+            val callerID = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
+            val image = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
+
+
             val intent = Intent(this, ChatDetailActivity::class.java)
             intent.putExtra(AppConstants.CHAT_ID, chatID)
             intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
@@ -140,6 +145,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
                 AppConstants.CHAT_USER_NAME,
                 name
             )
+//            intent.putExtra(AppConstants.MSG_ID, 0)
+            intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+            intent.putExtra(AppConstants.CHAT_USER_PICTURE, image)
             startActivityForResult(intent, AppConstants.CHAT_FRAGMENT_CODE)
         }
     }

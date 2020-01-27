@@ -7,3 +7,8 @@ data class BasicResponse(
     val data: String,
     val message: String
 )
+
+data class StatusResponse(
+    val user_id: Int,
+    val status: Int
+)
