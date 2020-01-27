@@ -75,9 +75,15 @@ class FCMService : FirebaseMessagingService() {
         val title: String? = remoteMessage.notification?.title
         val chatID: Int =
             Integer.valueOf(remoteMessage.data[AppConstants.FIREBASE_CHAT_ID].toString())
+
         logE("chatId: $chatID")
         var intent = Intent(this, SplashActivity::class.java)
         if (isAppRunning(this, packageName)) {
+            val msgId = remoteMessage.data["id"].toString()
+            val callerID = remoteMessage.data["sender_id"].toString()
+            val image = remoteMessage.data["profile_image"].toString()
+
+            logE("FCM data: sender_id$callerID masgId:$msgId profile_image:$image")
             intent = Intent(this, ChatDetailActivity::class.java)
             intent.putExtra(AppConstants.IS_FROM_OUTSIDE, false)
             intent.putExtra(AppConstants.CHAT_ID, chatID)
@@ -86,6 +92,10 @@ class FCMService : FirebaseMessagingService() {
                 remoteMessage.data[AppConstants.SENDER_NAME]
             )
             intent.putExtra(AppConstants.IS_CHATID_AVAILABLE, true)
+//            intent.putExtra(AppConstants.MSG_ID, 0)
+            intent.putExtra(AppConstants.CALLER_USER_ID, callerID.toInt())
+            intent.putExtra(AppConstants.CHAT_USER_PICTURE, image)
+
         }
         val notificationType = "Kalam Messages"
 

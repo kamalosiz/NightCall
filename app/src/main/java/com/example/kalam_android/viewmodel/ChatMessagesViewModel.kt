@@ -40,6 +40,39 @@ class ChatMessagesViewModel @Inject constructor(
         )
     }
 
+    fun updateItemToDB(
+        unix_time: String,
+        message: String,
+        uid: Int,
+        unReadcount: Int,
+        sender_id: Int?,
+        isRead: Int?
+    ) {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.updateItemToDB(unix_time, message, uid, unReadcount, sender_id, isRead)
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Chat Items inserted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
+        )
+    }
+
+    fun updateChatItemDB(uid: Int, unReadcount: Int, isRead: Int?) {
+        disposable.add(
+            Completable.fromAction {
+                localRepo.updateChatItemDB(uid, unReadcount, isRead)
+            }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    Debugger.i("testingLocal", "All Chat Items inserted")
+                }, {
+                    Debugger.i("testingLocal", "Exception while Data insertion: ${it.message}")
+                })
+        )
+    }
+
     fun addMessageToDB(list: ArrayList<ChatData>) {
         disposable.add(
             Completable.fromAction {

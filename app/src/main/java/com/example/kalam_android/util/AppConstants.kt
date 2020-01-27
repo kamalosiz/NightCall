@@ -40,6 +40,7 @@ object AppConstants {
     const val LAST_MESSAGE_SENDER_ID = "last_message_sender_id"
     const val LAST_MESSAGE_STATUS = "last_message_status"
     const val IS_NULL = "response_null_kalam"
+    const val CHAT_ID_DUMMY = "chat_id_dummy"
 
 
     //Request Code

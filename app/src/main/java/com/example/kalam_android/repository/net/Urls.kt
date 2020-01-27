@@ -8,11 +8,11 @@ class Urls {
         //        const val WEB_SOCKET_URL = "ws://192.168.0.168:9090"
 
         //Local IP
-        const val BASE_URL = "http://192.168.0.71:5000/"
+//        const val BASE_URL = "http://192.168.0.71:5000/"
 //        const val BASE_URL = "http://192.168.0.73:5000/"
 
         //Stage IP
-//        const val BASE_URL = "http://184.169.185.200:5000/"
+        const val BASE_URL = "http://184.169.185.200:5000/"
 //        const val BASE_URL = "http://184.169.185.200:6000/"
 
         //Live Ip
