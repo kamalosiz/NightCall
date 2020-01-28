@@ -20,7 +20,6 @@ class CustomWebSocketClient private constructor(
 ) :
     WebSocketClient(uri) {
 
-
     private val TAG = this.javaClass.simpleName
     private var webSocketCallback: WebSocketCallback? = null
     private var webSocketOfferCallback: WebSocketOfferCallback? = null
@@ -95,7 +94,6 @@ class CustomWebSocketClient private constructor(
                 onReadyForCall(json.getString(AppConstants.CONNECTED_USER_ID))
             }
             json.getString(AppConstants.TYPE) == AppConstants.OFFER -> {
-                logE("offer received $text")
                 if (isFromPush) {
                     isFromPush = false
                     val intent = Intent(context, MainActivity::class.java)
@@ -108,6 +106,8 @@ class CustomWebSocketClient private constructor(
                 }
             }
             else -> {
+//                Debugger.e("CallActivity", "onMessage string :$text")
+//                Debugger.e("CallActivity", "Sending Candidates")
                 webSocketCallback?.webSocketCallback(json)
             }
         }
@@ -226,7 +226,7 @@ class CustomWebSocketClient private constructor(
         }
     }
 
-    fun onNewCall(id: String,myName: String?) {
+    fun onNewCall(id: String, myName: String?) {
         try {
             val obj = JSONObject()
             obj.put("type", AppConstants.NEW_CALL)

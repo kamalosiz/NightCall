@@ -9,9 +9,9 @@
         <LinearLayout
             android:id="@+id/cvSearch"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_30sdp"
+            android:layout_height="@dimen/_31sdp"
             android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_6sdp"
             android:layout_marginEnd="@dimen/_8sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:background="@drawable/bg_audio_msg">
@@ -31,7 +31,7 @@
                 android:paddingStart="@dimen/_10sdp"
                 android:textColor="@color/black"
                 android:textColorHint="@color/black"
-                android:textSize="@dimen/_10ssp" />
+                android:textSize="@dimen/_11ssp" />
 
         </LinearLayout>
 

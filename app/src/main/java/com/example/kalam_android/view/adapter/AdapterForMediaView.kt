@@ -40,8 +40,8 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
                         context,
                         it,
                         list[position].file,
-                        R.drawable.dummy_placeholder_1,
-                        R.drawable.dummy_placeholder_1
+                        R.color.darkGrey,
+                        R.color.darkGrey
                     )
                 }
             }
@@ -55,8 +55,8 @@ class AdapterForMediaView(val context: Context, var list: ArrayList<MediaList>) 
                         context,
                         it,
                         list[position].file,
-                        R.drawable.dummy_placeholder_1,
-                        R.drawable.dummy_placeholder_1
+                        R.color.darkGrey,
+                        R.color.darkGrey
                     )
                 }
                 binding.viewVideoHolder.rlVideo.setOnClickListener {

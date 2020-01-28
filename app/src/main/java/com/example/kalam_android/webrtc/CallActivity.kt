@@ -111,7 +111,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
     }
 
     private fun initialization() {
-        isVideo = intent.getBooleanExtra("isVideoCall", false)
+        isVideo = intent.getBooleanExtra(AppConstants.IS_VIDEO_CALL, false)
         rootEglBase = EglBase.create()
         initViews(isVideo)
         binding.ibHangUp.setOnClickListener(this)
@@ -173,25 +173,28 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
              .builder("stun:stun.l.google.com:19302")
              .createIceServer()
          peerIceServers.add(stunIceServer)*/
-       /* val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
+        val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
             .setUsername("webrtc@live.com")
             .setPassword("muazkh")
-            .createIceServer()*/
-        val turnIceServer = PeerConnection.IceServer.builder("stun:52.53.151.191:3478")
-            .setUsername("softech")
-            .setPassword("Kalaam2020")
             .createIceServer()
         peerIceServers.add(turnIceServer)
-        val turnIceServer1 = PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=udp")
-            .setUsername("softech")
-            .setPassword("Kalaam2020")
-            .createIceServer()
-        peerIceServers.add(turnIceServer1)
-        val turnIceServer2 = PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=tcp")
-            .setUsername("softech")
-            .setPassword("Kalaam2020")
-            .createIceServer()
-        peerIceServers.add(turnIceServer2)
+        /* val turnIceServer = PeerConnection.IceServer.builder("stun:52.53.151.191:3478")
+             .setUsername("softech")
+             .setPassword("Kalaam2020")
+             .createIceServer()
+         peerIceServers.add(turnIceServer)
+         val turnIceServer1 =
+             PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=udp")
+                 .setUsername("softech")
+                 .setPassword("Kalaam2020")
+                 .createIceServer()
+         peerIceServers.add(turnIceServer1)
+         val turnIceServer2 =
+             PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=tcp")
+                 .setUsername("softech")
+                 .setPassword("Kalaam2020")
+                 .createIceServer()
+         peerIceServers.add(turnIceServer2)*/
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
             .createInitializationOptions()
         PeerConnectionFactory.initialize(initializationOptions)
@@ -231,15 +234,16 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             binding.ibAnswer.visibility = View.GONE
-            binding.tvCallStatus.text = "Calling"
-            webSocketClient?.onNewCall(callerID.toString(),myName)
+            binding.tvCallStatus.text = "Calling..."
+            webSocketClient?.onNewCall(callerID.toString(), myName)
 
         } else {
+            logE("is initiator False")
             val json = intent.getStringExtra(AppConstants.JSON)
             ringtune?.play()
             val data = JSONObject(json)
             newCallReceived(data)
-            binding.tvCallStatus.text = "Incoming"
+            binding.tvCallStatus.text = "Incoming..."
         }
         if (isVideo) {
             setCallerProfile(true)
@@ -249,8 +253,10 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
     }
 
     private fun newCallReceived(data: JSONObject) {
+        logE("newCallReceived")
         val offer = JSONObject(data.getString("offer"))
         callerID = data.getString(AppConstants.CONNECTED_USER_ID).toInt()
+        logE("callerID :$callerID")
         createPeerConnection()
         localPeer?.setRemoteDescription(
             CustomSdpObserver("localSetRemote"),
@@ -569,6 +575,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
         builder1.setMessage("Do you really want to end this call?")
         builder1.setCancelable(true)
         builder1.setPositiveButton("Yes") { dialog, id ->
+            dialog.cancel()
             hangup()
             webSocketClient?.onHangout(callerID.toString())
         }
@@ -586,6 +593,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
         runOnUiThread {
             when (jsonObject.getString(AppConstants.TYPE)) {
                 AppConstants.CANDIDATE -> {
+//                    logE("webSocketCallback CANDIDATE")
                     saveIceCandidates(jsonObject)
                 }
                 AppConstants.ANSWER -> {
@@ -595,10 +603,9 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                     hangup()
                 }
                 AppConstants.READY_FOR_CALL -> {
-                    logE("did readyForCall received $jsonObject")
                     createPeerConnection()
                     doCall()
-                    binding.tvCallStatus.text = "Ringing"
+                    binding.tvCallStatus.text = "Ringing..."
                     if (isVideo) {
                         turnOnSpeakers()
                     }

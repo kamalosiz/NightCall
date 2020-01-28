@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:gravity="center_horizontal"
-                android:minEms="5"
+                android:minEms="4"
                 android:paddingStart="@dimen/_10sdp"
                 android:paddingTop="@dimen/_6sdp"
                 android:paddingEnd="@dimen/_10sdp"

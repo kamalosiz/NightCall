@@ -63,7 +63,7 @@ class AdapterSelectedMedia(val context: Context, val list: ArrayList<MediaList>)
                 holder.binding.selectedImagesHolder.ivSelectedImages.let {
                     Glide.with(context)
                         .load(list[position].file)
-                        .placeholder(R.drawable.dummy_placeholder_1)
+                        .placeholder(R.color.darkGrey)
                         .into(it)
                 }
 
@@ -83,7 +83,7 @@ class AdapterSelectedMedia(val context: Context, val list: ArrayList<MediaList>)
                 holder.binding.selectedVideoHolder.ivImage.let {
                     Glide.with(context)
                         .load(list[position].file)
-                        .placeholder(R.drawable.dummy_placeholder_1)
+                        .placeholder(R.color.darkGrey)
                         .into(it)
                 }
                 holder.binding.selectedVideoHolder.ivImage.setOnClickListener {

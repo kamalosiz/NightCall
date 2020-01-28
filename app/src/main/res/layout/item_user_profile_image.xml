@@ -16,7 +16,6 @@
             android:layout_centerHorizontal="true"
             android:layout_margin="@dimen/_3sdp"
             android:scaleType="centerCrop"
-            android:src="@drawable/dummy_placeholder_1"
             android:transitionName="@string/trans_key"
             android:contentDescription="TODO" />
 

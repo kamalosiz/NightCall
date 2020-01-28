@@ -45,7 +45,7 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
         binding = DataBindingUtil.setContentView(this, R.layout.activity_status_detail)
 
         sliderItem = ArrayList()
-        sliderItem.add(ImageModel(R.drawable.image_sample_1))
+//        sliderItem.add(ImageModel(R.drawable.image_sample_1))
         sliderItem.add(ImageModel(R.drawable.image_sample_2))
         sliderItem.add(ImageModel(R.drawable.image_sample_3))
         sliderItem.add(ImageModel(R.drawable.image_sample_4))
