@@ -184,7 +184,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
                     )
                 }
                 1 -> {
-                    
+
                 }
             }
         }
