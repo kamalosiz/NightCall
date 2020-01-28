@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -20,6 +21,7 @@ import com.example.kalam_android.helper.EditItemTouchHelperCallback
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForMediaView
 import com.example.kalam_android.view.adapter.AdapterSelectedMedia
 import java.util.*
@@ -131,10 +133,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
                 finish()
             }
             R.id.llAudio -> {
-                startActivityForResult(
-                    Intent(this, AudioFileActivity::class.java),
-                    AppConstants.SELECT_AUDIO
-                )
+                showDialog()
             }
         }
     }
@@ -169,6 +168,30 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
         list!!.remove(mediaList)
         adapterForSelectedMedia.notifyDataSetChanged()
         adapterForMediaView.notifyDataSetChanged()
+    }
+
+    private fun showDialog() {
+        val pictureDialog = AlertDialog.Builder(this)
+        pictureDialog.setTitle("Select Action")
+        val pictureDialogItems = arrayOf("Select Audio", "Voice Recording")
+        pictureDialog.setItems(pictureDialogItems
+        ) { dialog, which ->
+            when (which) {
+                0 -> {
+                    startActivityForResult(
+                            Intent(this, AudioFileActivity::class.java),
+                            AppConstants.SELECT_AUDIO
+                    )
+                }
+                1 -> {
+                    startActivityForResult(
+                            Intent(this, VoiceRecordingActivity::class.java),
+                            AppConstants.SELECT_AUDIO
+                    )
+                }
+            }
+        }
+        pictureDialog.show()
     }
 
 

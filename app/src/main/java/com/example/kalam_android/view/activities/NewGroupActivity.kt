@@ -15,20 +15,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityNewGroupBinding
-import com.example.kalam_android.view.adapter.AdapterForContacts
 import com.example.kalam_android.view.adapter.AdapterForNewGroupContact
 import android.widget.PopupMenu
 import com.example.kalam_android.callbacks.OnClickNewGroupContact
-import com.example.kalam_android.databinding.ItemForNewGroupContactListBinding
 import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.util.AppConstants
-import kotlinx.android.synthetic.main.item_for_new_group_contact_list.view.*
+import com.example.kalam_android.util.toast
 
 class NewGroupActivity : AppCompatActivity(), OnClickNewGroupContact {
     private lateinit var binding: ActivityNewGroupBinding
     private lateinit var adapterForNewGroupContact: AdapterForNewGroupContact
-    private var selectedContactList : ArrayList<ContactsData> = ArrayList()
+    private var selectedContactList: ArrayList<ContactsData> = ArrayList()
     private var searchView: SearchView? = null
+    private var groupName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +36,15 @@ class NewGroupActivity : AppCompatActivity(), OnClickNewGroupContact {
         setAdapter()
         setToolbar()
         getIntentData()
+        binding.ivCreateGroup.setOnClickListener {
+            if (groupName == "") {
+                toast("Enter group name")
+            } else if (selectedContactList.size == 0) {
+                toast("Select Contact")
+            } else {
+
+            }
+        }
     }
 
     private fun getIntentData() {
@@ -93,14 +101,17 @@ class NewGroupActivity : AppCompatActivity(), OnClickNewGroupContact {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onClickGroupContact(binding: ItemForNewGroupContactListBinding, groupTitle: String, contact: ContactsData) {
-        if (binding.ivSelectContact.visibility == View.GONE) {
-            binding.ivSelectContact.visibility == View.VISIBLE
-            selectedContactList.add(contact)
-        } else {
-            binding.ivSelectContact.visibility == View.GONE
-            selectedContactList.remove(contact)
-        }
+    override fun addToList(contact: ContactsData) {
+        selectedContactList.add(contact)
+
+    }
+
+    override fun removeToList(contact: ContactsData) {
+        selectedContactList.remove(contact)
+    }
+
+    override fun groupName(groupTitle: String) {
+        groupName = groupTitle
     }
 
 

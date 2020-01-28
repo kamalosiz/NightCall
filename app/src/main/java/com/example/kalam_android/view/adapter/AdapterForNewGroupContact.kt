@@ -1,6 +1,8 @@
 package com.example.kalam_android.view.adapter
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +19,13 @@ import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.wrapper.GlideDownloader
 
-class AdapterForNewGroupContact(val context: Context,val onClickNewGroupContact : OnClickNewGroupContact) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
+class AdapterForNewGroupContact(val context: Context, val onClickNewGroupContact: OnClickNewGroupContact) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     private val VIEW_HEADER = 0
     private val VIEW_ITEM = 1
     private var list: ArrayList<ContactsData>? = null
     private var contactList2: ArrayList<ContactsData>? = null
     private var contactsFilteredList: ArrayList<ContactsData>? = null
-    private var groupTitle =""
+    private var groupTitle = ""
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_HEADER) {
             NewGroupNameViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_for_add_group_name, parent, false))
@@ -42,6 +44,20 @@ class AdapterForNewGroupContact(val context: Context,val onClickNewGroupContact 
             VIEW_HEADER -> {
                 val itemViewHolder = holder as NewGroupNameViewHolder
                 groupTitle = itemViewHolder.binding.etGroupName.text.toString()
+                itemViewHolder.binding.etGroupName.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(p0: Editable?) {
+                        groupTitle = p0.toString()
+                        onClickNewGroupContact.groupName(groupTitle)
+                    }
+
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                        groupTitle = p0.toString()
+                        onClickNewGroupContact.groupName(groupTitle)
+                    }
+                })
             }
             VIEW_ITEM -> {
                 val itemViewHolder = holder as NewGroupContactViewHolder
@@ -50,8 +66,15 @@ class AdapterForNewGroupContact(val context: Context,val onClickNewGroupContact 
                 GlideDownloader.load(context, itemViewHolder.binding.ivContactImage, list!![position - 1].profile_image, 0, R.drawable.dummy_placeholder)
 
                 itemViewHolder.itemView.setOnClickListener {
-//                        itemViewHolder.binding.ivSelectContact.visibility = View.VISIBLE
-                    list?.get(position-1)?.let { it1 -> onClickNewGroupContact.onClickGroupContact(itemViewHolder.binding,groupTitle, it1) }
+                    if (itemViewHolder.binding.ivSelectContact.visibility == View.GONE) {
+                        itemViewHolder.binding.ivSelectContact.visibility = View.VISIBLE
+                        itemViewHolder.binding.llSelectContact.setBackgroundResource(R.color.audio_send_background)
+                        onClickNewGroupContact.addToList(list?.get(position - 1)!!)
+                    } else {
+                        itemViewHolder.binding.ivSelectContact.visibility = View.GONE
+                        itemViewHolder.binding.llSelectContact.setBackgroundResource(0)
+                        onClickNewGroupContact.removeToList(list?.get(position - 1)!!)
+                    }
                 }
             }
         }
