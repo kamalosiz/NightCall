@@ -184,10 +184,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
                     )
                 }
                 1 -> {
-                    startActivityForResult(
-                            Intent(this, VoiceRecordingActivity::class.java),
-                            AppConstants.SELECT_AUDIO
-                    )
+                    
                 }
             }
         }

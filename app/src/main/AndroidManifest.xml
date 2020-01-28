@@ -27,7 +27,6 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
-        <activity android:name=".view.activities.VoiceRecordingActivity"></activity>
         <activity
             android:name=".view.activities.NewGroupActivity"
             android:screenOrientation="portrait" />
@@ -59,11 +58,6 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/app_name" />
 
-        <activity
-            android:name=".webrtc.AudioCallActivity"
-            android:excludeFromRecents="true"
-            android:screenOrientation="portrait"
-            android:showOnLockScreen="true" />
         <activity
             android:name=".webrtc.CallActivity"
             android:screenOrientation="portrait"
