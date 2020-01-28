@@ -88,7 +88,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var lastMessageSenderID = 0
     private var lastMessageStatus = 0
 
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,7 +132,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         isChatIdAvailable = intent.getBooleanExtra(AppConstants.IS_CHATID_AVAILABLE, false)
         chatId = intent.getIntExtra(AppConstants.CHAT_ID, 0)
         lastMsgID = intent.getLongExtra(AppConstants.MSG_ID, 0)
-//        logE("lastMessage ID : $lastMsgID")
         fromSearch = intent.getIntExtra(AppConstants.FROM_SEARCH, 0)
         userRealName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
         profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
@@ -242,11 +240,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun setUserData() {
-        logE("Setting User Data")
-        logE("profileImage : $profileImage")
-        logE("callerID : $callerID")
-        logE("lastMsgID : $lastMsgID")
-        logE("userRealName : $userRealName")
         binding.header.tvName.text = userRealName
         GlideDownloader.load(
             this,
@@ -545,7 +538,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         intent.putExtra(AppConstants.CHAT_USER_NAME, userRealName)
         intent.putExtra(AppConstants.GET_MY_NICKNAME, myName)
         intent.putExtra(AppConstants.CHAT_USER_PICTURE, profileImage)
-        intent.putExtra("isVideoCall", isVideo)
+        intent.putExtra(AppConstants.IS_VIDEO_CALL, isVideo)
         startActivity(intent)
         overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
     }
@@ -752,8 +745,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (chatId1.toInt() == chatId) {
             runOnUiThread {
                 if (isTyping) {
-                    val user = jsonObject.getInt("user_id")
-                    if (user == callerID) {
+                    val userId = jsonObject.getInt("user_id")
+                    if (userId == callerID) {
                         binding.header.tvTyping.text = "Typing..."
                     }
                 } else {
@@ -789,9 +782,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             if (list[0] == "over" && binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
             ) {
                 sendMessage()
-            } else {
-//                binding.lvBottomChat.editTextMessage.setText(list[0])
-//                binding.lvBottomChat.editTextMessage.setSelection(binding.lvBottomChat.editTextMessage.length())
             }
         }
     }

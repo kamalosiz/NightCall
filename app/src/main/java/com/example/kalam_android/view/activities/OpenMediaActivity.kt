@@ -69,9 +69,6 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
         profile = intent.getStringExtra(AppConstants.PROFILE_IMAGE_KEY)
         binding.rlBack.setOnClickListener(this)
         binding.llProfile.setOnClickListener(this)
-//        binding.header.ivAudio.visibility = View.GONE
-//        binding.header.ivMore.visibility = View.GONE
-//        binding.header.ivVideo.visibility = View.GONE
         GlideDownloader.load(
                 this,
                 binding.ivProfileImage,

@@ -260,7 +260,7 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     ) {
         val intent = Intent(this, mClass)
         intent.putExtra(AppConstants.JSON, jsonObject.toString())
-        intent.putExtra("isVideoCall", isVideo)
+        intent.putExtra(AppConstants.IS_VIDEO_CALL, isVideo)
         if (isFromPush) {
 //            startActivityForResult(intent, AppConstants.CODE_FROM_PUSH)
             startActivity(intent)

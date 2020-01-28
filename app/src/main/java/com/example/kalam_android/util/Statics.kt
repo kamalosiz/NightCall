@@ -219,7 +219,7 @@ fun showAlertDialog(context: Context, title: String, message: String) {
     builder1.create().show()
 }
 
-fun getReadableFileSize(size: Long): String {
+/*fun getReadableFileSize(size: Long): String {
     if (size <= 0) {
         return "0"
     }
@@ -228,7 +228,7 @@ fun getReadableFileSize(size: Long): String {
     return DecimalFormat("#,##0.#").format(
         size / 1024.0.pow(digitGroups.toDouble())
     ) + " " + units[digitGroups]
-}
+}*/
 
 /*fun getFileSizeInBytes(selectedPath: String): Int {
     val file = File(selectedPath)

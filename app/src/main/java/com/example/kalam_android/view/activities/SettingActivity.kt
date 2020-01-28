@@ -69,6 +69,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 val sharedPrefsHelper = getSharedPreferences("kalam-prefs", Context.MODE_PRIVATE)
                 val editor = sharedPrefsHelper.edit()
                 editor.clear().apply()
+                viewModel.deleteAllChats()
                 toast("Logout Successfully")
                 setResult(Activity.RESULT_OK)
                 finish()

@@ -6,9 +6,16 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowDisablePreview">true</item>
         <item name="android:textCursorDrawable">@null</item>
+        <item name="android:windowDisablePreview">true</item>
         <item name="android:windowContentTransitions">true</item>
+    </style>
+
+    <style name="SplashActivity" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@drawable/splash_dummy_bg</item>
     </style>
 
     <style name="Dexter.Internal.Theme.Transparent" parent="android:Theme">

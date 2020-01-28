@@ -27,7 +27,6 @@ import kotlinx.android.synthetic.main.gallery_image_item.view.*
 
 class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
 
-    var allPermissionsGranted = false
     var pictureCounter = 0
     private val TAG = this.javaClass.simpleName
 
@@ -50,7 +49,7 @@ class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()) {
                     initImageFetcher()
-                }else{
+                } else {
                     Toast.makeText(
                         applicationContext,
                         "Permission required to use gallery storage",
@@ -69,15 +68,13 @@ class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
         }).check()
     }
 
-//    lateinit var mediaOptions: ArrayList<GalleryImageModel>
-
     private fun initImageFetcher() {
 
         val imageFetcher = @SuppressLint("StaticFieldLeak")
         object : ImageFetcher(this) {
             override fun onPostExecute(paths: ArrayList<MediaList>) {
                 super.onPostExecute(paths)
-                var mediaOptions = ArrayList<MediaList>()
+                val mediaOptions = ArrayList<MediaList>()
 
                 mediaOptions.addAll(paths)
                 setList(mediaOptions)
@@ -107,18 +104,13 @@ class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
         view: View,
         position: Int
     ) {
-
-        logE("onGalleryItemClicked : position: $position")
-
         if (!tempList.contains(MediaList(list[position].file, list[position].type))) {
             view.setBackgroundColor(resources.getColor(R.color.grey))
             if (pictureCounter < list.size) {
                 pictureCounter++
             }
             view.rlSelectedImageCounter?.visibility = View.VISIBLE
-//            view.rlSelectedImageCounter?.visibility = pictureCounter.toString()
             highLightList.add(position)
-            logE("onGalleryItzemClicked : highlight position: ${highLightList[highLightList.size - 1]}")
             tempList.add(MediaList(list[position].file, list[position].type))
         } else {
             highLightList.remove(position)
@@ -127,36 +119,24 @@ class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
                 pictureCounter--
             }
             view.rlSelectedImageCounter?.visibility = View.GONE
-//            view.tvSelectedImageCounter?.text = ""
             highLightList.remove(position)
             tempList.remove(MediaList(list[position].file, list[position].type))
         }
         if (tempList.size == 0) {
             tvHeaderTitle.text = "Gallery"
             rlDone.isClickable = false
-//            tvDone.setTextColor(Color.parseColor("#999999"))
         } else {
             tvHeaderTitle.text = "Gallery (${tempList.size})"
             rlDone.isClickable = true
-//            tvDone.setTextColor(Color.BLUE)
         }
     }
 
-    fun rlCameraAction(view: View) {
-
-    }
-
     fun rlBackAction(view: View) {
-
         onBackPressed()
-//        finish()
-//        ChatDetailActivity.setGallery = false
     }
 
     fun rlDoneAction(view: View) {
         if (tempList.size > 0) {
-//            ChatDetailActivity.itemList.addAll(tempList)
-//            ChatDetailActivity.setGallery = true
             val intent = Intent()
             intent.putExtra(AppConstants.SELECTED_IMAGES_VIDEOS, tempList)
             setResult(Activity.RESULT_OK, intent)
@@ -167,7 +147,6 @@ class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
     override fun onBackPressed() {
         setResult(Activity.RESULT_OK)
         finish()
-//        ChatDetailActivity.setGallery = false
     }
 
     private fun logE(msg: String) {

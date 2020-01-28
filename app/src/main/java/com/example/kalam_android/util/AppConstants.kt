@@ -20,9 +20,6 @@ object AppConstants {
     const val VIDEO_MESSAGE = "video"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
-    const val LAST_MESSAGE = "lastmessage"
-    const val LAST_MESSAGE_TIME = "lastmsgtime"
-    const val IsSEEN = "isseen"
     const val CHAT_FILE = "chatfile"
     const val CHAT_TYPE = "chattype"
     const val SELECTED_IMAGES_VIDEOS = "selected_images_videos"
@@ -37,10 +34,7 @@ object AppConstants {
     const val SENDER_NAME = "sender_name"
     const val USER_DATA = "user_data"
     const val KALAM_CONTACT_LIST = "kalam_contact_list"
-    const val LAST_MESSAGE_SENDER_ID = "last_message_sender_id"
-    const val LAST_MESSAGE_STATUS = "last_message_status"
     const val IS_NULL = "response_null_kalam"
-    const val CHAT_ID_DUMMY = "chat_id_dummy"
 
 
     //Request Code
@@ -75,6 +69,8 @@ object AppConstants {
     const val GET_MY_NICKNAME = "get_my_nickname"
     const val CHECK_USER_STATUS = "check_user_status"
     const val GET_ALL_USER_STATUS = "get_all_user_status"
+    const val JSON = "webrtc_json"
+    const val IS_VIDEO_CALL = "isVideoCall"
 
     //WebRtc WebSockets
     const val CANDIDATE = "candidate"
@@ -83,14 +79,10 @@ object AppConstants {
     const val LOGIN = "login"
     const val TYPE = "type"
     const val REJECT = "reject"
-
-
-    const val AVAILABLE = "available"
     const val READY_FOR_CALL = "readyforcall"
+
+
     const val NEW_CALL = "newcall"
-
-
-    const val JSON = "webrtc_json"
 
     //Listeners
     const val MESSAGE_TYPING = "message_typing"

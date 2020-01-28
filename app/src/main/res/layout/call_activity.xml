@@ -26,11 +26,17 @@
                 android:layout_alignParentBottom="true" />
         </RelativeLayout>
 
+        <ImageView
+            android:id="@+id/ivUserAudio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
         <LinearLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/theme_color"
+            android:background="@color/call_color"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible">
@@ -99,38 +105,28 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/ivUserAudio"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/header"
-            android:background="@color/grey"
-            android:scaleType="centerCrop" />
-
         <!--Bottom Buttons-->
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/rlBottomCalls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/_30sdp"
+            android:layout_marginBottom="@dimen/_40sdp"
             android:gravity="center">
 
             <ImageButton
                 android:id="@+id/ibAnswer"
                 android:layout_width="@dimen/_45sdp"
                 android:layout_height="@dimen/_45sdp"
-                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_160sdp"
                 android:background="@drawable/call_receive" />
 
             <ImageButton
                 android:id="@+id/ibHangUp"
                 android:layout_width="@dimen/_45sdp"
                 android:layout_height="@dimen/_45sdp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="@dimen/_10sdp"
                 android:background="@drawable/call_cancel" />
 
-        </RelativeLayout>
+        </LinearLayout>
     </RelativeLayout>
 </layout>

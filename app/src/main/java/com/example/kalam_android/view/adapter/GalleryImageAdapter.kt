@@ -48,10 +48,10 @@ class GalleryImageAdapter(
                 .into(it)
         }
 
-        holder.itemView.setOnClickListener(View.OnClickListener {
+        holder.itemView.setOnClickListener {
             Log.i("onGalleryItemClicked", "clicked at position $position")
             listener.onGalleryItemClicked(list, holder.itemView, position)
-        })
+        }
     }
 
     override fun getItemViewType(position: Int): Int {

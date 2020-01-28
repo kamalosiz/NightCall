@@ -1,5 +1,7 @@
 package com.example.kalam_android.helper
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -7,12 +9,15 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import com.example.kalam_android.callbacks.ResultVoiceToText
+import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.toast
 import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
 
 class MyVoiceToTextHelper(val context: Activity, private val resultVoiceToText: ResultVoiceToText) :
@@ -21,26 +26,47 @@ class MyVoiceToTextHelper(val context: Activity, private val resultVoiceToText: 
     private var speech: SpeechRecognizer? = null
     private var recognizerIntent: Intent? = null
 
+    /*    fun checkPermissionForVoiceToText() {
+            Dexter.withActivity(context)
+                .withPermission(Manifest.permission.RECORD_AUDIO)
+                .withListener(object : PermissionListener {
+                    override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                        initVoiceToText()
+                    }
+
+                    override fun onPermissionRationaleShouldBeShown(
+                        permission: PermissionRequest?,
+                        token: PermissionToken?
+                    ) {
+                        token?.continuePermissionRequest()
+                    }
+
+                    override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                        response?.requestedPermission
+                    }
+
+                }).onSameThread().check()
+        }*/
+    @SuppressLint("CheckResult")
     fun checkPermissionForVoiceToText() {
-        Dexter.withActivity(context)
-            .withPermission(android.Manifest.permission.RECORD_AUDIO)
-            .withListener(object : PermissionListener {
-                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+        Dexter.withActivity(context).withPermissions(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report!!.areAllPermissionsGranted()) {
                     initVoiceToText()
                 }
+            }
 
-                override fun onPermissionRationaleShouldBeShown(
-                    permission: PermissionRequest?,
-                    token: PermissionToken?
-                ) {
-                    token?.continuePermissionRequest()
-                }
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+                token?.continuePermissionRequest()
+            }
 
-                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
-                    response?.requestedPermission
-                }
-
-            }).onSameThread().check()
+        }).check()
     }
 
     private fun initVoiceToText() {

@@ -17,10 +17,12 @@ import com.example.kalam_android.repository.model.LoginResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.showAlertDialog
 import com.example.kalam_android.util.toast
 import com.example.kalam_android.viewmodel.ForgetPasswordViewModel
 import com.example.kalam_android.viewmodel.LoginViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 
 class ResetPasswordActivity : BaseActivity(), View.OnClickListener {
@@ -90,17 +92,5 @@ class ResetPasswordActivity : BaseActivity(), View.OnClickListener {
                 finish()
             }
         }
-    }
-
-    private fun showAlertDialog(context: Context, title: String, message: String) {
-        val builder1 = AlertDialog.Builder(context)
-        builder1.setTitle(title)
-        builder1.setMessage(message)
-        builder1.setCancelable(true)
-        builder1.setPositiveButton("Okay") { dialog, id ->
-            dialog.cancel()
-            finish()
-        }
-        builder1.create().show()
     }
 }

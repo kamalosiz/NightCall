@@ -24,19 +24,15 @@ class SplashActivity : BaseActivity() {
         setContentView(R.layout.activity_splash)
         MyApplication.getAppComponent(this).doInjection(this)
         val chatId = intent.getStringExtra("chat_id")
-        logE("Chat ID starting: $chatId")
         val name = intent.getStringExtra("sender_name")
         val senderId = intent.getStringExtra("sender_id")?.toInt()
         val msgId = intent.getStringExtra("id")?.toLong()
         val profileImage = intent.getStringExtra("profile_image")
 
-        logE("SplashActivity data: sender_id$senderId masgId:$msgId profile_image:$profileImage")
-
         var intent = Intent(this, LoginActivity::class.java)
         if (sharedPrefsHelper.isLoggedIn()) {
             intent = Intent(this, MainActivity::class.java)
             if (chatId?.isNotEmpty() == true) {
-                logE("chatId is not empty in splash")
                 intent.putExtra(AppConstants.CHAT_ID, chatId.toInt())
                 intent.putExtra(AppConstants.IS_FROM_OUTSIDE, true)
                 intent.putExtra(AppConstants.CHAT_USER_NAME, name)
@@ -54,7 +50,7 @@ class SplashActivity : BaseActivity() {
         Handler().postDelayed({
             startActivity(intent)
             finish()
-        }, 2000)
+        }, 1000)
     }
 
     override fun onResume() {

@@ -10,10 +10,10 @@
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/rlBack"
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_8sdp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:gravity="center">
 
@@ -21,29 +21,29 @@
                 android:layout_width="@dimen/_16sdp"
                 android:layout_height="@dimen/_16sdp"
                 app:srcCompat="@drawable/icon_back" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ivProfileImage"
+                android:layout_width="@dimen/_27sdp"
+                android:layout_height="@dimen/_27sdp"
+                android:layout_marginLeft="@dimen/_2sdp"
+                android:transitionName="@string/profile_trans" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/llProfile"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:background="?attr/selectableItemBackground"
             android:layout_toStartOf="@+id/llCalls"
-            android:layout_toEndOf="@+id/rlBack">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/ivProfileImage"
-                android:layout_width="@dimen/_32sdp"
-                android:layout_height="@dimen/_32sdp"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:transitionName="@string/profile_trans" />
+            android:layout_toEndOf="@+id/rlBack"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/rlName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -51,7 +51,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
                     android:singleLine="true"
                     android:text="Waqar Mustafa"
                     android:textColor="@color/white"
@@ -64,9 +63,10 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_medium"
                     android:singleLine="true"
-                    android:text="away"
+                    android:text="Away"
+                    android:paddingBottom="@dimen/_3sdp"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_10ssp" />
+                    android:textSize="@dimen/_9ssp" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -75,10 +75,10 @@
             android:id="@+id/llCalls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_20sdp"
-            android:gravity="center"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true">
+            android:layout_marginStart="@dimen/_20sdp"
+            android:gravity="center">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivAudio"
