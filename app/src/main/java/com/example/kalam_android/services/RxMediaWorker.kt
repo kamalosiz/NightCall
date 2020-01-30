@@ -5,12 +5,16 @@ import androidx.work.RxWorker
 import androidx.work.WorkerParameters
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.repository.Repository
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.wrapper.SocketIO
+import com.github.nkzawa.socketio.client.Ack
+import com.google.gson.JsonObject
 import io.reactivex.Single
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.json.JSONObject
 import java.io.File
 import javax.inject.Inject
 
@@ -22,6 +26,7 @@ class RxMediaWorker(
 
     @Inject
     lateinit var repository: Repository
+    var isSocketConnected = false
 
     override fun createWork(): Single<Result> {
         MyApplication.getAppComponent(ctx).doInjection(this)
@@ -64,11 +69,13 @@ class RxMediaWorker(
             if (SocketIO.getInstance().socket == null) {
                 Debugger.e("WorkManagerMedia", "Socket is not connected")
                 SocketIO.getInstance().connectSocket(token)
+                isSocketConnected = false
             } else {
+                isSocketConnected = true
                 Debugger.e("WorkManagerMedia", "Socket is connected")
             }
             it.data?.let { list ->
-                SocketIO.getInstance().emitNewMessage(
+                emitNewMessage(
                     id.toString(),
                     chatId.toString(),
                     list[0].type.toString(),
@@ -86,5 +93,44 @@ class RxMediaWorker(
         }
             .map { Result.success() }
             .onErrorReturn { Result.retry() }
+    }
+
+    private fun emitNewMessage(
+        id: String,
+        chatID: String,
+        message: String,
+        type: String,
+        senderName: String,
+        fileID: String,
+        duration: Long,
+        thumbnail: String,
+        identifier: String,
+        language: String,
+        groupID: String,
+        profileImage: String
+    ) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("user_id", id)
+        jsonObject.addProperty("chat_id", chatID)
+        jsonObject.addProperty("message", message)
+        jsonObject.addProperty("mType", type)
+        jsonObject.addProperty("sender_name", senderName)
+        jsonObject.addProperty("file_id", fileID)
+        jsonObject.addProperty("duration", duration)
+        jsonObject.addProperty("thumbnail", thumbnail)
+        jsonObject.addProperty("identifier", identifier)
+        jsonObject.addProperty("language", language)
+        jsonObject.addProperty("group_id", groupID)
+        jsonObject.addProperty("profile_image", profileImage)
+        jsonObject.addProperty("is_group", 0)
+        SocketIO.getInstance().socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
+            val json = it[0] as JSONObject
+            if (isSocketConnected)
+                SocketIO.getInstance().socketCallback?.socketResponse(
+                    json,
+                    AppConstants.SEND_MESSAGE
+                )
+            else SocketIO.getInstance().socket?.disconnect()
+        })
     }
 }

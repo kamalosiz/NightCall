@@ -41,13 +41,14 @@ class AdapterForContacts(val context: Context) :
 
     fun updateList(listOfContact: ArrayList<ContactsData>?) {
         contactList?.clear()
+        tempContactList.clear()
         contactList = listOfContact
         contactList?.size?.plus(1)
         contactsFilteredList = contactList
         contactList2 = contactList
-        for (i in 0 until (contactList?.size!!)) {
-            if (contactList!![i].id != 0) {
-                tempContactList.add(contactList!![i])
+        for (i in 0 until (listOfContact?.size!!)) {
+            if (listOfContact[i].id != 0) {
+                tempContactList.add(listOfContact[i])
             }
         }
         notifyDataSetChanged()

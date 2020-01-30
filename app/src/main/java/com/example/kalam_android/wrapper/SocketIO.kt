@@ -16,7 +16,7 @@ import org.json.JSONObject
 
 class SocketIO private constructor() {
     private val TAG = this.javaClass.simpleName
-    private var socketCallback: SocketCallback? = null
+    public var socketCallback: SocketCallback? = null
     private var statusCallback: StatusCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null
     var socket: Socket? = null
@@ -150,6 +150,7 @@ class SocketIO private constructor() {
         jsonObject.addProperty("language", language)
         jsonObject.addProperty("group_id", groupID)
         jsonObject.addProperty("profile_image", profileImage)
+        jsonObject.addProperty("is_group", 0)
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)
@@ -177,7 +178,6 @@ class SocketIO private constructor() {
         jsonObject.addProperty("contact_id", contactId)
         socket?.emit(AppConstants.GET_MY_NICKNAME, jsonObject, Ack {
             val json = it[0] as JSONObject
-            Debugger.e("testingSocket", "json : $json")
             socketCallback?.socketResponse(json, AppConstants.GET_MY_NICKNAME)
         })
     }
@@ -187,7 +187,6 @@ class SocketIO private constructor() {
         jsonObject.addProperty("user_id", userId)
         socket?.emit(AppConstants.CHECK_USER_STATUS, jsonObject, Ack {
             val json = it[0] as JSONObject
-            Debugger.e("testingSocket", "checkUserStatus : $json")
             socketCallback?.socketResponse(json, AppConstants.CHECK_USER_STATUS)
         })
     }
@@ -197,7 +196,6 @@ class SocketIO private constructor() {
         jsonObject.addProperty("json_obj", json.toString())
         socket?.emit(AppConstants.GET_ALL_USER_STATUS, jsonObject, Ack {
             val list = it[0] as JSONArray
-            Debugger.e("testingSocket", "checkUserStatus : $list")
             statusCallback?.onStatusCallback(list)
         })
     }
