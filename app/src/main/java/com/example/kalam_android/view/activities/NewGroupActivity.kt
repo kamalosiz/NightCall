@@ -37,20 +37,21 @@ class NewGroupActivity : AppCompatActivity(), OnClickNewGroupContact {
         setToolbar()
         getIntentData()
         binding.ivCreateGroup.setOnClickListener {
-            if (groupName == "") {
-                toast("Enter group name")
-            } else if (selectedContactList.size == 0) {
-                toast("Select Contact")
-            } else {
-
+            when {
+                groupName == "" -> {
+                    toast("Enter group name")
+                }
+                selectedContactList.size < 2 -> {
+                    toast("Select more than 2 contacts")
+                }
             }
         }
     }
 
     private fun getIntentData() {
-
         if (intent != null) {
-            val list = intent.getSerializableExtra(AppConstants.KALAM_CONTACT_LIST) as ArrayList<ContactsData>
+            val list =
+                intent.getSerializableExtra(AppConstants.KALAM_CONTACT_LIST) as ArrayList<ContactsData>
             adapterForNewGroupContact.updateList(list)
         }
     }
@@ -69,12 +70,12 @@ class NewGroupActivity : AppCompatActivity(), OnClickNewGroupContact {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        menu!!.findItem(R.id.item_more)!!.isVisible = false
+        menu?.findItem(R.id.item_more)?.isVisible = false
         searchView = menu?.findItem(R.id.action_search)
-                ?.actionView as SearchView
+            ?.actionView as SearchView
         searchView?.setSearchableInfo(
-                searchManager
-                        .getSearchableInfo(componentName)
+            searchManager
+                .getSearchableInfo(componentName)
         )
         searchView?.maxWidth = Integer.MAX_VALUE
 
@@ -96,14 +97,12 @@ class NewGroupActivity : AppCompatActivity(), OnClickNewGroupContact {
         when (item.itemId) {
             R.id.action_search -> return true
             android.R.id.home -> finish()
-
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun addToList(contact: ContactsData) {
         selectedContactList.add(contact)
-
     }
 
     override fun removeToList(contact: ContactsData) {

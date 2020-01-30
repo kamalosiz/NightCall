@@ -26,7 +26,7 @@ class MyVoiceToTextHelper(val context: Activity, private val resultVoiceToText: 
     private var speech: SpeechRecognizer? = null
     private var recognizerIntent: Intent? = null
 
-    /*    fun checkPermissionForVoiceToText() {
+        fun checkPermissionForVoiceToText() {
             Dexter.withActivity(context)
                 .withPermission(Manifest.permission.RECORD_AUDIO)
                 .withListener(object : PermissionListener {
@@ -46,8 +46,8 @@ class MyVoiceToTextHelper(val context: Activity, private val resultVoiceToText: 
                     }
 
                 }).onSameThread().check()
-        }*/
-    @SuppressLint("CheckResult")
+        }
+  /*  @SuppressLint("CheckResult")
     fun checkPermissionForVoiceToText() {
         Dexter.withActivity(context).withPermissions(
             Manifest.permission.CAMERA,
@@ -67,7 +67,7 @@ class MyVoiceToTextHelper(val context: Activity, private val resultVoiceToText: 
             }
 
         }).check()
-    }
+    }*/
 
     private fun initVoiceToText() {
 

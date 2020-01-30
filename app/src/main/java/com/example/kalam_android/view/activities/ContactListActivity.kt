@@ -210,6 +210,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
 
     private fun getAllContact(): ArrayList<ContactInfo> {
         val list: ArrayList<ContactInfo> = ArrayList()
+        val nameList: ArrayList<String> = ArrayList()
         val cursor: Cursor? = contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null,
@@ -224,10 +225,22 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                 cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
                     .trim()
 
-            if (!list.contains(ContactInfo(name, phoneNumber))) {
+            if (!nameList.contains(name)) {
+                nameList.add(name)
                 list.add(ContactInfo(name, phoneNumber))
             }
 
+            /*if (!list.contains(ContactInfo(name, phoneNumber))) {
+                if (list.size == 0) {
+                    list.add(ContactInfo(name, phoneNumber))
+                } else {
+                    for (x in list.indices) {
+                        if (name != list[x].name) {
+                            list.add(ContactInfo(name, phoneNumber))
+                        }
+                    }
+                }
+            }*/
         }
         cursor.close()
         return list
@@ -260,7 +273,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                     params["contacts"] = createContactsJson(getAllContact()).toString()
                     viewModel.getContacts(sharedPrefsHelper.getUser()?.token.toString(), params)
                 } else {
-                    Debugger.e("Capturing Image", "onPermissionDenied")
+                    Debugger.e("checkPermissions", "onPermissionDenied")
                 }
             }
 

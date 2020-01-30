@@ -343,30 +343,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 AppConstants.CHAT_FRAGMENT_CODE -> {
                     val isNull = data?.getBooleanExtra(AppConstants.IS_NULL, false)
                     if (isNull == false) {
-                        /*val isSeen = data.getBooleanExtra(AppConstants.IsSEEN, false)
-                        val isRead =
-                            data.getIntExtra(AppConstants.LAST_MESSAGE_STATUS, 0)
-                        if (isSeen) {
-                            chatList[position].un_read_count = 0
-                            chatList[position].is_read = isRead
-                            viewModel.updateChatItemDB(chatList[position].chat_id, 0, isRead)
-//                        }
-                            (binding.chatRecycler.adapter as AllChatListAdapter).updateItem(
-                                chatList, position
-                            )
-                        } else {
-                            val lastMessage = data.getStringExtra(AppConstants.LAST_MESSAGE)
-                            val lastMsgTime = data.getStringExtra(AppConstants.LAST_MESSAGE_TIME)
-                            val lastMessageSenderId =
-                                data.getIntExtra(AppConstants.LAST_MESSAGE_SENDER_ID, 0)
-                            modifyItem(
-                                position,
-                                lastMessage,
-                                lastMsgTime?.toLong(),
-                                0,
-                                lastMessageSenderId, isRead
-                            )
-                        }*/
                         viewModel.getAllchatItemFromDB()
                     }
                     logE("onActivityResult of chats Fragment is called")
@@ -440,7 +416,6 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         if (sharedPrefsHelper[AppConstants.IS_FROM_CONTACTS, 0] == 1) {
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
-//            isRefresh = true
             hitAllChatApi()
             SocketIO.getInstance().setSocketCallbackListener(this)
             logE("OnResume of Chat Fragment")
@@ -505,11 +480,12 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 val jsonObject = array.getJSONObject(i)
                 val userId = jsonObject.getInt("user_id")
                 val status = jsonObject.getInt("status")
-                if (chatList[i].user_id == userId) {
-                    (binding.chatRecycler.adapter as AllChatListAdapter).updateOnlineStatus(
-                        i, status
-                    )
-                }
+                if (chatList.size != 0)
+                    if (chatList[i].user_id == userId) {
+                        (binding.chatRecycler.adapter as AllChatListAdapter).updateOnlineStatus(
+                            i, status
+                        )
+                    }
             }
         }
     }

@@ -173,28 +173,28 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
              .builder("stun:stun.l.google.com:19302")
              .createIceServer()
          peerIceServers.add(stunIceServer)*/
-        val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
-            .setUsername("webrtc@live.com")
-            .setPassword("muazkh")
+        /* val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
+             .setUsername("webrtc@live.com")
+             .setPassword("muazkh")
+             .createIceServer()
+         peerIceServers.add(turnIceServer)*/
+        val turnIceServer = PeerConnection.IceServer.builder("stun:52.53.151.191:3478")
+            .setUsername("softech")
+            .setPassword("Kalaam2020")
             .createIceServer()
         peerIceServers.add(turnIceServer)
-        /* val turnIceServer = PeerConnection.IceServer.builder("stun:52.53.151.191:3478")
-             .setUsername("softech")
-             .setPassword("Kalaam2020")
-             .createIceServer()
-         peerIceServers.add(turnIceServer)
-         val turnIceServer1 =
-             PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=udp")
-                 .setUsername("softech")
-                 .setPassword("Kalaam2020")
-                 .createIceServer()
-         peerIceServers.add(turnIceServer1)
-         val turnIceServer2 =
-             PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=tcp")
-                 .setUsername("softech")
-                 .setPassword("Kalaam2020")
-                 .createIceServer()
-         peerIceServers.add(turnIceServer2)*/
+        val turnIceServer1 =
+            PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=udp")
+                .setUsername("softech")
+                .setPassword("Kalaam2020")
+                .createIceServer()
+        peerIceServers.add(turnIceServer1)
+        val turnIceServer2 =
+            PeerConnection.IceServer.builder("turn:52.53.151.191:3478?transport=tcp")
+                .setUsername("softech")
+                .setPassword("Kalaam2020")
+                .createIceServer()
+        peerIceServers.add(turnIceServer2)
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
             .createInitializationOptions()
         PeerConnectionFactory.initialize(initializationOptions)
@@ -395,9 +395,11 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
         sdpConstraints.mandatory.add(
             MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true")
         )
-        sdpConstraints.mandatory.add(
-            MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true")
-        )
+        if (isVideo) {
+            sdpConstraints.mandatory.add(
+                MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true")
+            )
+        }
         localPeer?.createOffer(object : CustomSdpObserver("localCreateOffer") {
             override fun onCreateSuccess(sessionDescription: SessionDescription) {
                 super.onCreateSuccess(sessionDescription)

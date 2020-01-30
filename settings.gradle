@@ -1,2 +1,4 @@
-include ':app'/*, ':videocompressor'*/
-rootProject.name='Kalam-Android'
+include ':app'
+include ':sandriosCamera'
+//include ':videocompressor'
+rootProject.name = 'Kalam-Android'
