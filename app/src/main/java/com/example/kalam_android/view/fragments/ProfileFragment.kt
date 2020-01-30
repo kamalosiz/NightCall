@@ -30,6 +30,7 @@ import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.view.activities.EditUserProfileActivity
 import com.example.kalam_android.view.adapter.AdapterForProfilePhotos
 import com.example.kalam_android.view.adapter.AdapterForProfileVideos
+import com.example.kalam_android.view.adapter.ViewPagerAdapterFragment
 import com.example.kalam_android.viewmodel.UserProfileViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloader
@@ -39,7 +40,7 @@ import kotlinx.android.synthetic.main.layout_profile_header.view.*
 import kotlinx.android.synthetic.main.layout_profile_header.view.tvName
 import javax.inject.Inject
 
-class ProfileFragment : Fragment(), View.OnClickListener {
+class ProfileFragment : Fragment() {
 
     private lateinit var binding: ProfileFragmentBinding
 
@@ -48,7 +49,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     lateinit var viewModel: UserProfileViewModel
     @Inject
     lateinit var sharedPrefsHelper: SharedPrefsHelper
-    private var list: ArrayList<ProfileData>? = null
+    private var list: ArrayList<ProfileData> = ArrayList()
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -62,30 +63,20 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         viewModel.userProfileResponse().observe(this, Observer {
             consumeApiResponse(it)
         })
-
-        onclickListener()
-        initProfileVideosRecyclerView()
-        initProfileImagesRecyclerView()
-        binding.profileHeaderView.tvOverview.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelOverview)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.profileHeaderView.tvPhotos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelPhotos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.profileHeaderView.tvVideos.text = HtmlCompat.fromHtml(
-                "<u>${getString(R.string.labelVideos)}</u>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-        )
-        binding.rvUserProfileVideos.isFocusable = false
-        binding.rvUserProfilePhotos.isFocusable = false
-        binding.nestedScroll.isFocusable = false
-
         val params = HashMap<String, String>()
         params["user_id"] = sharedPrefsHelper.getUser()?.id.toString()
         viewModel.hitUserProfile(sharedPrefsHelper.getUser()?.token!!, params)
+        onClickListener()
         return binding.root
+    }
+
+    private fun onClickListener() {
+        binding.btnEditProfile.setOnClickListener {
+
+            val intent = Intent(activity!!, EditUserProfileActivity::class.java)
+            intent.putExtra(AppConstants.USER_DATA, list)
+            startActivityForResult(intent, AppConstants.UPDATE_PROFILE)
+        }
     }
 
     private fun consumeApiResponse(response: ApiResponse<UserProfile>) {
@@ -94,7 +85,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
             Status.LOADING -> {
             }
             Status.SUCCESS -> {
-                Debugger.e("consumeApiResponse : ", "${response.data}")
+                Debugger.e("Profile Data : ", "${response.data}")
                 renderResponse(response.data?.data!!)
 
             }
@@ -112,165 +103,30 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     @SuppressLint("SetTextI18n")
     private fun renderResponse(userList: ArrayList<ProfileData>) {
-        list = userList
-        binding.profileHeaderView.tvName.text = userList[0].firstname + " " + userList[0].lastname
+        if (list.size > 0) {
+            list.clear()
+        }
+        list.addAll(userList)
+        binding.tvUsername.text = userList[0].firstname + " " + userList[0].lastname
+        binding.tvJobDescription.text = userList[0].work
         GlideDownloader.load(
                 activity?.applicationContext,
-                binding.profileHeaderView.ivProfile,
+                binding.ivProfile.ivProfile,
                 userList[0].profile_image,
                 R.color.grey,
                 R.color.grey
         )
         GlideDownloader.load(
                 activity?.applicationContext,
-                binding.profileHeaderView.ivUserProfile,
+                binding.ivUserProfile.ivUserProfile,
                 userList[0].wall_image,
                 R.color.darkGrey,
                 R.color.darkGrey
         )
-        binding.overviewView.tvEmail.text = userList[0].email
-        binding.overviewView.tvPhone.text = "+" + userList[0].country_code + userList[0].phone
-        binding.overviewView.tvAddress.text = userList[0].address
-        binding.profileHeaderView.tvLocation.text = userList[0].city + " " + userList[0].country
-        binding.overviewView.tvEducation.text = userList[0].education
-        binding.overviewView.tvFax.text = userList[0].fax
-        binding.overviewView.tvDescription.text = userList[0].bio
-        initShowMore()
-        binding.overviewView.tvWork.text = userList[0].work
-        binding.overviewView.tvWebsite.text = userList[0].website
-        binding.overviewView.tvMartialStatus.text = userList[0].martial_status
-        binding.overviewView.tvInterested.text = userList[0].intrests
+        binding.viewpager.adapter = activity?.supportFragmentManager?.let { ViewPagerAdapterFragment(it, list) }
+        binding.tabs.setupWithViewPager(binding.viewpager)
+        (binding.viewpager.adapter as ViewPagerAdapterFragment).notifyDataSetChanged()
 
-    }
-
-    private fun initProfileVideosRecyclerView() {
-
-        binding.rvUserProfileVideos.layoutManager = GridLayoutManager(activity, 4)
-        binding.rvUserProfileVideos.adapter = AdapterForProfileVideos()
-    }
-
-    private fun initProfileImagesRecyclerView() {
-
-        binding.rvUserProfilePhotos.layoutManager = GridLayoutManager(activity, 4)
-        binding.rvUserProfilePhotos.adapter = AdapterForProfilePhotos()
-    }
-
-    private fun initShowMore() {
-        binding.overviewView.tvDescription.setShowingLine(3)
-        binding.overviewView.tvDescription.addShowMoreText("Show more")
-        binding.overviewView.tvDescription.addShowLessText("Show less")
-        binding.overviewView.tvDescription.setShowLessTextColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
-        )
-        binding.overviewView.tvDescription.setShowMoreColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
-        )
-
-    }
-
-    private fun onclickListener() {
-
-        binding.profileHeaderView.tvOverview.setTextColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
-        )
-        binding.profileHeaderView.tvOverview.setOnClickListener(this)
-        binding.profileHeaderView.tvPhotos.setOnClickListener(this)
-        binding.profileHeaderView.tvVideos.setOnClickListener(this)
-        binding.btnProfileEdit.setOnClickListener(this)
-    }
-
-
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.tvOverview -> {
-                binding.profileHeaderView.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.theme_color
-                        )
-                )
-                binding.profileHeaderView.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
-                )
-                binding.profileHeaderView.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
-                )
-                binding.overviewView.visibility = View.VISIBLE
-                binding.rvUserProfilePhotos.visibility = View.GONE
-                binding.rvUserProfileVideos.visibility = View.GONE
-
-
-            }
-            R.id.tvPhotos -> {
-                binding.profileHeaderView.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
-                )
-                binding.profileHeaderView.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.theme_color
-                        )
-                )
-                binding.profileHeaderView.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
-                )
-                binding.overviewView.visibility = View.GONE
-                binding.rvUserProfilePhotos.visibility = View.VISIBLE
-                binding.rvUserProfileVideos.visibility = View.GONE
-
-            }
-            R.id.tvVideos -> {
-                binding.profileHeaderView.tvOverview.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
-                )
-                binding.profileHeaderView.tvPhotos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.black
-                        )
-                )
-                binding.profileHeaderView.tvVideos.setTextColor(
-                        ContextCompat.getColor(
-                                activity!!.applicationContext,
-                                R.color.theme_color
-                        )
-                )
-                binding.overviewView.visibility = View.GONE
-                binding.rvUserProfilePhotos.visibility = View.GONE
-                binding.rvUserProfileVideos.visibility = View.VISIBLE
-
-            }
-            R.id.btnProfileEdit -> {
-                val intent = Intent(activity, EditUserProfileActivity::class.java)
-                intent.putExtra(AppConstants.USER_DATA, list)
-                startActivityForResult(intent, AppConstants.UPDATE_PROFILE)
-            }
-
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

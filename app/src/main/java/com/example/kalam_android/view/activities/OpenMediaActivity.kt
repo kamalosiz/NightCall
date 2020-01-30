@@ -123,8 +123,8 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
             val trackSelector: TrackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
             player = ExoPlayerFactory.newSimpleInstance(
                     DefaultRenderersFactory(this),
-                    trackSelector,
-                    loadControl
+                    DefaultTrackSelector(),
+                    DefaultLoadControl()
             )
             binding.videoFullScreenPlayer.player = player
         }

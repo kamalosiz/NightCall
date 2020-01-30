@@ -27,6 +27,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_gallery_post.*
+import kotlinx.android.synthetic.main.item_chat.*
 import kotlinx.android.synthetic.main.item_for_audio.view.*
 
 class AudioFileActivity : AppCompatActivity(), SelectAudioCallBack, View.OnClickListener {
@@ -34,6 +35,7 @@ class AudioFileActivity : AppCompatActivity(), SelectAudioCallBack, View.OnClick
     private lateinit var binding: ActivityAudioFileBinding
     private lateinit var adapterForAudio: AdapterForAudio
     private var mediaList: ArrayList<MediaList> = ArrayList()
+    private var isLoaded = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_audio_file)
@@ -55,6 +57,7 @@ class AudioFileActivity : AppCompatActivity(), SelectAudioCallBack, View.OnClick
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()) {
+                    binding.progressBar.visibility = View.VISIBLE
                     initAudioFetcher()
                 } else {
                     Toast.makeText(
@@ -81,7 +84,6 @@ class AudioFileActivity : AppCompatActivity(), SelectAudioCallBack, View.OnClick
         object : AudioFetcher(this) {
             override fun onPostExecute(paths: ArrayList<AudioModel>) {
                 super.onPostExecute(paths)
-
                 setList(paths)
             }
         }
@@ -95,6 +97,7 @@ class AudioFileActivity : AppCompatActivity(), SelectAudioCallBack, View.OnClick
         binding.rvAudio.adapter = adapterForAudio
         adapterForAudio.setSelectAudioCallBack(this)
         adapterForAudio.notifyDataSetChanged()
+        binding.progressBar.visibility = View.GONE
     }
 
     override fun selectAudio(view: View, audioModel: AudioModel, position: Int) {

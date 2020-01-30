@@ -67,6 +67,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/lvBack" />
+        <ProgressBar
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:visibility="gone"
+            android:id="@+id/progressBar"
+            android:layout_centerInParent="true"/>
 
     </RelativeLayout>
 

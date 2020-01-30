@@ -8,13 +8,11 @@ import com.example.kalam_android.repository.model.AudioModel
 import java.util.*
 
 open class AudioFetcher(private val context: Context) :
-    AsyncTask<Cursor, Void, ArrayList<AudioModel>>() {
+        AsyncTask<Cursor, Void, ArrayList<AudioModel>>() {
 
     override fun doInBackground(vararg params: Cursor?): ArrayList<AudioModel> {
         val audioList = ArrayList<AudioModel>()
-        (context as Activity).runOnUiThread {
-            audioList.addAll(getAllAudioFromDevice(context)!!)
-        }
+        audioList.addAll(getAllAudioFromDevice(context)!!)
         return audioList
     }
 

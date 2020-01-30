@@ -55,8 +55,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
-    SocketCallback, MessageTypingListener, View.OnTouchListener,
-    ResultVoiceToText {
+        SocketCallback, MessageTypingListener, View.OnTouchListener,
+        ResultVoiceToText {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -97,7 +97,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         viewModel.allChatResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding)
+        myChatMediaHelper = MyChatMediaHelper(this@ChatDetailActivity, binding.lvBottomChat,false)
         handleIntent(intent)
         initListeners()
         checkSomeoneTyping()
@@ -113,8 +113,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (chatResponse != null) {
             if (lastMessage?.isNotEmpty() == true) {
                 viewModel.updateItemToDB(
-                    lastMsgTime.toString(), lastMessage.toString(),
-                    chatId, 0, lastMessageSenderID, lastMessageStatus
+                        lastMsgTime.toString(), lastMessage.toString(),
+                        chatId, 0, lastMessageSenderID, lastMessageStatus
                 )
             } else {
                 viewModel.updateChatItemDB(chatId, 0, lastMessageStatus)
@@ -142,8 +142,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             Global.currentChatID = chatId
             hitConversationApi(lastMsgID, 0, fromSearch)
             SocketIO.getInstance().emitReadAllMessages(
-                chatId.toString(),
-                sharedPrefsHelper.getUser()?.id.toString()
+                    chatId.toString(),
+                    sharedPrefsHelper.getUser()?.id.toString()
             )
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 2)
         } else {
@@ -162,7 +162,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             sharedPrefsHelper.put(AppConstants.IS_FROM_CONTACTS, 1)
         }
         SocketIO.getInstance()
-            .emitGetNickName(sharedPrefsHelper.getUser()?.id.toString(), callerID.toString())
+                .emitGetNickName(sharedPrefsHelper.getUser()?.id.toString(), callerID.toString())
         SocketIO.getInstance().checkUserStatus(callerID.toString())
     }
 
@@ -183,19 +183,19 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         linearLayout.stackFromEnd = false
         binding.chatMessagesRecycler.layoutManager = linearLayout
         binding.chatMessagesRecycler.adapter =
-            ChatMessagesAdapter(
-                this,
-                sharedPrefsHelper.getUser()?.id.toString(),
-                userRealName.toString(),
-                profileImage.toString(),
-                sharedPrefsHelper.getTransState(),
-                sharedPrefsHelper.getLanguage(), myChatMediaHelper
-            )
+                ChatMessagesAdapter(
+                        this,
+                        sharedPrefsHelper.getUser()?.id.toString(),
+                        userRealName.toString(),
+                        profileImage.toString(),
+                        sharedPrefsHelper.getTransState(),
+                        sharedPrefsHelper.getLanguage(), myChatMediaHelper
+                )
     }
 
     private fun upwardPagination() {
         binding.chatMessagesRecycler.addOnScrollListener(object :
-            PaginationScrollUpListener(binding.chatMessagesRecycler.layoutManager as LinearLayoutManager) {
+                PaginationScrollUpListener(binding.chatMessagesRecycler.layoutManager as LinearLayoutManager) {
             override val isLastPage: Boolean
                 get() = chatResponse?.data?.is_last_page == 1
             override val isLoading: Boolean
@@ -213,7 +213,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun downwardPagination(isFromSearch: Boolean) {
         if (isFromSearch) {
             binding.chatMessagesRecycler.addOnScrollListener(object :
-                PaginationScrollDownListener(binding.chatMessagesRecycler.layoutManager as LinearLayoutManager) {
+                    PaginationScrollDownListener(binding.chatMessagesRecycler.layoutManager as LinearLayoutManager) {
                 override val isFirstPage: Boolean
                     get() = chatResponse?.data?.is_first_page == 1
                 override val isLoading: Boolean
@@ -242,11 +242,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun setUserData() {
         binding.header.tvName.text = userRealName
         GlideDownloader.load(
-            this,
-            binding.header.ivProfileImage,
-            profileImage,
-            R.drawable.dummy_placeholder,
-            R.drawable.dummy_placeholder
+                this,
+                binding.header.ivProfileImage,
+                profileImage,
+                R.drawable.dummy_placeholder,
+                R.drawable.dummy_placeholder
         )
     }
 
@@ -296,13 +296,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (it.isNotEmpty())
                         upChatList = it
                     (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(
-                        it, false
+                            it, false
                     )
                 } else if (response.data.swipe_up == 1) {
                     if (it.isNotEmpty())
                         downChatList = it
                     (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(
-                        it, true
+                            it, true
                     )
                 }
                 lastMessageStatus = it[0].is_read
@@ -311,54 +311,54 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun uploadMedia(
-        identifier: String,
-        file: String,
-        duration: Long,
-        type: String,
-        groupID: String
+            identifier: String,
+            file: String,
+            duration: Long,
+            type: String,
+            groupID: String
     ) {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED).build()
+                .setRequiredNetworkType(NetworkType.CONNECTED).build()
 
         val oneTimeWorkRequest = OneTimeWorkRequest.Builder(RxMediaWorker::class.java)
-            .setInputData(
-                createInputData(
-                    identifier,
-                    file,
-                    duration.toString(),
-                    type,
-                    sharedPrefsHelper.getUser()?.token.toString(),
-                    groupID
+                .setInputData(
+                        createInputData(
+                                identifier,
+                                file,
+                                duration.toString(),
+                                type,
+                                sharedPrefsHelper.getUser()?.token.toString(),
+                                groupID
+                        )
                 )
-            )
-            .setInitialDelay(5, TimeUnit.SECONDS)
-            .setConstraints(constraints).build()
+                .setInitialDelay(5, TimeUnit.SECONDS)
+                .setConstraints(constraints).build()
         WorkManager.getInstance(this).enqueue(oneTimeWorkRequest)
     }
 
     private fun createInputData(
-        identifier: String,
-        file: String,
-        duration: String,
-        type: String,
-        token: String,
-        groupID: String
+            identifier: String,
+            file: String,
+            duration: String,
+            type: String,
+            token: String,
+            groupID: String
     ): Data {
         return Data.Builder()
-            .putString("identifier", identifier)
-            .putString("file", file)
-            .putString("duration", duration)
-            .putString("type", type)
-            .putString("token", token)
-            .putString("id", sharedPrefsHelper.getUser()?.id.toString())
-            .putString("chatId", chatId.toString())
-            .putString(
-                "name", myName
-            )
-            .putString("language", sharedPrefsHelper.getLanguage().toString())
-            .putString("group_id", groupID)
-            .putString("profile_image", sharedPrefsHelper.getUser()?.profile_image.toString())
-            .build()
+                .putString("identifier", identifier)
+                .putString("file", file)
+                .putString("duration", duration)
+                .putString("type", type)
+                .putString("token", token)
+                .putString("id", sharedPrefsHelper.getUser()?.id.toString())
+                .putString("chatId", chatId.toString())
+                .putString(
+                        "name", myName
+                )
+                .putString("language", sharedPrefsHelper.getLanguage().toString())
+                .putString("group_id", groupID)
+                .putString("profile_image", sharedPrefsHelper.getUser()?.profile_image.toString())
+                .build()
     }
 
     private fun sendMediaMessage(file: String, type: String, duration: Long, groupID: String) {
@@ -375,10 +375,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             }
             AppConstants.VIDEO_MESSAGE -> {
                 createChatObject(
-                    "Video",
-                    file,
-                    type,
-                    identifier
+                        "Video",
+                        file,
+                        type,
+                        identifier
                 )
                 uploadMedia(identifier, file, duration, type, groupID)
             }
@@ -388,9 +388,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private val inputFinishChecker = Runnable {
         if (System.currentTimeMillis() > lastTextEdit + delay - 500) {
             SocketIO.getInstance().typingEvent(
-                AppConstants.STOP_TYPING,
-                sharedPrefsHelper.getUser()?.id.toString(),
-                chatId.toString()
+                    AppConstants.STOP_TYPING,
+                    sharedPrefsHelper.getUser()?.id.toString(),
+                    chatId.toString()
             )
         }
     }
@@ -409,9 +409,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s?.isNotEmpty() == true) {
                     SocketIO.getInstance().typingEvent(
-                        AppConstants.START_TYPING,
-                        sharedPrefsHelper.getUser()?.id.toString(),
-                        chatId.toString()
+                            AppConstants.START_TYPING,
+                            sharedPrefsHelper.getUser()?.id.toString(),
+                            chatId.toString()
                     )
                     handler.removeCallbacks(inputFinishChecker)
                 }
@@ -432,39 +432,39 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
     private fun createChatObject(message: String, file: String, type: String, identifier: String) {
         addMessage(
-            ChatData(
-                AppConstants.DUMMY_STRING,
-                file, AppConstants.DUMMY_STRING,
-                StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
-                    sharedPrefsHelper.getUser()?.lastname.toString()
-                ).toString(),
-                identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
-                AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
-                type, file, 0, 0, message, identifier,
-                System.currentTimeMillis() / 1000L.toDouble(), sharedPrefsHelper.getLanguage(),
-                sharedPrefsHelper.getUser()?.profile_image.toString()
-            )
+                ChatData(
+                        AppConstants.DUMMY_STRING,
+                        file, AppConstants.DUMMY_STRING,
+                        StringBuilder(sharedPrefsHelper.getUser()?.firstname.toString()).append(" ").append(
+                                sharedPrefsHelper.getUser()?.lastname.toString()
+                        ).toString(),
+                        identifier.toLong(), chatId, sharedPrefsHelper.getUser()?.id,
+                        AppConstants.DUMMY_DATA, message, AppConstants.DUMMY_DATA, AppConstants.DUMMY_DATA,
+                        type, file, 0, 0, message, identifier,
+                        System.currentTimeMillis() / 1000L.toDouble(), sharedPrefsHelper.getLanguage(),
+                        sharedPrefsHelper.getUser()?.profile_image.toString()
+                )
         )
     }
 
     private fun sendMessage() {
         val identifier = System.currentTimeMillis().toString()
         createChatObject(
-            binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
-            AppConstants.TEXT_MESSAGE, identifier
+                binding.lvBottomChat.editTextMessage.text.toString(), AppConstants.DUMMY_STRING,
+                AppConstants.TEXT_MESSAGE, identifier
         )
         SocketIO.getInstance().emitNewMessage(
-            sharedPrefsHelper.getUser()?.id.toString(),
-            chatId.toString(),
-            binding.lvBottomChat.editTextMessage.text.toString(),
-            AppConstants.TEXT_MESSAGE,
-            myName,
-            AppConstants.DUMMY_STRING,
-            0,
-            AppConstants.DUMMY_STRING,
-            identifier,
-            sharedPrefsHelper.getLanguage().toString(),
-            identifier, sharedPrefsHelper.getUser()?.profile_image.toString()
+                sharedPrefsHelper.getUser()?.id.toString(),
+                chatId.toString(),
+                binding.lvBottomChat.editTextMessage.text.toString(),
+                AppConstants.TEXT_MESSAGE,
+                myName,
+                AppConstants.DUMMY_STRING,
+                0,
+                AppConstants.DUMMY_STRING,
+                identifier,
+                sharedPrefsHelper.getLanguage().toString(),
+                identifier, sharedPrefsHelper.getUser()?.profile_image.toString()
         )
         logE("Message Emitted to socket")
         binding.lvBottomChat.editTextMessage.setText("")
@@ -474,7 +474,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         when (v?.id) {
             R.id.ivSend -> {
                 if (myChatMediaHelper?.fileOutput()?.isEmpty() == true &&
-                    binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
+                        binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
                 ) {
                     sendMessage()
                 } else {
@@ -482,8 +482,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         val groupID = System.currentTimeMillis().toString()
                         myChatMediaHelper?.getTotalDuration()?.let {
                             sendMediaMessage(
-                                myChatMediaHelper?.fileOutput().toString(),
-                                AppConstants.AUDIO_MESSAGE, it, groupID
+                                    myChatMediaHelper?.fileOutput().toString(),
+                                    AppConstants.AUDIO_MESSAGE, it, groupID
                             )
                         }
                         myChatMediaHelper?.hideRecorder()
@@ -501,20 +501,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 intent.putExtra(AppConstants.CALLER_USER_ID, callerID.toString())
                 val transitionName = getString(R.string.profile_trans)
                 val options =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        this,
-                        binding.header.ivProfileImage,
-                        transitionName
-                    )
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                this,
+                                binding.header.ivProfileImage,
+                                transitionName
+                        )
                 ActivityCompat.startActivity(this, intent, options.toBundle())
             }
             R.id.ivCamera -> {
                 SandriosCamera
-                    .with()
-                    .setShowPicker(false)
-                    .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
-                    .enableImageCropping(true)
-                    .launchCamera(this)
+                        .with()
+                        .setShowPicker(false)
+                        .setMediaAction(CameraConfiguration.MEDIA_ACTION_BOTH)
+                        .enableImageCropping(true)
+                        .launchCamera(this)
             }
             R.id.ivMic -> {
                 myChatMediaHelper?.initRecorderWithPermissions()
@@ -568,13 +568,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         if (media.type == SandriosCamera.MediaType.PHOTO) {
                             logE("onActivity Received")
                             sendMediaMessage(
-                                media.path,
-                                AppConstants.IMAGE_MESSAGE, 0, groupID
+                                    media.path,
+                                    AppConstants.IMAGE_MESSAGE, 0, groupID
                             )
                         } else if (media.type == SandriosCamera.MediaType.VIDEO) {
                             sendMediaMessage(
-                                media.path,
-                                AppConstants.VIDEO_MESSAGE, 0, groupID
+                                    media.path,
+                                    AppConstants.VIDEO_MESSAGE, 0, groupID
                             )
                         }
                     }
@@ -582,9 +582,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 AppConstants.SELECTED_IMAGES -> {
                     if (data != null) {
                         val list =
-                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                                data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
                         val intent =
-                            Intent(this@ChatDetailActivity, AttachmentActivity::class.java)
+                                Intent(this@ChatDetailActivity, AttachmentActivity::class.java)
                         intent.putExtra(AppConstants.SELECTED_IMAGES_VIDEOS, list)
                         startActivityForResult(intent, AppConstants.SELECT_IMAGES_VIDEOS)
 
@@ -593,7 +593,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 AppConstants.SELECT_IMAGES_VIDEOS -> {
                     if (data != null) {
                         val list =
-                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                                data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
                         Debugger.e("List", "$list")
                         sendVideoOrImage(list)
                     }
@@ -628,7 +628,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         myVoiceToTextHelper = MyVoiceToTextHelper(this, this)
         myVoiceToTextHelper?.checkPermissionForVoiceToText()
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
     }
 
@@ -637,8 +637,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         if (chatResponse != null) {
             if (lastMessage?.isNotEmpty() == true) {
                 viewModel.updateItemToDB(
-                    lastMsgTime.toString(), lastMessage.toString(),
-                    chatId, 0, lastMessageSenderID, lastMessageStatus
+                        lastMsgTime.toString(), lastMessage.toString(),
+                        chatId, 0, lastMessageSenderID, lastMessageStatus
                 )
             } else {
                 viewModel.updateChatItemDB(chatId, 0, lastMessageStatus)
@@ -662,9 +662,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (data.chat_id == chatId) {
                         addMessage(data)
                         SocketIO.getInstance().emitMessageSeen(
-                            data.chat_id.toString(),
-                            data.id.toString(),
-                            sharedPrefsHelper.getUser()?.id.toString()
+                                data.chat_id.toString(),
+                                data.id.toString(),
+                                sharedPrefsHelper.getUser()?.id.toString()
                         )
                     }
                 }
@@ -674,7 +674,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     val chatId = jsonObject.getString("chat_id").toInt()
                     if (this.chatId == chatId) {
                         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
-                            true
+                                true
                         )
                     }
                 }
@@ -685,7 +685,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 //                    val userId = jsonObject.getString("user_id")
                     if (chatId.toInt() == this.chatId) {
                         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
-                            false
+                                false
                         )
                     }
                 }
@@ -696,7 +696,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     val identifier = jsonObject.getString("identifier")
                     val msgId = jsonObject.getString("message_id")
                     (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
-                        identifier, isDelivered, msgId
+                            identifier, isDelivered, msgId
                     )
                 }
                 AppConstants.SEEN_MESSAGE -> {
@@ -706,7 +706,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     val chatId = jsonObject.getString("chat_id")
                     if (chatId.toInt() == this.chatId) {
                         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateSeenStatus(
-                            msgId.toLong()
+                                msgId.toLong()
                         )
                     }
                 }

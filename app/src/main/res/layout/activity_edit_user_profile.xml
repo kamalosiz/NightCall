@@ -75,35 +75,36 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_170sdp">
+                    android:layout_height="@dimen/_200sdp">
 
                     <ImageView
                         android:id="@+id/ivProfileWall"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_130sdp"
+                        android:layout_height="@dimen/_150sdp"
                         android:scaleType="fitXY"
                         android:src="@color/grey" />
 
                     <RelativeLayout
-                        android:layout_width="@dimen/_125sdp"
-                        android:layout_height="@dimen/_125sdp"
+                        android:layout_width="@dimen/_110sdp"
+                        android:layout_height="@dimen/_110sdp"
                         android:layout_alignParentBottom="true"
                         android:layout_centerInParent="true">
 
                         <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/ivProfile"
-                            android:layout_width="@dimen/_125sdp"
-                            android:layout_height="@dimen/_125sdp"
+                            android:layout_width="@dimen/_110sdp"
+                            android:layout_height="@dimen/_110sdp"
                             android:src="@color/grey"
-                            app:civ_border_color="@color/light_grey"
-                            app:civ_border_width="@dimen/_1sdp" />
+                            app:civ_border_color="@color/white"
+                            app:civ_border_width="@dimen/_2sdp" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/ivProfileCamera"
-                            android:layout_width="@dimen/_120sdp"
+                            android:layout_width="@dimen/_108sdp"
                             android:layout_height="@dimen/_30sdp"
                             android:layout_alignParentBottom="true"
                             android:layout_centerInParent="true"
+                            android:layout_marginBottom="@dimen/_2sdp"
                             android:background="@drawable/bg_camera_profile"
                             android:transitionName="@string/profile_trans" />
 

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="5dp"
+        app:cardUseCompatPadding="false">
+
+
+        <LinearLayout
+            android:id="@+id/lvForRecorder"
+            android:layout_width="@dimen/_250sdp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dialog_rounded_cornor"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rlSelectAudio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSelectAudio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:paddingTop="@dimen/_25sdp"
+                    android:paddingBottom="@dimen/_25sdp"
+                    android:text="Select Audio from Gallery"
+                    android:textColor="@color/theme_color"
+                    android:textSize="@dimen/_14ssp" />
+
+                <View
+                    android:id="@+id/viewSelectAudio"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_below="@+id/tvSelectAudio"
+                    android:background="@color/darkGrey" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/viewSelectAudio"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="@dimen/_25sdp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:text="Record Audio Now"
+                    android:textColor="@color/darkGrey"
+                    android:textSize="@dimen/_11ssp" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/lvPlayer"
+                android:layout_width="@dimen/_250sdp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="@dimen/_15sdp"
+                android:paddingBottom="@dimen/_10sdp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivPlay"
+                    android:layout_width="@dimen/_35sdp"
+                    android:layout_height="@dimen/_35sdp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/ic_pause_gray"
+                    android:clickable="false" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivRecord"
+                    android:layout_width="@dimen/_65sdp"
+                    android:layout_height="@dimen/_65sdp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:background="@drawable/ic_record_red"
+                    android:saveEnabled="true" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivStop"
+                    android:layout_width="@dimen/_35sdp"
+                    android:layout_height="@dimen/_35sdp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:background="@drawable/ic_stop_gray"
+                    android:clickable="false" />
+
+
+            </LinearLayout>
+
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/helvetica_medium"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14sdp"
+                android:visibility="visible" />
+
+            <RelativeLayout
+                android:id="@+id/lvSeekBar"
+                android:layout_width="@dimen/_250sdp"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/Widget.AppCompat.SeekBar"
+                    android:thumb="@drawable/new_seekbar_thumb" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/seekBar"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:text="00:00"
+                    android:textSize="@dimen/_11sdp" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvTotalTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/seekBar"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:text="00:00"
+                    android:textSize="@dimen/_11sdp" />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btnDone"
+                android:layout_width="@dimen/_250sdp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:background="@color/theme_color"
+                android:text="@string/labelDone"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_11ssp" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

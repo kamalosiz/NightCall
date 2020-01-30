@@ -60,6 +60,7 @@ class AdapterForNewGroupContact(val context: Context, val onClickNewGroupContact
                 })
             }
             VIEW_ITEM -> {
+
                 val itemViewHolder = holder as NewGroupContactViewHolder
                 itemViewHolder.binding.tvContactName.text = list?.get(position - 1)?.name
                 itemViewHolder.binding.tvContactPhone.text = list?.get(position - 1)?.number
@@ -72,7 +73,7 @@ class AdapterForNewGroupContact(val context: Context, val onClickNewGroupContact
                         onClickNewGroupContact.addToList(list?.get(position - 1)!!)
                     } else {
                         itemViewHolder.binding.ivSelectContact.visibility = View.GONE
-                        itemViewHolder.binding.llSelectContact.setBackgroundResource(0)
+                        itemViewHolder.binding.llSelectContact.setBackgroundResource(R.color.white)
                         onClickNewGroupContact.removeToList(list?.get(position - 1)!!)
                     }
                 }
