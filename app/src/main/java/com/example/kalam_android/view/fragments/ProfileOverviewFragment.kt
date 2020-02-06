@@ -25,10 +25,13 @@ class ProfileOverviewFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_profile_overview, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_profile_overview, container, false)
         setData()
         return binding.root
     }
@@ -39,7 +42,7 @@ class ProfileOverviewFragment : Fragment() {
             binding.tvDescription.text = list?.get(0)?.bio
             binding.tvAddress.text = list?.get(0)?.address
             binding.tvWork.text = list?.get(0)?.work
-            binding.tvPhone.text = "+" + list?.get(0)?.country_code + "" + list?.get(0)?.phone
+            binding.tvPhone.text = list?.get(0)?.phone
             binding.tvEmail.text = list?.get(0)?.email
             binding.tvInterested.text = list?.get(0)?.intrests
             binding.tvStatus.text = list?.get(0)?.martial_status
@@ -54,16 +57,16 @@ class ProfileOverviewFragment : Fragment() {
         binding.tvDescription.addShowMoreText("Show more")
         binding.tvDescription.addShowLessText("Show less")
         binding.tvDescription.setShowLessTextColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
+            ContextCompat.getColor(
+                activity!!.applicationContext,
+                R.color.theme_color
+            )
         )
         binding.tvDescription.setShowMoreColor(
-                ContextCompat.getColor(
-                        activity!!.applicationContext,
-                        R.color.theme_color
-                )
+            ContextCompat.getColor(
+                activity!!.applicationContext,
+                R.color.theme_color
+            )
         )
 
     }
@@ -73,10 +76,10 @@ class ProfileOverviewFragment : Fragment() {
         @JvmStatic
         fun newInstance(param1: ArrayList<ProfileData>) =
 
-                ProfileOverviewFragment().apply {
-                    this.arguments = Bundle().apply {
-                        putSerializable(ARG_PARAM1, param1)
-                    }
+            ProfileOverviewFragment().apply {
+                this.arguments = Bundle().apply {
+                    putSerializable(ARG_PARAM1, param1)
                 }
+            }
     }
 }

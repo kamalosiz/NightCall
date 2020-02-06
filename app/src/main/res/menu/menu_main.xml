@@ -10,8 +10,8 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/item_more"
-        android:icon="@drawable/vector_more"
-        android:title="More"
+        android:id="@+id/refresh"
+        android:icon="@drawable/refresh_contacts"
+        android:title="Sync Contacts"
         app:showAsAction="always" />
 </menu>

@@ -33,7 +33,6 @@ import javax.inject.Inject
 
 class LoginActivity : BaseActivity(), View.OnClickListener {
 
-
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityLoginBinding
     private var HIDE_PASSWORD = true

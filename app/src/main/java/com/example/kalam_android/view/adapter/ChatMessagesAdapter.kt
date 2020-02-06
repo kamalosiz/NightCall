@@ -15,6 +15,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
+import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.localdb.entities.ChatData
@@ -32,7 +33,8 @@ class ChatMessagesAdapter(
     private val profile: String,
     private val translateState: Int?,
     private val language: String?,
-    private val myChatMediaHelper: MyChatMediaHelper?
+    private val myChatMediaHelper: MyChatMediaHelper?,
+    private val myClickListener: MyClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val TAG = this.javaClass.simpleName
@@ -51,6 +53,16 @@ class ChatMessagesAdapter(
             chatList?.addAll(list)
             notifyDataSetChanged()
         }
+    }
+
+    fun itemChanged(list: ArrayList<ChatData>, position: Int) {
+        this.chatList = list
+        notifyItemChanged(position)
+    }
+
+    fun itemRemoved(list: ArrayList<ChatData>) {
+        this.chatList = list
+        notifyDataSetChanged()
     }
 
     fun updateIdentifier(identifier: String, isDelivered: Boolean, msgId: String) {
@@ -165,14 +177,20 @@ class ChatMessagesAdapter(
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
                 }
-                /*applyReadStatus(
-                    userId.toInt(), item.sender_id,
-                    itemHolder.binding.itemChat.ivDeliver, item.is_read
-                )*/
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.itemChat.tvMessageStatus, item.is_read
                 )
+                itemHolder.binding.itemChat.rlMessage.setOnLongClickListener {
+                    myClickListener.myOnClick(it, position)
+                    itemHolder.binding.itemChat.rlMessage.setBackgroundResource(R.color.light_grey)
+                    return@setOnLongClickListener true
+                }
+                if (item.is_selected) {
+                    itemHolder.binding.itemChat.rlMessage.setBackgroundResource(R.color.light_grey)
+                } else {
+                    itemHolder.binding.itemChat.rlMessage.setBackgroundResource(0)
+                }
             }
             AppConstants.AUDIO_MESSAGE -> {
                 hideShowViewOriginal(

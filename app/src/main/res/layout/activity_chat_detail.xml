@@ -22,8 +22,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:layout_marginEnd="@dimen/_8sdp"
                 android:paddingBottom="@dimen/_35sdp" />
 
             <LinearLayout
@@ -56,6 +54,14 @@
             </LinearLayout>
 
         </RelativeLayout>
+
+        <include
+            android:id="@+id/edit"
+            layout="@layout/layout_edit_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/header"
+            android:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/pbCenter"

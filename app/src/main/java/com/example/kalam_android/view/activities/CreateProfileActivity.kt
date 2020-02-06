@@ -127,7 +127,8 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                         sharedPrefsHelper,
                         this,
                         Uri.fromFile(File(returnValue?.get(0).toString()))
-                    ,false)
+                        , false
+                    )
                 }
                 UCrop.REQUEST_CROP -> {
                     logE("onActivityResult REQUEST_CROP")
@@ -209,13 +210,10 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
                 sharedPrefsHelper.getPhone()?.dialCode.toString()
             )
             params["fcm_token"] = RequestBody.create(MediaType.parse("text/plain"), fcmToken)
-
-            val imageFileBody: MultipartBody.Part?
-            val fileToUpload = File(profileImagePath.toString())
-            val requestBody = RequestBody.create(MediaType.parse("image/*"), fileToUpload)
-            imageFileBody =
-                MultipartBody.Part.createFormData("file", fileToUpload.name, requestBody)
-            viewModel.hitCreateProfileApi(params, imageFileBody)
+            viewModel.hitCreateProfileApi(
+                params,
+                getFileBody(profileImagePath.toString(), "file", this)
+            )
         } else {
             logE("Profile image empty")
 
@@ -234,7 +232,7 @@ class CreateProfileActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    fun checkPixPermission(requestCode: Int) {
+    private fun checkPixPermission(requestCode: Int) {
         Dexter.withActivity(this).withPermissions(
             Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,

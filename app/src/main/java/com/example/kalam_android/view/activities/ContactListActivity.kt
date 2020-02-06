@@ -40,7 +40,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import javax.inject.Inject
 
 
-class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
+class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*/ {
 
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityContactListBinding
@@ -111,7 +111,11 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_search -> return true
-            R.id.item_more -> popUpMenu(this.findViewById(item.itemId), R.menu.menu, this)
+//            R.id.refresh -> popUpMenu(this.findViewById(item.itemId), R.menu.menu, this)
+            R.id.refresh -> {
+                viewModel.deleteAllLocalContacts()
+                checkPermissions()
+            }
             android.R.id.home -> finish()
 
         }
@@ -128,7 +132,6 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                 binding.rvForContacts.visibility = View.VISIBLE
                 toast("Contacts Synced Successfully")
                 renderResponse(apiResponse.data as Contacts)
-                logE("+${apiResponse.data}")
             }
             Status.ERROR -> {
                 binding.pbCenter.visibility = View.GONE
@@ -229,18 +232,6 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
                 nameList.add(name)
                 list.add(ContactInfo(name, phoneNumber))
             }
-
-            /*if (!list.contains(ContactInfo(name, phoneNumber))) {
-                if (list.size == 0) {
-                    list.add(ContactInfo(name, phoneNumber))
-                } else {
-                    for (x in list.indices) {
-                        if (name != list[x].name) {
-                            list.add(ContactInfo(name, phoneNumber))
-                        }
-                    }
-                }
-            }*/
         }
         cursor.close()
         return list
@@ -287,7 +278,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
         }).check()
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
+    /*override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.sync -> {
                 viewModel.deleteAllLocalContacts()
@@ -296,7 +287,7 @@ class ContactListActivity : BaseActivity(), PopupMenu.OnMenuItemClickListener {
             }
             else -> false
         }
-    }
+    }*/
 
     override fun onBackPressed() {
         // close search view on back button pressed

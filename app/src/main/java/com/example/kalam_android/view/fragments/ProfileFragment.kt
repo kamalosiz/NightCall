@@ -51,12 +51,12 @@ class ProfileFragment : Fragment() {
     lateinit var sharedPrefsHelper: SharedPrefsHelper
     private var list: ArrayList<ProfileData> = ArrayList()
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(
-                inflater, R.layout.profile_fragment, container, false
+            inflater, R.layout.profile_fragment, container, false
         )
         MyApplication.getAppComponent(activity!!).doInjection(this)
         viewModel = ViewModelProviders.of(this, factory).get(UserProfileViewModel::class.java)
@@ -72,7 +72,6 @@ class ProfileFragment : Fragment() {
 
     private fun onClickListener() {
         binding.btnEditProfile.setOnClickListener {
-
             val intent = Intent(activity!!, EditUserProfileActivity::class.java)
             intent.putExtra(AppConstants.USER_DATA, list)
             startActivityForResult(intent, AppConstants.UPDATE_PROFILE)
@@ -110,20 +109,20 @@ class ProfileFragment : Fragment() {
         binding.tvUsername.text = userList[0].firstname + " " + userList[0].lastname
         binding.tvJobDescription.text = userList[0].work
         GlideDownloader.load(
-                activity?.applicationContext,
-                binding.ivProfile.ivProfile,
-                userList[0].profile_image,
-                R.color.grey,
-                R.color.grey
+            activity?.applicationContext,
+            binding.ivProfile.ivProfile,
+            userList[0].profile_image,
+            R.color.grey,
+            R.color.grey
         )
         GlideDownloader.load(
-                activity?.applicationContext,
-                binding.ivUserProfile.ivUserProfile,
-                userList[0].wall_image,
-                R.color.darkGrey,
-                R.color.darkGrey
+            activity?.applicationContext,
+            binding.ivUserProfile.ivUserProfile,
+            userList[0].wall_image,
+            R.color.darkGrey,
+            R.color.darkGrey
         )
-        binding.viewpager.adapter = activity?.supportFragmentManager?.let { ViewPagerAdapterFragment(it, list) }
+        binding.viewpager.adapter = ViewPagerAdapterFragment(childFragmentManager, list)
         binding.tabs.setupWithViewPager(binding.viewpager)
         (binding.viewpager.adapter as ViewPagerAdapterFragment).notifyDataSetChanged()
 

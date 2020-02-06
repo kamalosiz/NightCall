@@ -133,7 +133,7 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         if (isOutside) {
             val chatID = intent.getIntExtra(AppConstants.CHAT_ID, 0)
             val name = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
-            val msgId = intent.getLongExtra(AppConstants.MSG_ID, 0)
+//            val msgId = intent.getLongExtra(AppConstants.MSG_ID, 0)
             val callerID = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
             val image = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
 
@@ -176,15 +176,6 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
     }
 
     private fun connectWebSocket() {
-
-        /*val request = Request.Builder().url(Urls.WEB_SOCKET_URL).build()
-        val okHttpClientBuilder = OkHttpClient.Builder()
-        val webSocket1 = okHttpClientBuilder.build()
-        val webSocket =
-            webSocket1.newWebSocket(request, CustomWebSocketListener.getInstance(sharedPrefsHelper))
-        CustomWebSocketListener.getInstance(sharedPrefsHelper).setWebSocket(webSocket)
-        CustomWebSocketListener.getInstance(sharedPrefsHelper).setOfferListener(this, true)
-        webSocket1.dispatcher().executorService().shutdown()*/
         try {
             customWebSocketClient =
                 CustomWebSocketClient.getInstance(

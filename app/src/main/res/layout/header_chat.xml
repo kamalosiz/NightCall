@@ -26,7 +26,7 @@
                 android:id="@+id/ivProfileImage"
                 android:layout_width="@dimen/_27sdp"
                 android:layout_height="@dimen/_27sdp"
-                android:layout_marginLeft="@dimen/_2sdp"
+                android:layout_marginStart="@dimen/_2sdp"
                 android:transitionName="@string/profile_trans" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 

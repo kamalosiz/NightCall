@@ -26,7 +26,7 @@ class RxMediaWorker(
 
     @Inject
     lateinit var repository: Repository
-    var isSocketConnected = false
+    private var isSocketConnected = false
 
     override fun createWork(): Single<Result> {
         MyApplication.getAppComponent(ctx).doInjection(this)

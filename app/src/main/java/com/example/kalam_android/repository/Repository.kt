@@ -42,29 +42,29 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     }
 
     fun getAllChat(
-            authorization: String?,
-            parameters: Map<String, String>
+        authorization: String?,
+        parameters: Map<String, String>
     ): Observable<AllChatListResponse> {
         return apiCallInterface.getAllChats(authorization, parameters)
     }
 
     fun getSearchMessage(
-            authorization: String?,
-            parameters: Map<String, String>
+        authorization: String?,
+        parameters: Map<String, String>
     ): Observable<AllChatListResponse> {
         return apiCallInterface.getSearchMessage(authorization, parameters)
     }
 
     fun getAllMessages(
-            authorization: String?,
-            parameters: Map<String, String>
+        authorization: String?,
+        parameters: Map<String, String>
     ): Observable<ChatMessagesResponse> {
         return apiCallInterface.getAllMessages(authorization, parameters)
     }
 
     fun findFriends(
-            authorization: String?,
-            parameters: Map<String, String>
+        authorization: String?,
+        parameters: Map<String, String>
     ): Observable<FindFriends> {
         return apiCallInterface.findFriends(authorization, parameters)
     }
@@ -78,36 +78,66 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     }
 
     fun updateFcm(
-            authorization: String?,
-            parameters: Map<String, String>
+        authorization: String?,
+        parameters: Map<String, String>
     ): Observable<BasicResponse> {
         return apiCallInterface.updateFcm(authorization, parameters)
     }
 
     fun getProfileData(
-            authorization: String?,
-            parameters: Map<String, String>
+        authorization: String?,
+        parameters: Map<String, String>
     ): Observable<UserProfile> {
         return apiCallInterface.getProfileData(authorization, parameters)
     }
 
-    fun updateProfile(authorization: String?, parameters: Map<String, String>): Observable<UpdateUserProfile> {
+    fun updateProfile(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<UpdateUserProfile> {
         return apiCallInterface.updateProfile(authorization, parameters)
     }
 
-    fun updateProfile(authorization: String?, parameters: Map<String, @JvmSuppressWildcards RequestBody>, image: MultipartBody.Part): Observable<UpdateUserProfile> {
+    fun updateProfile(
+        authorization: String?,
+        parameters: Map<String, @JvmSuppressWildcards RequestBody>,
+        image: MultipartBody.Part
+    ): Observable<UpdateUserProfile> {
         return apiCallInterface.updateProfile(authorization!!, parameters, image)
     }
 
-    fun updateProfile(authorization: String?, parameters: Map<String, @JvmSuppressWildcards RequestBody>, profileImage: MultipartBody.Part, wallImage: MultipartBody.Part): Observable<UpdateUserProfile> {
+    fun updateProfile(
+        authorization: String?,
+        parameters: Map<String, @JvmSuppressWildcards RequestBody>,
+        profileImage: MultipartBody.Part,
+        wallImage: MultipartBody.Part
+    ): Observable<UpdateUserProfile> {
         return apiCallInterface.updateProfile(authorization!!, parameters, profileImage, wallImage)
     }
 
-    fun updateUserName(authorization: String?, parameters: Map<String, String>): Observable<BasicResponse> {
+   /* fun updateUserName(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<BasicResponse> {
         return apiCallInterface.updateUserName(authorization!!, parameters)
-    }
+    }*/
 
     fun forgetPassword(parameters: Map<String, String>): Observable<BasicResponse> {
         return apiCallInterface.forgetPassword(parameters)
+    }
+
+    fun createNewGroup(
+        authorization: String?,
+        parameters: Map<String, String>
+    ): Observable<BasicResponse> {
+        return apiCallInterface.createGroup(authorization, parameters)
+    }
+
+    fun createNewGroup(
+        authorization: String?,
+        parameters: Map<String, @JvmSuppressWildcards RequestBody>,
+        profileImage: MultipartBody.Part
+    ): Observable<BasicResponse> {
+        return apiCallInterface.createGroup(authorization, parameters, profileImage)
     }
 }

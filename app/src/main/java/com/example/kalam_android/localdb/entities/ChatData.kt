@@ -26,5 +26,6 @@ data class ChatData(
     @ColumnInfo(name = "identifier") var identifier: String?,
     @ColumnInfo(name = "unix_time") val unix_time: Double,
     @ColumnInfo(name = "language") val language: String?,
-    @ColumnInfo(name = "profile_image") val profile_image: String?
+    @ColumnInfo(name = "profile_image") val profile_image: String?,
+    @ColumnInfo(name = "is_selected") var is_selected: Boolean = false
 )

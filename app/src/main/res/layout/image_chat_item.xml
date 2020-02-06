@@ -6,7 +6,10 @@
         android:id="@+id/rlImageItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_4sdp">
+        android:paddingStart="@dimen/_10sdp"
+        android:paddingTop="@dimen/_2sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_2sdp">
 
         <TextView
             android:id="@+id/tvTime"

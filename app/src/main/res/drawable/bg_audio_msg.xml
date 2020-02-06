@@ -2,12 +2,7 @@
     android:shape="rectangle">
 
     <solid android:color="@color/grey" />
-    <corners
-        android:bottomLeftRadius="@dimen/_15sdp"
-        android:bottomRightRadius="@dimen/_15sdp"
-        android:topRightRadius="@dimen/_15sdp"
-        android:topLeftRadius="@dimen/_15sdp"/>
-
+    <corners android:radius="@dimen/_15sdp" />
 </shape>
 
 

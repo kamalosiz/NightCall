@@ -6,12 +6,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <RelativeLayout
             android:id="@+id/lvBack"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
-            android:visibility="gone"
-            android:background="@color/theme_color">
+            android:background="@color/theme_color"
+            android:visibility="gone">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/llBack"
@@ -39,8 +40,7 @@
                 android:singleLine="true"
                 android:text="Profile"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_14ssp"
-                android:transitionName="@string/profile_trans" />
+                android:textSize="@dimen/_14ssp" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvSave"
@@ -56,10 +56,10 @@
                 android:text="@string/labelSave"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14ssp"
-                android:transitionName="@string/profile_trans"
                 android:visibility="gone" />
 
         </RelativeLayout>
+
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -102,6 +102,7 @@
                                 android:layout_height="@dimen/_110sdp"
                                 android:layout_below="@+id/ivUserProfile"
                                 android:src="@color/darkGrey"
+                                android:transitionName="@string/profile_trans"
                                 app:civ_border_color="#FFFFFF"
                                 app:civ_border_width="@dimen/_2sdp"
                                 app:layout_constraintBottom_toBottomOf="@+id/ivUserProfile"
@@ -117,9 +118,9 @@
                                 android:background="?attr/selectableItemBackground"
                                 android:clickable="true"
                                 android:focusable="true"
+                                android:fontFamily="@font/roboto_medium"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/_18ssp"
-                                android:fontFamily="@font/roboto_medium"
                                 app:layout_constraintEnd_toEndOf="@+id/ivProfile"
                                 app:layout_constraintStart_toStartOf="@+id/ivProfile"
                                 app:layout_constraintTop_toBottomOf="@+id/ivProfile" />
@@ -134,8 +135,8 @@
                                 android:clickable="true"
                                 android:focusable="true"
                                 android:fontFamily="@font/roboto_regular"
-                                android:textSize="@dimen/_12ssp"
                                 android:textColor="@color/darkGrey"
+                                android:textSize="@dimen/_12ssp"
                                 app:layout_constraintEnd_toEndOf="@+id/tvUsername"
                                 app:layout_constraintStart_toStartOf="@+id/tvUsername"
                                 app:layout_constraintTop_toBottomOf="@+id/tvUsername" />

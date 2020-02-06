@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
+        android:id="@+id/llSelectContact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingTop="@dimen/_5sdp"
-        android:paddingBottom="@dimen/_5sdp"
         android:paddingStart="@dimen/_10sdp"
-        android:id="@+id/llSelectContact">
+        android:paddingTop="@dimen/_5sdp"
+        android:paddingBottom="@dimen/_5sdp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivContactImage"
@@ -19,8 +19,8 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -53,8 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/_10sdp"
             android:src="@drawable/ic_tick_contact"
-            android:visibility="gone"
-             />
+            android:visibility="gone" />
     </LinearLayout>
 
 </layout>

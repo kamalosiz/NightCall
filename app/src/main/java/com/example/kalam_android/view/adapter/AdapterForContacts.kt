@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.ContactsContract
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
@@ -22,6 +22,7 @@ import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.activities.NewGroupActivity
 import com.example.kalam_android.wrapper.GlideDownloader
+
 
 class AdapterForContacts(val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
@@ -110,6 +111,10 @@ class AdapterForContacts(val context: Context) :
                     itemHolder.binding.btnInvite.visibility = View.GONE
                     itemHolder.binding.rlItem.tag = position - 1
                     itemHolder.binding.rlItem.setOnClickListener(onClickListener)
+                    val outValue = TypedValue()
+                    context.theme
+                        .resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+                    itemHolder.binding.rlItem.setBackgroundResource(outValue.resourceId)
                 }
 
             }
@@ -190,8 +195,8 @@ class AdapterForContacts(val context: Context) :
         return object : Filter() {
             override fun performFiltering(charSequence: CharSequence): FilterResults {
                 val charString = charSequence.toString()
-                if (charString.isEmpty()) {
-                    contactsFilteredList = contactList2
+                contactsFilteredList = if (charString.isEmpty()) {
+                    contactList2
                 } else {
                     val filteredList = ArrayList<ContactsData>()
                     contactList2?.let {
@@ -203,7 +208,7 @@ class AdapterForContacts(val context: Context) :
                             }
                         }
                     }
-                    contactsFilteredList = filteredList
+                    filteredList
                 }
 
                 val filterResults = FilterResults()

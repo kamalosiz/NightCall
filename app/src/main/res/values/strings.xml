@@ -96,6 +96,7 @@
     <string name="labelSelectCity">Select City</string>
     <string name="labelAddPeople">Add People</string>
     <string name="labelEditProfile">Edit Profile</string>
+    <string name="type_group_name">Type Group Name</string>
     <string-array name="listStatus">
         <item>Select Status</item>
         <item>Single</item>

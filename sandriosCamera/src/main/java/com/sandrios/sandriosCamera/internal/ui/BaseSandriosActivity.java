@@ -94,6 +94,8 @@ public abstract class BaseSandriosActivity<CameraId> extends SandriosCameraActiv
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        fetchMediaList();
+
         ArrayList<String> permissions = new ArrayList<>();
 
         permissions.add(Manifest.permission.CAMERA);
@@ -107,7 +109,8 @@ public abstract class BaseSandriosActivity<CameraId> extends SandriosCameraActiv
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        fetchMediaList();
+                        if (report.areAllPermissionsGranted())
+                            fetchMediaList();
                     }
 
                     @Override

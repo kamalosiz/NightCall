@@ -109,8 +109,7 @@ class SignUpActivity : BaseActivity() {
             toast("Please enter your Number")
             return
         }
-        phone = StringBuilder(binding.tvDialCode.text).append(binding.etNumber.text.toString())
-            .toString()
+        phone = binding.etNumber.text.toString()
         logE("Phone number : $phone")
         val params = HashMap<String, String>()
         params["number"] = phone

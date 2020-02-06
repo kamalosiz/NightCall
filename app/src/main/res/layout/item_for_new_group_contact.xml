@@ -10,9 +10,11 @@
         <LinearLayout
             android:id="@+id/lvNewGroup"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_5sdp"
-            android:gravity="center">
+            android:layout_height="@dimen/_45sdp"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivNewGroupImage"
@@ -38,16 +40,18 @@
         <LinearLayout
             android:id="@+id/lvNewContact"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_5sdp"
-            android:gravity="center">
+            android:layout_height="@dimen/_45sdp"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivNewContactImage"
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:layout_marginStart="@dimen/_15sdp"
-                android:src="@color/theme_color" />
+                android:src="@color/grey" />
 
             <TextView
                 android:id="@+id/tvNewContact"

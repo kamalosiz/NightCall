@@ -4,8 +4,8 @@
     <RelativeLayout
         android:id="@+id/rlItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_5sdp">
+        android:layout_height="@dimen/_45sdp"
+        android:gravity="center">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivContactImage"
@@ -51,7 +51,6 @@
             android:layout_width="@dimen/_45sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/_10sdp"
             android:background="@color/theme_color"
             android:fontFamily="@font/roboto_regular"

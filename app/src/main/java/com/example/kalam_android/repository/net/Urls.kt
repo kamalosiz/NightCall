@@ -7,6 +7,7 @@ class Urls {
 //        const val WEB_SOCKET_URL = "ws://192.168.0.40:9090/"
 
         //Local IP
+//        const val BASE_URL = "http://192.168.0.54:5000/"
 //        const val BASE_URL = "http://192.168.0.125:5000/"
 //        const val BASE_URL = "http://192.168.0.73:5000/"
 
@@ -30,7 +31,8 @@ class Urls {
         const val UPLOAD_AUDIO = "/api/chat/upload_file"
         const val GET_PROFILE = "/api/user/profile"
         const val UPDATE_PROFILE = "/api/user/update_profile"
-        const val USER_NAME_UPDATE = "/api/user/update_contact_info"
+        //        const val USER_NAME_UPDATE = "/api/user/update_contact_info"
         const val FORGET_PASSWORD = "/api/site/forgot_password"
+        const val CREATE_GROUP = "/api/chat/create_group"
     }
 }

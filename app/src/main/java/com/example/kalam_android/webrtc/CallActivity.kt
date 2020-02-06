@@ -118,7 +118,8 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
         binding.ibAnswer.setOnClickListener(this)
         webSocketClient =
             CustomWebSocketClient.getInstance(sharedPrefsHelper, URI(Urls.WEB_SOCKET_URL))
-        webSocketClient?.setSocketCallback(this)
+        CustomWebSocketClient.getInstance(sharedPrefsHelper, URI(Urls.WEB_SOCKET_URL))
+            .setSocketCallback(this)
         webSocketClient?.setOfferListener(this, false)
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
@@ -169,16 +170,21 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
     fun startWebrtc() {
         initialization()
         //        getIceServers();
-        /* val stunIceServer = PeerConnection.IceServer
-             .builder("stun:stun.l.google.com:19302")
-             .createIceServer()
-         peerIceServers.add(stunIceServer)*/
-        /* val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
-             .setUsername("webrtc@live.com")
-             .setPassword("muazkh")
-             .createIceServer()
-         peerIceServers.add(turnIceServer)*/
-        val turnIceServer = PeerConnection.IceServer.builder("stun:52.53.151.191:3478")
+
+        val stunIceServer = PeerConnection.IceServer
+            .builder("stun:stun.l.google.com:19302")
+            .createIceServer()
+        peerIceServers.add(stunIceServer)
+        val turnIceServer = PeerConnection.IceServer.builder("turn:numb.viagenie.ca")
+            .setUsername("webrtc@live.com")
+            .setPassword("muazkh")
+            .createIceServer()
+        peerIceServers.add(turnIceServer)
+
+
+
+        logE("peerIceServers :$peerIceServers")
+/*        val turnIceServer = PeerConnection.IceServer.builder("stun:52.53.151.191:3478")
             .setUsername("softech")
             .setPassword("Kalaam2020")
             .createIceServer()
@@ -194,7 +200,37 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                 .setUsername("softech")
                 .setPassword("Kalaam2020")
                 .createIceServer()
+        peerIceServers.add(turnIceServer2)*/
+/*        val turnIceServer2 =
+            PeerConnection.IceServer.builder("turn:global.turn.twilio.com:3478?transport=tcp")
+                .setUsername("82a800ce5dadb28b08a40ad3ab4841cf495e9b08404b8347d268e0c74f197250")
+                .setPassword("iNVTHqAjtr3X/TNXsOOerZ4kta9yCKoTZnFbj8kQ+30=")
+                .createIceServer()
         peerIceServers.add(turnIceServer2)
+
+        val turnIceServer1 =
+            PeerConnection.IceServer.builder("turn:global.turn.twilio.com:3478?transport=udp")
+                .setUsername("82a800ce5dadb28b08a40ad3ab4841cf495e9b08404b8347d268e0c74f197250")
+                .setPassword("iNVTHqAjtr3X/TNXsOOerZ4kta9yCKoTZnFbj8kQ+30=")
+                .createIceServer()
+        peerIceServers.add(turnIceServer1)
+
+        val turnIceServer3 =
+            PeerConnection.IceServer.builder("turn:global.turn.twilio.com:443?transport=tcp")
+                .setUsername("82a800ce5dadb28b08a40ad3ab4841cf495e9b08404b8347d268e0c74f197250")
+                .setPassword("iNVTHqAjtr3X/TNXsOOerZ4kta9yCKoTZnFbj8kQ+30=")
+                .createIceServer()
+        peerIceServers.add(turnIceServer3)
+        val stunIceServer =
+            PeerConnection.IceServer.builder("stun:global.stun.twilio.com:3478?transport=udp")
+                .createIceServer()
+        peerIceServers.add(stunIceServer)
+
+        val stunIceServer2 =
+            PeerConnection.IceServer.builder("stun:global.stun.twilio.com:3478?transport=tcp")
+                .createIceServer()
+        peerIceServers.add(stunIceServer2)*/
+
         val initializationOptions = PeerConnectionFactory.InitializationOptions.builder(this)
             .createInitializationOptions()
         PeerConnectionFactory.initialize(initializationOptions)
@@ -336,7 +372,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                             }
                             PeerConnection.IceConnectionState.CHECKING -> {
                                 logE("Peer Connection CHECKING")
-                                binding.tvCallStatus.text = "Connecting"
+                                binding.tvCallStatus.text = "Connecting..."
                             }
                             else -> {
                             }
@@ -362,6 +398,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
 
     private fun turnOnSpeakers() {
         try {
+            logE("TURNING ON SPEAKERS")
             if (!audioManager.isSpeakerphoneOn) {
                 audioManager.isSpeakerphoneOn = true
             }
@@ -373,6 +410,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
 
     private fun turnOFFSpeakers() {
         try {
+            logE("TURNING OFF SPEAKERS")
             if (audioManager.isSpeakerphoneOn) {
                 audioManager.isSpeakerphoneOn = false
             }
@@ -476,13 +514,10 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
     }
 
     private fun updateVideoViews() {
-        runOnUiThread {
-            val params = binding.localVideoView.layoutParams
-            params.height = dpToPx()
-            params.width = dpToPx()
-            binding.localVideoView.layoutParams = params
-        }
-
+        val params = binding.localVideoView.layoutParams
+        params.height = dpToPx()
+        params.width = dpToPx()
+        binding.localVideoView.layoutParams = params
     }
 
     override fun onClick(v: View) {
@@ -509,36 +544,37 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
     }
 
     private fun hangup() {
-        if (ringtune?.isPlaying == true) {
-            ringtune?.stop()
-        }
-        if (peerConnectionFactory != null) {
-            peerConnectionFactory?.stopAecDump()
-        }
-        if (localPeer != null) {
-            localPeer?.close()
-            localPeer = null
-        }
-        if (isVideo) {
-            turnOFFSpeakers()
-            if (videoCapture != null) {
-                videoCapture?.stopCapture()
-                videoCapture?.dispose()
-                videoCapture = null
-            }
-            if (binding.localVideoView != null || binding.remoteVideoView != null) {
-                binding.localVideoView.release()
-                binding.remoteVideoView.release()
-            }
-        }
-        webSocketClient?.reAssignOfferListenerToMain()
-        setResult(Activity.RESULT_OK)
-        finish()
-        overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
-        /*} catch (e: Exception) {
-            logE("Exception Occurred ${e.message}")
-        }*/
+        try {
 
+            if (ringtune?.isPlaying == true) {
+                ringtune?.stop()
+            }
+            if (peerConnectionFactory != null) {
+                peerConnectionFactory?.stopAecDump()
+            }
+            if (localPeer != null) {
+                localPeer?.close()
+                localPeer = null
+            }
+            if (isVideo) {
+                turnOFFSpeakers()
+                if (videoCapture != null) {
+                    videoCapture?.stopCapture()
+                    videoCapture?.dispose()
+                    videoCapture = null
+                }
+                if (binding.localVideoView != null || binding.remoteVideoView != null) {
+                    binding.localVideoView.release()
+                    binding.remoteVideoView.release()
+                }
+            }
+            webSocketClient?.reAssignOfferListenerToMain()
+            setResult(Activity.RESULT_OK)
+            finish()
+            overridePendingTransition(R.anim.anim_nothing, R.anim.bottom_down)
+        } catch (e: Exception) {
+            logE("Exception Occurred ${e.message}")
+        }
     }
 
     private fun dpToPx(): Int {
@@ -567,7 +603,6 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                 }
             }
         }
-
         return null
     }
 
@@ -595,10 +630,11 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
         runOnUiThread {
             when (jsonObject.getString(AppConstants.TYPE)) {
                 AppConstants.CANDIDATE -> {
-//                    logE("webSocketCallback CANDIDATE")
+                    logE("iceCandidates Received :$jsonObject")
                     saveIceCandidates(jsonObject)
                 }
                 AppConstants.ANSWER -> {
+                    logE("answer Received :$jsonObject")
                     onAnswerSave(jsonObject)
                 }
                 AppConstants.REJECT -> {

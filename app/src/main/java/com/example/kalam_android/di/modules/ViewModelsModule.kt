@@ -71,4 +71,9 @@ abstract class ViewModelsModule {
     @IntoMap
     @ViewModelKey(ForgetPasswordViewModel::class)
     abstract fun bindForgetPasswordViewModel(viewModel: ForgetPasswordViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NewGroupViewModel::class)
+    abstract fun bindNewGroupViewModel(viewModel: NewGroupViewModel): ViewModel
 }

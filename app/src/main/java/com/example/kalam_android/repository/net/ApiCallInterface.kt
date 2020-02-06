@@ -21,8 +21,8 @@ interface ApiCallInterface {
     @Multipart
     @POST(Urls.CREATE_PROFILE)
     fun createProfile(
-            @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>,
-            @Part profilePic: MultipartBody.Part
+        @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part profilePic: MultipartBody.Part
     ): Observable<CreateProfileResponse>
 
     @POST(Urls.SIGN_IN)
@@ -75,9 +75,15 @@ interface ApiCallInterface {
     @POST(Urls.UPDATE_PROFILE)
     fun updateProfile(@Header("Authorization") authorization: String, @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part profile: MultipartBody.Part, @Part wallImage: MultipartBody.Part): Observable<UpdateUserProfile>
 
-    @POST(Urls.USER_NAME_UPDATE)
-    fun updateUserName(@Header("Authorization") authorization: String, @Body parameters: Map<String, String>): Observable<BasicResponse>
+//    @POST(Urls.USER_NAME_UPDATE)
+//    fun updateUserName(@Header("Authorization") authorization: String, @Body parameters: Map<String, String>): Observable<BasicResponse>
 
     @POST(Urls.FORGET_PASSWORD)
     fun forgetPassword(@Body parameters: Map<String, String>): Observable<BasicResponse>
+
+    @POST(Urls.CREATE_GROUP)
+    fun createGroup(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>
+
+    @POST(Urls.CREATE_GROUP)
+    fun createGroup(@Header("Authorization") authorization: String?, @PartMap parameters: Map<String, @JvmSuppressWildcards RequestBody>, @Part profile: MultipartBody.Part): Observable<BasicResponse>
 }

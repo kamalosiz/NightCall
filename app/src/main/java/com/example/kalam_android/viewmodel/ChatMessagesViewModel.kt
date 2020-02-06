@@ -73,6 +73,8 @@ class ChatMessagesViewModel @Inject constructor(
         )
     }
 
+    //Save Messages to DB
+
     fun addMessageToDB(list: ArrayList<ChatData>) {
         disposable.add(
             Completable.fromAction {

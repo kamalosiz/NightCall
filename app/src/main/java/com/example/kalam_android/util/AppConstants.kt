@@ -35,6 +35,8 @@ object AppConstants {
     const val USER_DATA = "user_data"
     const val KALAM_CONTACT_LIST = "kalam_contact_list"
     const val IS_NULL = "response_null_kalam"
+    const val JSON = "webrtc_json"
+    const val IS_VIDEO_CALL = "isVideoCall"
 
 
     //Request Code
@@ -49,8 +51,9 @@ object AppConstants {
     const val SELECT_AUDIO = 15
     const val UPDATE_PROFILE = 11
     const val CODE_FROM_PUSH = 1010
+    const val GROUP_IMAGE_CODE = 1011
 
-    //Local DB=
+    //Local DB
     const val DB_NAME = "kalam_local_db"
     const val CONTACTS_TABLE = "contacts"
     const val ALL_CHAT_ENTITY = "allchat"
@@ -69,8 +72,13 @@ object AppConstants {
     const val GET_MY_NICKNAME = "get_my_nickname"
     const val CHECK_USER_STATUS = "check_user_status"
     const val GET_ALL_USER_STATUS = "get_all_user_status"
-    const val JSON = "webrtc_json"
-    const val IS_VIDEO_CALL = "isVideoCall"
+    const val DELETE_MESSAGE = "delete_message"
+    const val MESSAGE_TYPING = "message_typing"
+    const val NEW_MESSAGE = "new_message"
+    const val MESSAGE_STOPS_TYPING = "message_stop_typing"
+    const val ALL_MESSAGES_READ = "all_messages_read"
+    const val MESSAGE_DELIVERED = "messages_delivered"
+    const val MESSAGE_DELETED = "message_deleted"
 
     //WebRtc WebSockets
     const val CANDIDATE = "candidate"
@@ -81,13 +89,5 @@ object AppConstants {
     const val REJECT = "reject"
     const val READY_FOR_CALL = "readyforcall"
 
-
     const val NEW_CALL = "newcall"
-
-    //Listeners
-    const val MESSAGE_TYPING = "message_typing"
-    const val NEW_MESSAGE = "new_message"
-    const val MESSAGE_STOPS_TYPING = "message_stop_typing"
-    const val ALL_MESSAGES_READ = "all_messages_read"
-    const val MESSAGE_DELIVERED = "messages_delivered"
 }

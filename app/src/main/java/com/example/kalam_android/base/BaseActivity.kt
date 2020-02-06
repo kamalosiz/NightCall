@@ -36,15 +36,15 @@ open class BaseActivity : AppCompatActivity() {
         ).matches()
     }*/
 
-    fun popUpMenu(view: View?, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
+   /* fun popUpMenu(view: View?, menu: Int, listener: PopupMenu.OnMenuItemClickListener) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(menu)
         popupMenu.setOnMenuItemClickListener(listener)
-        /* val tempMenu = popupMenu.getMenu()
+        *//* val tempMenu = popupMenu.getMenu()
          for (i in 0 until tempMenu.size()) {
              val mi = tempMenu.getItem(i)
              applyFontToMenuItem(mi)
-         }*/
+         }*//*
         popupMenu.show()
-    }
+    }*/
 }

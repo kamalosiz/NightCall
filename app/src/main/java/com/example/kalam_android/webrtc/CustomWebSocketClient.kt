@@ -17,9 +17,7 @@ import java.net.URI
 class CustomWebSocketClient private constructor(
     val sharedPrefsHelper: SharedPrefsHelper,
     uri: URI
-) :
-    WebSocketClient(uri) {
-
+) : WebSocketClient(uri) {
     private val TAG = this.javaClass.simpleName
     private var webSocketCallback: WebSocketCallback? = null
     private var webSocketOfferCallback: WebSocketOfferCallback? = null
@@ -106,8 +104,6 @@ class CustomWebSocketClient private constructor(
                 }
             }
             else -> {
-//                Debugger.e("CallActivity", "onMessage string :$text")
-//                Debugger.e("CallActivity", "Sending Candidates")
                 webSocketCallback?.webSocketCallback(json)
             }
         }
@@ -177,7 +173,7 @@ class CustomWebSocketClient private constructor(
             obj.put("type", AppConstants.CANDIDATE)
             obj.put("candidate", iceCandidate)
             obj.put("connectedUserId", callerID)
-            logE("ICE Candidates $obj")
+            logE("send IceCandidate $obj")
             send(obj.toString())
         } catch (e: JSONException) {
             logE("onIceCandidateReceived JSONException ${e.message}")
@@ -208,6 +204,7 @@ class CustomWebSocketClient private constructor(
             obj.put("offer", JSONObject().put("sdp", sessionDescription.description))
             obj.put("connectedUserId", callerID)
             send(obj.toString())
+            logE("doAnswer :$obj")
         } catch (e: JSONException) {
             logE("onSetFailure" + e.message)
             e.printStackTrace()

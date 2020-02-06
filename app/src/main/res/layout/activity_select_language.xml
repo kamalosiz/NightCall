@@ -85,8 +85,9 @@
                 android:paddingStart="@dimen/_5sdp"
                 android:paddingEnd="@dimen/_5sdp"
                 android:text="Update Changes"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_10ssp" />
+                android:textSize="@dimen/_11ssp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -104,8 +105,9 @@
                 android:paddingStart="@dimen/_5sdp"
                 android:paddingEnd="@dimen/_5sdp"
                 android:text="Logout"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_10ssp" />
+                android:textSize="@dimen/_11ssp" />
         </RelativeLayout>
     </LinearLayout>
 </layout>

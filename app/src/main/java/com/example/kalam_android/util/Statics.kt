@@ -15,6 +15,10 @@ import android.widget.Toast
 import androidx.loader.content.CursorLoader
 import com.example.kalam_android.repository.model.AudioModel
 import com.example.kalam_android.repository.model.MediaList
+import id.zelory.compressor.Compressor
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -136,11 +140,11 @@ fun mergeFiles(files: List<File>, into: File) {
     mergingStream.close()
 }*/
 
-/*fun getFileBody(path: String, fileName: String): MultipartBody.Part {
-    val file = File(path)
+fun getFileBody(path: String, fileName: String, context: Context): MultipartBody.Part {
+    val file = Compressor(context).compressToFile(File(path))
     val requestFileProfile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
     return MultipartBody.Part.createFormData(fileName, file.name, requestFileProfile)
-}*/
+}
 
 /*fun calculateLocalDate(unixTime: Long): String {
     val date = Date(unixTime * 1000L)

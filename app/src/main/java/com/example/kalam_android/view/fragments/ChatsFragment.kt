@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.kalam_android.R
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.MyClickListener
@@ -79,6 +80,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         viewModel.getAllchatItemFromDB()
         hitAllChatApi()
         binding.chatRecycler.adapter = AllChatListAdapter(activity as Context, this)
+        ((binding.chatRecycler.itemAnimator) as SimpleItemAnimator).supportsChangeAnimations =
+            false
         SocketIO.getInstance().setSocketCallbackListener(this)
         SocketIO.getInstance().setStatusCallbackListener(this)
         binding.swipeRefreshLayout.setOnRefreshListener {

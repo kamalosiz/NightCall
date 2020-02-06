@@ -1,5 +1,6 @@
 package com.example.kalam_android.wrapper
 
+import androidx.work.impl.utils.ForceStopRunnable
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.callbacks.StatusCallback
@@ -80,6 +81,10 @@ class SocketIO private constructor() {
         }?.on(AppConstants.USER_STATUS) {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.USER_STATUS)
+        }?.on(AppConstants.MESSAGE_DELETED) {
+            val json = it[0] as JSONObject
+            Debugger.e("MESSAGE_DELETED", "json:$json")
+            socketCallback?.socketResponse(json, AppConstants.MESSAGE_DELETED)
         }
     }
 
@@ -192,11 +197,21 @@ class SocketIO private constructor() {
     }
 
     fun getUserStatuses(json: JsonArray) {
-        val jsonObject = JsonObject()
-        jsonObject.addProperty("json_obj", json.toString())
-        socket?.emit(AppConstants.GET_ALL_USER_STATUS, jsonObject, Ack {
+        socket?.emit(AppConstants.GET_ALL_USER_STATUS, json, Ack {
             val list = it[0] as JSONArray
             statusCallback?.onStatusCallback(list)
+        })
+    }
+
+    fun emitDeleteMsg(chatID: String, msgId: String, receiver_id: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("chat_id", chatID)
+        jsonObject.addProperty("msg_id", msgId)
+        jsonObject.addProperty("receiver_id", receiver_id)
+        socket?.emit(AppConstants.DELETE_MESSAGE, jsonObject, Ack {
+            val json = it[0] as JSONObject
+            Debugger.e("emitDeleteMsg", "json :$json")
+//            socketCallback?.socketResponse(json, AppConstants.DELETE_MESSAGE)
         })
     }
 }
