@@ -1,16 +1,21 @@
 package com.example.kalam_android.view.activities
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.NotificationManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
-import android.speech.tts.Voice
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.app.ActivityCompat
@@ -24,16 +29,14 @@ import androidx.work.*
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
-import com.example.kalam_android.callbacks.MessageTypingListener
-import com.example.kalam_android.callbacks.MyClickListener
-import com.example.kalam_android.callbacks.ResultVoiceToText
-import com.example.kalam_android.callbacks.SocketCallback
+import com.example.kalam_android.callbacks.*
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.helper.MyVoiceToTextHelper
 import com.example.kalam_android.localdb.entities.ChatData
-import com.example.kalam_android.repository.model.ChatMessagesResponse
+import com.example.kalam_android.repository.model.ChatDetailResponse
 import com.example.kalam_android.repository.model.MediaList
+import com.example.kalam_android.repository.model.Point
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.services.RxMediaWorker
@@ -44,23 +47,37 @@ import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.webrtc.CallActivity
 import com.example.kalam_android.wrapper.GlideDownloader
 import com.example.kalam_android.wrapper.SocketIO
+import com.github.nkzawa.engineio.client.Socket
 import com.github.nkzawa.socketio.client.Ack
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_edit_message.view.*
+import kotlinx.android.synthetic.main.layout_for_attachment.view.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     SocketCallback, MessageTypingListener, View.OnTouchListener,
-    ResultVoiceToText, MyClickListener {
+    ResultVoiceToText, SelectItemListener {
 
     private val TAG = this.javaClass.simpleName
     @Inject
@@ -79,10 +96,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var upChatList: ArrayList<ChatData> = ArrayList()
     private var downChatList: ArrayList<ChatData> = ArrayList()
     private var msgList: ArrayList<ChatData> = ArrayList()
-    private var deletedObjectList: ArrayList<ChatData> = ArrayList()
-    private var deletedList: ArrayList<Long> = ArrayList()
+    private var deleteMsgIds: ArrayList<Long> = ArrayList()
     private var senderIds: ArrayList<Int?> = ArrayList()
-    private var chatResponse: ChatMessagesResponse? = null
+    private var chatResponse: ChatDetailResponse? = null
     private var profileImage: String? = null
     private var loading = false
     private var isChatIdAvailable = false
@@ -95,6 +111,12 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private var lastMsgTime: Long = 0
     private var lastMessageSenderID = 0
     private var lastMessageStatus = 0
+    private var isEditableEnabled = false
+    private var editingMessage = false
+    private var showingLocation = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    lateinit var mainHandler: Handler
+    lateinit var runnable: Runnable
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -185,6 +207,9 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.header.ivVideo.setOnClickListener(this)
         binding.edit.ivCancel.setOnClickListener(this)
         binding.edit.llDelete.setOnClickListener(this)
+        binding.edit.llCopy.setOnClickListener(this)
+        binding.edit.llEdit.setOnClickListener(this)
+        binding.lvBottomChat.lvForAttachment.llLocation.setOnClickListener(this)
     }
 
     private fun initAdapter() {
@@ -262,7 +287,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         )
     }
 
-    private fun consumeResponse(apiResponse: ApiResponse<ChatMessagesResponse>?) {
+    private fun consumeResponse(apiResponse: ApiResponse<ChatDetailResponse>?) {
         when (apiResponse?.status) {
 
             Status.LOADING -> {
@@ -274,7 +299,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 binding.pbCenter.visibility = View.GONE
                 binding.pbHeader.visibility = View.GONE
                 binding.pbFooter.visibility = View.GONE
-                renderResponse(apiResponse.data as ChatMessagesResponse)
+                renderResponse(apiResponse.data as ChatDetailResponse)
             }
             Status.ERROR -> {
                 loading = false
@@ -289,7 +314,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    private fun renderResponse(mResponse: ChatMessagesResponse?) {
+    private fun renderResponse(mResponse: ChatDetailResponse?) {
         logE("socketResponse: $mResponse")
         mResponse?.let { response ->
             chatResponse = response
@@ -441,7 +466,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
 
         lastMessageStatus = 0
         msgList.add(0, chatData)
-        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatData)
+        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(msgList)
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
 
@@ -497,25 +522,214 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.lvBottomChat.editTextMessage.setText("")
     }
 
+    //Socket Listeners
+
+    override fun socketResponse(jsonObject: JSONObject, type: String) {
+        runOnUiThread {
+            when (type) {
+                AppConstants.NEW_MESSAGE -> {
+                    val gson = Gson()
+                    val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
+                    logE("data: $data")
+                    if (data.chat_id == chatId) {
+                        addMessage(data)
+                        SocketIO.getInstance().emitMessageSeen(
+                            data.chat_id.toString(),
+                            data.id.toString(),
+                            sharedPrefsHelper.getUser()?.id.toString()
+                        )
+                    }
+                }
+                AppConstants.ALL_MESSAGES_READ -> {
+                    logE("Chat ID received : $jsonObject")
+                    lastMessageStatus = 2
+                    val chatId = jsonObject.getString("chat_id").toInt()
+                    if (this.chatId == chatId) {
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
+                            true
+                        )
+                    }
+                }
+                AppConstants.MESSAGE_DELIVERED -> {
+                    lastMessageStatus = 1
+                    val chatId = jsonObject.getString("chat_id")
+//                    val userId = jsonObject.getString("user_id")
+                    if (chatId.toInt() == this.chatId) {
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
+                            false
+                        )
+                    }
+                }
+                AppConstants.SEND_MESSAGE -> {
+                    logE("AppConstants.SEND_MESSAGE status: $jsonObject")
+                    val isDelivered = jsonObject.getBoolean("delivered")
+                    if (isDelivered) lastMessageStatus = 1
+                    val identifier = jsonObject.getString("identifier")
+                    val msgId = jsonObject.getString("message_id")
+                    msgList.let {
+                        for (x in it.indices) {
+                            if (msgList[x].identifier == identifier) {
+                                msgList[x].identifier = ""
+                                msgList[x].id = msgId.toLong()
+                                if (isDelivered) {
+                                    msgList[x].is_read = 1
+                                } else {
+                                    msgList[x].is_read = 0
+                                }
+                                (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
+                                    msgList, x
+                                )
+                                if (msgList[x].type == AppConstants.LOCATION_MESSAGE) {
+                                    showingLocation = true
+                                    mainHandler = Handler(Looper.getMainLooper())
+                                    runnable = object : Runnable {
+                                        override fun run() {
+                                            initMap(true, msgId)
+                                            mainHandler.postDelayed(this, 3000)
+                                        }
+
+                                    }
+                                    mainHandler.post(runnable)
+                                }
+                            }
+                        }
+                    }
+                }
+                AppConstants.SEEN_MESSAGE -> {
+                    logE("SEEN_MESSAGE :$jsonObject")
+                    lastMessageStatus = 2
+                    val msgId = jsonObject.getString("message_id")
+                    val chatId = jsonObject.getString("chat_id")
+                    if (chatId.toInt() == this.chatId) {
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateSeenStatus(
+                            msgId.toLong()
+                        )
+                    }
+                }
+                AppConstants.GET_MY_NICKNAME -> {
+                    myName = jsonObject.getString("nickname")
+                }
+                AppConstants.CHECK_USER_STATUS -> {
+                    val userId = jsonObject.getInt("user_id")
+                    val status = jsonObject.getInt("status")
+                    checkUserStatus(userId, status)
+                }
+                AppConstants.USER_STATUS -> {
+                    val userId = jsonObject.getInt("user_id")
+                    val status = jsonObject.getInt("status")
+                    checkUserStatus(userId, status)
+                }
+                AppConstants.MESSAGE_DELETED -> {
+                    logE("MESSAGE_DELETED :$jsonObject")
+                    val messages = jsonObject.getJSONArray("messages")
+                    val chatId = jsonObject.getString("chat_id")
+                    if (this.chatId == chatId.toInt()) {
+                        deleteMessages(messages)
+                    }
+                }
+                AppConstants.DELETE_MESSAGE -> {
+                    val messages = jsonObject.getJSONArray("messages")
+                    deleteMessages(messages)
+                }
+                AppConstants.EDIT_MESSAGE -> {
+                    val chatId = jsonObject.getString("chat_id")
+                    val messageId = jsonObject.getString("message_id")
+                    val message = jsonObject.getString("message")
+                    if (this.chatId == chatId.toInt()) {
+                        val item = msgList.single { it.id == messageId.toLong() }
+                        val index = msgList.indexOf(item)
+                        item.message = message
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
+                            msgList, index
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkUserStatus(userId: Int, status: Int) {
+        if (callerID == userId) {
+            if (status == 1) {
+                onlineStatus = "Online"
+                binding.header.tvTyping.text = onlineStatus
+            } else {
+                onlineStatus = "Away"
+                binding.header.tvTyping.text = onlineStatus
+            }
+        }
+    }
+
+    private fun resetSelection() {
+        binding.edit.visibility = View.GONE
+        isEditableEnabled = false
+        deleteMsgIds.clear()
+        senderIds.clear()
+    }
+
+    private fun removeSelectItems() {
+        if (deleteMsgIds.isNotEmpty()) {
+            deleteMsgIds.forEach { id ->
+                val item = msgList.single { data -> data.id == id }
+                val index = msgList.indexOf(item)
+                item.is_selected = false
+                (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
+                    msgList,
+                    index
+                )
+            }
+            resetSelection()
+        }
+    }
+
+    private fun deleteMessages(messages: JSONArray) {
+        for (x in 0 until messages.length()) {
+            val id = messages.getLong(x)
+            val msg = msgList.filter { it.id == id }
+            val index = msgList.indexOf(msg[0])
+            msgList.remove(msg[0])
+            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemRemoved(
+                msgList, index
+            )
+        }
+        resetSelection()
+    }
+
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivSend -> {
-                if (myChatMediaHelper?.fileOutput()?.isEmpty() == true &&
-                    binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
-                ) {
-                    sendMessage()
-                } else {
-                    if (myChatMediaHelper?.isFileReady() == true) {
-                        val groupID = System.currentTimeMillis().toString()
-                        myChatMediaHelper?.getTotalDuration()?.let {
-                            sendMediaMessage(
-                                myChatMediaHelper?.fileOutput().toString(),
-                                AppConstants.AUDIO_MESSAGE, it, groupID
-                            )
+                if (!editingMessage) {
+                    if (myChatMediaHelper?.fileOutput()?.isEmpty() == true &&
+                        binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
+                    ) {
+                        logE("onClick if")
+                        sendMessage()
+                    } else {
+                        logE("onClick else")
+                        if (myChatMediaHelper?.isFileReady() == true) {
+                            val groupID = System.currentTimeMillis().toString()
+                            myChatMediaHelper?.getTotalDuration()?.let {
+                                sendMediaMessage(
+                                    myChatMediaHelper?.fileOutput().toString(),
+                                    AppConstants.AUDIO_MESSAGE, it, groupID
+                                )
+                            }
+                            myChatMediaHelper?.hideRecorder()
+                            myChatMediaHelper?.cancel(false)
                         }
-                        myChatMediaHelper?.hideRecorder()
-                        myChatMediaHelper?.cancel(false)
                     }
+                } else {
+                    binding.lvBottomChat.editTextMessage.setText("")
+                    logE("editingMessage else")
+                    SocketIO.getInstance().emitEditMsg(
+                        deleteMsgIds[0].toString(),
+                        chatId.toString(),
+                        binding.lvBottomChat.editTextMessage.text.toString(), callerID.toString()
+                    )
+                    logE("deletedItems :${deleteMsgIds[0]}")
+                    editingMessage = false
+                    removeSelectItems()
                 }
             }
             R.id.rlBack -> {
@@ -556,36 +770,117 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 startNewActivity(CallActivity::class.java, true)
             }
             R.id.ivCancel -> {
-                binding.edit.visibility = View.GONE
+                removeSelectItems()
             }
             R.id.llDelete -> {
-                if (deletedList.isNotEmpty()) {
+                if (deleteMsgIds.isNotEmpty()) {
                     SocketIO.getInstance().emitDeleteMsg(
                         chatId.toString(),
-                        deletedList.toString(),
+                        deleteMsgIds.toString(),
                         callerID.toString()
                     )
-                    for (x in deletedObjectList.indices) {
-                        msgList.remove(deletedObjectList[x])
-                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemRemoved(
-                            msgList
-                        )
-                    }
-                    /*viewModel.updateItemToDB(
-                        lastMsgTime.toString(), lastMessage.toString(),
-                        chatId, 0, lastMessageSenderID, lastMessageStatus
-                    )*/
-                    /*  for (i in deletedList.indices) {
-                          for (x in msgList.indices) {
-                              if (msgList[x].id == deletedList[i]) {
-                                  msgList.remove(msgList[x])
-                                  (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemRemoved(
-                                      msgList,
-                                      x
-                                  )
-                              }
-                          }
-                      }*/
+                }
+            }
+            R.id.llCopy -> {
+                val clipManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                var text = ""
+                deleteMsgIds.forEach { id ->
+                    val item = msgList.single { it.id == id }
+                    text += item.message
+                }
+                val clipData = ClipData.newPlainText("text", text)
+                clipManager.setPrimaryClip(clipData)
+                removeSelectItems()
+                toast("Copied to Clipboard")
+            }
+            R.id.llEdit -> {
+                val item = msgList.single { it.id == deleteMsgIds[0] }
+                val text = item.message.toString()
+                binding.lvBottomChat.editTextMessage.setText(text)
+                editingMessage = true
+            }
+            R.id.llLocation -> {
+                locationPermissions()
+            }
+        }
+    }
+
+    fun openLocationDialoge() {
+        val builder1 = AlertDialog.Builder(this@ChatDetailActivity)
+        builder1.setTitle("Share Location")
+        builder1.setMessage("Do you really want to share your location?")
+        builder1.setCancelable(true)
+        builder1.setPositiveButton("Yes") { dialog, id ->
+            val identifier = System.currentTimeMillis().toString()
+            initMap(false, identifier)
+            myChatMediaHelper?.hideAttachments()
+            dialog.dismiss()
+
+        }
+        builder1.setNegativeButton("No") { dialog, id ->
+            dialog.dismiss()
+        }
+        builder1.create().show()
+    }
+
+    private fun locationPermissions() {
+        Dexter.withActivity(this)
+            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    openLocationDialoge()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    response?.requestedPermission
+                }
+
+            }).onSameThread().check()
+    }
+
+    private fun initMap(isResendLocation: Boolean, msgId: String) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            if (it != null) {
+                logE("latitude :${it.latitude}")
+                logE("longitude :${it.longitude}")
+                val currentPoint = Point(it.latitude, it.longitude)
+                if (!isResendLocation) {
+                    createChatObject(
+                        StringBuilder(currentPoint.lat.toString()).append(",").append(currentPoint.long.toString()).toString(),
+                        AppConstants.DUMMY_STRING,
+                        AppConstants.LOCATION_MESSAGE,
+                        msgId
+                    )
+                    SocketIO.getInstance().emitNewMessage(
+                        sharedPrefsHelper.getUser()?.id.toString(),
+                        chatId.toString(),
+                        StringBuilder(currentPoint.lat.toString()).append(",").append(currentPoint.long.toString()).toString(),
+                        AppConstants.LOCATION_MESSAGE,
+                        myName,
+                        AppConstants.DUMMY_STRING,
+                        0,
+                        AppConstants.DUMMY_STRING,
+                        msgId,
+                        sharedPrefsHelper.getLanguage().toString(),
+                        msgId, sharedPrefsHelper.getUser()?.profile_image.toString()
+                    )
+                } else {
+                    SocketIO.getInstance().emitEditLocation(
+                        msgId.toInt(),
+                        chatId,
+                        callerID,
+                        it.latitude,
+                        it.longitude
+                    )
+                    logE("New Location Emmited")
                 }
             }
         }
@@ -603,18 +898,68 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         overridePendingTransition(R.anim.bottom_up, R.anim.anim_nothing)
     }
 
-    private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
-        myChatMediaHelper?.hideAttachments()
-        list?.let {
-            it.forEach { media ->
-                val groupID = System.currentTimeMillis().toString()
-                when (media.type) {
-                    0 -> sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0, groupID)
-                    1 -> sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0, groupID)
-                    2 -> sendMediaMessage(media.file, AppConstants.AUDIO_MESSAGE, 0, groupID)
+    override fun typingResponse(jsonObject: JSONObject, isTyping: Boolean) {
+        val chatId1 = jsonObject.getString("chat_id")
+        if (chatId1.toInt() == chatId) {
+            runOnUiThread {
+                if (isTyping) {
+                    val userId = jsonObject.getInt("user_id")
+                    if (userId == callerID) {
+                        binding.header.tvTyping.text = "Typing..."
+                    }
+                } else {
+                    binding.header.tvTyping.text = onlineStatus
                 }
             }
         }
+    }
+
+    override fun itemListener(view: View, position: Int, isLongClick: Boolean) {
+        val outValue = TypedValue()
+        theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+        view.setBackgroundResource(outValue.resourceId)
+        if (isLongClick) {
+            isEditableEnabled = true
+            performClickAction(position)
+        } else {
+            if (isEditableEnabled) {
+                performClickAction(position)
+            }
+        }
+    }
+
+    private fun performClickAction(position: Int) {
+        if (msgList[position].is_selected) {
+            msgList[position].is_selected = false
+            deleteMsgIds.remove(msgList[position].id)
+            senderIds.remove(msgList[position].sender_id)
+        } else {
+            msgList[position].is_selected = true
+            deleteMsgIds.add(msgList[position].id)
+            senderIds.add(msgList[position].sender_id)
+        }
+        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
+            msgList,
+            position
+        )
+        if (senderIds.contains(callerID)) {
+            binding.edit.llDelete.setOnClickListener(null)
+            binding.edit.llDelete.alpha = 0.5f
+        } else {
+            binding.edit.llDelete.setOnClickListener(this)
+            binding.edit.llDelete.alpha = 1f
+        }
+        if (deleteMsgIds.size > 1 || senderIds.contains(callerID) || msgList[position].type != AppConstants.TEXT_MESSAGE) {
+            binding.edit.llEdit.setOnClickListener(null)
+            binding.edit.llEdit.alpha = 0.5f
+        } else {
+            binding.edit.llEdit.setOnClickListener(this)
+            binding.edit.llEdit.alpha = 1f
+        }
+        if (deleteMsgIds.size == 0) {
+            binding.edit.visibility = View.GONE
+            isEditableEnabled = false
+        } else binding.edit.visibility = View.VISIBLE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -662,6 +1007,33 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
+    private fun sendVideoOrImage(list: ArrayList<MediaList>?) {
+        myChatMediaHelper?.hideAttachments()
+        list?.let {
+            it.forEach { media ->
+                val groupID = System.currentTimeMillis().toString()
+                when (media.type) {
+                    0 -> sendMediaMessage(media.file, AppConstants.IMAGE_MESSAGE, 0, groupID)
+                    1 -> sendMediaMessage(media.file, AppConstants.VIDEO_MESSAGE, 0, groupID)
+                    2 -> sendMediaMessage(media.file, AppConstants.AUDIO_MESSAGE, 0, groupID)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                myVoiceToTextHelper?.startVoiceToText()
+            }
+            MotionEvent.ACTION_UP -> {
+                myVoiceToTextHelper?.stopVoiceToText()
+            }
+        }
+        return v?.onTouchEvent(event) ?: true
+    }
+
 
     override fun onPause() {
         super.onPause()
@@ -707,140 +1079,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         } else {
             intent.putExtra(AppConstants.IS_NULL, true)
         }
+        if (showingLocation)
+            mainHandler.removeCallbacks(runnable)
         setResult(Activity.RESULT_OK, intent)
         finish()
-    }
-
-    //Socket Listeners
-
-    override fun socketResponse(jsonObject: JSONObject, type: String) {
-        runOnUiThread {
-            when (type) {
-                AppConstants.NEW_MESSAGE -> {
-                    val gson = Gson()
-                    val data = gson.fromJson(jsonObject.toString(), ChatData::class.java)
-                    if (data.chat_id == chatId) {
-                        addMessage(data)
-                        SocketIO.getInstance().emitMessageSeen(
-                            data.chat_id.toString(),
-                            data.id.toString(),
-                            sharedPrefsHelper.getUser()?.id.toString()
-                        )
-                    }
-                }
-                AppConstants.ALL_MESSAGES_READ -> {
-                    logE("Chat ID received : $jsonObject")
-                    lastMessageStatus = 2
-                    val chatId = jsonObject.getString("chat_id").toInt()
-                    if (this.chatId == chatId) {
-                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
-                            true
-                        )
-                    }
-                }
-                AppConstants.MESSAGE_DELIVERED -> {
-                    lastMessageStatus = 1
-                    logE("MESSAGE_DELIVERED  : $jsonObject")
-                    val chatId = jsonObject.getString("chat_id")
-//                    val userId = jsonObject.getString("user_id")
-                    if (chatId.toInt() == this.chatId) {
-                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateReadStatus(
-                            false
-                        )
-                    }
-                }
-                AppConstants.SEND_MESSAGE -> {
-                    logE("AppConstants.SEND_MESSAGE status: $jsonObject")
-                    val isDelivered = jsonObject.getBoolean("delivered")
-                    if (isDelivered) lastMessageStatus = 1
-                    val identifier = jsonObject.getString("identifier")
-                    val msgId = jsonObject.getString("message_id")
-                    (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateIdentifier(
-                        identifier, isDelivered, msgId
-                    )
-                }
-                AppConstants.SEEN_MESSAGE -> {
-                    logE("Message Seen")
-                    lastMessageStatus = 2
-                    val msgId = jsonObject.getString("message_id")
-                    val chatId = jsonObject.getString("chat_id")
-                    if (chatId.toInt() == this.chatId) {
-                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateSeenStatus(
-                            msgId.toLong()
-                        )
-                    }
-                }
-                AppConstants.GET_MY_NICKNAME -> {
-                    myName = jsonObject.getString("nickname")
-                }
-                AppConstants.CHECK_USER_STATUS -> {
-                    val userId = jsonObject.getInt("user_id")
-                    val status = jsonObject.getInt("status")
-                    checkUserStatus(userId, status)
-                }
-                AppConstants.USER_STATUS -> {
-                    logE("USER_STATUS : $jsonObject")
-                    val userId = jsonObject.getInt("user_id")
-                    val status = jsonObject.getInt("status")
-                    checkUserStatus(userId, status)
-                }
-                AppConstants.MESSAGE_DELETED -> {
-//                    val messages = jsonObject.getString("messages")
-                    val chatId = jsonObject.getString("chat_id")
-                    if (this.chatId == chatId.toInt()) {
-                        logE("MESSAGE_DELETEDchatId1:$chatId")
-                        logE("MESSAGE_DELETEDchatId2:${this.chatId}")
-                        hitConversationApi(0, 0, 0)
-                    }
-//                    logE("messages:$messages")
-                }
-            }
-        }
-    }
-
-    private fun checkUserStatus(userId: Int, status: Int) {
-        if (callerID == userId) {
-            if (status == 1) {
-                onlineStatus = "Online"
-                binding.header.tvTyping.text = onlineStatus
-            } else {
-                onlineStatus = "Away"
-                binding.header.tvTyping.text = onlineStatus
-            }
-        }
-    }
-
-    override fun typingResponse(jsonObject: JSONObject, isTyping: Boolean) {
-        val chatId1 = jsonObject.getString("chat_id")
-        if (chatId1.toInt() == chatId) {
-            runOnUiThread {
-                if (isTyping) {
-                    val userId = jsonObject.getInt("user_id")
-                    if (userId == callerID) {
-                        binding.header.tvTyping.text = "Typing..."
-                    }
-                } else {
-                    binding.header.tvTyping.text = onlineStatus
-                }
-            }
-        }
-    }
-
-    private fun logE(msg: String) {
-        Debugger.e(TAG, msg)
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        when (event?.action) {
-            MotionEvent.ACTION_DOWN -> {
-                myVoiceToTextHelper?.startVoiceToText()
-            }
-            MotionEvent.ACTION_UP -> {
-                myVoiceToTextHelper?.stopVoiceToText()
-            }
-        }
-        return v?.onTouchEvent(event) ?: true
     }
 
     override fun onResultVoiceToText(list: ArrayList<String>) {
@@ -856,28 +1098,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
     }
 
-    override fun myOnClick(view: View, position: Int) {
-        if (msgList[position].is_selected) {
-            msgList[position].is_selected = false
-            deletedList.remove(msgList[position].id)
-            senderIds.remove(msgList[position].sender_id)
-            deletedObjectList.remove(msgList[position])
-        } else {
-            msgList[position].is_selected = true
-            deletedList.add(msgList[position].id)
-            senderIds.add(msgList[position].sender_id)
-            deletedObjectList.add(msgList[position])
-        }
-        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(msgList, position)
-        if (senderIds.contains(callerID)) {
-            binding.edit.llDelete.setOnClickListener(null)
-            binding.edit.llDelete.alpha = 0.5f
-        } else {
-            binding.edit.llDelete.alpha = 1f
-            binding.edit.llDelete.setOnClickListener(this)
-        }
-        if (deletedList.size == 0) binding.edit.visibility = View.GONE
-        else binding.edit.visibility = View.VISIBLE
-
+    private fun logE(msg: String) {
+        Debugger.e(TAG, msg)
     }
 }

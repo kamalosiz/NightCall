@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.repository.Repository
-import com.example.kalam_android.repository.model.ChatMessagesResponse
+import com.example.kalam_android.repository.model.ChatDetailResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.util.Debugger
 import io.reactivex.Completable
@@ -21,9 +21,9 @@ class ChatMessagesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val disposable = CompositeDisposable()
-    private val responsiveLiveData = MutableLiveData<ApiResponse<ChatMessagesResponse>>()
+    private val responsiveLiveData = MutableLiveData<ApiResponse<ChatDetailResponse>>()
 
-    fun allChatResponse(): MutableLiveData<ApiResponse<ChatMessagesResponse>> {
+    fun allChatResponse(): MutableLiveData<ApiResponse<ChatDetailResponse>> {
         return responsiveLiveData
     }
 

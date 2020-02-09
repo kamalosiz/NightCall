@@ -3,7 +3,7 @@ package com.example.kalam_android.repository.model
 import com.example.kalam_android.localdb.entities.ChatData
 import java.io.Serializable
 
-data class ChatMessagesResponse(
+data class ChatDetailResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
@@ -47,3 +47,5 @@ data class AudioModel(
     val duration: String,
     val audioLength: String
 )
+
+data class Point(var lat: Double, var long: Double)

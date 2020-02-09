@@ -22,9 +22,6 @@ abstract class PaginationScrollUpListener(
 
         if (!isLoading && !isLastPage) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition > 0) {
-                Debugger.e("testing", "firstVisibleItemPosition : $firstVisibleItemPosition")
-                Debugger.e("testing", "visibleItemCount : $visibleItemCount")
-                Debugger.e("testing", "totalItemCount : $totalItemCount")
                 loadMoreItems()
             }
         }

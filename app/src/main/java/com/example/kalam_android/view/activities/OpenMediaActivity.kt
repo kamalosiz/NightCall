@@ -1,11 +1,11 @@
 package com.example.kalam_android.view.activities
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Point
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -15,23 +15,42 @@ import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentActivity
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
+import com.example.kalam_android.callbacks.LocationsCallback
 import com.example.kalam_android.databinding.ActivityOpenMediaBinding
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.PlayerListener
 import com.example.kalam_android.wrapper.GlideDownloader
+import com.example.kalam_android.wrapper.SocketIO
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.*
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelection
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Util
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
+import org.json.JSONObject
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
-class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventListener, View.OnTouchListener {
+class OpenMediaActivity : BaseActivity(), View.OnClickListener,
+    View.OnTouchListener, OnMapReadyCallback, LocationsCallback {
 
     lateinit var binding: ActivityOpenMediaBinding
     private val TAG = this.javaClass.simpleName
@@ -49,10 +68,14 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
     private var previousFingerPosition = 0
     private var baseLayoutPosition = 0
     private var defaultViewHeight = 0
-
+    private var chatId = 0
     private var isClosing = false
     private var isScrollingUp = false
     private var isScrollingDown = false
+    private lateinit var fragmentActivity: FragmentActivity
+    lateinit var gMap: GoogleMap
+    private var isPermissionGranted = false
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,39 +88,59 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
     private fun initialization() {
         type = intent.getStringExtra(AppConstants.CHAT_TYPE)
         file = intent.getStringExtra(AppConstants.CHAT_FILE)
+        chatId = intent.getIntExtra("location_chat_id", 0)
+        logE("initialization :$file")
         name = intent.getStringExtra(AppConstants.USER_NAME)
         profile = intent.getStringExtra(AppConstants.PROFILE_IMAGE_KEY)
         binding.rlBack.setOnClickListener(this)
         binding.llProfile.setOnClickListener(this)
         GlideDownloader.load(
-                this,
-                binding.ivProfileImage,
-                profile,
-                R.color.grey,
-                R.color.grey
+            this,
+            binding.ivProfileImage,
+            profile,
+            R.color.grey,
+            R.color.grey
         )
         binding.tvName.text = name
 
     }
 
     private fun checkMediaType() {
-        if (type == AppConstants.IMAGE_MESSAGE) {
-            logE("Image Received")
-            binding.image.visibility = View.VISIBLE
-            binding.rlVideo.visibility = View.GONE
-            GlideDownloader.load(
+        when (type) {
+            AppConstants.IMAGE_MESSAGE -> {
+                logE("Image Received")
+                binding.image.visibility = View.VISIBLE
+                binding.rlVideo.visibility = View.GONE
+                binding.flMap.visibility = View.GONE
+                GlideDownloader.load(
                     this,
                     binding.image,
                     file,
                     R.color.grey,
                     R.color.grey
-            )
-        } else if (type == AppConstants.VIDEO_MESSAGE) {
-            logE("Video Received")
-            binding.image.visibility = View.GONE
-            binding.rlVideo.visibility = View.VISIBLE
-            setUpPlayer(file)
+                )
+            }
+            AppConstants.VIDEO_MESSAGE -> {
+                logE("Video Received:$file")
+                binding.rlVideo.visibility = View.VISIBLE
+                binding.image.visibility = View.GONE
+                binding.flMap.visibility = View.GONE
+                setUpPlayer(file)
+            }
+            AppConstants.LOCATION_KEY -> {
+                SocketIO.getInstance().setLocationsCallback(this)
+                binding.flMap.visibility = View.VISIBLE
+                binding.image.visibility = View.GONE
+                binding.rlVideo.visibility = View.GONE
+                initializeGoogleMaps()
+            }
         }
+    }
+
+    private fun initializeGoogleMaps() {
+        fragmentActivity = this
+        val mapFrag = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFrag?.getMapAsync(this)
     }
 
     private fun setUpPlayer(videoUri: String?) {
@@ -110,21 +153,21 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
 
     private fun initializePlayer() {
         if (player == null) {
-            val loadControl: LoadControl = DefaultLoadControl(
-                    DefaultAllocator(true, 16),
-                    MIN_BUFFER_DURATION,
-                    MAX_BUFFER_DURATION,
-                    MIN_PLAYBACK_START_BUFFER,
-                    MIN_PLAYBACK_RESUME_BUFFER, -1, true
+            DefaultLoadControl(
+                DefaultAllocator(true, 16),
+                MIN_BUFFER_DURATION,
+                MAX_BUFFER_DURATION,
+                MIN_PLAYBACK_START_BUFFER,
+                MIN_PLAYBACK_RESUME_BUFFER, -1, true
             )
             val bandwidthMeter: BandwidthMeter = DefaultBandwidthMeter()
             val videoTrackSelectionFactory: TrackSelection.Factory =
-                    AdaptiveTrackSelection.Factory(bandwidthMeter)
-            val trackSelector: TrackSelector = DefaultTrackSelector(videoTrackSelectionFactory)
+                AdaptiveTrackSelection.Factory(bandwidthMeter)
+            DefaultTrackSelector(videoTrackSelectionFactory)
             player = ExoPlayerFactory.newSimpleInstance(
-                    DefaultRenderersFactory(this),
-                    DefaultTrackSelector(),
-                    DefaultLoadControl()
+                DefaultRenderersFactory(this),
+                DefaultTrackSelector(),
+                DefaultLoadControl()
             )
             binding.videoFullScreenPlayer.player = player
         }
@@ -134,14 +177,28 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
         logE("Uri : $mUri")
         val bandwidthMeter = DefaultBandwidthMeter()
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
-                this,
-                Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter
+            this,
+            Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter
         )
         val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(mUri)
+            .createMediaSource(mUri)
         player?.prepare(videoSource)
         player?.playWhenReady = true
-        player?.addListener(this)
+        player?.addListener(object : PlayerListener() {
+
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> binding.spinnerVideoDetails.visibility = View.VISIBLE
+                    Player.STATE_ENDED -> {
+                    }
+                    Player.STATE_IDLE -> {
+                    }
+                    Player.STATE_READY -> binding.spinnerVideoDetails.visibility = View.GONE
+                    else -> {
+                    }
+                }
+            }
+        })
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -155,10 +212,6 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
         }
     }
 
-    private fun logE(msg: String) {
-        Debugger.e(TAG, msg)
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.rlBack -> {
@@ -170,57 +223,12 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
                 intent.putExtra(AppConstants.CHAT_USER_PICTURE, profile)
                 val transitionName = getString(R.string.profile_trans)
                 val options =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(
-                                this,
-                                binding.ivProfileImage,
-                                transitionName
-                        )
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        this,
+                        binding.ivProfileImage,
+                        transitionName
+                    )
                 ActivityCompat.startActivity(this, intent, options.toBundle())
-            }
-        }
-    }
-
-
-    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters?) {
-    }
-
-    override fun onSeekProcessed() {
-    }
-
-    override fun onTracksChanged(
-            trackGroups: TrackGroupArray?,
-            trackSelections: TrackSelectionArray?
-    ) {
-    }
-
-    override fun onPlayerError(error: ExoPlaybackException?) {
-    }
-
-    override fun onLoadingChanged(isLoading: Boolean) {
-    }
-
-    override fun onPositionDiscontinuity(reason: Int) {
-    }
-
-    override fun onRepeatModeChanged(repeatMode: Int) {
-    }
-
-    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-    }
-
-    override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
-
-    }
-
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        when (playbackState) {
-            Player.STATE_BUFFERING -> binding.spinnerVideoDetails.visibility = View.VISIBLE
-            Player.STATE_ENDED -> {
-            }
-            Player.STATE_IDLE -> {
-            }
-            Player.STATE_READY -> binding.spinnerVideoDetails.visibility = View.GONE
-            else -> {
             }
         }
     }
@@ -291,7 +299,8 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
                         isScrollingUp = true
                     }
                     if (binding.basePopupLayout.height < defaultViewHeight) {
-                        binding.basePopupLayout.layoutParams.height = (binding.basePopupLayout.height - (Y - previousFingerPosition)).toInt()
+                        binding.basePopupLayout.layoutParams.height =
+                            (binding.basePopupLayout.height - (Y - previousFingerPosition))
                         binding.basePopupLayout.requestLayout()
                     } else {
                         if (baseLayoutPosition - currentYPosition > defaultViewHeight / 4) {
@@ -300,17 +309,20 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
                         }
 
                     }
-                    binding.basePopupLayout.y = binding.basePopupLayout.y + (Y - previousFingerPosition)
+                    binding.basePopupLayout.y =
+                        binding.basePopupLayout.y + (Y - previousFingerPosition)
                 } else {
                     if (!isScrollingDown) {
                         isScrollingDown = true
                     }
-                    if (Math.abs(baseLayoutPosition - currentYPosition) > defaultViewHeight / 2) {
+                    if (abs(baseLayoutPosition - currentYPosition) > defaultViewHeight / 2) {
                         closeDownAndDismissDialog(currentYPosition)
                         return true
                     }
-                    binding.basePopupLayout.setY(binding.basePopupLayout.y + (Y - previousFingerPosition))
-                    binding.basePopupLayout.layoutParams.height = (binding.basePopupLayout.height - (Y - previousFingerPosition)).toInt()
+                    binding.basePopupLayout.y =
+                        binding.basePopupLayout.y + (Y - previousFingerPosition)
+                    binding.basePopupLayout.layoutParams.height =
+                        (binding.basePopupLayout.height - (Y - previousFingerPosition))
                     binding.basePopupLayout.requestLayout()
                 }
                 previousFingerPosition = Y
@@ -323,10 +335,15 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
     private fun closeDownAndDismissDialog(currentPosition: Int) {
         isClosing = true
         val display = windowManager.defaultDisplay
-        val size = Point()
+        val size = android.graphics.Point()
         display.getSize(size)
         val screenHeight = size.y
-        val positionAnimator: ObjectAnimator = ObjectAnimator.ofInt(binding.basePopupLayout, "y", currentPosition, screenHeight + binding.basePopupLayout.height)
+        val positionAnimator: ObjectAnimator = ObjectAnimator.ofInt(
+            binding.basePopupLayout,
+            "y",
+            currentPosition,
+            screenHeight + binding.basePopupLayout.height
+        )
         positionAnimator.duration = 50
         positionAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator?) {
@@ -350,7 +367,12 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
     @SuppressLint("ObjectAnimatorBinding")
     private fun closeUpAndDismissDialog(currentPosition: Int) {
         isClosing = true
-        val positionAnimator: ObjectAnimator = ObjectAnimator.ofInt(binding.basePopupLayout, "y", currentPosition, -binding.basePopupLayout.height)
+        val positionAnimator: ObjectAnimator = ObjectAnimator.ofInt(
+            binding.basePopupLayout,
+            "y",
+            currentPosition,
+            -binding.basePopupLayout.height
+        )
         positionAnimator.duration = 50
         positionAnimator.addListener(object : Animator.AnimatorListener {
             override fun onAnimationRepeat(animation: Animator?) {
@@ -367,5 +389,66 @@ class OpenMediaActivity : BaseActivity(), View.OnClickListener, Player.EventList
             }
         })
         positionAnimator.start()
+    }
+
+    private fun locationPermissions() {
+        Dexter.withActivity(this)
+            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            .withListener(object : PermissionListener {
+                override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                    isPermissionGranted = true
+                    initMap(file)
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permission: PermissionRequest?,
+                    token: PermissionToken?
+                ) {
+                    token?.continuePermissionRequest()
+                }
+
+                override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                    response?.requestedPermission
+                }
+
+            }).onSameThread().check()
+    }
+
+    private fun initMap(location: String?) {
+        runOnUiThread {
+            val mLocation = location?.split(",")
+            logE("Finally got location: $mLocation")
+            gMap.isMyLocationEnabled = true
+            gMap.uiSettings.isMyLocationButtonEnabled = false
+            mLocation?.let {
+                logE("Finally got location: $mLocation")
+                val currentLatLng = LatLng(it[0].toDouble(), it[1].toDouble())
+                gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 18f))
+            }
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        if (googleMap != null) {
+            gMap = googleMap
+            locationPermissions()
+        }
+    }
+
+    private fun logE(msg: String) {
+        Debugger.e(TAG, msg)
+    }
+
+    override fun onLocationCallback(jsonObject: JSONObject) {
+        logE("onLocationCallback:$jsonObject")
+        val chatId = jsonObject.getInt("chatId")
+        if (this.chatId == chatId) {
+            val lat = jsonObject.getString("lat")
+            val long = jsonObject.getString("long")
+            val message =
+                StringBuilder(lat.toString()).append(",").append(long.toString()).toString()
+            if (isPermissionGranted)
+                initMap(message)
+        }
     }
 }

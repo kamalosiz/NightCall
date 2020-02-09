@@ -117,4 +117,13 @@
         <item name="android:fontFamily">@font/roboto_regular</item>
         <item name="textAllCaps">false</item>
     </style>
+
+    <style name="SelectableItemTheme">
+        <item name="colorControlHighlight">@color/theme_color</item>
+    </style>
+
+    <style name="SelectableItemBackground">
+        <item name="android:theme">@style/SelectableItemTheme</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
 </resources>

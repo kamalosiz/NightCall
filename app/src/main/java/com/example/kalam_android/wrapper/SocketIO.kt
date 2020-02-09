@@ -1,6 +1,6 @@
 package com.example.kalam_android.wrapper
 
-import androidx.work.impl.utils.ForceStopRunnable
+import com.example.kalam_android.callbacks.LocationsCallback
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.callbacks.StatusCallback
@@ -17,7 +17,8 @@ import org.json.JSONObject
 
 class SocketIO private constructor() {
     private val TAG = this.javaClass.simpleName
-    public var socketCallback: SocketCallback? = null
+    var socketCallback: SocketCallback? = null
+    var locationCallback: LocationsCallback? = null
     private var statusCallback: StatusCallback? = null
     private var messageTypingResponse: MessageTypingListener? = null
     var socket: Socket? = null
@@ -76,6 +77,7 @@ class SocketIO private constructor() {
 
         }?.on(AppConstants.SEEN_MESSAGE) {
             val json = it[0] as JSONObject
+            Debugger.e("SocketIO", "SEEN_MESSAGE :$json")
             socketCallback?.socketResponse(json, AppConstants.SEEN_MESSAGE)
 
         }?.on(AppConstants.USER_STATUS) {
@@ -83,8 +85,13 @@ class SocketIO private constructor() {
             socketCallback?.socketResponse(json, AppConstants.USER_STATUS)
         }?.on(AppConstants.MESSAGE_DELETED) {
             val json = it[0] as JSONObject
-            Debugger.e("MESSAGE_DELETED", "json:$json")
             socketCallback?.socketResponse(json, AppConstants.MESSAGE_DELETED)
+        }?.on(AppConstants.EDIT_MESSAGE) {
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.EDIT_MESSAGE)
+        }?.on(AppConstants.SEND_LOCATION) {
+            val json = it[0] as JSONObject
+            locationCallback?.onLocationCallback(json)
         }
     }
 
@@ -118,6 +125,10 @@ class SocketIO private constructor() {
 
     fun setSocketCallbackListener(socketCallback: SocketCallback) {
         this.socketCallback = socketCallback
+    }
+
+    fun setLocationsCallback(locationsCallback: LocationsCallback) {
+        this.locationCallback = locationsCallback
     }
 
     fun setStatusCallbackListener(statusCallback: StatusCallback) {
@@ -156,6 +167,7 @@ class SocketIO private constructor() {
         jsonObject.addProperty("group_id", groupID)
         jsonObject.addProperty("profile_image", profileImage)
         jsonObject.addProperty("is_group", 0)
+        Debugger.e("emitNewMessage", "jsonObject :$jsonObject")
         socket?.emit(AppConstants.SEND_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
             socketCallback?.socketResponse(json, AppConstants.SEND_MESSAGE)
@@ -174,6 +186,7 @@ class SocketIO private constructor() {
         jsonObject.addProperty("chat_id", chatId)
         jsonObject.addProperty("user_id", userId)
         jsonObject.addProperty("message_id", msgId)
+        Debugger.e("SocketIO", "Message seen and emmited to socket:$jsonObject")
         socket?.emit(AppConstants.MESSAGE_SEEN, jsonObject)
     }
 
@@ -208,10 +221,39 @@ class SocketIO private constructor() {
         jsonObject.addProperty("chat_id", chatID)
         jsonObject.addProperty("msg_id", msgId)
         jsonObject.addProperty("receiver_id", receiver_id)
+        Debugger.e("testing", "emitDeleteMsg:$jsonObject")
         socket?.emit(AppConstants.DELETE_MESSAGE, jsonObject, Ack {
             val json = it[0] as JSONObject
-            Debugger.e("emitDeleteMsg", "json :$json")
-//            socketCallback?.socketResponse(json, AppConstants.DELETE_MESSAGE)
+            socketCallback?.socketResponse(json, AppConstants.DELETE_MESSAGE)
         })
+    }
+
+    fun emitEditMsg(message_id: String, chatId: String, message: String, receiver_id: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("message_id", message_id)
+        jsonObject.addProperty("chatId", chatId)
+        jsonObject.addProperty("isGroupChat", false)
+        jsonObject.addProperty("message", message)
+        jsonObject.addProperty("receiver_id", receiver_id)
+        socket?.emit(AppConstants.EDIT_MESSAGE, jsonObject, Ack {
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.EDIT_MESSAGE)
+        })
+    }
+
+    fun emitEditLocation(
+        message_id: Int,
+        chatId: Int,
+        receiver_id: Int,
+        lat: Double,
+        long: Double
+    ) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("message_id", message_id)
+        jsonObject.addProperty("chatId", chatId)
+        jsonObject.addProperty("receiver_id", receiver_id)
+        jsonObject.addProperty("lat", lat)
+        jsonObject.addProperty("long", long)
+        socket?.emit(AppConstants.SEND_LOCATION, jsonObject)
     }
 }

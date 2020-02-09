@@ -18,6 +18,7 @@ object AppConstants {
     const val AUDIO_MESSAGE = "audio"
     const val IMAGE_MESSAGE = "image"
     const val VIDEO_MESSAGE = "video"
+    const val LOCATION_MESSAGE = "location"
     const val IS_FROM_CONTACTS = "inFromContactsAdapter"
     const val FCM_TOKEN = "fcm_token"
     const val CHAT_FILE = "chatfile"
@@ -37,7 +38,7 @@ object AppConstants {
     const val IS_NULL = "response_null_kalam"
     const val JSON = "webrtc_json"
     const val IS_VIDEO_CALL = "isVideoCall"
-
+    const val LOCATION_KEY = "key_location_kalam"
 
     //Request Code
     const val IMAGE_GALLERY = 0
@@ -52,6 +53,7 @@ object AppConstants {
     const val UPDATE_PROFILE = 11
     const val CODE_FROM_PUSH = 1010
     const val GROUP_IMAGE_CODE = 1011
+    const val LOCATION_REQUEST_CODE = 1022
 
     //Local DB
     const val DB_NAME = "kalam_local_db"
@@ -79,6 +81,8 @@ object AppConstants {
     const val ALL_MESSAGES_READ = "all_messages_read"
     const val MESSAGE_DELIVERED = "messages_delivered"
     const val MESSAGE_DELETED = "message_deleted"
+    const val EDIT_MESSAGE = "edit_message"
+    const val SEND_LOCATION = "sendlocation"
 
     //WebRtc WebSockets
     const val CANDIDATE = "candidate"

@@ -7,7 +7,6 @@ import io.reactivex.Single
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
-import retrofit2.http.Header
 import retrofit2.http.Part
 import retrofit2.http.PartMap
 
@@ -58,7 +57,7 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
     fun getAllMessages(
         authorization: String?,
         parameters: Map<String, String>
-    ): Observable<ChatMessagesResponse> {
+    ): Observable<ChatDetailResponse> {
         return apiCallInterface.getAllMessages(authorization, parameters)
     }
 

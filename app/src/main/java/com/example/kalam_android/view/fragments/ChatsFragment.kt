@@ -259,19 +259,17 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                         )
                         if (chatIDs.contains(newChat.chat_id)) {
                             logE("Chat ID matched")
-                            for (x in chatList.indices) {
-                                if (chatList[x].chat_id == newChat.chat_id) {
-                                    chatList[x].un_read_count += 1
-                                    modifyItem(
-                                        x,
-                                        item.message.toString(),
-                                        unixTime,
-                                        chatList[x].un_read_count,
-                                        item.user_id,
-                                        item.is_read
-                                    )
-                                }
-                            }
+                            val objItem = chatList.single { it.chat_id == newChat.chat_id }
+                            val x = chatList.indexOf(objItem)
+                            objItem.un_read_count += 1
+                            modifyItem(
+                                x,
+                                item.message.toString(),
+                                unixTime,
+                                chatList[x].un_read_count,
+                                item.user_id,
+                                item.is_read
+                            )
                         } else {
                             logE("This chat is not present")
                             if (chatList.size == 0) {
@@ -483,12 +481,13 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
                 val jsonObject = array.getJSONObject(i)
                 val userId = jsonObject.getInt("user_id")
                 val status = jsonObject.getInt("status")
-                if (chatList.size != 0)
-                    if (chatList[i].user_id == userId) {
-                        (binding.chatRecycler.adapter as AllChatListAdapter).updateOnlineStatus(
-                            i, status
-                        )
-                    }
+                if (chatList.size != 0) {
+                    val obj = chatList.single { it.user_id == userId }
+                    val index = chatList.indexOf(obj)
+                    (binding.chatRecycler.adapter as AllChatListAdapter).updateOnlineStatus(
+                        index, status
+                    )
+                }
             }
         }
     }

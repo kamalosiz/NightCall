@@ -44,7 +44,7 @@ interface ApiCallInterface {
 
 
     @POST(Urls.ALL_CHATS_MESSAGES)
-    fun getAllMessages(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<ChatMessagesResponse>
+    fun getAllMessages(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<ChatDetailResponse>
 
     @POST(Urls.FIND_FRIENDS)
     @FormUrlEncoded

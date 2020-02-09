@@ -25,6 +25,9 @@
             android:id="@+id/groupHolder"
             layout="@layout/item_for_multiple_images" />
 
+        <include
+            android:id="@+id/location"
+            layout="@layout/item_for_location" />
 
     </RelativeLayout>
 </layout>

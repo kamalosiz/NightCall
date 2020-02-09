@@ -94,6 +94,30 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 item = "ar"
                 this.position = position
             }
+            2 -> {
+                item = "fr"
+                this.position = position
+            }
+            3 -> {
+                item = "de"
+                this.position = position
+            }
+            4 -> {
+                item = "it"
+                this.position = position
+            }
+            5 -> {
+                item = "ja"
+                this.position = position
+            }
+            6 -> {
+                item = "ru"
+                this.position = position
+            }
+            7 -> {
+                item = "es"
+                this.position = position
+            }
         }
     }
 
@@ -109,16 +133,48 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
 
     private fun applySpinner() {
         val languages: ArrayList<String> = ArrayList()
-        languages.addAll(arrayOf("English", "Arabic"))
+        languages.addAll(
+            arrayOf(
+                "English",
+                "Arabic",
+                "French",
+                "German",
+                "Italian",
+                "Japanese",
+                "Russian",
+                "Spanish"
+            )
+        )
         binding.spinner1.onItemSelectedListener = this
         val aa =
             ArrayAdapter(this, android.R.layout.simple_spinner_item, languages)
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinner1.adapter = aa
-        if (sharedPrefsHelper.getLanguage() == "en") {
-            binding.spinner1.setSelection(0)
-        } else if (sharedPrefsHelper.getLanguage() == "ar") {
-            binding.spinner1.setSelection(1)
+        when {
+            sharedPrefsHelper.getLanguage() == "en" -> {
+                binding.spinner1.setSelection(0)
+            }
+            sharedPrefsHelper.getLanguage() == "ar" -> {
+                binding.spinner1.setSelection(1)
+            }
+            sharedPrefsHelper.getLanguage() == "fr" -> {
+                binding.spinner1.setSelection(2)
+            }
+            sharedPrefsHelper.getLanguage() == "de" -> {
+                binding.spinner1.setSelection(3)
+            }
+            sharedPrefsHelper.getLanguage() == "it" -> {
+                binding.spinner1.setSelection(4)
+            }
+            sharedPrefsHelper.getLanguage() == "ja" -> {
+                binding.spinner1.setSelection(5)
+            }
+            sharedPrefsHelper.getLanguage() == "ru" -> {
+                binding.spinner1.setSelection(6)
+            }
+            sharedPrefsHelper.getLanguage() == "es" -> {
+                binding.spinner1.setSelection(7)
+            }
         }
     }
 

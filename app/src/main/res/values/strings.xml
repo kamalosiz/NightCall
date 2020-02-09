@@ -97,6 +97,9 @@
     <string name="labelAddPeople">Add People</string>
     <string name="labelEditProfile">Edit Profile</string>
     <string name="type_group_name">Type Group Name</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyA98PlJT-cGnaa8HunAG7Sdkyvjg3gUkoM
+    </string>
     <string-array name="listStatus">
         <item>Select Status</item>
         <item>Single</item>

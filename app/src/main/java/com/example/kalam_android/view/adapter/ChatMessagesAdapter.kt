@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
@@ -16,6 +17,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.MyClickListener
+import com.example.kalam_android.callbacks.SelectItemListener
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.localdb.entities.ChatData
@@ -34,15 +36,14 @@ class ChatMessagesAdapter(
     private val translateState: Int?,
     private val language: String?,
     private val myChatMediaHelper: MyChatMediaHelper?,
-    private val myClickListener: MyClickListener
+    private val selectItemListener: SelectItemListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val TAG = this.javaClass.simpleName
+    //    private val TAG = this.javaClass.simpleName
     private var chatList: ArrayList<ChatData>? = ArrayList()
 
     fun updateList(list: ArrayList<ChatData>, isDown: Boolean) {
         if (isDown) {
-            logE("isDown is true")
             var i = list.size - 1
             while (i > -1) {
                 chatList?.add(0, list[i])
@@ -60,12 +61,12 @@ class ChatMessagesAdapter(
         notifyItemChanged(position)
     }
 
-    fun itemRemoved(list: ArrayList<ChatData>) {
-        this.chatList = list
-        notifyDataSetChanged()
+    fun itemRemoved(list: ArrayList<ChatData>, position: Int) {
+        chatList = list
+        notifyItemRemoved(position)
     }
 
-    fun updateIdentifier(identifier: String, isDelivered: Boolean, msgId: String) {
+/*    fun updateIdentifier(identifier: String, isDelivered: Boolean, msgId: String) {
         chatList?.let {
             for (x in it.indices) {
                 if (chatList?.get(x)?.identifier == identifier) {
@@ -80,7 +81,7 @@ class ChatMessagesAdapter(
                 }
             }
         }
-    }
+    }*/
 
     fun updateSeenStatus(msgId: Long) {
         chatList?.let {
@@ -111,8 +112,8 @@ class ChatMessagesAdapter(
         }
     }
 
-    fun addMessage(message: ChatData) {
-        chatList?.add(0, message)
+    fun addMessage(list: ArrayList<ChatData>) {
+        chatList = list
         notifyItemInserted(0)
     }
 
@@ -146,6 +147,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
+                itemHolder.binding.location.rlLocation.visibility = View.GONE
                 itemHolder.binding.itemChat.tvMessage.text = item.message
                 val regex = "(?s).*\\p{InArabic}.*"
                 if (item.message?.matches(Regex(regex)) == true) {
@@ -181,16 +183,7 @@ class ChatMessagesAdapter(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.itemChat.tvMessageStatus, item.is_read
                 )
-                itemHolder.binding.itemChat.rlMessage.setOnLongClickListener {
-                    myClickListener.myOnClick(it, position)
-                    itemHolder.binding.itemChat.rlMessage.setBackgroundResource(R.color.light_grey)
-                    return@setOnLongClickListener true
-                }
-                if (item.is_selected) {
-                    itemHolder.binding.itemChat.rlMessage.setBackgroundResource(R.color.light_grey)
-                } else {
-                    itemHolder.binding.itemChat.rlMessage.setBackgroundResource(0)
-                }
+                checkSelected(item, itemHolder.binding.itemChat.rlMessage)
             }
             AppConstants.AUDIO_MESSAGE -> {
                 hideShowViewOriginal(
@@ -208,6 +201,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
+                itemHolder.binding.location.rlLocation.visibility = View.GONE
                 itemHolder.binding.audioPlayer.ivPlayPause.setOnClickListener {
                     myChatMediaHelper?.playVoiceMsg(
                         itemHolder.binding,
@@ -240,6 +234,7 @@ class ChatMessagesAdapter(
                         item.audio_url = audioUrl
                     }
                 }
+                checkSelected(item, itemHolder.binding.audioPlayer.rlAudioItem)
             }
             AppConstants.IMAGE_MESSAGE -> {
                 if (item.identifier.isNullOrEmpty()) {
@@ -252,6 +247,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.VISIBLE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
+                itemHolder.binding.location.rlLocation.visibility = View.GONE
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
                 GlideDownloader.load(
                     context,
@@ -267,7 +263,7 @@ class ChatMessagesAdapter(
                 }
                 itemHolder.binding.imageHolder.rlImage.setOnClickListener {
                     startOpenMediaActivity(
-                        item.audio_url.toString(),
+                        item.audio_url.toString(), item.chat_id,
                         AppConstants.IMAGE_MESSAGE,
                         itemHolder.binding.imageHolder.ivImage
                     )
@@ -276,6 +272,7 @@ class ChatMessagesAdapter(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.imageHolder.tvMessageStatus, item.is_read
                 )
+                checkSelected(item, itemHolder.binding.imageHolder.rlImageItem)
             }
             AppConstants.VIDEO_MESSAGE -> {
                 itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
@@ -283,6 +280,7 @@ class ChatMessagesAdapter(
                 itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
                 itemHolder.binding.videoHolder.rlVideoItem.visibility = View.VISIBLE
                 itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
+                itemHolder.binding.location.rlLocation.visibility = View.GONE
 
                 if (item.identifier.isNullOrEmpty()) {
                     itemHolder.binding.videoHolder.tvTime.text =
@@ -302,9 +300,10 @@ class ChatMessagesAdapter(
                     R.color.grey,
                     R.color.grey
                 )
-                itemHolder.binding.videoHolder.rlVideoItem.setOnClickListener {
+                itemHolder.binding.videoHolder.rlVideo.setOnClickListener {
+                    Debugger.e("testingVideo", "rlVideo ${item.audio_url.toString()}")
                     startOpenMediaActivity(
-                        item.audio_url.toString(),
+                        item.audio_url.toString(), item.chat_id,
                         AppConstants.VIDEO_MESSAGE,
                         itemHolder.binding.videoHolder.ivImage
                     )
@@ -313,20 +312,101 @@ class ChatMessagesAdapter(
                     userId.toInt(), item.sender_id,
                     itemHolder.binding.videoHolder.tvMessageStatus, item.is_read
                 )
+                checkSelected(item, itemHolder.binding.videoHolder.rlVideoItem)
+            }
+            AppConstants.LOCATION_MESSAGE -> {
+                Debugger.e("ChatMessagesAdapter", "LOCATION_MESSAGE message:${item.message}")
+                itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
+                itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
+                itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
+                itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
+                itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
+                itemHolder.binding.location.rlLocation.visibility = View.VISIBLE
+                itemHolder.binding.location.tvTime.text = getTimeStamp(item.unix_time.toLong())
+                if (item.sender_id == userId.toInt()) {
+                    itemHolder.binding.location.rlLocation.gravity = Gravity.END
+                } else {
+                    itemHolder.binding.location.rlLocation.gravity = Gravity.START
+                }
+                itemHolder.binding.location.ivImage.setOnClickListener {
+                    startOpenMediaActivity(
+                        item.message.toString(), item.chat_id,
+                        AppConstants.LOCATION_KEY,
+                        itemHolder.binding.location.ivImage
+                    )
+                }
+                applyReadStatus(
+                    userId.toInt(), item.sender_id,
+                    itemHolder.binding.location.tvMessageStatus, item.is_read
+                )
+                checkSelected(item, itemHolder.binding.location.rlLocation)
             }
 
         }
-
     }
 
-    inner class MyHolder(val binding: ItemChatRightBinding) : RecyclerView.ViewHolder(binding.root)
+    private fun checkSelected(item: ChatData, view: RelativeLayout) {
+        if (item.is_selected) {
+            view.setBackgroundResource(R.color.shared_gray)
+        } else {
+            view.setBackgroundResource(0)
+        }
+    }
 
-    private fun startOpenMediaActivity(file: String, type: String, view: View) {
+    inner class MyHolder(val binding: ItemChatRightBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        private val rlMessage: RelativeLayout = binding.itemChat.rlMessage
+        private val rlAudio: RelativeLayout = binding.audioPlayer.rlAudioItem
+        private val rlImage: RelativeLayout = binding.imageHolder.rlImageItem
+        private val rlVideo: RelativeLayout = binding.videoHolder.rlVideoItem
+        private val rlLocation: RelativeLayout = binding.location.rlLocation
+
+        init {
+            rlMessage.setOnClickListener { view ->
+                selectItemListener.itemListener(view, adapterPosition, false)
+            }
+            rlMessage.setOnLongClickListener {
+                selectItemListener.itemListener(it, adapterPosition, true)
+                return@setOnLongClickListener true
+            }
+            rlAudio.setOnClickListener { view ->
+                selectItemListener.itemListener(view, adapterPosition, false)
+            }
+            rlAudio.setOnLongClickListener {
+                selectItemListener.itemListener(it, adapterPosition, true)
+                return@setOnLongClickListener true
+            }
+            rlImage.setOnClickListener { view ->
+                selectItemListener.itemListener(view, adapterPosition, false)
+            }
+            rlImage.setOnLongClickListener {
+                selectItemListener.itemListener(it, adapterPosition, true)
+                return@setOnLongClickListener true
+            }
+            rlVideo.setOnClickListener { view ->
+                selectItemListener.itemListener(view, adapterPosition, false)
+            }
+            rlVideo.setOnLongClickListener {
+                selectItemListener.itemListener(it, adapterPosition, true)
+                return@setOnLongClickListener true
+            }
+            rlLocation.setOnClickListener { view ->
+                selectItemListener.itemListener(view, adapterPosition, false)
+            }
+            rlLocation.setOnLongClickListener {
+                selectItemListener.itemListener(it, adapterPosition, true)
+                return@setOnLongClickListener true
+            }
+        }
+    }
+
+    private fun startOpenMediaActivity(file: String, chatId: Int, type: String, view: View) {
         val intent = Intent(context, OpenMediaActivity::class.java)
         intent.putExtra(AppConstants.CHAT_FILE, file)
         intent.putExtra(AppConstants.CHAT_TYPE, type)
         intent.putExtra(AppConstants.USER_NAME, name)
         intent.putExtra(AppConstants.PROFILE_IMAGE_KEY, profile)
+        intent.putExtra("location_chat_id", chatId)
 
         val transitionName = context.getString(R.string.trans_key)
         val options =
@@ -369,9 +449,5 @@ class ChatMessagesAdapter(
         } else {
             view.visibility = View.GONE
         }
-    }
-
-    private fun logE(msg: String) {
-        Debugger.e(TAG, msg)
     }
 }

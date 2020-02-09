@@ -2,6 +2,7 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.media.*
@@ -37,8 +38,8 @@ import kotlin.math.abs
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MyChatMediaHelper(
-        val context: AppCompatActivity,
-        val view: View, val isDialog: Boolean
+    val context: AppCompatActivity,
+    val view: View, val isDialog: Boolean
 ) : View.OnClickListener {
     private val TAG = this.javaClass.simpleName
     private lateinit var path: String
@@ -77,9 +78,9 @@ class MyChatMediaHelper(
         initRecorderListener()
         logE("initRecorderWithPermissions")
         Dexter.withActivity(context).withPermissions(
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()) {
@@ -91,8 +92,8 @@ class MyChatMediaHelper(
             }
 
             override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>?,
-                    token: PermissionToken?
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
             ) {
                 token?.continuePermissionRequest()
             }
@@ -105,9 +106,9 @@ class MyChatMediaHelper(
         initRecorderListener()
         logE("initRecorderWithPermissions")
         Dexter.withActivity(context).withPermissions(
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report!!.areAllPermissionsGranted()) {
@@ -118,8 +119,8 @@ class MyChatMediaHelper(
             }
 
             override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>?,
-                    token: PermissionToken?
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
             ) {
                 token?.continuePermissionRequest()
             }
@@ -155,9 +156,9 @@ class MyChatMediaHelper(
         view.lvForRecorder.tvTotalTime.text = "00:00"
         updateDrawables(recordGreen, playGray, stopGray)
         updateClickable(
-                canClickRecorder = true,
-                canClickPlay = false,
-                canClickStop = false
+            canClickRecorder = true,
+            canClickPlay = false,
+            canClickStop = false
         )
         visibility(gone, gone, visible)
         if (deleteFile) {
@@ -177,9 +178,9 @@ class MyChatMediaHelper(
             recorder?.startRecording()
             updateDrawables(recordGray, pauseGreen, stopGreen)
             updateClickable(
-                    canClickRecorder = false,
-                    canClickPlay = true,
-                    canClickStop = true
+                canClickRecorder = false,
+                canClickPlay = true,
+                canClickStop = true
             )
             isRecording = true
             isStopRecording = true
@@ -187,9 +188,9 @@ class MyChatMediaHelper(
             resumeChronometer()
             updateDrawables(recordGray, pauseGreen, stopGreen)
             updateClickable(
-                    canClickRecorder = false,
-                    canClickPlay = true,
-                    canClickStop = true
+                canClickRecorder = false,
+                canClickPlay = true,
+                canClickStop = true
             )
             recorder?.resumeRecording()
             isStopRecording = true
@@ -211,7 +212,7 @@ class MyChatMediaHelper(
     private fun pauseChronometer() {
 
         timeWhenPause =
-                view.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()
+            view.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()
         view.lvForRecorder.chronometer.stop()
 
     }
@@ -219,7 +220,7 @@ class MyChatMediaHelper(
     private fun resumeChronometer() {
 
         view.lvForRecorder.chronometer.base =
-                SystemClock.elapsedRealtime() + timeWhenPause
+            SystemClock.elapsedRealtime() + timeWhenPause
         view.lvForRecorder.chronometer.start()
 
     }
@@ -228,7 +229,7 @@ class MyChatMediaHelper(
         path = "/recording_${System.currentTimeMillis()}.wav"
         output = context.getExternalFilesDir(null)?.absolutePath + path
         recorder = OmRecorder.wav(
-                PullTransport.Default(mic()), file()
+            PullTransport.Default(mic()), file()
         )
     }
 
@@ -238,10 +239,10 @@ class MyChatMediaHelper(
 
     private fun mic(): PullableSource {
         return PullableSource.Default(
-                AudioRecordConfig.Default(
-                        MediaRecorder.AudioSource.MIC, AudioFormat.ENCODING_PCM_16BIT,
-                        AudioFormat.CHANNEL_IN_MONO, 44100
-                )
+            AudioRecordConfig.Default(
+                MediaRecorder.AudioSource.MIC, AudioFormat.ENCODING_PCM_16BIT,
+                AudioFormat.CHANNEL_IN_MONO, 44100
+            )
         )
     }
 
@@ -250,7 +251,7 @@ class MyChatMediaHelper(
     }
 
     private fun updateDrawables(
-            recordButton: Int, playButton: Int, stopButton: Int
+        recordButton: Int, playButton: Int, stopButton: Int
     ) {
         view.lvForRecorder.ivRecord.setImageResource(recordButton)
         view.lvForRecorder.ivPlay.setImageResource(playButton)
@@ -258,9 +259,9 @@ class MyChatMediaHelper(
     }
 
     private fun updateClickable(
-            canClickRecorder: Boolean,
-            canClickPlay: Boolean,
-            canClickStop: Boolean
+        canClickRecorder: Boolean,
+        canClickPlay: Boolean,
+        canClickStop: Boolean
     ) {
         view.lvForRecorder.ivRecord.isClickable = canClickRecorder
         view.lvForRecorder.ivPlay.isClickable = canClickPlay
@@ -277,9 +278,9 @@ class MyChatMediaHelper(
         view.lvForRecorder.seekBar.max = 0
         updateDrawables(recordGray, playGreen, stopGray)
         updateClickable(
-                canClickRecorder = false,
-                canClickPlay = true,
-                canClickStop = false
+            canClickRecorder = false,
+            canClickPlay = true,
+            canClickStop = false
         )
         view.lvForRecorder.tvTimer.text = "00:00"
 
@@ -296,14 +297,14 @@ class MyChatMediaHelper(
             recorder = null
             logE("Recorder Time : ${view.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime()}")
             totalDuration =
-                    abs(view.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime())
+                abs(view.lvForRecorder.chronometer.base - SystemClock.elapsedRealtime())
             logE("Recorder Time totalDuration $totalDuration")
             visibility(visible, visible, gone)
             updateDrawables(recordGray, playGreen, stopGray)
             updateClickable(
-                    canClickRecorder = false,
-                    canClickPlay = true,
-                    canClickStop = false
+                canClickRecorder = false,
+                canClickPlay = true,
+                canClickStop = false
             )
             isStopRecording = false
             isRecording = false
@@ -311,9 +312,9 @@ class MyChatMediaHelper(
             stopPlayer()
             updateDrawables(recordGray, playGreen, stopGray)
             updateClickable(
-                    canClickRecorder = true,
-                    canClickPlay = false,
-                    canClickStop = false
+                canClickRecorder = true,
+                canClickPlay = false,
+                canClickStop = false
             )
             isResumeRecorder = true
         }
@@ -338,9 +339,9 @@ class MyChatMediaHelper(
         pauseChronometer()
         updateDrawables(recordRed, pauseGray, stopGreen)
         updateClickable(
-                canClickRecorder = true,
-                canClickPlay = false,
-                canClickStop = true
+            canClickRecorder = true,
+            canClickPlay = false,
+            canClickStop = true
         )
         recorder?.pauseRecording()
         isResumeRecorder = true
@@ -359,17 +360,17 @@ class MyChatMediaHelper(
                     mediaPlayer?.pause()
                     updateDrawables(recordGray, playGreen, stopGreen)
                     updateClickable(
-                            canClickRecorder = false,
-                            canClickPlay = true,
-                            canClickStop = true
+                        canClickRecorder = false,
+                        canClickPlay = true,
+                        canClickStop = true
                     )
                 } else {
                     mediaPlayer?.pause()
                     updateDrawables(recordGray, pauseGreen, stopGreen)
                     updateClickable(
-                            canClickRecorder = false,
-                            canClickPlay = true,
-                            canClickStop = true
+                        canClickRecorder = false,
+                        canClickPlay = true,
+                        canClickStop = true
                     )
                     mediaPlayer?.start()
                 }
@@ -377,17 +378,17 @@ class MyChatMediaHelper(
             } else {
                 updateDrawables(recordGray, pauseGreen, stopGreen)
                 updateClickable(
-                        canClickRecorder = false,
-                        canClickPlay = true,
-                        canClickStop = true
+                    canClickRecorder = false,
+                    canClickPlay = true,
+                    canClickStop = true
                 )
                 mediaPlayer = MediaPlayer()
                 mediaPlayer?.setAudioAttributes(
-                        AudioAttributes
-                                .Builder()
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                                .build()
+                    AudioAttributes
+                        .Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                        .build()
                 )
                 mediaPlayer?.setDataSource(output)
                 mediaPlayer?.prepare()
@@ -408,9 +409,9 @@ class MyChatMediaHelper(
             view.lvForRecorder.tvTimer.text = "00:00"
             view.lvForRecorder.seekBar.max = 0
             updateClickable(
-                    canClickRecorder = false,
-                    canClickPlay = true,
-                    canClickStop = false
+                canClickRecorder = false,
+                canClickPlay = true,
+                canClickStop = false
             )
             updateDrawables(recordGray, playGreen, stopGray)
 
@@ -421,7 +422,7 @@ class MyChatMediaHelper(
 
         view.lvForRecorder.seekBar.max = mediaPlayer?.duration!!
         view.lvForRecorder.tvTotalTime.text =
-                timeFormatter.format(mediaPlayer?.duration!!)
+            timeFormatter.format(mediaPlayer?.duration!!)
         runnable = Runnable {
             try {
                 if (mediaPlayer != null) {
@@ -431,7 +432,7 @@ class MyChatMediaHelper(
                     }
 
                     view.lvForRecorder.tvTimer.text =
-                            timeFormatter.format(currentSeconds)
+                        timeFormatter.format(currentSeconds)
                     handler.postDelayed(runnable, 1)
                 }
             } catch (e: IllegalStateException) {
@@ -442,7 +443,7 @@ class MyChatMediaHelper(
         handler.postDelayed(runnable, 1)
 
         view.lvForRecorder.seekBar.setOnSeekBarChangeListener(object :
-                SeekBar.OnSeekBarChangeListener {
+            SeekBar.OnSeekBarChangeListener {
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (mediaPlayer != null && fromUser) {
@@ -505,13 +506,11 @@ class MyChatMediaHelper(
             }
             R.id.llGallery -> {
                 context.startActivityForResult(
-                        Intent(
-                                context,
-                                GalleryPostActivity::class.java
-                        ), AppConstants.SELECTED_IMAGES
+                    Intent(
+                        context,
+                        GalleryPostActivity::class.java
+                    ), AppConstants.SELECTED_IMAGES
                 )
-
-
             }
         }
     }
@@ -523,14 +522,17 @@ class MyChatMediaHelper(
     var myPlayer: MediaPlayer? = null
 
     fun playVoiceMsg(
-            binding: ItemChatRightBinding,
-            voiceMessage: String,
-            currentPos: Long,
-            context: Context,
-            unixTime: Double,
-            language: String
+        binding: ItemChatRightBinding,
+        voiceMessage: String,
+        currentPos: Long,
+        context: Context,
+        unixTime: Double,
+        language: String
     ) {
-        if (!File(context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3").exists() && voiceMessage.contains("https://")) {
+        if (!File(context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3").exists() && voiceMessage.contains(
+                "https://"
+            )
+        ) {
             DownloadAudioFileFromURL(context, binding, unixTime, language).execute(voiceMessage)
 
         } else {
@@ -555,16 +557,16 @@ class MyChatMediaHelper(
                         prePos = currentPos
                         myPlayer = MediaPlayer()
                         myPlayer?.setAudioAttributes(
-                                AudioAttributes
-                                        .Builder()
-                                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                                        .build()
+                            AudioAttributes
+                                .Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                                .build()
                         )
                         isRelease = false
                         if (voiceMessage.contains("https://")) {
                             val path =
-                                    File(context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3").absolutePath
+                                File(context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3").absolutePath
                             myPlayer?.setDataSource(path)
                         } else {
                             myPlayer?.setDataSource(voiceMessage)
@@ -593,7 +595,7 @@ class MyChatMediaHelper(
                         }
                     }
 
-                } catch (e: IllegalStateException) {
+                } catch (e: Exception) {
                     Debugger.e("ChatMessagesAdapter", "exception:${e.message}")
                 }
 
@@ -614,11 +616,11 @@ class MyChatMediaHelper(
                 }
 
                 binding.audioPlayer.seekBar.setOnSeekBarChangeListener(object :
-                        SeekBar.OnSeekBarChangeListener {
+                    SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(
-                            seekBar: SeekBar?,
-                            progress: Int,
-                            fromUser: Boolean
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
                     ) {
                         if (fromUser) {
                             myPlayer?.seekTo(progress * 1000)
@@ -659,11 +661,11 @@ class MyChatMediaHelper(
     }
 
     internal class DownloadAudioFileFromURL(
-            val context: Context,
-            val binding: ItemChatRightBinding
-            , val unixTime: Double, val language: String
+        val context: Context,
+        val binding: ItemChatRightBinding
+        , val unixTime: Double, val language: String
     ) :
-            AsyncTask<String?, String?, String?>() {
+        AsyncTask<String?, String?, String?>() {
         private val TAG = this.javaClass.simpleName
         override fun doInBackground(vararg f_url: String?): String? {
             var count: Int = 0
@@ -674,11 +676,11 @@ class MyChatMediaHelper(
                 val lenghtOfFile: Int = connection.contentLength
                 // download the file
                 val input: InputStream = BufferedInputStream(
-                        url.openStream(),
-                        8192
+                    url.openStream(),
+                    8192
                 )
                 val path =
-                        context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3"
+                    context.getExternalFilesDir(null)?.absolutePath + "/" + language + "$unixTime.mp3"
                 val output: OutputStream = FileOutputStream(path)
                 val data = ByteArray(1024)
                 var total: Long = 0
@@ -725,7 +727,7 @@ class MyChatMediaHelper(
         var fileOutput: String? = null
         var dirFiles: Array<File>? = null
         val fileDirectory =
-                File(context.getExternalFilesDir(null)?.absolutePath)
+            File(context.getExternalFilesDir(null)?.absolutePath)
         if (fileDirectory.exists()) {
             dirFiles = fileDirectory.listFiles()
 
