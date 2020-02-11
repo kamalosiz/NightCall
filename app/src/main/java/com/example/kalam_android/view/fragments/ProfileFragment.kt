@@ -95,9 +95,7 @@ class ProfileFragment : Fragment() {
             else -> {
 
             }
-
         }
-
     }
 
     @SuppressLint("SetTextI18n")

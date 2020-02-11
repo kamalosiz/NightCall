@@ -12,6 +12,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.callbacks.SelectAudioCallBack
 import com.example.kalam_android.databinding.ActivityAudioFileBinding
 import com.example.kalam_android.repository.model.AudioModel
@@ -30,7 +31,7 @@ import kotlinx.android.synthetic.main.activity_gallery_post.*
 import kotlinx.android.synthetic.main.item_chat.*
 import kotlinx.android.synthetic.main.item_for_audio.view.*
 
-class AudioFileActivity : AppCompatActivity(), SelectAudioCallBack, View.OnClickListener {
+class AudioFileActivity : BaseActivity(), SelectAudioCallBack, View.OnClickListener {
 
     private lateinit var binding: ActivityAudioFileBinding
     private lateinit var adapterForAudio: AdapterForAudio

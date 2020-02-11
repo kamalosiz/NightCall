@@ -1,12 +1,12 @@
 package com.example.kalam_android.view.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.databinding.ActivityMultipleMediasGroupBinding
 
-class MultipleMediasGroupActivity : AppCompatActivity() {
+class MultipleMediasGroupActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMultipleMediasGroupBinding
     override fun onCreate(savedInstanceState: Bundle?) {

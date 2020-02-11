@@ -6,18 +6,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
-import android.widget.Button
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.callbacks.OnStartDragListener
 import com.example.kalam_android.callbacks.RemoveItemCallBack
@@ -29,13 +25,12 @@ import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
-import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForMediaView
 import com.example.kalam_android.view.adapter.AdapterSelectedMedia
 import java.util.*
 
-class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragListener,
-        SelectedItemCallBack, View.OnClickListener, RemoveItemCallBack {
+class AttachmentActivity : BaseActivity(), MyClickListener, OnStartDragListener,
+    SelectedItemCallBack, View.OnClickListener, RemoveItemCallBack {
 
     private lateinit var binding: ActivityAttachmentBinding
     private var list: ArrayList<MediaList>? = null
@@ -76,7 +71,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
 
         adapterForSelectedMedia = AdapterSelectedMedia(this, list!!)
         binding.rvSelectedMedia.layoutManager =
-                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvSelectedMedia.adapter = adapterForSelectedMedia
         adapterForSelectedMedia.setMyClickListener(this)
         adapterForSelectedMedia.setOnStartDragListener(this)
@@ -89,7 +84,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
     private fun getIntentData() {
         if (intent != null) {
             list =
-                    intent.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>?
+                intent.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>?
             Debugger.w("Gallery list ", list.toString())
         }
     }
@@ -101,7 +96,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
         binding.rvSelectedMedia.itemAnimator = itemAnimator
 
         val callback: ItemTouchHelper.Callback =
-                EditItemTouchHelperCallback(adapterForSelectedMedia)
+            EditItemTouchHelperCallback(adapterForSelectedMedia)
         mItemTouchHelper = ItemTouchHelper(callback)
         mItemTouchHelper?.attachToRecyclerView(binding.rvSelectedMedia)
     }
@@ -131,8 +126,8 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
             }
             R.id.llGallery -> {
                 startActivityForResult(
-                        Intent(this, GalleryPostActivity::class.java),
-                        AppConstants.SELECTED_IMAGES
+                    Intent(this, GalleryPostActivity::class.java),
+                    AppConstants.SELECTED_IMAGES
                 )
             }
             R.id.tvDone -> {
@@ -154,7 +149,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
                 AppConstants.SELECTED_IMAGES -> {
                     if (data != null) {
                         val listData =
-                                data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
                         list?.addAll(listData)
                         adapterForMediaView.updateList(list!!)
                         adapterForSelectedMedia.notifyDataSetChanged()
@@ -163,7 +158,7 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
                 AppConstants.SELECT_AUDIO -> {
                     if (data != null) {
                         val listData =
-                                data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
+                            data.getSerializableExtra(AppConstants.SELECTED_IMAGES_VIDEOS) as ArrayList<MediaList>
                         list?.addAll(listData)
                         adapterForMediaView.updateList(list!!)
                         adapterForSelectedMedia.notifyDataSetChanged()
@@ -181,7 +176,12 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
 
     private fun showDialog() {
 
-        val dialogBinding: LayoutAudioRecoderDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(applicationContext), R.layout.layout_audio_recoder_dialog, null, false)
+        val dialogBinding: LayoutAudioRecoderDialogBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(applicationContext),
+            R.layout.layout_audio_recoder_dialog,
+            null,
+            false
+        )
         myChatMediaHelper = MyChatMediaHelper(this@AttachmentActivity, dialogBinding.root, true)
         myChatMediaHelper?.initRecorderPermissions()
         val dialog = Dialog(this)
@@ -191,8 +191,8 @@ class AttachmentActivity : AppCompatActivity(), MyClickListener, OnStartDragList
         dialog.setContentView(dialogBinding.root)
         dialogBinding.tvSelectAudio.setOnClickListener {
             startActivityForResult(
-                    Intent(this, AudioFileActivity::class.java),
-                    AppConstants.SELECT_AUDIO
+                Intent(this, AudioFileActivity::class.java),
+                AppConstants.SELECT_AUDIO
             )
             dialog.dismiss()
         }

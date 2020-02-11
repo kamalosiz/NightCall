@@ -7,10 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.callbacks.OnGalleryItemClickedListener
 import com.example.kalam_android.repository.model.MediaList
 import com.example.kalam_android.util.AppConstants
@@ -25,7 +25,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_gallery_post.*
 import kotlinx.android.synthetic.main.gallery_image_item.view.*
 
-class GalleryPostActivity : AppCompatActivity(), OnGalleryItemClickedListener {
+class GalleryPostActivity : BaseActivity(), OnGalleryItemClickedListener {
 
     var pictureCounter = 0
     private val TAG = this.javaClass.simpleName

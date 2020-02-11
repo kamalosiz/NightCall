@@ -2,11 +2,8 @@ package com.example.kalam_android.base
 
 import android.app.AlertDialog
 import android.content.Context
-import android.view.View
-import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kalam_android.R
-import com.example.kalam_android.util.Debugger
 
 
 open class BaseActivity : AppCompatActivity() {

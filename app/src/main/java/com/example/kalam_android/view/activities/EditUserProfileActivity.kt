@@ -14,7 +14,6 @@ import android.view.Window
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
@@ -24,6 +23,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityEditUserProfileBinding
 import com.example.kalam_android.helper.JSONParser
@@ -47,30 +47,28 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.yalantis.ucrop.UCrop
-import id.zelory.compressor.Compressor
 import kotlinx.android.synthetic.main.activity_sign_up.view.tvCountry
 import kotlinx.android.synthetic.main.layout_for_user_edit_profile_overview.view.*
 import okhttp3.MediaType
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
 import javax.inject.Inject
 
-class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
+class EditUserProfileActivity : BaseActivity(), View.OnClickListener,
     CountriesAdapter.LocationItemClickListener, CityAdapter.CityItemClickListener {
     private lateinit var binding: ActivityEditUserProfileBinding
     private var isWallImage: Boolean = false
     private var profileImagePath: String? = null
-    lateinit var dialogCountry: Dialog
-    lateinit var dialogCity: Dialog
-    var countryName = ""
-    var cityName = ""
-    var countries: ArrayList<String>? = null
-    var cities: ArrayList<String>? = null
-    var countriesJson = ""
-    var citiesJson = ""
-    var wallImage = ""
-    var profileImage = ""
+    private lateinit var dialogCountry: Dialog
+    private lateinit var dialogCity: Dialog
+    private var countryName = ""
+    private var cityName = ""
+    private var countries: ArrayList<String>? = null
+    private var cities: ArrayList<String>? = null
+    private var countriesJson = ""
+    private var citiesJson = ""
+    private var wallImage = ""
+    private var profileImage = ""
     @Inject
     lateinit var factory: ViewModelFactory
     lateinit var viewModel: EditUserProfileViewModel
@@ -136,15 +134,11 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                 intent.getSerializableExtra(AppConstants.USER_DATA) as ArrayList<ProfileData>?
             binding.etFirstName.setText(list?.get(0)?.firstname)
             binding.etLastName.setText(list?.get(0)?.lastname)
-            if (list?.get(0)?.country_code != null && list.get(0)?.phone != null) {
-                binding.overviewView.etPhone.setText("+" + list?.get(0)?.country_code + list?.get(0)?.phone)
-            }
+            binding.overviewView.etPhone.setText(list?.get(0)?.phone)
             binding.overviewView.etEmail.setText(list?.get(0)?.email)
             binding.overviewView.etDescription.setText(list?.get(0)?.bio)
             binding.overviewView.etAddress.setText(list?.get(0)?.address)
-//            binding.overviewView.etWebsite.setText(list?.get(0)?.website)
             binding.overviewView.etEducation.setText(list?.get(0)?.education)
-//            binding.overviewView.etFax.setText(list?.get(0)?.fax)
             binding.overviewView.etWork.setText(list?.get(0)?.work)
             binding.overviewView.tvCity.text = list?.get(0)?.city
             binding.overviewView.tvCountry.text = list?.get(0)?.country
@@ -233,6 +227,7 @@ class EditUserProfileActivity : AppCompatActivity(), View.OnClickListener,
                         applicationContext,
                         R.color.black
                     )
+
                 )
                 binding.tvPhotos.setTextColor(
                     ContextCompat.getColor(

@@ -1,8 +1,5 @@
 package com.example.kalam_android.view.activities
 
-import android.app.AlertDialog
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.DataBindingUtil
@@ -13,16 +10,13 @@ import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityResetPasswordBinding
 import com.example.kalam_android.repository.model.BasicResponse
-import com.example.kalam_android.repository.model.LoginResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.showAlertDialog
 import com.example.kalam_android.util.toast
 import com.example.kalam_android.viewmodel.ForgetPasswordViewModel
-import com.example.kalam_android.viewmodel.LoginViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 
 class ResetPasswordActivity : BaseActivity(), View.OnClickListener {

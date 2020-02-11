@@ -2,13 +2,10 @@ package com.example.kalam_android.util
 
 import android.content.Context
 import android.graphics.Typeface
-import android.media.AudioManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
-import java.lang.reflect.Type
 
 
 object Global {

@@ -1,31 +1,26 @@
 package com.example.kalam_android.view.activities
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.ViewPager
 import com.example.kalam_android.R
+import com.example.kalam_android.base.BaseActivity
+import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.databinding.ActivityStatusDetailBinding
 import com.example.kalam_android.repository.model.ImageModel
 import com.example.kalam_android.view.adapter.StatusPagerAdapter
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.widget.NestedScrollView
-import com.example.kalam_android.callbacks.MyClickListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.status_bottom_sheet_fragment.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 
-class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchListener {
+class StatusDetailActivity : BaseActivity(), MyClickListener, View.OnTouchListener {
 
 
     private lateinit var binding: ActivityStatusDetailBinding
@@ -72,13 +67,14 @@ class StatusDetailActivity : AppCompatActivity(), MyClickListener, View.OnTouchL
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
 
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-             }
+            }
 
         })
 

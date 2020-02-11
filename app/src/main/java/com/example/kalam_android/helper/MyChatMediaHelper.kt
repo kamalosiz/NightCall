@@ -2,12 +2,10 @@ package com.example.kalam_android.helper
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.media.*
 import android.os.AsyncTask
-import android.os.Environment
 import android.os.Handler
 import android.os.SystemClock
 import android.view.View
@@ -24,7 +22,6 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.activity_chat_detail.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_for_attachment.view.*
 import kotlinx.android.synthetic.main.layout_for_recoder.view.*
