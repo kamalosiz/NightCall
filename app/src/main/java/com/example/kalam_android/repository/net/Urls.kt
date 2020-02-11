@@ -17,6 +17,7 @@ class Urls {
 
         //Live Ip
 //        const val BASE_URL = "http://54.183.109.117:5000/"
+
         const val VERIFY_PHONE = "api/user/verify_phone"
         const val VERIFY_PHONE_CODE = "api/user/verify_phone_code"
         const val CREATE_PROFILE = "api/user/signup"
