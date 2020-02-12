@@ -7,11 +7,11 @@ import com.example.kalam_android.localdb.dao.ChatDataDao
 import com.example.kalam_android.localdb.dao.ContactsDao
 import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.localdb.entities.ChatListData
-import com.example.kalam_android.localdb.entities.ContactsEntityClass
+import com.example.kalam_android.localdb.entities.ContactsData
 
 @Database(
-    entities = [ContactsEntityClass::class, ChatListData::class, ChatData::class],
-    version = 1
+    entities = [ContactsData::class, ChatListData::class, ChatData::class],
+    version = 2
 )
 abstract class RoomDB : RoomDatabase() {
 

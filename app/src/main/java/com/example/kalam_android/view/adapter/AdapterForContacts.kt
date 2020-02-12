@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.databinding.ItemForContactListBinding
 import com.example.kalam_android.databinding.ItemForNewGroupContactBinding
-import com.example.kalam_android.repository.model.ContactsData
+import com.example.kalam_android.localdb.entities.ContactsData
 import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.view.activities.ChatDetailActivity
@@ -201,8 +201,7 @@ class AdapterForContacts(val context: Context) :
                     val filteredList = ArrayList<ContactsData>()
                     contactList2?.let {
                         for (row in it) {
-                            if (row.name?.toLowerCase()?.contains(charString.toLowerCase()) == true ||
-                                row.number?.contains(charSequence) == true
+                            if (row.name?.toLowerCase()?.contains(charString.toLowerCase()) == true || row.number.contains(charSequence)
                             ) {
                                 filteredList.add(row)
                             }

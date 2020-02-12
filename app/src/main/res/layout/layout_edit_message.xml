@@ -16,6 +16,7 @@
         android:paddingBottom="@dimen/_7sdp">
 
         <LinearLayout
+            android:id="@+id/llCopy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_7sdp"
@@ -29,41 +30,14 @@
             <ImageView
                 android:layout_width="@dimen/_9sdp"
                 android:layout_height="@dimen/_9sdp"
-                android:background="@drawable/icon_like" />
+                android:background="@drawable/icon_copy" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
-                android:text="Like"
-                android:textColor="@color/theme_color"
-                android:textSize="@dimen/_11sdp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_7sdp"
-            android:background="@drawable/edit_message_not_selectable"
-            android:gravity="center"
-            android:paddingStart="@dimen/_10sdp"
-            android:paddingTop="@dimen/_5sdp"
-            android:paddingEnd="@dimen/_10sdp"
-            android:paddingBottom="@dimen/_5sdp">
-
-            <ImageView
-                android:layout_width="@dimen/_9sdp"
-                android:layout_height="@dimen/_9sdp"
-                android:background="@drawable/icon_edit" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_2sdp"
-                android:fontFamily="@font/roboto_regular"
-                android:text="Edit"
+                android:text="Copy"
                 android:textColor="@color/theme_color"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
@@ -96,7 +70,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/llCopy"
+            android:id="@+id/llEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_7sdp"
@@ -110,14 +84,41 @@
             <ImageView
                 android:layout_width="@dimen/_9sdp"
                 android:layout_height="@dimen/_9sdp"
-                android:background="@drawable/icon_copy" />
+                android:background="@drawable/icon_edit" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
-                android:text="Copy"
+                android:text="Edit"
+                android:textColor="@color/theme_color"
+                android:textSize="@dimen/_11sdp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llForward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_7sdp"
+            android:background="@drawable/edit_message_not_selectable"
+            android:gravity="center"
+            android:paddingStart="@dimen/_10sdp"
+            android:paddingTop="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_10sdp"
+            android:paddingBottom="@dimen/_5sdp">
+
+            <ImageView
+                android:layout_width="@dimen/_9sdp"
+                android:layout_height="@dimen/_9sdp"
+                android:background="@drawable/icon_forward" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_2sdp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="Forward"
                 android:textColor="@color/theme_color"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
@@ -162,14 +163,14 @@
             <ImageView
                 android:layout_width="@dimen/_9sdp"
                 android:layout_height="@dimen/_9sdp"
-                android:background="@drawable/icon_forward" />
+                android:background="@drawable/icon_like" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
-                android:text="Forward"
+                android:text="Like"
                 android:textColor="@color/theme_color"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>

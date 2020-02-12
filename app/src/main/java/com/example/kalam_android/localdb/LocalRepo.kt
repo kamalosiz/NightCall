@@ -6,7 +6,8 @@ import com.example.kalam_android.localdb.dao.ChatDataDao
 import com.example.kalam_android.localdb.dao.ContactsDao
 import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.localdb.entities.ChatListData
-import com.example.kalam_android.localdb.entities.ContactsEntityClass
+import com.example.kalam_android.localdb.entities.ContactsData
+import com.example.kalam_android.util.Debugger
 import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,30 +18,14 @@ class LocalRepo @Inject constructor(
     private val daoChats: AllChatListDao,
     private val chatDataDao: ChatDataDao
 ) {
-
-    fun insertContactsToIntoDB(contactsData: ArrayList<ContactsEntityClass>) {
+    fun insertContactsToIntoDB(contactsData: ArrayList<ContactsData>) {
         contactsData.let {
-            Log.i("testingLocal", "insertContactsToIntoDB: $it")
+            Debugger.e("insertContactsToIntoDB", "insertContactsToIntoDB: $it")
             dao.insert(it)
         }
     }
 
-    //Testing
-    /* fun insertListIntoDB(data: ArrayList<*>, type: String) {
-         when (type) {
-             "chats" -> {
-                 data.let {
-                     dao.insert(it as ArrayList<ContactsEntityClass>)
-                 }
-             }
-             "contacts" -> {
-
-             }
-         }
-     }*/
-    //
-
-    fun getContactsFromLocal(): Single<List<ContactsEntityClass>> {
+    fun getContactsFromLocal(): Single<List<ContactsData>> {
         return dao.getAllContacts()
     }
 

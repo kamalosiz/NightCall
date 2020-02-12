@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
 import com.example.kalam_android.callbacks.OnClickNewGroupContact
 import com.example.kalam_android.databinding.ItemForNewGroupContactListBinding
-import com.example.kalam_android.repository.model.ContactsData
+import com.example.kalam_android.localdb.entities.ContactsData
 import com.example.kalam_android.wrapper.GlideDownloader
 
-class AdapterForNewGroupContact(
+class AdapterForKalamUsers(
     val context: Context,
     private val onClickNewGroupContact: OnClickNewGroupContact
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
@@ -50,7 +50,7 @@ class AdapterForNewGroupContact(
             0,
             R.drawable.dummy_placeholder
         )
-        if (contact?.isSelected == true) {
+        if (contact?.is_selected == true) {
             itemViewHolder.binding.ivSelectContact.visibility = View.VISIBLE
             itemViewHolder.binding.llSelectContact.setBackgroundResource(R.color.audio_send_background)
         } else {

@@ -64,7 +64,7 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
             Status.LOADING -> {
                 showProgressDialog(this)
             }
-            Status.SUCCESS -> {
+            else -> {
                 hideProgressDialog()
                 val sharedPrefsHelper = getSharedPreferences("kalam-prefs", Context.MODE_PRIVATE)
                 val editor = sharedPrefsHelper.edit()
@@ -73,11 +73,6 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                 toast("Logout Successfully")
                 setResult(Activity.RESULT_OK)
                 finish()
-            }
-            Status.ERROR -> {
-                hideProgressDialog()
-            }
-            else -> {
             }
         }
     }
@@ -190,9 +185,12 @@ class SettingActivity : BaseActivity(), AdapterView.OnItemSelectedListener, View
                         AppConstants.UPDATE_SETTINGS, autoTranslate.toString()
                         , item, sharedPrefsHelper.getUser()?.id.toString()
                     )
+
                     sharedPrefsHelper.saveLanguage(item)
                     autoTranslate?.let { sharedPrefsHelper.saveTranslateState(it) }
                     toast("Language successfully updated")
+                    logE("saved Language :${sharedPrefsHelper.getLanguage()}")
+                    logE("saved Language state :${sharedPrefsHelper.getTransState()}")
                 }
                 builder1.setNegativeButton("No") { dialog, id ->
                     dialog.cancel()

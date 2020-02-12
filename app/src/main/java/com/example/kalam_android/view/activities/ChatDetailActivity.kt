@@ -47,7 +47,6 @@ import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.webrtc.CallActivity
 import com.example.kalam_android.wrapper.GlideDownloader
 import com.example.kalam_android.wrapper.SocketIO
-import com.github.nkzawa.engineio.client.Socket
 import com.github.nkzawa.socketio.client.Ack
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -69,7 +68,7 @@ import kotlinx.android.synthetic.main.layout_for_attachment.view.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.util.*
+import java.io.Serializable
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -95,8 +94,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     var handler = Handler()
     private var upChatList: ArrayList<ChatData> = ArrayList()
     private var downChatList: ArrayList<ChatData> = ArrayList()
-    private var msgList: ArrayList<ChatData> = ArrayList()
-    private var deleteMsgIds: ArrayList<Long> = ArrayList()
+    private var chatMessagesList: ArrayList<ChatData> = ArrayList()
+    private var selectedMsgsIds: ArrayList<Long> = ArrayList()
     private var senderIds: ArrayList<Int?> = ArrayList()
     private var chatResponse: ChatDetailResponse? = null
     private var profileImage: String? = null
@@ -209,6 +208,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         binding.edit.llDelete.setOnClickListener(this)
         binding.edit.llCopy.setOnClickListener(this)
         binding.edit.llEdit.setOnClickListener(this)
+        binding.edit.llForward.setOnClickListener(this)
         binding.lvBottomChat.lvForAttachment.llLocation.setOnClickListener(this)
     }
 
@@ -319,7 +319,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         mResponse?.let { response ->
             chatResponse = response
             response.data.chats?.let {
-                msgList.addAll(it)
+                chatMessagesList.addAll(it)
                 if (fromSearch == 1) {
                     fromSearch = 0
                     for (x in it.indices) {
@@ -465,8 +465,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         }
 
         lastMessageStatus = 0
-        msgList.add(0, chatData)
-        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(msgList)
+        chatMessagesList.add(0, chatData)
+        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(chatMessagesList)
         binding.chatMessagesRecycler.scrollToPosition(0)
     }
 
@@ -566,20 +566,20 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (isDelivered) lastMessageStatus = 1
                     val identifier = jsonObject.getString("identifier")
                     val msgId = jsonObject.getString("message_id")
-                    msgList.let {
+                    chatMessagesList.let {
                         for (x in it.indices) {
-                            if (msgList[x].identifier == identifier) {
-                                msgList[x].identifier = ""
-                                msgList[x].id = msgId.toLong()
+                            if (chatMessagesList[x].identifier == identifier) {
+                                chatMessagesList[x].identifier = ""
+                                chatMessagesList[x].id = msgId.toLong()
                                 if (isDelivered) {
-                                    msgList[x].is_read = 1
+                                    chatMessagesList[x].is_read = 1
                                 } else {
-                                    msgList[x].is_read = 0
+                                    chatMessagesList[x].is_read = 0
                                 }
                                 (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
-                                    msgList, x
+                                    chatMessagesList, x
                                 )
-                                if (msgList[x].type == AppConstants.LOCATION_MESSAGE) {
+                                if (chatMessagesList[x].type == AppConstants.LOCATION_MESSAGE) {
                                     showingLocation = true
                                     mainHandler = Handler(Looper.getMainLooper())
                                     runnable = object : Runnable {
@@ -636,11 +636,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     val messageId = jsonObject.getString("message_id")
                     val message = jsonObject.getString("message")
                     if (this.chatId == chatId.toInt()) {
-                        val item = msgList.single { it.id == messageId.toLong() }
-                        val index = msgList.indexOf(item)
+                        val item = chatMessagesList.single { it.id == messageId.toLong() }
+                        val index = chatMessagesList.indexOf(item)
                         item.message = message
                         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
-                            msgList, index
+                            chatMessagesList, index
                         )
                     }
                 }
@@ -663,18 +663,18 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun resetSelection() {
         binding.edit.visibility = View.GONE
         isEditableEnabled = false
-        deleteMsgIds.clear()
+        selectedMsgsIds.clear()
         senderIds.clear()
     }
 
     private fun removeSelectItems() {
-        if (deleteMsgIds.isNotEmpty()) {
-            deleteMsgIds.forEach { id ->
-                val item = msgList.single { data -> data.id == id }
-                val index = msgList.indexOf(item)
+        if (selectedMsgsIds.isNotEmpty()) {
+            selectedMsgsIds.forEach { id ->
+                val item = chatMessagesList.single { data -> data.id == id }
+                val index = chatMessagesList.indexOf(item)
                 item.is_selected = false
                 (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
-                    msgList,
+                    chatMessagesList,
                     index
                 )
             }
@@ -685,11 +685,11 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private fun deleteMessages(messages: JSONArray) {
         for (x in 0 until messages.length()) {
             val id = messages.getLong(x)
-            val msg = msgList.filter { it.id == id }
-            val index = msgList.indexOf(msg[0])
-            msgList.remove(msg[0])
+            val msg = chatMessagesList.filter { it.id == id }
+            val index = chatMessagesList.indexOf(msg[0])
+            chatMessagesList.remove(msg[0])
             (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemRemoved(
-                msgList, index
+                chatMessagesList, index
             )
         }
         resetSelection()
@@ -720,14 +720,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         }
                     }
                 } else {
-                    binding.lvBottomChat.editTextMessage.setText("")
                     logE("editingMessage else")
                     SocketIO.getInstance().emitEditMsg(
-                        deleteMsgIds[0].toString(),
+                        selectedMsgsIds[0].toString(),
                         chatId.toString(),
                         binding.lvBottomChat.editTextMessage.text.toString(), callerID.toString()
                     )
-                    logE("deletedItems :${deleteMsgIds[0]}")
+                    logE("deletedItems :${selectedMsgsIds[0]}")
+                    binding.lvBottomChat.editTextMessage.setText("")
                     editingMessage = false
                     removeSelectItems()
                 }
@@ -773,10 +773,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 removeSelectItems()
             }
             R.id.llDelete -> {
-                if (deleteMsgIds.isNotEmpty()) {
+                if (selectedMsgsIds.isNotEmpty()) {
                     SocketIO.getInstance().emitDeleteMsg(
                         chatId.toString(),
-                        deleteMsgIds.toString(),
+                        selectedMsgsIds.toString(),
                         callerID.toString()
                     )
                 }
@@ -784,23 +784,29 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             R.id.llCopy -> {
                 val clipManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 var text = ""
-                deleteMsgIds.forEach { id ->
-                    val item = msgList.single { it.id == id }
+                selectedMsgsIds.forEach { id ->
+                    val item = chatMessagesList.single { it.id == id }
                     text += item.message
                 }
                 val clipData = ClipData.newPlainText("text", text)
                 clipManager.setPrimaryClip(clipData)
                 removeSelectItems()
-                toast("Copied to Clipboard")
+                toast("Text Copied to Clipboard")
             }
             R.id.llEdit -> {
-                val item = msgList.single { it.id == deleteMsgIds[0] }
+                val item = chatMessagesList.single { it.id == selectedMsgsIds[0] }
                 val text = item.message.toString()
                 binding.lvBottomChat.editTextMessage.setText(text)
                 editingMessage = true
             }
             R.id.llLocation -> {
                 locationPermissions()
+            }
+            R.id.llForward -> {
+                val intent = Intent(this, ContactListActivity::class.java)
+                intent.putExtra(AppConstants.IS_FORWARD_MESSAGE, true)
+                intent.putExtra(AppConstants.SELECTED_MSGS_IDS, selectedMsgsIds.toString())
+                startActivity(intent)
             }
         }
     }
@@ -929,17 +935,17 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun performClickAction(position: Int) {
-        if (msgList[position].is_selected) {
-            msgList[position].is_selected = false
-            deleteMsgIds.remove(msgList[position].id)
-            senderIds.remove(msgList[position].sender_id)
+        if (chatMessagesList[position].is_selected) {
+            chatMessagesList[position].is_selected = false
+            selectedMsgsIds.remove(chatMessagesList[position].id)
+            senderIds.remove(chatMessagesList[position].sender_id)
         } else {
-            msgList[position].is_selected = true
-            deleteMsgIds.add(msgList[position].id)
-            senderIds.add(msgList[position].sender_id)
+            chatMessagesList[position].is_selected = true
+            selectedMsgsIds.add(chatMessagesList[position].id)
+            senderIds.add(chatMessagesList[position].sender_id)
         }
         (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).itemChanged(
-            msgList,
+            chatMessagesList,
             position
         )
         if (senderIds.contains(callerID)) {
@@ -949,14 +955,14 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             binding.edit.llDelete.setOnClickListener(this)
             binding.edit.llDelete.alpha = 1f
         }
-        if (deleteMsgIds.size > 1 || senderIds.contains(callerID) || msgList[position].type != AppConstants.TEXT_MESSAGE) {
+        if (selectedMsgsIds.size > 1 || senderIds.contains(callerID) || chatMessagesList[position].type != AppConstants.TEXT_MESSAGE) {
             binding.edit.llEdit.setOnClickListener(null)
             binding.edit.llEdit.alpha = 0.5f
         } else {
             binding.edit.llEdit.setOnClickListener(this)
             binding.edit.llEdit.alpha = 1f
         }
-        if (deleteMsgIds.size == 0) {
+        if (selectedMsgsIds.size == 0) {
             binding.edit.visibility = View.GONE
             isEditableEnabled = false
         } else binding.edit.visibility = View.VISIBLE

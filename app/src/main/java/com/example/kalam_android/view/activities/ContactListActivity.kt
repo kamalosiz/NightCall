@@ -9,25 +9,27 @@ import android.provider.ContactsContract
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.PopupMenu
 import android.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
+import com.example.kalam_android.callbacks.OnClickNewGroupContact
 import com.example.kalam_android.databinding.ActivityContactListBinding
-import com.example.kalam_android.localdb.entities.ContactsEntityClass
+import com.example.kalam_android.localdb.entities.ContactsData
 import com.example.kalam_android.repository.model.ContactInfo
 import com.example.kalam_android.repository.model.Contacts
-import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
+import com.example.kalam_android.util.AppConstants
 import com.example.kalam_android.util.Debugger
 import com.example.kalam_android.util.SharedPrefsHelper
 import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.adapter.AdapterForContacts
+import com.example.kalam_android.view.adapter.AdapterForKalamUsers
 import com.example.kalam_android.viewmodel.ContactsViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.google.gson.JsonArray
@@ -39,8 +41,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import javax.inject.Inject
 
-
-class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*/ {
+class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
 
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityContactListBinding
@@ -51,7 +52,9 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
     lateinit var viewModel: ContactsViewModel
     lateinit var contactList: ArrayList<ContactsData>
     private var searchView: SearchView? = null
-
+    private var isFromForward = false
+    private var selectedMsgsIds = ""
+    private var selectedContactList: ArrayList<Int?> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,10 +63,10 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
             R.layout.activity_contact_list
         )
         MyApplication.getAppComponent(this).doInjection(this)
+        isFromForward = intent.getBooleanExtra(AppConstants.IS_FORWARD_MESSAGE, false)
         viewModel = ViewModelProviders.of(this, factory).get(ContactsViewModel::class.java)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Contacts"
 
         if (sharedPrefsHelper.isContactsSynced()) {
             viewModel.getContactsFromLocal()
@@ -78,9 +81,24 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
         viewModel.contactsResponse().observe(this, Observer {
             consumeResponse(it)
         })
-        binding.rvForContacts.adapter =
-            AdapterForContacts(this)
-        contactList = ArrayList()
+        if (isFromForward) {
+            supportActionBar?.title = "Forward To"
+            binding.ivForward.visibility = View.VISIBLE
+            contactList = ArrayList()
+            binding.rvForContacts.adapter =
+                AdapterForKalamUsers(this, this)
+            ((binding.rvForContacts.itemAnimator) as SimpleItemAnimator).supportsChangeAnimations =
+                false
+            selectedMsgsIds =
+                intent.getStringExtra(AppConstants.SELECTED_MSGS_IDS)
+            logE("chatMessagesList :$selectedMsgsIds")
+        } else {
+            supportActionBar?.title = "Contacts"
+            binding.ivForward.visibility = View.GONE
+            binding.rvForContacts.adapter =
+                AdapterForContacts(this)
+            contactList = ArrayList()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -96,12 +114,17 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
+                if (isFromForward)
+                    (binding.rvForContacts.adapter as AdapterForKalamUsers).filter.filter(query)
+                else (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
                 return false
             }
 
             override fun onQueryTextChange(query: String): Boolean {
-                (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
+                if (isFromForward)
+                    (binding.rvForContacts.adapter as AdapterForKalamUsers).filter.filter(query)
+                else (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
+//                (binding.rvForContacts.adapter as AdapterForContacts).filter.filter(query)
                 return false
             }
         })
@@ -149,35 +172,31 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
         response?.let {
             contactList.clear()
             contactList = it.data.contacts_list
-            (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
-            val entityList = ArrayList<ContactsEntityClass>()
-            for (i in contactList) {
-                entityList.add(
-                    ContactsEntityClass(
-                        0,
-                        i.number,
-                        i.id,
-                        i.name,
-                        i.profile_image,
-                        i.kalam_number,
-                        i.kalam_name
-                    )
-                )
+            if (isFromForward) {
+                val list = ArrayList<ContactsData>()
+                for (i in 0 until (contactList.size)) {
+                    if (contactList[i].id != 0) {
+                        list.add(contactList[i])
+                    }
+                }
+                (binding.rvForContacts.adapter as AdapterForKalamUsers).updateList(list)
+            } else {
+                (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
             }
-            viewModel.addContactsToLocal(entityList)
+            viewModel.addContactsToLocal(contactList)
             sharedPrefsHelper.contactsSynced()
         }
     }
 
-    private fun consumeLocalResponse(apiResponse: ApiResponse<List<ContactsEntityClass>>?) {
+    private fun consumeLocalResponse(apiResponse: ApiResponse<List<ContactsData>>) {
 
-        when (apiResponse?.status) {
+        when (apiResponse.status) {
 
             Status.LOADING -> {
             }
             Status.SUCCESS -> {
                 binding.pbCenter.visibility = View.GONE
-                renderLocalResponse(apiResponse.data)
+                renderLocalResponse(apiResponse.data!!)
                 logE("local socketResponse +${apiResponse.data}")
             }
             Status.ERROR -> {
@@ -190,25 +209,21 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
         }
     }
 
-    private fun renderLocalResponse(list: List<ContactsEntityClass>?) {
+    private fun renderLocalResponse(list: List<ContactsData>) {
         logE("renderLocalResponse: $list")
-        if (list?.isNotEmpty() == true) {
-            for (item in list) {
-                logE("Added to list")
-                contactList.add(
-                    ContactsData(
-                        item.number,
-                        item.contact_id,
-                        item.name,
-                        item.profile_image,
-                        item.kalam_number,
-                        item.kalam_name
-                    )
-                )
+        contactList.clear()
+        contactList.addAll(list)
+        if (isFromForward) {
+            val newList = ArrayList<ContactsData>()
+            for (i in 0 until (contactList.size)) {
+                if (contactList[i].id != 0) {
+                    newList.add(contactList[i])
+                }
             }
-            logE("Local List Size: ${contactList.size}")
+            (binding.rvForContacts.adapter as AdapterForKalamUsers).updateList(newList)
+        } else {
+            (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
         }
-        (binding.rvForContacts.adapter as AdapterForContacts).updateList(contactList)
     }
 
     private fun getAllContact(): ArrayList<ContactInfo> {
@@ -278,17 +293,6 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
         }).check()
     }
 
-    /*override fun onMenuItemClick(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.sync -> {
-                viewModel.deleteAllLocalContacts()
-                checkPermissions()
-                true
-            }
-            else -> false
-        }
-    }*/
-
     override fun onBackPressed() {
         // close search view on back button pressed
         /*if (searchView?.isIconified == true) {
@@ -301,6 +305,17 @@ class ContactListActivity : BaseActivity()/*, PopupMenu.OnMenuItemClickListener*
 
     private fun logE(message: String) {
         Debugger.e(TAG, message)
+    }
+
+    override fun onMyClick(position: Int, list: ArrayList<ContactsData>?) {
+        if (list?.get(position)?.is_selected == true) {
+            list[position].is_selected = false
+            selectedContactList.remove(list[position].id)
+        } else {
+            list?.get(position)?.is_selected = true
+            selectedContactList.add(list?.get(position)?.id)
+        }
+        (binding.rvForContacts.adapter as AdapterForKalamUsers).notifyList(list, position)
     }
 
 }

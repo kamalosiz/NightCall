@@ -1,7 +1,7 @@
 package com.example.kalam_android.callbacks
 
 import android.view.View
-import com.example.kalam_android.repository.model.ContactsData
+import com.example.kalam_android.localdb.entities.ContactsData
 
 interface MyClickListener {
     fun myOnClick(view: View, position: Int)

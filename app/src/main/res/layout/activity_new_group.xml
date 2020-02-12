@@ -129,14 +129,14 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/ivCreateGroup"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_margin="@dimen/_10sdp"
-            android:src="@drawable/ic_send_btn" />
+            android:background="@drawable/ic_send_btn" />
 
     </RelativeLayout>
 </layout>

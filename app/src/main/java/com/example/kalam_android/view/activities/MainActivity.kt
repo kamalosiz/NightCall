@@ -63,7 +63,9 @@ class MainActivity : BaseActivity(), WebSocketOfferCallback {
         binding.ivSettings.setOnClickListener { binding.viewPager.setCurrentItem(4, true) }
         binding.header.btnRight.visibility = View.GONE
         binding.ivCompose.setOnClickListener {
-            startActivity(Intent(this, ContactListActivity::class.java))
+            val intent = Intent(this, ContactListActivity::class.java)
+            intent.putExtra(AppConstants.IS_FORWARD_MESSAGE, false)
+            startActivity(intent)
         }
         viewModel.updateFcmTokenResponse().observe(this,
             Observer<ApiResponse<BasicResponse>> { t ->

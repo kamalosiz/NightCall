@@ -1,6 +1,6 @@
 package com.example.kalam_android.repository.model
 
-import java.io.Serializable
+import com.example.kalam_android.localdb.entities.ContactsData
 
 data class ContactInfo(val name: String, val number: String)
 
@@ -15,12 +15,4 @@ data class ContactList(
     val contacts_list: ArrayList<ContactsData>
 )
 
-data class ContactsData(
-    val number: String?,
-    val id: Int?,
-    val name: String?,
-    val profile_image: String?,
-    val kalam_number: String?,
-    val kalam_name: String?,
-    var isSelected: Boolean = false
-) : Serializable
+

@@ -39,6 +39,8 @@ object AppConstants {
     const val JSON = "webrtc_json"
     const val IS_VIDEO_CALL = "isVideoCall"
     const val LOCATION_KEY = "key_location_kalam"
+    const val IS_FORWARD_MESSAGE = "key_is_forward_message"
+    const val SELECTED_MSGS_IDS = "key_selected_messages_list"
 
     //Request Code
     const val IMAGE_GALLERY = 0

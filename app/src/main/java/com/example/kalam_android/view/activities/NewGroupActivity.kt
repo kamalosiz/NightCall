@@ -22,12 +22,12 @@ import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.OnClickNewGroupContact
 import com.example.kalam_android.databinding.ActivityNewGroupBinding
+import com.example.kalam_android.localdb.entities.ContactsData
 import com.example.kalam_android.repository.model.BasicResponse
-import com.example.kalam_android.repository.model.ContactsData
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.*
-import com.example.kalam_android.view.adapter.AdapterForNewGroupContact
+import com.example.kalam_android.view.adapter.AdapterForKalamUsers
 import com.example.kalam_android.viewmodel.NewGroupViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
 import com.example.kalam_android.wrapper.GlideDownloader
@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 class NewGroupActivity : BaseActivity(), OnClickNewGroupContact, View.OnClickListener {
     private lateinit var binding: ActivityNewGroupBinding
-    private lateinit var adapterForNewGroupContact: AdapterForNewGroupContact
+    private lateinit var adapterForKalamUsers: AdapterForKalamUsers
     private var selectedContactList: ArrayList<Int?> = ArrayList()
     private var contactsList: ArrayList<ContactsData>? = ArrayList()
     private var searchView: SearchView? = null
@@ -111,17 +111,6 @@ class NewGroupActivity : BaseActivity(), OnClickNewGroupContact, View.OnClickLis
         )
     }
 
-    /*  private fun createContactsJson(list: MutableList<ContactsData>): JsonArray {
-          val jsonArray = JsonArray()
-          for (x in list.indices) {
-              val jsonObject = JsonObject()
-              jsonObject.addProperty("name", list[x].id)
-              jsonArray.add(jsonObject)
-          }
-          logE("Json Array : $jsonArray")
-          return jsonArray
-      }*/
-
     private fun consumeResponse(apiResponse: ApiResponse<BasicResponse>?) {
         when (apiResponse?.status) {
 
@@ -145,14 +134,14 @@ class NewGroupActivity : BaseActivity(), OnClickNewGroupContact, View.OnClickLis
         if (intent != null) {
             contactsList =
                 intent.getSerializableExtra(AppConstants.KALAM_CONTACT_LIST) as ArrayList<ContactsData>
-            adapterForNewGroupContact.updateList(contactsList)
+            adapterForKalamUsers.updateList(contactsList)
         }
     }
 
     private fun setAdapter() {
-        adapterForNewGroupContact = AdapterForNewGroupContact(this, this)
+        adapterForKalamUsers = AdapterForKalamUsers(this, this)
         binding.rvForContacts.layoutManager = LinearLayoutManager(this)
-        binding.rvForContacts.adapter = adapterForNewGroupContact
+        binding.rvForContacts.adapter = adapterForKalamUsers
         ((binding.rvForContacts.itemAnimator) as SimpleItemAnimator).supportsChangeAnimations =
             false
     }
@@ -176,12 +165,12 @@ class NewGroupActivity : BaseActivity(), OnClickNewGroupContact, View.OnClickLis
 
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                (binding.rvForContacts.adapter as AdapterForNewGroupContact).filter.filter(query)
+                (binding.rvForContacts.adapter as AdapterForKalamUsers).filter.filter(query)
                 return false
             }
 
             override fun onQueryTextChange(query: String): Boolean {
-                (binding.rvForContacts.adapter as AdapterForNewGroupContact).filter.filter(query)
+                (binding.rvForContacts.adapter as AdapterForKalamUsers).filter.filter(query)
                 return false
             }
         })
@@ -197,14 +186,14 @@ class NewGroupActivity : BaseActivity(), OnClickNewGroupContact, View.OnClickLis
     }
 
     override fun onMyClick(position: Int, list: ArrayList<ContactsData>?) {
-        if (list?.get(position)?.isSelected == true) {
-            list[position].isSelected = false
+        if (list?.get(position)?.is_selected == true) {
+            list[position].is_selected = false
             selectedContactList.remove(list[position].id)
         } else {
-            list?.get(position)?.isSelected = true
+            list?.get(position)?.is_selected = true
             selectedContactList.add(list?.get(position)?.id)
         }
-        adapterForNewGroupContact.notifyList(list, position)
+        adapterForKalamUsers.notifyList(list, position)
     }
 
     private fun checkPixPermission() {

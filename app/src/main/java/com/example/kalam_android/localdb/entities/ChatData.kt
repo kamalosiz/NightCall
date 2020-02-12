@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.kalam_android.util.AppConstants
+import java.io.Serializable
 
 @Entity(tableName = AppConstants.CHAT_MESSAGES)
 data class ChatData(
@@ -28,4 +29,4 @@ data class ChatData(
     @ColumnInfo(name = "language") val language: String?,
     @ColumnInfo(name = "profile_image") val profile_image: String?,
     @ColumnInfo(name = "is_selected") var is_selected: Boolean = false
-)
+) : Serializable

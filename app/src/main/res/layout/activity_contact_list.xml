@@ -40,5 +40,15 @@
             android:layout_centerInParent="true"
             android:visibility="visible" />
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/ivForward"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/_10sdp"
+            android:visibility="gone"
+            android:background="@drawable/ic_send_btn" />
+
     </RelativeLayout>
 </layout>

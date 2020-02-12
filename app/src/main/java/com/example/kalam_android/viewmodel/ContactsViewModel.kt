@@ -2,7 +2,7 @@ package com.example.kalam_android.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.kalam_android.localdb.entities.ContactsEntityClass
+import com.example.kalam_android.localdb.entities.ContactsData
 import com.example.kalam_android.localdb.LocalRepo
 import com.example.kalam_android.repository.Repository
 import com.example.kalam_android.repository.model.Contacts
@@ -20,13 +20,13 @@ class ContactsViewModel @Inject constructor(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val responseLiveData = MutableLiveData<ApiResponse<Contacts>>()
-    private val responsiveRoomData = MutableLiveData<ApiResponse<List<ContactsEntityClass>>>()
+    private val responsiveRoomData = MutableLiveData<ApiResponse<List<ContactsData>>>()
 
     fun contactsResponse(): MutableLiveData<ApiResponse<Contacts>> {
         return responseLiveData
     }
 
-    fun contactsFromRoomResponse(): MutableLiveData<ApiResponse<List<ContactsEntityClass>>> {
+    fun contactsFromRoomResponse(): MutableLiveData<ApiResponse<List<ContactsData>>> {
         return responsiveRoomData
     }
 
@@ -41,7 +41,7 @@ class ContactsViewModel @Inject constructor(
             ))
     }
 
-    fun addContactsToLocal(list: ArrayList<ContactsEntityClass>) {
+    fun addContactsToLocal(list: ArrayList<ContactsData>) {
         disposables.add(
             Completable.fromAction {
                 localRepo.insertContactsToIntoDB(list)
@@ -60,6 +60,7 @@ class ContactsViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+
                     responsiveRoomData.value = ApiResponse.success(it)
                 }, {
                     responsiveRoomData.value = ApiResponse.error(it)
