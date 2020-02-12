@@ -53,7 +53,7 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
     lateinit var contactList: ArrayList<ContactsData>
     private var searchView: SearchView? = null
     private var isFromForward = false
-    private var selectedMsgsIds = ""
+    private var selectedMsgsIds: String? = null
     private var selectedContactList: ArrayList<Int?> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,8 +89,7 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
                 AdapterForKalamUsers(this, this)
             ((binding.rvForContacts.itemAnimator) as SimpleItemAnimator).supportsChangeAnimations =
                 false
-            selectedMsgsIds =
-                intent.getStringExtra(AppConstants.SELECTED_MSGS_IDS)
+            selectedMsgsIds = intent.getStringExtra(AppConstants.SELECTED_MSGS_IDS)
             logE("chatMessagesList :$selectedMsgsIds")
         } else {
             supportActionBar?.title = "Contacts"
