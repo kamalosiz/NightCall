@@ -62,9 +62,11 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
+import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_edit_message.view.*
 import kotlinx.android.synthetic.main.layout_for_attachment.view.*
+import kotlinx.android.synthetic.main.layout_for_attachment.view.ivAudio
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File

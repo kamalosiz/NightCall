@@ -85,6 +85,7 @@ object AppConstants {
     const val MESSAGE_DELETED = "message_deleted"
     const val EDIT_MESSAGE = "edit_message"
     const val SEND_LOCATION = "sendlocation"
+    const val FORWARD_MESSAGE = "forward_message"
 
     //WebRtc WebSockets
     const val CANDIDATE = "candidate"

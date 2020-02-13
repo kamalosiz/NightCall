@@ -1,5 +1,6 @@
 package com.example.kalam_android.wrapper
 
+import android.os.Debug
 import com.example.kalam_android.callbacks.LocationsCallback
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.SocketCallback
@@ -255,5 +256,16 @@ class SocketIO private constructor() {
         jsonObject.addProperty("lat", lat)
         jsonObject.addProperty("long", long)
         socket?.emit(AppConstants.SEND_LOCATION, jsonObject)
+    }
+
+    fun emitForwardMessage(message_id: String, receiver_id: String, sender_id: String) {
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("message_id", message_id)
+        jsonObject.addProperty("receiver_id", receiver_id)
+        jsonObject.addProperty("sender_id", sender_id)
+        socket?.emit(AppConstants.FORWARD_MESSAGE, jsonObject, Ack {
+            val json = it[0] as JSONObject
+            Debugger.e("SocketIO", "emitForwardMessage: $json")
+        })
     }
 }

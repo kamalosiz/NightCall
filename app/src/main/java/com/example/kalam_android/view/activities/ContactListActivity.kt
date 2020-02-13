@@ -32,6 +32,7 @@ import com.example.kalam_android.view.adapter.AdapterForContacts
 import com.example.kalam_android.view.adapter.AdapterForKalamUsers
 import com.example.kalam_android.viewmodel.ContactsViewModel
 import com.example.kalam_android.viewmodel.factory.ViewModelFactory
+import com.example.kalam_android.wrapper.SocketIO
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.karumi.dexter.Dexter
@@ -91,6 +92,14 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
                 false
             selectedMsgsIds = intent.getStringExtra(AppConstants.SELECTED_MSGS_IDS)
             logE("chatMessagesList :$selectedMsgsIds")
+            binding.ivForward.setOnClickListener {
+                SocketIO.getInstance()
+                    .emitForwardMessage(
+                        selectedMsgsIds.toString(),
+                        selectedContactList.toString(),
+                        sharedPrefsHelper.getUser()?.id.toString()
+                    )
+            }
         } else {
             supportActionBar?.title = "Contacts"
             binding.ivForward.visibility = View.GONE
