@@ -79,7 +79,7 @@ interface ApiCallInterface {
 //    fun updateUserName(@Header("Authorization") authorization: String, @Body parameters: Map<String, String>): Observable<BasicResponse>
 
     @POST(Urls.FORGET_PASSWORD)
-    fun forgetPassword(@Body parameters: Map<String, String>): Observable<BasicResponse>
+    fun forgetPassword(@Body parameters: Map<String, String>): Observable<ForgotResponse>
 
     @POST(Urls.CREATE_GROUP)
     fun createGroup(@Header("Authorization") authorization: String?, @Body parameters: Map<String, String>): Observable<BasicResponse>

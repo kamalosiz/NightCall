@@ -3,7 +3,7 @@ package com.example.kalam_android.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kalam_android.repository.Repository
-import com.example.kalam_android.repository.model.BasicResponse
+import com.example.kalam_android.repository.model.ForgotResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -14,9 +14,9 @@ import javax.inject.Inject
 class ForgetPasswordViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val disposable = CompositeDisposable()
-    private val responsiveLiveData = MutableLiveData<ApiResponse<BasicResponse>>()
+    private val responsiveLiveData = MutableLiveData<ApiResponse<ForgotResponse>>()
 
-    fun forgetPasswordResponse(): MutableLiveData<ApiResponse<BasicResponse>> {
+    fun forgetPasswordResponse(): MutableLiveData<ApiResponse<ForgotResponse>> {
         return responsiveLiveData
     }
 

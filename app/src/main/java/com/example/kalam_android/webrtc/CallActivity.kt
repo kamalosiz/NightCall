@@ -261,7 +261,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
             logE("callTimeRunnable called")
             hangup()
         }
-        handler.postDelayed(callTimeRunnable, 60 * 1000)
+        handler.postDelayed(callTimeRunnable, 90 * 1000)
 
         val initiator = intent.getBooleanExtra(AppConstants.INITIATOR, false)
         if (initiator) {

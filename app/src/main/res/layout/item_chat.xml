@@ -5,8 +5,8 @@
         android:id="@+id/rlMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_1sdp"
+        android:paddingStart="@dimen/_10sdp"
         android:paddingTop="@dimen/_1sdp"
         android:paddingEnd="@dimen/_10sdp"
         android:paddingBottom="@dimen/_1sdp">
@@ -73,14 +73,14 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:text="View Original"
-                android:textColor="@color/black"
+                android:textColor="@color/darkGrey"
                 android:textSize="@dimen/_8ssp" />
 
             <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/black" />
+                android:background="@color/darkGrey" />
         </LinearLayout>
 
         <TextView
@@ -92,17 +92,7 @@
             android:layout_marginTop="@dimen/_2sdp"
             android:layout_marginEnd="@dimen/_9sdp"
             android:fontFamily="@font/roboto_regular"
-            android:textColor="@color/theme_color"
             android:textSize="@dimen/_8ssp" />
 
-        <ImageView
-            android:id="@+id/ivDeliver"
-            android:layout_width="@dimen/_10sdp"
-            android:layout_height="@dimen/_10sdp"
-            android:layout_below="@id/rlLayout"
-            android:layout_alignEnd="@id/rlLayout"
-            android:layout_marginTop="@dimen/_3sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:visibility="gone" />
     </RelativeLayout>
 </layout>

@@ -264,8 +264,8 @@ class SocketIO private constructor() {
         jsonObject.addProperty("receiver_id", receiver_id)
         jsonObject.addProperty("sender_id", sender_id)
         socket?.emit(AppConstants.FORWARD_MESSAGE, jsonObject, Ack {
-            val json = it[0] as JSONObject
-            Debugger.e("SocketIO", "emitForwardMessage: $json")
+//            val json = it[0] as JSONObject
+//            Debugger.e("SocketIO", "emitForwardMessage: $json")
         })
     }
 }

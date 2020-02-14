@@ -8,11 +8,11 @@ class Urls {
 
         //Local IP
 //        const val BASE_URL = "http://192.168.0.54:5000/"
-//        const val BASE_URL = "http://192.168.0.125:5000/"
+        const val BASE_URL = "http://192.168.0.125:5000/"
 //        const val BASE_URL = "http://192.168.0.73:5000/"
 
         //Stage IP
-        const val BASE_URL = "http://184.169.185.200:5000/"
+//        const val BASE_URL = "http://184.169.185.200:5000/"
 //        const val BASE_URL = "http://184.169.185.200:6000/"
 
         //Live Ip

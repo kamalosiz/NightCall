@@ -9,7 +9,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.databinding.ActivityResetPasswordBinding
-import com.example.kalam_android.repository.model.BasicResponse
+import com.example.kalam_android.repository.model.ForgotResponse
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
 import com.example.kalam_android.util.Debugger
@@ -43,7 +43,7 @@ class ResetPasswordActivity : BaseActivity(), View.OnClickListener {
         binding.btnSubmit.setOnClickListener(this)
     }
 
-    private fun consumeResponse(apiResponse: ApiResponse<BasicResponse>?) {
+    private fun consumeResponse(apiResponse: ApiResponse<ForgotResponse>?) {
         Debugger.e("Forget Password Response : ", "${apiResponse?.data}")
         when (apiResponse?.status) {
             Status.LOADING -> {
@@ -51,7 +51,9 @@ class ResetPasswordActivity : BaseActivity(), View.OnClickListener {
             }
             Status.SUCCESS -> {
                 hideProgressDialog()
-                showAlertDialog(this, "Send email", apiResponse.data!!.data)
+                if (apiResponse.data?.code == 200)
+                    showAlertDialog(this, "KalamTime", apiResponse.data.data.toString())
+                else showAlertDialog(this, "KalamTime", apiResponse.data!!.message)
             }
             Status.ERROR -> {
                 hideProgressDialog()

@@ -7,7 +7,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -16,7 +15,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kalam_android.R
-import com.example.kalam_android.callbacks.MyClickListener
 import com.example.kalam_android.callbacks.SelectItemListener
 import com.example.kalam_android.databinding.ItemChatRightBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
@@ -56,6 +54,11 @@ class ChatMessagesAdapter(
         }
     }
 
+    fun updateList(list: ArrayList<ChatData>) {
+        chatList = list
+        notifyDataSetChanged()
+    }
+
     fun itemChanged(list: ArrayList<ChatData>, position: Int) {
         this.chatList = list
         notifyItemChanged(position)
@@ -65,23 +68,6 @@ class ChatMessagesAdapter(
         chatList = list
         notifyItemRemoved(position)
     }
-
-/*    fun updateIdentifier(identifier: String, isDelivered: Boolean, msgId: String) {
-        chatList?.let {
-            for (x in it.indices) {
-                if (chatList?.get(x)?.identifier == identifier) {
-                    chatList?.get(x)?.identifier = ""
-                    chatList?.get(x)?.id = msgId.toLong()
-                    if (isDelivered) {
-                        chatList?.get(x)?.is_read = 1
-                    } else {
-                        chatList?.get(x)?.is_read = 0
-                    }
-                    notifyItemChanged(x)
-                }
-            }
-        }
-    }*/
 
     fun updateSeenStatus(msgId: Long) {
         chatList?.let {
@@ -173,7 +159,6 @@ class ChatMessagesAdapter(
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                 } else {
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
-                    itemHolder.binding.itemChat.llOriginal.gravity = View.VISIBLE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
@@ -214,10 +199,11 @@ class ChatMessagesAdapter(
                 }
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.END
-                    itemHolder.binding.audioPlayer.llOriginal.gravity = View.GONE
+                    itemHolder.binding.audioPlayer.llOriginal.visibility = View.GONE
+                    itemHolder.binding.audioPlayer.llViewText.visibility = View.GONE
                 } else {
                     itemHolder.binding.audioPlayer.rlAudioItem.gravity = Gravity.START
-                    itemHolder.binding.audioPlayer.llOriginal.gravity = View.VISIBLE
+                    itemHolder.binding.audioPlayer.llViewText.visibility = View.VISIBLE
                 }
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
@@ -235,6 +221,23 @@ class ChatMessagesAdapter(
                     }
                 }
                 checkSelected(item, itemHolder.binding.audioPlayer.rlAudioItem)
+                var isExpanded = false
+                itemHolder.binding.audioPlayer.llViewText.setOnClickListener {
+                    if (isExpanded) {
+                        isExpanded = false
+                        Global.collapse(itemHolder.binding.audioPlayer.llRecordedText)
+                        itemHolder.binding.audioPlayer.tvViewText.text = "View Text"
+                    } else {
+                        isExpanded = true
+                        itemHolder.binding.audioPlayer.tvViewText.text = "Hide Text"
+                        if (item.original_audio_text?.isNotEmpty() == true) {
+                            Global.expand(itemHolder.binding.audioPlayer.llRecordedText)
+                            itemHolder.binding.audioPlayer.tvRecordedText.text =
+                                item.original_audio_text.toString()
+                        }
+
+                    }
+                }
             }
             AppConstants.IMAGE_MESSAGE -> {
                 if (item.identifier.isNullOrEmpty()) {
@@ -341,7 +344,14 @@ class ChatMessagesAdapter(
                 )
                 checkSelected(item, itemHolder.binding.location.rlLocation)
             }
-
+            else -> {
+                itemHolder.binding.audioPlayer.rlAudioItem.visibility = View.GONE
+                itemHolder.binding.itemChat.rlMessage.visibility = View.GONE
+                itemHolder.binding.imageHolder.rlImageItem.visibility = View.GONE
+                itemHolder.binding.videoHolder.rlVideoItem.visibility = View.GONE
+                itemHolder.binding.groupHolder.rlMultiImageItem.visibility = View.GONE
+                itemHolder.binding.location.rlLocation.visibility = View.GONE
+            }
         }
     }
 

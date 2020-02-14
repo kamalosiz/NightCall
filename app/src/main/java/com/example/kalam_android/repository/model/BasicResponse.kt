@@ -8,6 +8,14 @@ data class BasicResponse(
     val message: String
 )
 
+data class ForgotResponse(
+    val action: String,
+    val code: Int,
+    val status: Boolean,
+    val data: Any,
+    val message: String
+)
+
 data class StatusResponse(
     val user_id: Int,
     val status: Int

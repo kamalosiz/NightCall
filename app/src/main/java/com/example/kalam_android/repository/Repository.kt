@@ -121,7 +121,7 @@ class Repository(private val apiCallInterface: ApiCallInterface) {
         return apiCallInterface.updateUserName(authorization!!, parameters)
     }*/
 
-    fun forgetPassword(parameters: Map<String, String>): Observable<BasicResponse> {
+    fun forgetPassword(parameters: Map<String, String>): Observable<ForgotResponse> {
         return apiCallInterface.forgetPassword(parameters)
     }
 

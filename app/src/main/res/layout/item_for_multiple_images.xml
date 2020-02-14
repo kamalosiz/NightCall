@@ -133,13 +133,5 @@
                 android:visibility="gone" />
         </RelativeLayout>
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/ivDeliver"
-            android:layout_width="@dimen/_10sdp"
-            android:layout_height="@dimen/_10sdp"
-            android:layout_below="@id/rlImage"
-            android:layout_alignEnd="@id/rlImage"
-            android:layout_marginTop="@dimen/_3sdp"
-            android:layout_marginEnd="@dimen/_10sdp" />
     </RelativeLayout>
 </layout>

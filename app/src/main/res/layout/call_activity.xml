@@ -4,6 +4,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -25,12 +26,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true" />
         </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/ivUserAudio"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
 
         <LinearLayout
             android:id="@+id/header"
@@ -75,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:fontFamily="@font/roboto_medium"
-                android:text="Dummy Name"
+                android:text="Name"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_18sdp" />
 
@@ -105,6 +100,12 @@
             </RelativeLayout>
         </LinearLayout>
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivUserAudio"
+            android:layout_width="@dimen/_200sdp"
+            android:layout_height="@dimen/_200sdp"
+            android:layout_centerInParent="true"
+            android:src="@color/call_color" />
         <!--Bottom Buttons-->
         <LinearLayout
             android:id="@+id/rlBottomCalls"
@@ -116,15 +117,15 @@
 
             <ImageButton
                 android:id="@+id/ibAnswer"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
                 android:layout_marginEnd="@dimen/_160sdp"
                 android:background="@drawable/call_receive" />
 
             <ImageButton
                 android:id="@+id/ibHangUp"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
                 android:background="@drawable/call_cancel" />
 
         </LinearLayout>

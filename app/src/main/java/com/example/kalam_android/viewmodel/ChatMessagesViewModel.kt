@@ -1,5 +1,6 @@
 package com.example.kalam_android.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kalam_android.localdb.LocalRepo
@@ -21,21 +22,27 @@ class ChatMessagesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val disposable = CompositeDisposable()
-    private val responsiveLiveData = MutableLiveData<ApiResponse<ChatDetailResponse>>()
+    private var responsiveLiveData = MutableLiveData<ApiResponse<ChatDetailResponse>>()
 
-    fun allChatResponse(): MutableLiveData<ApiResponse<ChatDetailResponse>> {
+    fun allChatResponse(): LiveData<ApiResponse<ChatDetailResponse>> {
         return responsiveLiveData
     }
 
     fun hitAllChatApi(authorization: String?, @Body parameters: Map<String, String>) {
+        Debugger.e("hitAllChatApi", "hitAllChatApi")
         disposable.add(repository.getAllMessages(authorization, parameters)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }
+            .doOnSubscribe {
+                Debugger.e("hitAllChatApi", "doOnSubscribe")
+                responsiveLiveData.value = ApiResponse.loading()
+            }
             .subscribe({
+                Debugger.e("hitAllChatApi", "response :${it.data}")
                 responsiveLiveData.value = ApiResponse.success(it)
             }, {
                 responsiveLiveData.value = ApiResponse.error(it)
+                Debugger.e("hitAllChatApi", "throwable :${it}")
             })
         )
     }

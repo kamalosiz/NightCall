@@ -29,7 +29,10 @@ import androidx.work.*
 import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
-import com.example.kalam_android.callbacks.*
+import com.example.kalam_android.callbacks.MessageTypingListener
+import com.example.kalam_android.callbacks.ResultVoiceToText
+import com.example.kalam_android.callbacks.SelectItemListener
+import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.databinding.ActivityChatDetailBinding
 import com.example.kalam_android.helper.MyChatMediaHelper
 import com.example.kalam_android.helper.MyVoiceToTextHelper
@@ -62,19 +65,14 @@ import com.sandrios.sandriosCamera.internal.SandriosCamera
 import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration
 import com.sandrios.sandriosCamera.internal.ui.model.Media
 import id.zelory.compressor.Compressor
-import kotlinx.android.synthetic.main.header_chat.view.*
 import kotlinx.android.synthetic.main.layout_content_of_chat.view.*
 import kotlinx.android.synthetic.main.layout_edit_message.view.*
 import kotlinx.android.synthetic.main.layout_for_attachment.view.*
-import kotlinx.android.synthetic.main.layout_for_attachment.view.ivAudio
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import java.io.Serializable
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     SocketCallback, MessageTypingListener, View.OnTouchListener,
@@ -94,8 +92,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     private val delay: Long = 1000
     private var lastTextEdit: Long = 0
     var handler = Handler()
-    private var upChatList: ArrayList<ChatData> = ArrayList()
-    private var downChatList: ArrayList<ChatData> = ArrayList()
     private var chatMessagesList: ArrayList<ChatData> = ArrayList()
     private var selectedMsgsIds: ArrayList<Long> = ArrayList()
     private var senderIds: ArrayList<Int?> = ArrayList()
@@ -241,9 +237,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 get() = loading
 
             override fun loadMoreItems() {
+                logE("Upward Pagination")
                 binding.pbHeader.visibility = View.VISIBLE
                 loading = true
-                lastMsgID = upChatList[upChatList.size - 1].id
+                lastMsgID = chatMessagesList[chatMessagesList.size - 1].id
                 hitConversationApi(lastMsgID, 0, fromSearch)
             }
         })
@@ -259,9 +256,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     get() = loading
 
                 override fun loadMoreItems() {
+                    logE("Downward Pagination")
                     binding.pbFooter.visibility = View.VISIBLE
                     loading = true
-                    lastMsgID = downChatList[0].id
+                    lastMsgID = chatMessagesList[0].id
                     hitConversationApi(lastMsgID, 1, fromSearch)
                 }
             })
@@ -274,6 +272,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         params["offset"] = offset.toString()
         params["swipe_up"] = swipe.toString()
         params["from_search"] = fromSearch.toString()
+        logE("params: $params")
         viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
 
     }
@@ -290,8 +289,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<ChatDetailResponse>?) {
+        logE("consumeResponse: $apiResponse")
         when (apiResponse?.status) {
-
             Status.LOADING -> {
                 loading = true
                 logE("Loading Chat Messages")
@@ -320,8 +319,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         logE("socketResponse: $mResponse")
         mResponse?.let { response ->
             chatResponse = response
-            response.data.chats?.let {
-                chatMessagesList.addAll(it)
+            response.data?.chats?.let {
                 if (fromSearch == 1) {
                     fromSearch = 0
                     for (x in it.indices) {
@@ -329,21 +327,24 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                             binding.chatMessagesRecycler.scrollToPosition(x)
                         }
                     }
-                    if (it.isNotEmpty())
-                        downChatList = it
                 }
                 if (response.data.swipe_up == 0) {
+                    chatMessagesList.addAll(it)
                     if (it.isNotEmpty())
-                        upChatList = it
-                    (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(
-                        it, false
-                    )
+                        (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(
+                            chatMessagesList
+                        )
                 } else if (response.data.swipe_up == 1) {
-                    if (it.isNotEmpty())
-                        downChatList = it
-                    (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).updateList(
-                        it, true
-                    )
+                    if (it.isNotEmpty()) {
+                        var i = it.size - 1
+                        while (i > -1) {
+                            chatMessagesList.add(0, it[i])
+                            (binding.chatMessagesRecycler.adapter as ChatMessagesAdapter).addMessage(
+                                chatMessagesList
+                            )
+                            i--
+                        }
+                    }
                 }
                 lastMessageStatus = it[0].is_read
             }

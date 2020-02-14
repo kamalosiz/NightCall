@@ -7,7 +7,7 @@ data class ChatDetailResponse(
     val action: String,
     val code: Int,
     val status: Boolean,
-    val data: DataObject,
+    val data: DataObject?,
     val message: String
 )
 

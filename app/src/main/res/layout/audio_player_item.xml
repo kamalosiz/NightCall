@@ -5,8 +5,8 @@
         android:id="@+id/rlAudioItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_1sdp"
+        android:paddingStart="@dimen/_10sdp"
         android:paddingTop="@dimen/_1sdp"
         android:paddingEnd="@dimen/_10sdp"
         android:paddingBottom="@dimen/_1sdp">
@@ -15,7 +15,7 @@
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/cvPlayer"
+            android:layout_alignEnd="@id/cvPlayerHead"
             android:layout_marginEnd="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_3sdp"
             android:fontFamily="@font/roboto_regular"
@@ -24,54 +24,81 @@
             android:textSize="@dimen/_8ssp" />
 
         <RelativeLayout
-            android:id="@+id/cvPlayer"
-            android:layout_width="@dimen/_250sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_below="@id/tvTime"
-            android:background="@drawable/media_background"
-            android:gravity="center"
-            tools:ignore="UselessParent">
+            android:id="@+id/cvPlayerHead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTime">
 
             <RelativeLayout
-                android:id="@+id/rlPlay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/_5sdp">
+                android:id="@+id/cvPlayer"
+                android:layout_width="@dimen/_250sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:background="@drawable/media_background"
+                android:gravity="center"
+                tools:ignore="UselessParent">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/ivPlayPause"
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/ic_play_audio" />
+                <RelativeLayout
+                    android:id="@+id/rlPlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/_5sdp">
 
-                <ProgressBar
-                    android:id="@+id/ivPlayProgress"
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:visibility="gone" />
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivPlayPause"
+                        android:layout_width="@dimen/_22sdp"
+                        android:layout_height="@dimen/_22sdp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/ic_play_audio" />
+
+                    <ProgressBar
+                        android:id="@+id/ivPlayProgress"
+                        android:layout_width="@dimen/_22sdp"
+                        android:layout_height="@dimen/_22sdp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:layout_toEndOf="@+id/rlPlay"
+                    android:clickable="false"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/seekbar_style"
+                    android:thumb="@drawable/new_seekbar_thumb" />
+
+
             </RelativeLayout>
 
-            <SeekBar
-                android:id="@+id/seekBar"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/llRecordedText"
+                android:layout_width="@dimen/_250sdp"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/_10sdp"
-                android:layout_toEndOf="@+id/rlPlay"
-                android:clickable="false"
-                android:progress="0"
-                android:progressDrawable="@drawable/seekbar_style"
-                android:thumb="@drawable/new_seekbar_thumb" />
+                android:layout_below="@id/cvPlayer"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:padding="@dimen/_5sdp"
+                android:visibility="gone">
 
+                <TextView
+                    android:id="@+id/tvRecordedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textAlignment="center"
+                    android:textSize="@dimen/_8ssp" />
+            </LinearLayout>
         </RelativeLayout>
+
 
         <LinearLayout
             android:id="@+id/llOriginal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cvPlayer"
+            android:layout_below="@id/cvPlayerHead"
             android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_3sdp"
             android:orientation="vertical">
@@ -82,34 +109,51 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Play Original"
-                android:textColor="@color/black"
+                android:textColor="@color/darkGrey"
                 android:textSize="@dimen/_8ssp" />
 
             <View
                 android:id="@+id/view"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/black" />
+                android:background="@color/darkGrey" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llViewText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cvPlayerHead"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_toEndOf="@id/llOriginal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvViewText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:text="View Text"
+                android:textColor="@color/darkGrey"
+                android:textSize="@dimen/_8ssp" />
+
+            <View
+                android:id="@+id/viewText"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/darkGrey" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvMessageStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/cvPlayer"
-            android:layout_alignEnd="@id/cvPlayer"
-            android:layout_marginTop="@dimen/_2sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:textSize="@dimen/_8ssp" />
-
-        <!--<ImageView
-            android:id="@+id/ivDeliver"
-            android:layout_width="@dimen/_10sdp"
-            android:layout_height="@dimen/_10sdp"
-            android:layout_below="@id/cvPlayer"
-            android:layout_alignEnd="@id/cvPlayer"
+            android:layout_below="@id/cvPlayerHead"
+            android:layout_alignEnd="@id/cvPlayerHead"
             android:layout_marginTop="@dimen/_3sdp"
-            android:visibility="gone"
-            android:layout_marginEnd="@dimen/_10sdp"/>-->
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="@dimen/_8ssp" />
     </RelativeLayout>
 </layout>
