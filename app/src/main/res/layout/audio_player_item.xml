@@ -79,7 +79,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cvPlayer"
                 android:layout_centerHorizontal="true"
-                android:gravity="center"
                 android:padding="@dimen/_5sdp"
                 android:visibility="gone">
 
@@ -88,7 +87,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_regular"
-                    android:textAlignment="center"
+                    android:paddingStart="@dimen/_5sdp"
+                    android:paddingEnd="@dimen/_5sdp"
                     android:textSize="@dimen/_8ssp" />
             </LinearLayout>
         </RelativeLayout>

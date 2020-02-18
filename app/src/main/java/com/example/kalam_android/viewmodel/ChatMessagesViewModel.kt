@@ -29,21 +29,13 @@ class ChatMessagesViewModel @Inject constructor(
     }
 
     fun hitAllChatApi(authorization: String?, @Body parameters: Map<String, String>) {
-        Debugger.e("hitAllChatApi", "hitAllChatApi")
         disposable.add(repository.getAllMessages(authorization, parameters)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                Debugger.e("hitAllChatApi", "doOnSubscribe")
-                responsiveLiveData.value = ApiResponse.loading()
-            }
-            .subscribe({
-                Debugger.e("hitAllChatApi", "response :${it.data}")
-                responsiveLiveData.value = ApiResponse.success(it)
-            }, {
-                responsiveLiveData.value = ApiResponse.error(it)
-                Debugger.e("hitAllChatApi", "throwable :${it}")
-            })
+            .doOnSubscribe { responsiveLiveData.value = ApiResponse.loading() }
+            .subscribe(
+                { responsiveLiveData.value = ApiResponse.success(it) },
+                { responsiveLiveData.value = ApiResponse.error(it) })
         )
     }
 

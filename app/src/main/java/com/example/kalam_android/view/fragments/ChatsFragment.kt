@@ -25,10 +25,12 @@ import com.example.kalam_android.helper.MyVoiceToTextHelper
 import com.example.kalam_android.localdb.entities.ChatData
 import com.example.kalam_android.localdb.entities.ChatListData
 import com.example.kalam_android.repository.model.AllChatListResponse
-import com.example.kalam_android.repository.model.ContactInfo
 import com.example.kalam_android.repository.net.ApiResponse
 import com.example.kalam_android.repository.net.Status
-import com.example.kalam_android.util.*
+import com.example.kalam_android.util.AppConstants
+import com.example.kalam_android.util.Debugger
+import com.example.kalam_android.util.SharedPrefsHelper
+import com.example.kalam_android.util.toast
 import com.example.kalam_android.view.activities.ChatDetailActivity
 import com.example.kalam_android.view.adapter.AllChatListAdapter
 import com.example.kalam_android.viewmodel.AllChatListViewModel
@@ -342,10 +344,8 @@ class ChatsFragment : Fragment(), SocketCallback, MyClickListener,
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 AppConstants.CHAT_FRAGMENT_CODE -> {
-                    val isNull = data?.getBooleanExtra(AppConstants.IS_NULL, false)
-                    if (isNull == false) {
-                        viewModel.getAllchatItemFromDB()
-                    }
+                    viewModel.getAllchatItemFromDB()
+                    hitAllChatApi()
                     logE("onActivityResult of chats Fragment is called")
                     SocketIO.getInstance().setSocketCallbackListener(this)
                     SocketIO.getInstance().getUserStatuses(createIdsJson(userIds))

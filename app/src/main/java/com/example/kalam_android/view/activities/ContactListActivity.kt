@@ -1,8 +1,10 @@
 package com.example.kalam_android.view.activities
 
 import android.Manifest
+import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -18,6 +20,7 @@ import com.example.kalam_android.R
 import com.example.kalam_android.base.BaseActivity
 import com.example.kalam_android.base.MyApplication
 import com.example.kalam_android.callbacks.OnClickNewGroupContact
+import com.example.kalam_android.callbacks.SocketCallback
 import com.example.kalam_android.databinding.ActivityContactListBinding
 import com.example.kalam_android.localdb.entities.ContactsData
 import com.example.kalam_android.repository.model.ContactInfo
@@ -40,9 +43,10 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import org.json.JSONObject
 import javax.inject.Inject
 
-class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
+class ContactListActivity : BaseActivity(), OnClickNewGroupContact, SocketCallback {
 
     private val TAG = this.javaClass.simpleName
     lateinit var binding: ActivityContactListBinding
@@ -55,6 +59,7 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
     private var searchView: SearchView? = null
     private var isFromForward = false
     private var selectedMsgsIds: String? = null
+    private var receiverId: Int = -1
     private var selectedContactList: ArrayList<Int?> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +96,9 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
             ((binding.rvForContacts.itemAnimator) as SimpleItemAnimator).supportsChangeAnimations =
                 false
             selectedMsgsIds = intent.getStringExtra(AppConstants.SELECTED_MSGS_IDS)
+            receiverId = intent.getIntExtra(AppConstants.CALLER_USER_ID, 0)
             logE("chatMessagesList :$selectedMsgsIds")
+            SocketIO.getInstance().setSocketCallbackListener(this)
             binding.ivForward.setOnClickListener {
                 SocketIO.getInstance()
                     .emitForwardMessage(
@@ -99,6 +106,7 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
                         selectedContactList.toString(),
                         sharedPrefsHelper.getUser()?.id.toString()
                     )
+                showProgressDialog(this)
             }
         } else {
             supportActionBar?.title = "Contacts"
@@ -324,6 +332,21 @@ class ContactListActivity : BaseActivity(), OnClickNewGroupContact {
             selectedContactList.add(list?.get(position)?.id)
         }
         (binding.rvForContacts.adapter as AdapterForKalamUsers).notifyList(list, position)
+    }
+
+    override fun socketResponse(jsonObject: JSONObject, type: String) {
+        if (type == AppConstants.FORWARD_MESSAGE) {
+            val delivered = jsonObject.getBoolean("delivered")
+            if (delivered) {
+                hideProgressDialog()
+                val intent = Intent()
+                if (selectedContactList.contains(receiverId))
+                    intent.putExtra("is_contain_receiver", true)
+                else intent.putExtra("is_contain_receiver", false)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            }
+        }
     }
 
 }

@@ -71,6 +71,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
     lateinit var callTimeRunnable: Runnable
     private var isVideo = false
     lateinit var binding: CallActivityBinding
+    private var isSpeakerOn = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,6 +141,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
             binding.tvCall.text = "Audio Call"
             binding.ivUserAudio.visibility = View.VISIBLE
             binding.ivUserVideo.visibility = View.GONE
+            binding.ibSpeaker.setOnClickListener(this)
         }
     }
 
@@ -270,6 +272,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
             calleeName = intent.getStringExtra(AppConstants.CHAT_USER_NAME)
             profileImage = intent.getStringExtra(AppConstants.CHAT_USER_PICTURE)
             binding.ibAnswer.visibility = View.GONE
+            binding.ibSpeaker.visibility = View.VISIBLE
             binding.tvCallStatus.text = "Calling..."
             webSocketClient?.onNewCall(callerID.toString(), myName)
 
@@ -461,6 +464,8 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
         if (isVideo) {
             updateVideoViews()
             turnOnSpeakers()
+        } else {
+            binding.ibSpeaker.visibility = View.VISIBLE
         }
     }
 
@@ -540,6 +545,17 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                     }
                 }
             }
+            R.id.ibSpeaker -> {
+                if (!isSpeakerOn) {
+                    binding.ibSpeaker.setBackgroundResource(R.drawable.speaker_off)
+                    isSpeakerOn = true
+                    turnOnSpeakers()
+                } else {
+                    binding.ibSpeaker.setBackgroundResource(R.drawable.speaker_on)
+                    isSpeakerOn = false
+                    turnOFFSpeakers()
+                }
+            }
         }
     }
 
@@ -557,7 +573,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                 localPeer = null
             }
             if (isVideo) {
-                turnOFFSpeakers()
+//                turnOFFSpeakers()
                 if (videoCapture != null) {
                     videoCapture?.stopCapture()
                     videoCapture?.dispose()
@@ -568,6 +584,7 @@ class CallActivity : BaseActivity(), View.OnClickListener, WebSocketCallback,
                     binding.remoteVideoView.release()
                 }
             }
+            turnOFFSpeakers()
             webSocketClient?.reAssignOfferListenerToMain()
             setResult(Activity.RESULT_OK)
             finish()

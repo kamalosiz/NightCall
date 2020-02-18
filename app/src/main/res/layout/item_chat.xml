@@ -38,24 +38,68 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvTime"
-            android:paddingBottom="@dimen/_5sdp">
+            android:paddingTop="@dimen/_2sdp"
+            android:paddingBottom="@dimen/_2sdp">
+
+            <TextView
+                android:id="@+id/tvForwarded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:paddingStart="@dimen/_10sdp"
+                android:paddingTop="@dimen/_5sdp"
+                android:paddingEnd="@dimen/_5sdp"
+                android:text="Forwarded"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_8ssp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/tvForwarded"
+                android:layout_centerVertical="true"
                 android:fontFamily="@font/roboto_regular"
-                android:gravity="center_horizontal"
                 android:minEms="4"
                 android:paddingStart="@dimen/_10sdp"
-                android:paddingTop="@dimen/_6sdp"
+                android:paddingTop="@dimen/_3sdp"
                 android:paddingEnd="@dimen/_10sdp"
                 android:paddingBottom="@dimen/_3sdp"
                 android:singleLine="false"
                 android:textAlignment="textStart"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_12ssp"
                 tools:ignore="RtlCompat" />
+
+            <RelativeLayout
+                android:id="@+id/rlAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvMessage"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ivSeperator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignStart="@id/tvAuthor"
+                    android:layout_alignEnd="@id/tvAuthor"
+                    android:background="@color/white" />
+
+                <TextView
+                    android:id="@+id/tvAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ivSeperator"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:fontFamily="@font/roboto_light"
+                    android:paddingBottom="@dimen/_5sdp"
+                    android:text="By Waqar Mustafa 4:30 PM"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_8ssp" />
+            </RelativeLayout>
         </RelativeLayout>
 
         <LinearLayout

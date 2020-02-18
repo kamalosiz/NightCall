@@ -1,6 +1,5 @@
 package com.example.kalam_android.wrapper
 
-import android.os.Debug
 import com.example.kalam_android.callbacks.LocationsCallback
 import com.example.kalam_android.callbacks.MessageTypingListener
 import com.example.kalam_android.callbacks.SocketCallback
@@ -264,8 +263,8 @@ class SocketIO private constructor() {
         jsonObject.addProperty("receiver_id", receiver_id)
         jsonObject.addProperty("sender_id", sender_id)
         socket?.emit(AppConstants.FORWARD_MESSAGE, jsonObject, Ack {
-//            val json = it[0] as JSONObject
-//            Debugger.e("SocketIO", "emitForwardMessage: $json")
+            val json = it[0] as JSONObject
+            socketCallback?.socketResponse(json, AppConstants.FORWARD_MESSAGE)
         })
     }
 }

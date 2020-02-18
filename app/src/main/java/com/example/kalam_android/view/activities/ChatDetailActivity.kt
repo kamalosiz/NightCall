@@ -272,7 +272,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
         params["offset"] = offset.toString()
         params["swipe_up"] = swipe.toString()
         params["from_search"] = fromSearch.toString()
-        logE("params: $params")
         viewModel.hitAllChatApi(sharedPrefsHelper.getUser()?.token.toString(), params)
 
     }
@@ -289,7 +288,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     private fun consumeResponse(apiResponse: ApiResponse<ChatDetailResponse>?) {
-        logE("consumeResponse: $apiResponse")
         when (apiResponse?.status) {
             Status.LOADING -> {
                 loading = true
@@ -360,7 +358,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     ) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED).build()
-
         val oneTimeWorkRequest = OneTimeWorkRequest.Builder(RxMediaWorker::class.java)
             .setInputData(
                 createInputData(
@@ -393,9 +390,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             .putString("token", token)
             .putString("id", sharedPrefsHelper.getUser()?.id.toString())
             .putString("chatId", chatId.toString())
-            .putString(
-                "name", myName
-            )
+            .putString("name", myName)
             .putString("language", sharedPrefsHelper.getLanguage().toString())
             .putString("group_id", groupID)
             .putString("profile_image", sharedPrefsHelper.getUser()?.profile_image.toString())
@@ -497,7 +492,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 identifier,
                 System.currentTimeMillis() / 1000L.toDouble(),
                 sharedPrefsHelper.getLanguage(),
-                sharedPrefsHelper.getUser()?.profile_image.toString()
+                sharedPrefsHelper.getUser()?.profile_image.toString(),
+                AppConstants.DUMMY_STRING
             )
         )
     }
@@ -633,6 +629,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 AppConstants.DELETE_MESSAGE -> {
                     val messages = jsonObject.getJSONArray("messages")
                     deleteMessages(messages)
+                    editingMessage = false
+
                 }
                 AppConstants.EDIT_MESSAGE -> {
                     val chatId = jsonObject.getString("chat_id")
@@ -681,6 +679,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     index
                 )
             }
+            editingMessage = false
             resetSelection()
         }
     }
@@ -706,10 +705,8 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     if (myChatMediaHelper?.fileOutput()?.isEmpty() == true &&
                         binding.lvBottomChat.editTextMessage.text.toString().isNotEmpty()
                     ) {
-                        logE("onClick if")
                         sendMessage()
                     } else {
-                        logE("onClick else")
                         if (myChatMediaHelper?.isFileReady() == true) {
                             val groupID = System.currentTimeMillis().toString()
                             myChatMediaHelper?.getTotalDuration()?.let {
@@ -731,7 +728,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                     )
                     logE("deletedItems :${selectedMsgsIds[0]}")
                     binding.lvBottomChat.editTextMessage.setText("")
-                    editingMessage = false
                     removeSelectItems()
                 }
             }
@@ -809,12 +805,13 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                 val intent = Intent(this, ContactListActivity::class.java)
                 intent.putExtra(AppConstants.IS_FORWARD_MESSAGE, true)
                 intent.putExtra(AppConstants.SELECTED_MSGS_IDS, selectedMsgsIds.toString())
-                startActivity(intent)
+                intent.putExtra(AppConstants.CALLER_USER_ID, callerID)
+                startActivityForResult(intent, AppConstants.FORWARD_REQUEST_CODE)
             }
         }
     }
 
-    fun openLocationDialoge() {
+    fun openLocationDialog() {
         val builder1 = AlertDialog.Builder(this@ChatDetailActivity)
         builder1.setTitle("Share Location")
         builder1.setMessage("Do you really want to share your location?")
@@ -824,7 +821,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             initMap(false, identifier)
             myChatMediaHelper?.hideAttachments()
             dialog.dismiss()
-
         }
         builder1.setNegativeButton("No") { dialog, id ->
             dialog.dismiss()
@@ -837,7 +833,7 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             .withListener(object : PermissionListener {
                 override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-                    openLocationDialoge()
+                    openLocationDialog()
                 }
 
                 override fun onPermissionRationaleShouldBeShown(
@@ -889,7 +885,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         it.latitude,
                         it.longitude
                     )
-                    logE("New Location Emmited")
                 }
             }
         }
@@ -1012,6 +1007,21 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
                         sendVideoOrImage(list)
                     }
                 }
+                AppConstants.FORWARD_REQUEST_CODE -> {
+                    /*val isContainReceiver = data?.getBooleanExtra("is_contain_receiver", false)
+                    if (isContainReceiver == true) {
+                        logE("isContainReceiver: $isContainReceiver")
+                        selectedMsgsIds.forEach { id ->
+                            val msgObject = chatMessagesList.single { it.id == id }
+                            logE("msgObject: $msgObject")
+                            addMessage(msgObject)
+                        }
+                    }*/
+                    SocketIO.getInstance().setSocketCallbackListener(this)
+                    toast("Forwarded successfully")
+
+                    removeSelectItems()
+                }
             }
         }
     }
@@ -1074,7 +1084,6 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
     }
 
     override fun onBackPressed() {
-        val intent = Intent()
         if (chatResponse != null) {
             if (lastMessage?.isNotEmpty() == true) {
                 viewModel.updateItemToDB(
@@ -1084,13 +1093,10 @@ class ChatDetailActivity : BaseActivity(), View.OnClickListener,
             } else {
                 viewModel.updateChatItemDB(chatId, 0, lastMessageStatus)
             }
-            intent.putExtra(AppConstants.IS_NULL, false)
-        } else {
-            intent.putExtra(AppConstants.IS_NULL, true)
         }
         if (showingLocation)
             mainHandler.removeCallbacks(runnable)
-        setResult(Activity.RESULT_OK, intent)
+        setResult(Activity.RESULT_OK)
         finish()
     }
 

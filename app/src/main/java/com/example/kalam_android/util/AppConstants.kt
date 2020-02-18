@@ -55,7 +55,7 @@ object AppConstants {
     const val UPDATE_PROFILE = 11
     const val CODE_FROM_PUSH = 1010
     const val GROUP_IMAGE_CODE = 1011
-    const val LOCATION_REQUEST_CODE = 1022
+    const val FORWARD_REQUEST_CODE = 1032
 
     //Local DB
     const val DB_NAME = "kalam_local_db"

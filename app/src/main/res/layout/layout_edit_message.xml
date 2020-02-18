@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/lightest_grey"
+        android:background="@color/light_grey"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingTop="@dimen/_7sdp"
@@ -38,7 +38,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Copy"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 
@@ -65,7 +65,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Delete"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 
@@ -92,7 +92,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Edit"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 
@@ -119,7 +119,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Forward"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 
@@ -145,7 +145,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Quote"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 
@@ -171,7 +171,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Like"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 
@@ -197,7 +197,7 @@
                 android:layout_marginStart="@dimen/_2sdp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="Details"
-                android:textColor="@color/theme_color"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11sdp" />
         </LinearLayout>
 

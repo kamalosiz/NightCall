@@ -3,10 +3,12 @@ package com.example.kalam_android.view.adapter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -37,22 +39,7 @@ class ChatMessagesAdapter(
     private val selectItemListener: SelectItemListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    //    private val TAG = this.javaClass.simpleName
     private var chatList: ArrayList<ChatData>? = ArrayList()
-
-    fun updateList(list: ArrayList<ChatData>, isDown: Boolean) {
-        if (isDown) {
-            var i = list.size - 1
-            while (i > -1) {
-                chatList?.add(0, list[i])
-                notifyItemInserted(0)
-                i--
-            }
-        } else {
-            chatList?.addAll(list)
-            notifyDataSetChanged()
-        }
-    }
 
     fun updateList(list: ArrayList<ChatData>) {
         chatList = list
@@ -150,7 +137,16 @@ class ChatMessagesAdapter(
                         itemHolder.binding.itemChat.tvMessage.text = item.message
                     }
                 }
+
                 if (item.sender_id == userId.toInt()) {
+                    setupForwarded(
+                        item.owner_name,
+                        itemHolder.binding.itemChat.tvForwarded,
+                        itemHolder.binding.itemChat.tvAuthor,
+                        itemHolder.binding.itemChat.rlAuthor,
+                        itemHolder.binding.itemChat.ivSeperator,
+                        R.color.white
+                    )
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.END
                     itemHolder.binding.itemChat.llOriginal.visibility = View.GONE
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
@@ -158,11 +154,30 @@ class ChatMessagesAdapter(
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_send_background)
                 } else {
+                    setupForwarded(
+                        item.owner_name,
+                        itemHolder.binding.itemChat.tvForwarded,
+                        itemHolder.binding.itemChat.tvAuthor,
+                        itemHolder.binding.itemChat.rlAuthor,
+                        itemHolder.binding.itemChat.ivSeperator,
+                        R.color.black
+                    )
                     itemHolder.binding.itemChat.rlMessage.gravity = Gravity.START
                     itemHolder.binding.itemChat.tvMessage.setTextColor(
                         Global.setColor(context, R.color.black)
                     )
                     itemHolder.binding.itemChat.ivMessage.setBackgroundResource(R.drawable.text_receive_background)
+                }
+                if (item.owner_name?.isNotEmpty() == true) {
+                    itemHolder.binding.itemChat.tvMessage.typeface = Typeface.create(
+                        itemHolder.binding.itemChat.tvMessage.typeface,
+                        Typeface.BOLD
+                    )
+                } else {
+                    itemHolder.binding.itemChat.tvMessage.typeface = Typeface.create(
+                        itemHolder.binding.itemChat.tvMessage.typeface,
+                        Typeface.NORMAL
+                    )
                 }
                 applyReadStatus(
                     userId.toInt(), item.sender_id,
@@ -259,10 +274,21 @@ class ChatMessagesAdapter(
                     R.color.grey,
                     R.color.grey
                 )
+                /* setupForwarded(
+                     item.owner_name,
+                     itemHolder.binding.imageHolder.tvForwarded,
+                     itemHolder.binding.imageHolder.tvAuthor,
+                 )
+                 setForwardedColor(
+                     itemHolder.binding.imageHolder.tvForwarded,
+                     itemHolder.binding.imageHolder.tvAuthor,
+                     R.color.theme_color
+                 )*/
                 if (item.sender_id == userId.toInt()) {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.END
                 } else {
                     itemHolder.binding.imageHolder.rlImageItem.gravity = Gravity.START
+
                 }
                 itemHolder.binding.imageHolder.rlImage.setOnClickListener {
                     startOpenMediaActivity(
@@ -408,6 +434,46 @@ class ChatMessagesAdapter(
                 return@setOnLongClickListener true
             }
         }
+    }
+
+    private fun setupForwarded(
+        owner_name: String?,
+        tvForwarded: TextView,
+        tvAuthor: TextView,
+        rlAuthor: RelativeLayout,
+        ivSeparator: ImageView,
+        color: Int = R.color.black
+    ) {
+        if (owner_name?.isNotEmpty() == true) {
+            tvForwarded.visibility = View.VISIBLE
+            rlAuthor.visibility = View.VISIBLE
+            tvAuthor.text = StringBuilder("By ").append(owner_name).append(" 4:30 PM").toString()
+            setForwardedColor(tvForwarded, tvAuthor, ivSeparator, color)
+        } else {
+            tvForwarded.visibility = View.GONE
+            rlAuthor.visibility = View.GONE
+        }
+    }
+
+    private fun setForwardedColor(
+        tvForwarded: TextView,
+        tvAuthor: TextView,
+        ivSeparator: ImageView,
+        color: Int
+    ) {
+        tvForwarded.setTextColor(
+            Global.setColor(
+                context,
+                color
+            )
+        )
+        tvAuthor.setTextColor(
+            Global.setColor(
+                context,
+                color
+            )
+        )
+        ivSeparator.setBackgroundResource(color)
     }
 
     private fun startOpenMediaActivity(file: String, chatId: Int, type: String, view: View) {

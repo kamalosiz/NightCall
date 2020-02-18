@@ -102,8 +102,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/ivUserAudio"
-            android:layout_width="@dimen/_200sdp"
-            android:layout_height="@dimen/_200sdp"
+            android:layout_width="@dimen/_180sdp"
+            android:layout_height="@dimen/_180sdp"
             android:layout_centerInParent="true"
             android:src="@color/call_color" />
         <!--Bottom Buttons-->
@@ -111,8 +111,8 @@
             android:id="@+id/rlBottomCalls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/_40sdp"
+            android:layout_above="@id/rlBottomOptions"
+            android:layout_marginBottom="@dimen/_15sdp"
             android:gravity="center">
 
             <ImageButton
@@ -120,7 +120,8 @@
                 android:layout_width="@dimen/_50sdp"
                 android:layout_height="@dimen/_50sdp"
                 android:layout_marginEnd="@dimen/_160sdp"
-                android:background="@drawable/call_receive" />
+                android:background="@drawable/call_receive"
+                android:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/ibHangUp"
@@ -128,6 +129,23 @@
                 android:layout_height="@dimen/_50sdp"
                 android:background="@drawable/call_cancel" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rlBottomOptions"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ibSpeaker"
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:background="@drawable/speaker_on"
+                android:visibility="gone" />
         </LinearLayout>
     </RelativeLayout>
 </layout>
